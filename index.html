@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#1D9E75">
+<title>FreshControl</title>
+<link rel="manifest" href="/manifest.json">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#f0f4f0;min-height:100vh;display:flex;justify-content:center;overflow-x:hidden}
+#app{width:100%;max-width:430px;min-height:100vh;background:#f0f4f0;display:flex;flex-direction:column;position:relative}
+.header{background:#1D9E75;padding:16px 20px 14px;flex-shrink:0;position:sticky;top:0;z-index:50}
+.header-top{display:flex;justify-content:space-between;align-items:flex-start}
+.header-title{color:#fff;font-size:19px;font-weight:600;letter-spacing:-0.3px}
+.header-sub{color:rgba(255,255,255,0.75);font-size:11px;margin-top:3px}
+.badge-urgent{background:#E24B4A;color:#fff;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600}
+.content{flex:1;overflow-y:auto;padding-bottom:76px}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;border-top:1px solid #e8ede8;display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-btn{flex:1;padding:10px 4px 8px;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:#9aaa9a;transition:color .2s}
+.nav-btn.active{color:#1D9E75}
+.nav-icon{font-size:19px;line-height:1}
+.nav-label{font-size:9px;letter-spacing:0.3px;text-transform:uppercase}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px 16px 0}
+.stat-card{border-radius:12px;padding:13px 14px;cursor:pointer;transition:transform .1s;border:1px solid transparent}
+.stat-card:active{transform:scale(0.97)}
+.stat-num{font-size:30px;font-weight:600;line-height:1}
+.stat-lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.6px;margin-top:3px;opacity:0.8}
+.section-title{padding:14px 16px 6px;font-size:11px;font-weight:600;color:#7a8a7a;text-transform:uppercase;letter-spacing:0.6px}
+.filters{display:flex;gap:6px;padding:0 16px 8px;overflow-x:auto;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.pill{padding:5px 13px;border-radius:20px;border:1px solid #dde8dd;background:#fff;color:#7a8a7a;font-size:12px;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0}
+.pill.active-green{background:#1D9E75;color:#fff;border-color:#1D9E75}
+.pill.active-blue{background:#378ADD;color:#fff;border-color:#378ADD}
+.card{background:#fff;border-radius:12px;border:1px solid #e8ede8;margin:0 16px 10px;padding:13px 14px}
+.card:active{transform:scale(0.99)}
+.prod-name{font-size:14px;font-weight:500;color:#1a2a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prod-sub{font-size:11px;color:#9aaa9a;margin-top:2px}
+.status-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:500;flex-shrink:0}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block;flex-shrink:0}
+.meta-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.meta-item{display:flex;flex-direction:column;gap:1px}
+.meta-label{font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:#9aaa9a}
+.meta-val{font-size:13px;font-weight:500;color:#1a2a1a}
+.icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid #e8ede8;background:#f7f9f7;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;flex-shrink:0}
+.icon-btn.danger:active{background:#FCEBEB;border-color:#E24B4A}
+.gencod-tag{font-size:10px;color:#9aaa9a;font-family:monospace;background:#f7f9f7;border-radius:6px;padding:3px 8px;margin-top:8px;display:inline-block}
+.alert-box{margin:12px 16px 0;border-radius:12px;padding:13px 14px}
+.btn{padding:12px 20px;border-radius:10px;border:none;cursor:pointer;font-size:14px;font-weight:500;transition:all .2s;width:100%;text-align:center}
+.btn-green{background:#1D9E75;color:#fff}
+.btn-green:active{background:#0F6E56}
+.btn-outline{background:#fff;color:#1a2a1a;border:1px solid #dde8dd;margin-top:10px}
+.btn-outline:active{border-color:#1D9E75}
+.btn-red{background:#E24B4A;color:#fff}
+.btn:disabled{opacity:0.4;pointer-events:none}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .2s}
+.sheet{background:#fff;border-radius:20px 20px 0 0;padding:20px 20px 40px;width:100%;max-width:430px;max-height:92vh;overflow-y:auto;animation:slideUp .25s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-handle{width:36px;height:4px;background:#e0e0e0;border-radius:2px;margin:0 auto 18px}
+.sheet-title{font-size:16px;font-weight:600;margin-bottom:18px;color:#1a2a1a}
+.form-group{margin-bottom:14px}
+.form-label{font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#9aaa9a;margin-bottom:5px;display:block}
+.form-input{width:100%;padding:11px 13px;border-radius:10px;border:1px solid #dde8dd;background:#f7f9f7;color:#1a2a1a;font-size:14px;outline:none;transition:border .2s;-webkit-appearance:none}
+.form-input:focus{border-color:#1D9E75;background:#fff}
+.preview-badge{border-radius:8px;padding:9px 13px;margin-bottom:14px;font-size:13px;font-weight:500;text-align:center;display:none}
+.scan-zone{margin:16px;background:#E1F5EE;border:2px dashed #5DCAA5;border-radius:16px;padding:36px 20px;text-align:center;cursor:pointer;transition:all .2s}
+.scan-zone:active{background:#c5eddf}
+.info-card{background:#fff;border-radius:12px;border:1px solid #e8ede8;margin:0 16px 10px;padding:13px 14px}
+.day-btn{width:44px;height:44px;border-radius:10px;border:1px solid #dde8dd;background:#f7f9f7;color:#9aaa9a;font-size:13px;cursor:pointer;transition:all .2s}
+.day-btn.active{background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:500}
+.edit-input{padding:6px 9px;border-radius:7px;border:1px solid #1D9E75;font-size:12px;background:#fff;color:#1a2a1a;outline:none;width:130px}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1a2a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:500;animation:fadeIn .3s;white-space:nowrap}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.n8n-status{display:flex;align-items:center;gap:6px;font-size:11px;padding:6px 12px;background:#E1F5EE;border-radius:20px;color:#0F6E56;margin:8px 16px 0;width:fit-content}
+.status-dot-live{width:7px;height:7px;border-radius:50%;background:#1D9E75;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+input[type=date]{color-scheme:light}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="header">
+    <div class="header-top">
+      <div>
+        <div class="header-title">🥬 FreshControl</div>
+        <div class="header-sub" id="header-sub">Chargement...</div>
+      </div>
+      <div id="urgent-badge"></div>
+    </div>
+  </header>
+  <main class="content" id="content"></main>
+  <nav class="nav">
+    <button class="nav-btn active" onclick="switchTab('dashboard')" id="tab-dashboard">
+      <span class="nav-icon">▤</span><span class="nav-label">Tableau</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('scan')" id="tab-scan">
+      <span class="nav-icon">◎</span><span class="nav-label">Scanner</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('alerts')" id="tab-alerts">
+      <span class="nav-icon">◬</span><span class="nav-label">Alertes</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('planning')" id="tab-planning">
+      <span class="nav-icon">◷</span><span class="nav-label">Planning</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CONFIG — modifiez ici vos URLs N8N
+// ═══════════════════════════════════════════════
+const N8N_WEBHOOK = 'https://stephane1377.app.n8n.cloud/webhook/scan-produit-magasin';
+const MAGASINS_DEFAUT = ['Monoprix Marseille', 'Casino Nice'];
+
+// ═══════════════════════════════════════════════
+// UTILITAIRES
+// ═══════════════════════════════════════════════
+const uid = () => Math.random().toString(36).slice(2,8);
+const addDays = n => { const d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; };
+const fmtDate = d => new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'});
+const daysUntil = d => Math.ceil((new Date(d)-new Date())/86400000);
+const statusOf = d => { const n=daysUntil(d); if(n<0)return'expired'; if(n<=2)return'critical'; if(n<=7)return'warning'; return'ok'; };
+const STATUS = {
+  expired:  {label:'Périmé',   bg:'#FCEBEB',text:'#A32D2D',border:'#F7C1C1',dot:'#E24B4A'},
+  critical: {label:'Critique', bg:'#FAEEDA',text:'#854F0B',border:'#FAC775',dot:'#EF9F27'},
+  warning:  {label:'Attention',bg:'#EAF3DE',text:'#3B6D11',border:'#C0DD97',dot:'#639922'},
+  ok:       {label:'OK',       bg:'#E6F1FB',text:'#185FA5',border:'#B5D4F4',dot:'#378ADD'},
+};
+
+// ═══════════════════════════════════════════════
+// ÉTAT
+// ═══════════════════════════════════════════════
+let products = JSON.parse(localStorage.getItem('fc_products') || 'null') || [
+  {id:uid(),gencod:'3760020500665',name:"Sirop d'Agave BIO 700g",   rayon:'Épicerie',   qty:8, expiry:addDays(-3),magasin:'Monoprix Marseille'},
+  {id:uid(),gencod:'3289196040640',name:'Boisson Citron Gingembre', rayon:'Boissons',   qty:4, expiry:addDays(1), magasin:'Monoprix Marseille'},
+  {id:uid(),gencod:'3228857000166',name:'Yaourt Nature Danone',      rayon:'Crémerie',   qty:12,expiry:addDays(4), magasin:'Casino Nice'},
+  {id:uid(),gencod:'3274080005003',name:'Lait Demi-Écrémé 1L',      rayon:'Crémerie',   qty:6, expiry:addDays(6), magasin:'Monoprix Marseille'},
+  {id:uid(),gencod:'8410076480781',name:'Jambon Fumé Aoste',         rayon:'Charcuterie',qty:3, expiry:addDays(-1),magasin:'Casino Nice'},
+  {id:uid(),gencod:'3414280210021',name:'Camembert Président',       rayon:'Crémerie',   qty:5, expiry:addDays(5), magasin:'Monoprix Marseille'},
+  {id:uid(),gencod:'3017620422003',name:'Nutella 400g',              rayon:'Épicerie',   qty:20,expiry:addDays(45),magasin:'Casino Nice'},
+];
+let planning = JSON.parse(localStorage.getItem('fc_planning') || 'null') || {
+  'Monoprix Marseille':['Lun','Mar','Ven'],
+  'Casino Nice':['Mar','Jeu'],
+};
+let currentTab = 'dashboard';
+let filterStatus = 'Tous';
+let filterMag = 'Tous';
+let popupDismissed = false;
+let editingId = null;
+let currentLocation = null;
+
+// ═══════════════════════════════════════════════
+// PERSISTANCE
+// ═══════════════════════════════════════════════
+const save = () => {
+  localStorage.setItem('fc_products', JSON.stringify(products));
+  localStorage.setItem('fc_planning', JSON.stringify(planning));
+};
+
+// ═══════════════════════════════════════════════
+// GÉOLOCALISATION
+// ═══════════════════════════════════════════════
+function getLocation() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(pos => {
+    currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+    updateHeader();
+  }, () => {});
+}
+
+// ═══════════════════════════════════════════════
+// CONNEXION N8N
+// ═══════════════════════════════════════════════
+async function sendToN8N(photo, magasin) {
+  const formData = new FormData();
+  formData.append('photo', photo);
+  formData.append('magasin', magasin);
+  if (currentLocation) {
+    formData.append('latitude',  currentLocation.lat.toString());
+    formData.append('longitude', currentLocation.lng.toString());
+  }
+  const res = await fetch(N8N_WEBHOOK, { method:'POST', body:formData });
+  if (!res.ok) throw new Error('Erreur N8N: ' + res.status);
+  return await res.json();
+}
+
+// ═══════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════
+function toast(msg, duration=2500) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), duration);
+}
+
+// ═══════════════════════════════════════════════
+// HEADER
+// ═══════════════════════════════════════════════
+function updateHeader() {
+  const stats = getStats();
+  const urgent = stats.expired.length + stats.critical.length;
+  const mag = filterMag !== 'Tous' ? filterMag : getMagasins()[1] || 'Tous les magasins';
+  document.getElementById('header-sub').textContent =
+    `${mag} · ${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}`;
+  const b = document.getElementById('urgent-badge');
+  b.innerHTML = urgent > 0
+    ? `<div class="badge-urgent">${urgent} urgent${urgent>1?'s':''}</div>` : '';
+}
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+const getStats = () => ({
+  expired:  products.filter(p=>statusOf(p.expiry)==='expired'),
+  critical: products.filter(p=>statusOf(p.expiry)==='critical'),
+  warning:  products.filter(p=>statusOf(p.expiry)==='warning'),
+  ok:       products.filter(p=>statusOf(p.expiry)==='ok'),
+});
+const getMagasins = () => ['Tous', ...new Set(products.map(p=>p.magasin))];
+const badge = st => `<span class="status-badge" style="background:${STATUS[st].bg};color:${STATUS[st].text};border:1px solid ${STATUS[st].border}"><span class="dot" style="background:${STATUS[st].dot}"></span>${STATUS[st].label}</span>`;
+
+// ═══════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════
+function renderDashboard() {
+  const stats = getStats();
+  const mags  = getMagasins();
+  const statusFilters = ['Tous','Périmé','Critique','Attention','OK'];
+  const statusMap = {'Périmé':'expired','Critique':'critical','Attention':'warning','OK':'ok'};
+  const urgent = [...stats.expired,...stats.critical];
+
+  const filtered = products.filter(p => {
+    const ms = filterMag==='Tous' || p.magasin===filterMag;
+    const ss = filterStatus==='Tous' || statusOf(p.expiry)===statusMap[filterStatus];
+    return ms && ss;
+  }).sort((a,b)=>new Date(a.expiry)-new Date(b.expiry));
+
+  let html = '';
+
+  // Popup alerte
+  if (urgent.length > 0 && !popupDismissed) {
+    html += `<div class="alert-box" style="background:#FCEBEB;border:1px solid #F7C1C1">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:13px;font-weight:600;color:#A32D2D">⚠ ${urgent.length} produit(s) urgent(s)</div>
+        <button onclick="popupDismissed=true;render()" style="background:none;border:none;color:#A32D2D;cursor:pointer;font-size:18px;line-height:1">×</button>
+      </div>
+      ${urgent.slice(0,3).map(p=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-top:1px solid #F7C1C1;margin-top:5px">
+          <span style="font-size:12px;color:#A32D2D">${p.name}</span>
+          ${badge(statusOf(p.expiry))}
+        </div>`).join('')}
+    </div>`;
+  }
+
+  // Stats
+  html += `<div class="stat-grid">
+    ${Object.entries(stats).map(([k,items])=>`
+      <div class="stat-card" style="background:${STATUS[k].bg};border-color:${STATUS[k].border}" onclick="setFilter('${k}')">
+        <div class="stat-num" style="color:${STATUS[k].text}">${items.length}</div>
+        <div class="stat-lbl" style="color:${STATUS[k].text}">${STATUS[k].label}</div>
+      </div>`).join('')}
+  </div>`;
+
+  // Filtres
+  html += `<div class="section-title">Filtrer</div>
+  <div class="filters">
+    ${statusFilters.map(f=>`<button class="pill${filterStatus===f?' active-green':''}" onclick="setStatusFilter('${f}')">${f}</button>`).join('')}
+  </div>
+  <div class="filters">
+    ${mags.map(m=>`<button class="pill${filterMag===m?' active-blue':''}" onclick="setMagFilter('${m}')">${m}</button>`).join('')}
+  </div>`;
+
+  // En-tête liste
+  html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:0 16px 6px">
+    <div style="font-size:11px;font-weight:600;color:#7a8a7a;text-transform:uppercase;letter-spacing:0.6px">${filtered.length} produit(s)</div>
+    <button onclick="openForm()" style="background:#1D9E75;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer;font-weight:500">+ Ajouter</button>
+  </div>`;
+
+  if (filtered.length === 0) {
+    html += `<div style="text-align:center;padding:40px 16px;color:#9aaa9a">
+      <div style="font-size:44px;margin-bottom:10px">✓</div>
+      <div style="font-size:14px">Aucun produit pour ces filtres</div>
+    </div>`;
+  } else {
+    filtered.forEach(p => {
+      const st = statusOf(p.expiry);
+      const days = daysUntil(p.expiry);
+      const daysTxt = days<0 ? `${Math.abs(days)}j dépassé` : days===0 ? "Aujourd'hui" : `${days}j`;
+      const isEditing = editingId === p.id;
+      html += `<div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+          <div style="flex:1;min-width:0">
+            <div class="prod-name">${p.name}</div>
+            <div class="prod-sub">${p.rayon} · ${p.magasin}</div>
+          </div>
+          ${badge(st)}
+        </div>
+        <div class="meta-row">
+          <div class="meta-item" style="flex:1">
+            <div class="meta-label">DLC</div>
+            ${isEditing
+              ? `<input class="edit-input" type="date" value="${p.expiry}" id="edit-${p.id}">`
+              : `<div class="meta-val" style="color:${STATUS[st].text}">${fmtDate(p.expiry)}</div>`}
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Jours</div>
+            <div class="meta-val" style="color:${STATUS[st].text}">${daysTxt}</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Qté</div>
+            <div class="meta-val">${p.qty}</div>
+          </div>
+          <div style="display:flex;gap:5px;align-self:flex-end;margin-left:auto">
+            ${isEditing
+              ? `<button class="icon-btn" onclick="saveEdit('${p.id}')" style="background:#1D9E75;border-color:#1D9E75;color:#fff">✓</button>
+                 <button class="icon-btn" onclick="cancelEdit()">✕</button>`
+              : `<button class="icon-btn" onclick="startEdit('${p.id}')">✏</button>
+                 <button class="icon-btn danger" onclick="deleteProduct('${p.id}')">🗑</button>`}
+          </div>
+        </div>
+        <div class="gencod-tag">${p.gencod}</div>
+      </div>`;
+    });
+  }
+  return html;
+}
+
+// ═══════════════════════════════════════════════
+// SCAN
+// ═══════════════════════════════════════════════
+function renderScan() {
+  const locInfo = currentLocation
+    ? `<div style="font-size:11px;color:#1D9E75;margin-top:6px">📍 GPS actif · ${currentLocation.lat.toFixed(4)}, ${currentLocation.lng.toFixed(4)}</div>`
+    : `<div style="font-size:11px;color:#9aaa9a;margin-top:6px">GPS non disponible</div>`;
+
+  let html = `<div class="scan-zone" onclick="document.getElementById('photo-input').click()">
+    <div style="font-size:52px;margin-bottom:14px">📷</div>
+    <div style="font-size:16px;font-weight:600;color:#0F6E56;margin-bottom:6px">Scanner un produit</div>
+    <div style="font-size:12px;color:#1D9E75;margin-bottom:16px">Gemini IA analyse la photo et extrait<br>le gencod et la DLC automatiquement</div>
+    <div style="background:#1D9E75;color:#fff;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:500">Prendre une photo</div>
+    ${locInfo}
+  </div>
+  <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event)">
+  <button class="btn btn-outline" style="margin:0 16px;width:calc(100% - 32px)" onclick="openForm()">✏ Saisir manuellement</button>
+  <div class="section-title">Connexion N8N</div>
+  <div class="info-card" style="background:#E1F5EE;border-color:#9FE1CB">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <div style="width:8px;height:8px;border-radius:50%;background:#1D9E75"></div>
+      <div style="font-size:13px;font-weight:500;color:#0F6E56">Workflow actif</div>
+    </div>
+    <div style="font-size:11px;color:#1D9E75;line-height:1.6">
+      📸 Photo → Gemini IA → Extraction DLC + Gencod<br>
+      📊 Enregistrement Google Sheets + Bubble<br>
+      📧 Alerte Gmail si périmé<br>
+      📅 Google Calendar mis à jour
+    </div>
+  </div>
+  <div class="section-title">Derniers scans</div>`;
+
+  [...products].reverse().slice(0,5).forEach(p => {
+    const st = statusOf(p.expiry);
+    html += `<div class="card" style="display:flex;align-items:center;gap:12px">
+      <div style="width:40px;height:40px;border-radius:10px;background:${STATUS[st].bg};display:flex;align-items:center;justify-content:center;color:${STATUS[st].text};font-size:18px;flex-shrink:0;border:1px solid ${STATUS[st].border}">
+        ${st==='expired'?'✕':st==='critical'?'!':st==='warning'?'~':'✓'}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-sub">${p.rayon} · DLC: ${fmtDate(p.expiry)}</div>
+      </div>
+      ${badge(st)}
+    </div>`;
+  });
+  return html;
+}
+
+// ═══════════════════════════════════════════════
+// ALERTES
+// ═══════════════════════════════════════════════
+function renderAlerts() {
+  const byMag = {};
+  products.forEach(p => {
+    const st = statusOf(p.expiry);
+    if (st==='ok') return;
+    if (!byMag[p.magasin]) byMag[p.magasin] = [];
+    byMag[p.magasin].push(p);
+  });
+
+  let html = `<div class="info-card" style="background:#E1F5EE;border-color:#9FE1CB;margin-top:14px">
+    <div style="font-size:13px;font-weight:600;color:#0F6E56;margin-bottom:4px">Automatisation N8N active</div>
+    <div style="font-size:12px;color:#1D9E75;line-height:1.6">
+      ⏰ Email récap chaque matin à 7h<br>
+      📅 Google Calendar mis à jour automatiquement<br>
+      🔔 Alertes anticipées J-7, J-3, J-1
+    </div>
+  </div>`;
+
+  if (Object.keys(byMag).length === 0) {
+    html += `<div style="text-align:center;padding:48px 16px;color:#9aaa9a">
+      <div style="font-size:44px;margin-bottom:10px">✓</div>
+      <div style="font-size:15px;font-weight:500">Aucune alerte active</div>
+      <div style="font-size:12px;margin-top:6px">Tous les produits sont dans les délais</div>
+    </div>`;
+    return html;
+  }
+
+  Object.entries(byMag).forEach(([mag, prods]) => {
+    html += `<div class="section-title">${mag}</div>`;
+    prods.sort((a,b)=>new Date(a.expiry)-new Date(b.expiry)).forEach(p => {
+      const st = statusOf(p.expiry);
+      const days = daysUntil(p.expiry);
+      html += `<div class="card" style="display:flex;align-items:center;gap:12px">
+        <div style="width:46px;height:46px;border-radius:11px;background:${STATUS[st].bg};border:1px solid ${STATUS[st].border};display:flex;align-items:center;justify-content:center;color:${STATUS[st].text};font-size:22px;flex-shrink:0;font-weight:700">
+          ${st==='expired'?'✕':st==='critical'?'!':'~'}
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="prod-name">${p.name}</div>
+          <div class="prod-sub">${p.rayon} · ${p.gencod}</div>
+          <div class="prod-sub">DLC: ${fmtDate(p.expiry)}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:20px;font-weight:700;color:${STATUS[st].text}">${days<0?'+'+Math.abs(days)+'j':days===0?'Auj.':days+'j'}</div>
+          <div style="font-size:10px;color:#9aaa9a">${days<0?'dépassé':'restants'}</div>
+        </div>
+      </div>`;
+    });
+  });
+  return html;
+}
+
+// ═══════════════════════════════════════════════
+// PLANNING
+// ═══════════════════════════════════════════════
+function renderPlanning() {
+  const jours = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  const mags = getMagasins().filter(m=>m!=='Tous');
+
+  let html = `<div class="info-card" style="background:#E6F1FB;border-color:#B5D4F4;margin-top:14px">
+    <div style="font-size:13px;font-weight:600;color:#185FA5;margin-bottom:4px">Planning de visite</div>
+    <div style="font-size:12px;color:#378ADD">Les alertes Google Calendar tiennent compte de vos jours de passage pour chaque magasin</div>
+  </div>`;
+
+  mags.forEach(mag => {
+    const activeDays = planning[mag] || [];
+    html += `<div class="section-title">${mag}</div>
+    <div class="info-card">
+      <div style="font-size:12px;color:#9aaa9a;margin-bottom:10px">Jours de visite</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${jours.map(j=>`<button class="day-btn${activeDays.includes(j)?' active':''}" onclick="toggleDay('${mag}','${j}')">${j}</button>`).join('')}
+      </div>
+      <div style="margin-top:12px;background:#f7f9f7;border-radius:8px;padding:8px 12px">
+        <div style="font-size:11px;color:#9aaa9a">Jours configurés</div>
+        <div style="font-size:13px;font-weight:500;color:#1a2a1a;margin-top:2px">${activeDays.length>0?activeDays.join(', '):'Aucun jour configuré'}</div>
+      </div>
+    </div>`;
+  });
+
+  // Stats par magasin
+  html += `<div class="section-title">Vue d'ensemble</div>`;
+  mags.forEach(mag => {
+    const magProds = products.filter(p=>p.magasin===mag);
+    const urgent = magProds.filter(p=>['expired','critical'].includes(statusOf(p.expiry))).length;
+    const warning = magProds.filter(p=>statusOf(p.expiry)==='warning').length;
+    html += `<div class="info-card" style="display:flex;align-items:center;gap:12px">
+      <div style="width:42px;height:42px;border-radius:10px;background:${urgent>0?'#FCEBEB':warning>0?'#FAEEDA':'#E1F5EE'};display:flex;align-items:center;justify-content:center;font-size:20px">
+        ${urgent>0?'⚠':warning>0?'~':'✓'}
+      </div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:500;color:#1a2a1a">${mag}</div>
+        <div style="font-size:11px;color:#9aaa9a;margin-top:2px">${magProds.length} produits · ${urgent} urgent${urgent>1?'s':''} · ${warning} attention</div>
+      </div>
+      <div style="font-size:12px;color:#9aaa9a">${(planning[mag]||[]).length}j/sem</div>
+    </div>`;
+  });
+  return html;
+}
+
+// ═══════════════════════════════════════════════
+// FORMULAIRE MANUEL
+// ═══════════════════════════════════════════════
+function openForm(prefilled={}) {
+  const mags = getMagasins().filter(m=>m!=='Tous');
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.id = 'form-overlay';
+  overlay.innerHTML = `<div class="sheet" id="form-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Ajouter un produit</div>
+    <div class="form-group">
+      <label class="form-label">Code-barres / Gencod *</label>
+      <input class="form-input" type="text" id="f-gencod" placeholder="3017620422003" value="${prefilled.gencod||''}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nom du produit *</label>
+      <input class="form-input" type="text" id="f-name" placeholder="Ex: Yaourt Nature" value="${prefilled.name||''}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Rayon</label>
+      <select class="form-input" id="f-rayon">
+        ${['Épicerie','Crémerie','Charcuterie','Boulangerie','Surgelés','Boissons','Traiteur','Confiserie','Fruits & Légumes'].map(r=>`<option${prefilled.rayon===r?' selected':''}>${r}</option>`).join('')}
+      </select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="form-group">
+        <label class="form-label">Quantité</label>
+        <input class="form-input" type="number" id="f-qty" value="${prefilled.qty||1}" min="1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">DLC *</label>
+        <input class="form-input" type="date" id="f-expiry" value="${prefilled.expiry||''}" oninput="updatePreview()">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Magasin</label>
+      <select class="form-input" id="f-magasin">
+        ${mags.map(m=>`<option>${m}</option>`).join('')}
+      </select>
+    </div>
+    <div id="form-preview" class="preview-badge"></div>
+    <button class="btn btn-green" id="submit-btn" onclick="submitForm()">Enregistrer le produit</button>
+    <button class="btn btn-outline" onclick="closeForm()">Annuler</button>
+  </div>`;
+  overlay.addEventListener('click', e => { if(e.target===overlay) closeForm(); });
+  document.body.appendChild(overlay);
+  if (prefilled.expiry) updatePreview();
+}
+
+function closeForm() {
+  const o = document.getElementById('form-overlay');
+  if (o) o.remove();
+}
+
+function updatePreview() {
+  const e = document.getElementById('f-expiry');
+  const p = document.getElementById('form-preview');
+  if (!e||!p) return;
+  if (e.value) {
+    const st = statusOf(e.value);
+    const days = daysUntil(e.value);
+    p.style.display = 'block';
+    p.style.background = STATUS[st].bg;
+    p.style.color = STATUS[st].text;
+    p.style.border = `1px solid ${STATUS[st].border}`;
+    const txt = days<0 ? `${Math.abs(days)}j dépassé` : days===0 ? "Expire aujourd'hui" : `${days} jours restants`;
+    p.textContent = `${STATUS[st].label} · ${txt}`;
+  } else { p.style.display='none'; }
+}
+
+function submitForm() {
+  const g = document.getElementById('f-gencod').value.trim();
+  const n = document.getElementById('f-name').value.trim();
+  const r = document.getElementById('f-rayon').value;
+  const q = parseInt(document.getElementById('f-qty').value)||1;
+  const e = document.getElementById('f-expiry').value;
+  const m = document.getElementById('f-magasin').value;
+  if (!g||!n||!e) { toast('⚠ Remplissez les champs obligatoires *'); return; }
+  products.push({id:uid(),gencod:g,name:n,rayon:r,qty:q,expiry:e,magasin:m});
+  save();
+  closeForm();
+  filterStatus='Tous'; filterMag='Tous';
+  toast('✓ Produit ajouté avec succès');
+  switchTab('dashboard');
+}
+
+// ═══════════════════════════════════════════════
+// GESTION PHOTO → N8N
+// ═══════════════════════════════════════════════
+async function handlePhoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Affiche le loader
+  const loaderDiv = document.createElement('div');
+  loaderDiv.className = 'overlay';
+  loaderDiv.id = 'loader-overlay';
+  loaderDiv.innerHTML = `<div class="sheet" style="text-align:center;padding:40px 20px">
+    <div style="font-size:48px;margin-bottom:16px">🤖</div>
+    <div style="font-size:16px;font-weight:600;color:#1a2a1a;margin-bottom:8px">Analyse en cours...</div>
+    <div style="font-size:12px;color:#9aaa9a;margin-bottom:24px">Gemini IA extrait le gencod et la DLC</div>
+    <div style="display:flex;justify-content:center;gap:6px">
+      <div style="width:8px;height:8px;border-radius:50%;background:#1D9E75;animation:pulse 1s infinite"></div>
+      <div style="width:8px;height:8px;border-radius:50%;background:#1D9E75;animation:pulse 1s .2s infinite"></div>
+      <div style="width:8px;height:8px;border-radius:50%;background:#1D9E75;animation:pulse 1s .4s infinite"></div>
+    </div>
+  </div>`;
+  document.body.appendChild(loaderDiv);
+
+  try {
+    const magasin = getMagasins().filter(m=>m!=='Tous')[0] || 'Magasin';
+    const result = await sendToN8N(file, magasin);
+    document.getElementById('loader-overlay')?.remove();
+
+    // Ajoute le produit localement aussi
+    const newProduct = {
+      id: uid(),
+      gencod: result.gencod || '',
+      name: result.produit || 'Produit scanné',
+      rayon: result.type_produit || 'Épicerie',
+      qty: 1,
+      expiry: result.date_peremption ? result.date_peremption.split('-').reverse().join('-') : addDays(30),
+      magasin: magasin,
+    };
+    products.push(newProduct);
+    save();
+    toast('✓ Produit analysé et enregistré !');
+    openForm(newProduct); // Ouvre le form pour corriger si besoin
+
+  } catch (err) {
+    document.getElementById('loader-overlay')?.remove();
+    toast('⚠ Erreur N8N · Saisie manuelle ?', 3000);
+    openForm();
+  }
+  event.target.value = '';
+}
+
+// ═══════════════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════════════
+function setFilter(key) {
+  const map = {expired:'Périmé',critical:'Critique',warning:'Attention',ok:'OK'};
+  filterStatus = map[key];
+  if (currentTab!=='dashboard') switchTab('dashboard');
+  else render();
+}
+function setStatusFilter(f) { filterStatus=f; render(); }
+function setMagFilter(m) { filterMag=m; render(); }
+function startEdit(id) { editingId=id; render(); }
+function cancelEdit() { editingId=null; render(); }
+function saveEdit(id) {
+  const input = document.getElementById('edit-'+id);
+  if (input?.value) {
+    products = products.map(p=>p.id===id?{...p,expiry:input.value}:p);
+    save();
+    toast('✓ DLC mise à jour');
+  }
+  editingId=null; render();
+}
+function deleteProduct(id) {
+  if (confirm('Supprimer ce produit ?')) {
+    products = products.filter(p=>p.id!==id);
+    save();
+    render();
+    toast('Produit supprimé');
+  }
+}
+function toggleDay(mag, day) {
+  if (!planning[mag]) planning[mag]=[];
+  const idx = planning[mag].indexOf(day);
+  if (idx>-1) planning[mag].splice(idx,1);
+  else planning[mag].push(day);
+  save();
+  render();
+}
+
+// ═══════════════════════════════════════════════
+// RENDU PRINCIPAL
+// ═══════════════════════════════════════════════
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+tab)?.classList.add('active');
+  render();
+}
+
+function render() {
+  updateHeader();
+  let html = '';
+  if (currentTab==='dashboard') html = renderDashboard();
+  else if (currentTab==='scan') html = renderScan();
+  else if (currentTab==='alerts') html = renderAlerts();
+  else if (currentTab==='planning') html = renderPlanning();
+  document.getElementById('content').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+getLocation();
+render();
+</script>
+</body>
+</html>

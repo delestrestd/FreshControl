@@ -1,0 +1,14 @@
+{
+  "name": "FreshControl",
+  "short_name": "FreshControl",
+  "description": "Gestion des produits périmés en supermarché",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1D9E75",
+  "theme_color": "#1D9E75",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "https://fakeimg.pl/192x192/1D9E75/ffffff?text=FC&font_size=72", "sizes": "192x192", "type": "image/png" },
+    { "src": "https://fakeimg.pl/512x512/1D9E75/ffffff?text=FC&font_size=180", "sizes": "512x512", "type": "image/png" }
+  ]
+}
