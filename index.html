@@ -318,11 +318,12 @@ let planning = JSON.parse(localStorage.getItem('fc_pl')||'null') || {
 };
 let curTab='dashboard', fStatus='Tous', fMag='Tous';
 let gps=null;               // { lat, lng, accuracy }
-let recentScans=[];
+let recentScans = JSON.parse(localStorage.getItem('fc_scans') || '[]');
 
 const save = () => {
   localStorage.setItem('fc_p',  JSON.stringify(products));
   localStorage.setItem('fc_pl', JSON.stringify(planning));
+  localStorage.setItem('fc_scans', JSON.stringify(recentScans.slice(0,20)));
 };
 
 // ═══════════════════════════════════════════
@@ -556,6 +557,52 @@ function updatePrev(){
   el.textContent=`${ST[st].lbl} · ${txt}`;
 }
 
+// ═══════════════════════════════════════════
+// CATALOGUE N8N
+// ═══════════════════════════════════════════
+async function checkCatalogue(gencod, expiry) {
+  try {
+    const payload = {
+      gencod,
+      date_peremption: expiry ? expiry.split('-').reverse().join('-') : '',
+      magasin: getActiveMag(),
+      latitude:  gps?.lat ?? '',
+      longitude: gps?.lng ?? '',
+    };
+    const resp = await fetch(N8N, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!resp.ok) return { found: true, produit: null };
+    const data = await resp.json();
+    if (typeof data.found === 'boolean') return data;
+    if (data.produit || data.name) return { found: true, ...data };
+    if (data.message) return { found: true, produit: null };
+    return { found: false };
+  } catch { return { found: true, produit: null }; }
+}
+
+// Envoi N8N après validation formulaire
+async function sendToN8N(product) {
+  try {
+    await fetch(N8N, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        produit:         product.name,
+        gencod:          product.gencod,
+        date_peremption: product.expiry ? product.expiry.split('-').reverse().join('-') : '',
+        type_produit:    product.rayon,
+        magasin:         product.magasin,
+        quantite:        product.qty,
+        latitude:        gps?.lat ?? '',
+        longitude:       gps?.lng ?? '',
+      }),
+    });
+  } catch { console.warn('N8N non joignable'); }
+}
+
 function submitForm(){
   const g=document.getElementById('f-gencod').value.trim();
   const n=document.getElementById('f-name').value.trim();
@@ -565,13 +612,16 @@ function submitForm(){
   const m=document.getElementById('f-magasin').value;
   const id=document.getElementById('f-id').value;
   if(!g||!n||!e){toast('⚠ Remplissez les champs obligatoires *');return;}
+  const product = {id: id||uid(), gencod:g, name:n, rayon:r, qty:q, expiry:e, magasin:m};
   if(id){
     const i=products.findIndex(p=>p.id===id);
-    if(i>=0) products[i]={...products[i],gencod:g,name:n,rayon:r,qty:q,expiry:e,magasin:m};
+    if(i>=0) products[i]=product;
   } else {
-    products.push({id:uid(),gencod:g,name:n,rayon:r,qty:q,expiry:e,magasin:m});
+    products.push(product);
   }
-  save(); closeForm(); toast('✓ Produit enregistré'); switchTab('dashboard');
+  save();
+  sendToN8N(product); // Envoi N8N en arrière-plan
+  closeForm(); toast('✓ Produit enregistré et envoyé'); switchTab('dashboard');
 }
 
 function deleteProduct(){
@@ -674,7 +724,7 @@ async function analyzeExpiry(file) {
       max_tokens: 100,
       messages: [{ role: 'user', content: [
         { type: 'image', source: { type: 'base64', media_type: mimeType, data: b64 } },
-        { type: 'text', text: 'Lis uniquement la date de péremption (DLC, DLUO, BBD, à consommer avant) sur cette image. Réponds UNIQUEMENT en JSON valide :\n{"expiry":"date au format YYYY-MM-DD ou vide si non visible"}\nNe mets jamais null.' }
+        { type: 'text', text: 'Lis la date de péremption sur cette image. Elle peut être indiquée par : DLC, DLUO, BBD, EXP, à consommer avant, best before, MHD, TMC. La date peut être sous forme JJ/MM/AAAA, MM/AAAA, JJ.MM.AAAA, AAAA-MM-JJ ou similaire. Réponds UNIQUEMENT en JSON valide, sans markdown :\n{"expiry":"date au format YYYY-MM-DD. Si seulement mois/année visible, mets le dernier jour du mois. Chaine vide si aucune date trouvée."}\nNe mets jamais null.' }
       ]}],
     }),
   });
@@ -743,7 +793,7 @@ document.getElementById('scan-input-expiry').addEventListener('change', async fu
     if(cat.type_produit) product.rayon = cat.type_produit;
 
     recentScans.unshift({ found:true, name:product.name, gencod:product.gencod, time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) });
-    renderScanner();
+    save(); renderScanner();
     toast('✓ Produit reconnu — vérifiez et corrigez si besoin');
     openForm(product, true);
     scanDataBarcode = null;
@@ -803,15 +853,14 @@ document.addEventListener('DOMContentLoaded',()=>{
   renderAll();
   setTimeout(checkStartup, 1000);
   // GPS seulement si consentement déjà donné
-  if(localStorage.getItem('fc_rgpd') === 'accepted') {
+  const rgpd = localStorage.getItem('fc_rgpd');
+  if(rgpd === 'accepted') {
     initGPS();
   } else {
-    // Afficher la bannière RGPD au premier lancement
+    // Toujours afficher si pas encore accepté
     setTimeout(() => {
-      if(!localStorage.getItem('fc_rgpd')) {
-        document.getElementById('rgpd-banner').style.display = 'block';
-      }
-    }, 1500);
+      document.getElementById('rgpd-banner').style.display = 'block';
+    }, 1200);
   }
 });
 </script>
