@@ -635,9 +635,12 @@ async function analyzeAI(file){
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({image:b64, mimeType:file.type||'image/jpeg'}),
   });
-  if(!resp.ok) throw new Error('Erreur /api/analyze');
+  if(!resp.ok) {
+    let detail = '';
+    try { const e = await resp.json(); detail = e.error || e.detail || ''; } catch{}
+    throw new Error('API ' + resp.status + (detail ? ' - ' + detail : ''));
+  }
   return resp.json();
-  // → { name, gencod, expiry (YYYY-MM-DD), rayon }
 }
 
 // ═══════════════════════════════════════════
