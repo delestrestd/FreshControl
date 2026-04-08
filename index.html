@@ -594,7 +594,42 @@ function toast(msg,dur=3000){
 
 // SCAN 2 PHOTOS
 // ═══════════════════════════════════════════
-let scanDataBarcode = null; // résultat photo 1
+let scanDataBarcode = null;
+
+// Compression photo (iOS Safari compatible)
+async function compressAndB64(file) {
+  const tryCanvas = () => new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      try {
+        const MAX = 800;
+        let w = img.width || MAX, h = img.height || MAX;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('Canvas non supporté');
+        ctx.drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(url);
+        resolve(canvas.toDataURL('image/jpeg', 0.7).split(',')[1]);
+      } catch(e) { URL.revokeObjectURL(url); reject(e); }
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image échouée')); };
+    img.src = url;
+  });
+  const tryFileReader = () => new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result.split(',')[1]);
+    r.onerror = () => reject(new Error('FileReader échoué'));
+    r.readAsDataURL(file);
+  });
+  try { return await tryCanvas(); }
+  catch(e) { return await tryFileReader(); }
+} // résultat photo 1
 
 async function analyzeBarcode(file) {
   const b64 = await compressAndB64(file);
