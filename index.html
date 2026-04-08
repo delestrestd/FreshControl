@@ -2,687 +2,737 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1D9E75">
 <title>FreshControl</title>
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="manifest.json">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#f0f4f0;min-height:100vh;display:flex;justify-content:center;overflow-x:hidden}
-#app{width:100%;max-width:430px;min-height:100vh;background:#f0f4f0;display:flex;flex-direction:column;position:relative}
-.header{background:#1D9E75;padding:16px 20px 14px;flex-shrink:0;position:sticky;top:0;z-index:50}
-.header-top{display:flex;justify-content:space-between;align-items:flex-start}
-.header-title{color:#fff;font-size:19px;font-weight:600;letter-spacing:-0.3px}
-.header-sub{color:rgba(255,255,255,0.75);font-size:11px;margin-top:3px}
-.badge-urgent{background:#E24B4A;color:#fff;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600}
-.content{flex:1;overflow-y:auto;padding-bottom:76px}
-.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;border-top:1px solid #e8ede8;display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom,0px)}
-.nav-btn{flex:1;padding:10px 4px 8px;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:#9aaa9a;transition:color .2s}
-.nav-btn.active{color:#1D9E75}
-.nav-icon{font-size:19px;line-height:1}
-.nav-label{font-size:9px;letter-spacing:0.3px;text-transform:uppercase}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px 16px 0}
-.stat-card{border-radius:12px;padding:13px 14px;cursor:pointer;transition:transform .1s;border:1px solid transparent}
-.stat-card:active{transform:scale(0.97)}
-.stat-num{font-size:30px;font-weight:600;line-height:1}
-.stat-lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.6px;margin-top:3px;opacity:0.8}
-.section-title{padding:14px 16px 6px;font-size:11px;font-weight:600;color:#7a8a7a;text-transform:uppercase;letter-spacing:0.6px}
-.filters{display:flex;gap:6px;padding:0 16px 8px;overflow-x:auto;scrollbar-width:none}
-.filters::-webkit-scrollbar{display:none}
-.pill{padding:5px 13px;border-radius:20px;border:1px solid #dde8dd;background:#fff;color:#7a8a7a;font-size:12px;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0}
-.pill.active-green{background:#1D9E75;color:#fff;border-color:#1D9E75}
-.pill.active-blue{background:#378ADD;color:#fff;border-color:#378ADD}
-.card{background:#fff;border-radius:12px;border:1px solid #e8ede8;margin:0 16px 10px;padding:13px 14px}
-.card:active{transform:scale(0.99)}
-.prod-name{font-size:14px;font-weight:500;color:#1a2a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.prod-sub{font-size:11px;color:#9aaa9a;margin-top:2px}
-.status-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:500;flex-shrink:0}
-.dot{width:6px;height:6px;border-radius:50%;display:inline-block;flex-shrink:0}
-.meta-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
-.meta-item{display:flex;flex-direction:column;gap:1px}
-.meta-label{font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:#9aaa9a}
-.meta-val{font-size:13px;font-weight:500;color:#1a2a1a}
-.icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid #e8ede8;background:#f7f9f7;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;flex-shrink:0}
-.icon-btn.danger:active{background:#FCEBEB;border-color:#E24B4A}
-.gencod-tag{font-size:10px;color:#9aaa9a;font-family:monospace;background:#f7f9f7;border-radius:6px;padding:3px 8px;margin-top:8px;display:inline-block}
-.alert-box{margin:12px 16px 0;border-radius:12px;padding:13px 14px}
-.btn{padding:12px 20px;border-radius:10px;border:none;cursor:pointer;font-size:14px;font-weight:500;transition:all .2s;width:100%;text-align:center}
-.btn-green{background:#1D9E75;color:#fff}
-.btn-green:active{background:#0F6E56}
-.btn-outline{background:#fff;color:#1a2a1a;border:1px solid #dde8dd;margin-top:10px}
-.btn-outline:active{border-color:#1D9E75}
-.btn-red{background:#E24B4A;color:#fff}
-.btn:disabled{opacity:0.4;pointer-events:none}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .2s}
-.sheet{background:#fff;border-radius:20px 20px 0 0;padding:20px 20px 40px;width:100%;max-width:430px;max-height:92vh;overflow-y:auto;animation:slideUp .25s}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.sheet-handle{width:36px;height:4px;background:#e0e0e0;border-radius:2px;margin:0 auto 18px}
-.sheet-title{font-size:16px;font-weight:600;margin-bottom:18px;color:#1a2a1a}
-.form-group{margin-bottom:14px}
-.form-label{font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#9aaa9a;margin-bottom:5px;display:block}
-.form-input{width:100%;padding:11px 13px;border-radius:10px;border:1px solid #dde8dd;background:#f7f9f7;color:#1a2a1a;font-size:14px;outline:none;transition:border .2s;-webkit-appearance:none}
-.form-input:focus{border-color:#1D9E75;background:#fff}
-.preview-badge{border-radius:8px;padding:9px 13px;margin-bottom:14px;font-size:13px;font-weight:500;text-align:center;display:none}
-.scan-zone{margin:16px;background:#E1F5EE;border:2px dashed #5DCAA5;border-radius:16px;padding:36px 20px;text-align:center;cursor:pointer;transition:all .2s}
-.scan-zone:active{background:#c5eddf}
-.info-card{background:#fff;border-radius:12px;border:1px solid #e8ede8;margin:0 16px 10px;padding:13px 14px}
-.day-btn{width:44px;height:44px;border-radius:10px;border:1px solid #dde8dd;background:#f7f9f7;color:#9aaa9a;font-size:13px;cursor:pointer;transition:all .2s}
-.day-btn.active{background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:500}
-.edit-input{padding:6px 9px;border-radius:7px;border:1px solid #1D9E75;font-size:12px;background:#fff;color:#1a2a1a;outline:none;width:130px}
-.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1a2a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:500;animation:fadeIn .3s;white-space:nowrap}
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.n8n-status{display:flex;align-items:center;gap:6px;font-size:11px;padding:6px 12px;background:#E1F5EE;border-radius:20px;color:#0F6E56;margin:8px 16px 0;width:fit-content}
-.status-dot-live{width:7px;height:7px;border-radius:50%;background:#1D9E75;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-input[type=date]{color-scheme:light}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1D9E75;--green-light:#E8F8F2;--green-dark:#167A5B;
+  --red:#E24B4A;--red-light:#FCEBEB;
+  --orange:#EF9F27;--orange-light:#FAEEDA;
+  --blue:#378ADD;--blue-light:#E6F1FB;
+  --bg:#F5F7F5;--card:#FFF;--text:#1A2A1A;--muted:#7A8A7A;--border:#E8EDE8;
+  --radius:16px;--shadow:0 2px 12px rgba(0,0,0,.08);
+  --tab-h:64px;--hdr-h:72px;
+}
+html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text);overflow:hidden}
+
+/* HEADER */
+#hdr{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--green);color:#fff;padding:14px 20px 12px;height:var(--hdr-h);display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(29,158,117,.3)}
+#hdr h1{font-size:20px;font-weight:700}
+#hdr-sub{font-size:11px;opacity:.8;margin-top:2px}
+.badge-urgent{background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px}
+
+/* MAIN */
+#main{position:fixed;top:var(--hdr-h);bottom:var(--tab-h);left:0;right:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px}
+
+/* TABBAR */
+#tabbar{position:fixed;bottom:0;left:0;right:0;z-index:100;background:#fff;height:var(--tab-h);display:flex;border-top:1px solid var(--border);box-shadow:0 -2px 12px rgba(0,0,0,.06)}
+.tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:transparent;font-size:10px;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color .2s}
+.tb .ic{font-size:22px}
+.tb.on{color:var(--green)}
+.tab{display:none}.tab.on{display:block}
+
+/* CARDS & STATS */
+.card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);border-left:4px solid currentColor;cursor:pointer}
+.stat-num{font-size:28px;font-weight:800}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+.c-exp{color:var(--red)}.c-crit{color:var(--orange)}.c-warn{color:#639922}.c-ok{color:var(--blue)}
+
+/* PRODUCT ITEMS */
+.pi{background:var(--card);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.pi-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.pi-info{flex:1;min-width:0}
+.pi-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pi-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.pi-badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:8px;white-space:nowrap}
+.btn-icon{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;flex-shrink:0}
+
+/* FILTERS */
+.frow{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
+.frow::-webkit-scrollbar{display:none}
+.fpill{flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:#fff;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+.fpill.on{background:var(--green);color:#fff;border-color:var(--green)}
+
+/* SCAN */
+.scan-zone{background:var(--card);border-radius:var(--radius);padding:36px 20px;text-align:center;box-shadow:var(--shadow);margin-bottom:16px;border:2px dashed var(--green);cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative}
+.scan-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.scan-ic{font-size:56px;margin-bottom:12px}
+.scan-zone h2{font-size:17px;font-weight:700;color:var(--green)}
+.scan-zone p{font-size:13px;color:var(--muted);margin-top:6px}
+
+/* GPS */
+.gps-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;background:var(--green-light);color:var(--green);margin-bottom:14px;width:100%}
+.gps-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;flex-shrink:0}
+
+/* NOT FOUND */
+.nf-card{background:var(--red-light);border-radius:var(--radius);padding:24px 20px;text-align:center;margin-bottom:16px;border:1px solid #F7C1C1;display:none}
+.nf-card .nf-ic{font-size:44px;margin-bottom:10px}
+.nf-card h3{font-size:17px;font-weight:800;color:var(--red)}
+.nf-card p{font-size:13px;color:#A32D2D;margin-top:6px}
+
+/* FORM OVERLAY */
+.overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.5);display:flex;flex-direction:column;justify-content:flex-end}
+.sheet{background:#fff;border-radius:24px 24px 0 0;padding:24px 20px 44px;max-height:90vh;overflow-y:auto}
+.handle{width:40px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 20px}
+.sh-title{font-size:18px;font-weight:700;margin-bottom:20px}
+.fg{margin-bottom:14px}
+.fl{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;display:block}
+.fi{width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:15px;font-family:inherit;color:var(--text);background:var(--bg);-webkit-appearance:none;appearance:none}
+.fi:focus{outline:none;border-color:var(--green);background:#fff}
+select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A8A7A' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.status-prev{padding:10px 14px;border-radius:10px;font-size:13px;font-weight:600;margin-top:8px;display:none}
+
+/* BUTTONS */
+.btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:16px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:6px}
+.btn-p{background:var(--green);color:#fff}
+.btn-s{background:var(--bg);color:var(--muted)}
+.btn-d{background:var(--red-light);color:var(--red)}
+.fab{position:fixed;bottom:calc(var(--tab-h)+16px);right:16px;z-index:90;width:52px;height:52px;border-radius:50%;background:var(--green);color:#fff;font-size:26px;border:none;box-shadow:0 4px 16px rgba(29,158,117,.4);display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+
+/* ALERTS */
+.al-item{background:var(--card);border-radius:12px;padding:14px;margin-bottom:8px;border-left:4px solid}
+.al-exp{border-color:var(--red)}.al-crit{border-color:var(--orange)}
+
+/* PLANNING */
+.pmag{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.pmag h3{font-size:15px;font-weight:700;margin-bottom:12px}
+.dg{display:flex;gap:6px}
+.db{flex:1;padding:8px 2px;border-radius:8px;border:1.5px solid var(--border);font-size:11px;font-weight:600;background:#fff;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent}
+.db.on{background:var(--green);color:#fff;border-color:var(--green)}
+
+/* LOADER */
+#ldr{display:none}
+#ldr .sheet{padding:52px 20px;text-align:center}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--tab-h)+16px);left:50%;transform:translateX(-50%);background:#1a2a1a;color:#fff;padding:12px 20px;border-radius:20px;font-size:14px;font-weight:500;z-index:999;white-space:nowrap;pointer-events:none;animation:fiu .3s ease}
+
+/* RECENT SCANS */
+.rs-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.rs-item:last-child{border-bottom:none}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty .ei{font-size:48px;margin-bottom:12px}
+
+/* SECTION HDR */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sh-t{font-size:15px;font-weight:700}
+.sh-c{font-size:12px;color:var(--muted)}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes fiu{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 </style>
 </head>
 <body>
-<div id="app">
-  <header class="header">
-    <div class="header-top">
-      <div>
-        <div class="header-title">🥬 FreshControl</div>
-        <div class="header-sub" id="header-sub">Chargement...</div>
-      </div>
-      <div id="urgent-badge"></div>
+
+<!-- HEADER -->
+<div id="hdr">
+  <div>
+    <h1>🌿 FreshControl</h1>
+    <div id="hdr-sub">Chargement…</div>
+  </div>
+  <div id="urgent-badge"></div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard" class="tab on">
+    <div class="stat-grid">
+      <div class="stat c-exp" onclick="setFS('Périmés')"><div class="stat-num" id="cn-exp">0</div><div class="stat-lbl">Périmés</div></div>
+      <div class="stat c-crit" onclick="setFS('Critique')"><div class="stat-num" id="cn-crit">0</div><div class="stat-lbl">Critiques ≤ 2j</div></div>
+      <div class="stat c-warn" onclick="setFS('Attention')"><div class="stat-num" id="cn-warn">0</div><div class="stat-lbl">Attention ≤ 7j</div></div>
+      <div class="stat c-ok" onclick="setFS('OK')"><div class="stat-num" id="cn-ok">0</div><div class="stat-lbl">OK</div></div>
     </div>
-  </header>
-  <main class="content" id="content"></main>
-  <nav class="nav">
-    <button class="nav-btn active" onclick="switchTab('dashboard')" id="tab-dashboard">
-      <span class="nav-icon">▤</span><span class="nav-label">Tableau</span>
-    </button>
-    <button class="nav-btn" onclick="switchTab('scan')" id="tab-scan">
-      <span class="nav-icon">◎</span><span class="nav-label">Scanner</span>
-    </button>
-    <button class="nav-btn" onclick="switchTab('alerts')" id="tab-alerts">
-      <span class="nav-icon">◬</span><span class="nav-label">Alertes</span>
-    </button>
-    <button class="nav-btn" onclick="switchTab('planning')" id="tab-planning">
-      <span class="nav-icon">◷</span><span class="nav-label">Planning</span>
-    </button>
-  </nav>
+    <div class="frow" id="fsr"></div>
+    <div class="frow" id="fmr"></div>
+    <div class="sh"><span class="sh-t">Produits</span><span class="sh-c" id="pcount"></span></div>
+    <div id="plist"></div>
+  </div>
+
+  <!-- SCANNER -->
+  <div id="tab-scanner" class="tab">
+    <div id="gps-pill" class="gps-pill" style="display:none">
+      <div class="gps-dot"></div>
+      <span id="gps-txt">Localisation…</span>
+    </div>
+
+    <div class="scan-zone">
+      <input type="file" id="scan-input" accept="image/*" capture="environment">
+      <div class="scan-ic">📸</div>
+      <h2>Scanner un produit</h2>
+      <p>Photographiez le code-barres et la date de péremption</p>
+    </div>
+
+    <div id="nf-card" class="nf-card">
+      <div class="nf-ic">🚫</div>
+      <h3>Produit inexistant</h3>
+      <p id="nf-msg">Ce produit ne figure pas dans le catalogue Léa Nature.</p>
+    </div>
+
+    <div class="card">
+      <div class="sh-t" style="margin-bottom:12px">Derniers scans</div>
+      <div id="recent-scans"><p style="color:var(--muted);font-size:13px">Aucun scan récent</p></div>
+    </div>
+  </div>
+
+  <!-- ALERTES -->
+  <div id="tab-alertes" class="tab">
+    <div class="card" style="background:var(--orange-light);border:1px solid #FAC775;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:600;color:#854F0B;margin-bottom:4px">📊 Automatisation active</div>
+      <div style="font-size:12px;color:#854F0B">Gmail + Google Calendar via N8N · recap 7h chaque matin</div>
+    </div>
+    <div id="alert-list"></div>
+  </div>
+
+  <!-- PLANNING -->
+  <div id="tab-planning" class="tab">
+    <div class="card" style="margin-bottom:16px">
+      <div style="font-size:13px;color:var(--muted)">Définissez les jours de visite par magasin pour déclencher les alertes Calendar au bon moment.</div>
+    </div>
+    <div id="planning-list"></div>
+  </div>
+
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="openForm(null)">+</button>
+
+<!-- TABBAR -->
+<div id="tabbar">
+  <button class="tb on" id="tbtn-dashboard" onclick="switchTab('dashboard')"><span class="ic">🏠</span>Tableau de bord</button>
+  <button class="tb" id="tbtn-scanner"   onclick="switchTab('scanner')"><span class="ic">📷</span>Scanner</button>
+  <button class="tb" id="tbtn-alertes"   onclick="switchTab('alertes')"><span class="ic">🔔</span>Alertes</button>
+  <button class="tb" id="tbtn-planning"  onclick="switchTab('planning')"><span class="ic">📅</span>Planning</button>
+</div>
+
+<!-- FORM OVERLAY -->
+<div id="form-ov" class="overlay" style="display:none" onclick="if(event.target===this)closeForm()">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sh-title" id="form-title">Ajouter un produit</div>
+    <div class="fg"><label class="fl">Gencod / EAN *</label><input type="number" id="f-gencod" class="fi" placeholder="3289196040640"></div>
+    <div class="fg"><label class="fl">Nom du produit *</label><input type="text" id="f-name" class="fi" placeholder="Boisson Citron Gingembre"></div>
+    <div class="fg"><label class="fl">Rayon</label>
+      <select id="f-rayon" class="fi">
+        <option>Épicerie</option><option>Crémerie</option><option>Charcuterie</option>
+        <option>Boulangerie</option><option>Surgelés</option><option>Boissons</option>
+        <option>Hygiène</option><option>Confiserie</option><option>Traiteur</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">Quantité</label><input type="number" id="f-qty" class="fi" value="1" min="1"></div>
+    <div class="fg">
+      <label class="fl">Date de péremption *</label>
+      <input type="date" id="f-expiry" class="fi" oninput="updatePrev()">
+      <div class="status-prev" id="sprev"></div>
+    </div>
+    <div class="fg"><label class="fl">Magasin</label><select id="f-magasin" class="fi"></select></div>
+    <input type="hidden" id="f-id">
+    <button class="btn btn-p" onclick="submitForm()">✓ Enregistrer</button>
+    <button class="btn btn-s" onclick="closeForm()">Annuler</button>
+    <button class="btn btn-d" id="btn-del" onclick="deleteProduct()" style="display:none">🗑 Supprimer</button>
+  </div>
+</div>
+
+<!-- SCAN LOADER -->
+<div id="ldr" class="overlay">
+  <div class="sheet">
+    <div style="font-size:52px;margin-bottom:16px">🤖</div>
+    <div style="font-size:17px;font-weight:700;margin-bottom:8px">Analyse en cours…</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:28px">L'IA lit le gencod et la DLC</div>
+    <div style="display:flex;justify-content:center;gap:8px">
+      <div style="width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1s infinite"></div>
+      <div style="width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1s .2s infinite"></div>
+      <div style="width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1s .4s infinite"></div>
+    </div>
+  </div>
+</div>
+
+<!-- POPUP ALERTE -->
+<div id="popup" class="overlay" style="display:none">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="handle"></div>
+    <div style="text-align:center;padding:8px 0 16px">
+      <div style="font-size:48px;margin-bottom:12px">⚠️</div>
+      <div style="font-size:18px;font-weight:800;color:var(--red);margin-bottom:8px">Produits urgents !</div>
+      <div id="popup-txt" style="font-size:14px;color:var(--muted)"></div>
+    </div>
+    <button class="btn btn-p" onclick="document.getElementById('popup').style.display='none';switchTab('alertes')">Voir les alertes →</button>
+  </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════
-// CONFIG — modifiez ici vos URLs N8N
-// ═══════════════════════════════════════════════
-const N8N_WEBHOOK = 'https://stephane1377.app.n8n.cloud/webhook/scan-produit-magasin';
-const MAGASINS_DEFAUT = ['Monoprix Marseille', 'Casino Nice'];
+// ═══════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════
+const N8N = 'https://stephane1377.app.n8n.cloud/webhook/scan-produit-magasin';
+const MAGS_DEF = ['Monoprix Marseille', 'Casino Nice'];
 
-// ═══════════════════════════════════════════════
-// UTILITAIRES
-// ═══════════════════════════════════════════════
-const uid = () => Math.random().toString(36).slice(2,8);
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+const uid = () => Math.random().toString(36).slice(2,10);
 const addDays = n => { const d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; };
-const fmtDate = d => new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'});
-const daysUntil = d => Math.ceil((new Date(d)-new Date())/86400000);
-const statusOf = d => { const n=daysUntil(d); if(n<0)return'expired'; if(n<=2)return'critical'; if(n<=7)return'warning'; return'ok'; };
-const STATUS = {
-  expired:  {label:'Périmé',   bg:'#FCEBEB',text:'#A32D2D',border:'#F7C1C1',dot:'#E24B4A'},
-  critical: {label:'Critique', bg:'#FAEEDA',text:'#854F0B',border:'#FAC775',dot:'#EF9F27'},
-  warning:  {label:'Attention',bg:'#EAF3DE',text:'#3B6D11',border:'#C0DD97',dot:'#639922'},
-  ok:       {label:'OK',       bg:'#E6F1FB',text:'#185FA5',border:'#B5D4F4',dot:'#378ADD'},
+const fmt = d => d ? new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'}) : '—';
+const daysLeft = d => Math.ceil((new Date(d+'T12:00:00')-new Date())/86400000);
+const stOf = d => { const n=daysLeft(d); if(n<0)return'exp'; if(n<=2)return'crit'; if(n<=7)return'warn'; return'ok'; };
+const ST = {
+  exp:  {lbl:'Périmé',   bg:'#FCEBEB',tx:'#A32D2D',dot:'#E24B4A'},
+  crit: {lbl:'Critique', bg:'#FAEEDA',tx:'#854F0B',dot:'#EF9F27'},
+  warn: {lbl:'Attention',bg:'#EAF3DE',tx:'#3B6D11',dot:'#639922'},
+  ok:   {lbl:'OK',       bg:'#E6F1FB',tx:'#185FA5',dot:'#378ADD'},
 };
 
-// ═══════════════════════════════════════════════
-// ÉTAT
-// ═══════════════════════════════════════════════
-let products = JSON.parse(localStorage.getItem('fc_products') || 'null') || [
-  {id:uid(),gencod:'3760020500665',name:"Sirop d'Agave BIO 700g",   rayon:'Épicerie',   qty:8, expiry:addDays(-3),magasin:'Monoprix Marseille'},
-  {id:uid(),gencod:'3289196040640',name:'Boisson Citron Gingembre', rayon:'Boissons',   qty:4, expiry:addDays(1), magasin:'Monoprix Marseille'},
-  {id:uid(),gencod:'3228857000166',name:'Yaourt Nature Danone',      rayon:'Crémerie',   qty:12,expiry:addDays(4), magasin:'Casino Nice'},
-  {id:uid(),gencod:'3274080005003',name:'Lait Demi-Écrémé 1L',      rayon:'Crémerie',   qty:6, expiry:addDays(6), magasin:'Monoprix Marseille'},
-  {id:uid(),gencod:'8410076480781',name:'Jambon Fumé Aoste',         rayon:'Charcuterie',qty:3, expiry:addDays(-1),magasin:'Casino Nice'},
-  {id:uid(),gencod:'3414280210021',name:'Camembert Président',       rayon:'Crémerie',   qty:5, expiry:addDays(5), magasin:'Monoprix Marseille'},
-  {id:uid(),gencod:'3017620422003',name:'Nutella 400g',              rayon:'Épicerie',   qty:20,expiry:addDays(45),magasin:'Casino Nice'},
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let products = JSON.parse(localStorage.getItem('fc_p')||'null') || [
+  {id:uid(),gencod:'3760020500665',name:"Sirop d'Agave BIO",  rayon:'Épicerie',   qty:8, expiry:addDays(-3),magasin:'Monoprix Marseille'},
+  {id:uid(),gencod:'3289196040640',name:'Boisson Citron Gingembre',rayon:'Boissons',qty:4,expiry:addDays(1),magasin:'Monoprix Marseille'},
+  {id:uid(),gencod:'3228857000166',name:'Yaourt Nature Danone',rayon:'Crémerie',  qty:12,expiry:addDays(4), magasin:'Casino Nice'},
+  {id:uid(),gencod:'3274080005003',name:'Lait Demi-Écrémé 1L',rayon:'Crémerie',  qty:6, expiry:addDays(6), magasin:'Monoprix Marseille'},
+  {id:uid(),gencod:'8410076480781',name:'Jambon Fumé Aoste',  rayon:'Charcuterie',qty:3, expiry:addDays(-1),magasin:'Casino Nice'},
 ];
-let planning = JSON.parse(localStorage.getItem('fc_planning') || 'null') || {
-  'Monoprix Marseille':['Lun','Mar','Ven'],
+let planning = JSON.parse(localStorage.getItem('fc_pl')||'null') || {
+  'Monoprix Marseille':['Lun','Ven'],
   'Casino Nice':['Mar','Jeu'],
 };
-let currentTab = 'dashboard';
-let filterStatus = 'Tous';
-let filterMag = 'Tous';
-let popupDismissed = false;
-let editingId = null;
-let currentLocation = null;
+let curTab='dashboard', fStatus='Tous', fMag='Tous';
+let gps=null;               // { lat, lng, accuracy }
+let recentScans=[];
 
-// ═══════════════════════════════════════════════
-// PERSISTANCE
-// ═══════════════════════════════════════════════
 const save = () => {
-  localStorage.setItem('fc_products', JSON.stringify(products));
-  localStorage.setItem('fc_planning', JSON.stringify(planning));
+  localStorage.setItem('fc_p',  JSON.stringify(products));
+  localStorage.setItem('fc_pl', JSON.stringify(planning));
 };
 
-// ═══════════════════════════════════════════════
-// GÉOLOCALISATION
-// ═══════════════════════════════════════════════
-function getLocation() {
+// ═══════════════════════════════════════════
+// GEOLOCATION — watchPosition pour maintenir à jour
+// ═══════════════════════════════════════════
+function initGPS() {
+  const pill = document.getElementById('gps-pill');
+  const txt  = document.getElementById('gps-txt');
   if (!navigator.geolocation) return;
-  navigator.geolocation.getCurrentPosition(pos => {
-    currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-    updateHeader();
-  }, () => {});
+
+  pill.style.display = 'inline-flex';
+
+  navigator.geolocation.watchPosition(
+    pos => {
+      gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: Math.round(pos.coords.accuracy) };
+      txt.textContent = `GPS actif · ±${gps.acc}m`;
+      pill.style.background = 'var(--green-light)';
+      pill.style.color = 'var(--green)';
+    },
+    err => {
+      txt.textContent = 'GPS non disponible';
+      pill.style.background = '#FAEEDA';
+      pill.style.color = '#854F0B';
+    },
+    { enableHighAccuracy: true, maximumAge: 15000, timeout: 12000 }
+  );
 }
 
-// ═══════════════════════════════════════════════
-// CONNEXION N8N
-// ═══════════════════════════════════════════════
-async function sendToN8N(photo, magasin) {
-  const formData = new FormData();
-  formData.append('photo', photo);
-  formData.append('magasin', magasin);
-  if (currentLocation) {
-    formData.append('latitude',  currentLocation.lat.toString());
-    formData.append('longitude', currentLocation.lng.toString());
-  }
-  const res = await fetch(N8N_WEBHOOK, { method:'POST', body:formData });
-  if (!res.ok) throw new Error('Erreur N8N: ' + res.status);
-  return await res.json();
-}
-
-// ═══════════════════════════════════════════════
-// TOAST
-// ═══════════════════════════════════════════════
-function toast(msg, duration=2500) {
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), duration);
-}
-
-// ═══════════════════════════════════════════════
-// HEADER
-// ═══════════════════════════════════════════════
-function updateHeader() {
-  const stats = getStats();
-  const urgent = stats.expired.length + stats.critical.length;
-  const mag = filterMag !== 'Tous' ? filterMag : getMagasins()[1] || 'Tous les magasins';
-  document.getElementById('header-sub').textContent =
-    `${mag} · ${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}`;
-  const b = document.getElementById('urgent-badge');
-  b.innerHTML = urgent > 0
-    ? `<div class="badge-urgent">${urgent} urgent${urgent>1?'s':''}</div>` : '';
-}
-
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════
 // HELPERS
-// ═══════════════════════════════════════════════
-const getStats = () => ({
-  expired:  products.filter(p=>statusOf(p.expiry)==='expired'),
-  critical: products.filter(p=>statusOf(p.expiry)==='critical'),
-  warning:  products.filter(p=>statusOf(p.expiry)==='warning'),
-  ok:       products.filter(p=>statusOf(p.expiry)==='ok'),
-});
-const getMagasins = () => ['Tous', ...new Set(products.map(p=>p.magasin))];
-const badge = st => `<span class="status-badge" style="background:${STATUS[st].bg};color:${STATUS[st].text};border:1px solid ${STATUS[st].border}"><span class="dot" style="background:${STATUS[st].dot}"></span>${STATUS[st].label}</span>`;
+// ═══════════════════════════════════════════
+const getMags = () => ['Tous', ...new Set([...MAGS_DEF, ...products.map(p=>p.magasin), ...Object.keys(planning)])];
+const getActiveMag = () => getMags().filter(m=>m!=='Tous')[0] || 'Magasin';
 
-// ═══════════════════════════════════════════════
+function stats() {
+  const base = fMag==='Tous' ? products : products.filter(p=>p.magasin===fMag);
+  return {
+    exp:  base.filter(p=>stOf(p.expiry)==='exp'),
+    crit: base.filter(p=>stOf(p.expiry)==='crit'),
+    warn: base.filter(p=>stOf(p.expiry)==='warn'),
+    ok:   base.filter(p=>stOf(p.expiry)==='ok'),
+  };
+}
+
+// ═══════════════════════════════════════════
+// HEADER
+// ═══════════════════════════════════════════
+function updateHdr() {
+  const s = stats();
+  const u = s.exp.length + s.crit.length;
+  const mag = fMag!=='Tous' ? fMag : 'Tous les magasins';
+  document.getElementById('hdr-sub').textContent =
+    `${mag} · ${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}`;
+  document.getElementById('urgent-badge').innerHTML =
+    u>0 ? `<div class="badge-urgent">${u} urgent${u>1?'s':''}</div>` : '';
+}
+
+// ═══════════════════════════════════════════
 // DASHBOARD
-// ═══════════════════════════════════════════════
-function renderDashboard() {
-  const stats = getStats();
-  const mags  = getMagasins();
-  const statusFilters = ['Tous','Périmé','Critique','Attention','OK'];
-  const statusMap = {'Périmé':'expired','Critique':'critical','Attention':'warning','OK':'ok'};
-  const urgent = [...stats.expired,...stats.critical];
+// ═══════════════════════════════════════════
+function renderDash() {
+  const s = stats();
+  document.getElementById('cn-exp').textContent  = s.exp.length;
+  document.getElementById('cn-crit').textContent = s.crit.length;
+  document.getElementById('cn-warn').textContent = s.warn.length;
+  document.getElementById('cn-ok').textContent   = s.ok.length;
 
-  const filtered = products.filter(p => {
-    const ms = filterMag==='Tous' || p.magasin===filterMag;
-    const ss = filterStatus==='Tous' || statusOf(p.expiry)===statusMap[filterStatus];
-    return ms && ss;
-  }).sort((a,b)=>new Date(a.expiry)-new Date(b.expiry));
-
-  let html = '';
-
-  // Popup alerte
-  if (urgent.length > 0 && !popupDismissed) {
-    html += `<div class="alert-box" style="background:#FCEBEB;border:1px solid #F7C1C1">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div style="font-size:13px;font-weight:600;color:#A32D2D">⚠ ${urgent.length} produit(s) urgent(s)</div>
-        <button onclick="popupDismissed=true;render()" style="background:none;border:none;color:#A32D2D;cursor:pointer;font-size:18px;line-height:1">×</button>
-      </div>
-      ${urgent.slice(0,3).map(p=>`
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-top:1px solid #F7C1C1;margin-top:5px">
-          <span style="font-size:12px;color:#A32D2D">${p.name}</span>
-          ${badge(statusOf(p.expiry))}
-        </div>`).join('')}
-    </div>`;
-  }
-
-  // Stats
-  html += `<div class="stat-grid">
-    ${Object.entries(stats).map(([k,items])=>`
-      <div class="stat-card" style="background:${STATUS[k].bg};border-color:${STATUS[k].border}" onclick="setFilter('${k}')">
-        <div class="stat-num" style="color:${STATUS[k].text}">${items.length}</div>
-        <div class="stat-lbl" style="color:${STATUS[k].text}">${STATUS[k].label}</div>
-      </div>`).join('')}
-  </div>`;
-
-  // Filtres
-  html += `<div class="section-title">Filtrer</div>
-  <div class="filters">
-    ${statusFilters.map(f=>`<button class="pill${filterStatus===f?' active-green':''}" onclick="setStatusFilter('${f}')">${f}</button>`).join('')}
-  </div>
-  <div class="filters">
-    ${mags.map(m=>`<button class="pill${filterMag===m?' active-blue':''}" onclick="setMagFilter('${m}')">${m}</button>`).join('')}
-  </div>`;
-
-  // En-tête liste
-  html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:0 16px 6px">
-    <div style="font-size:11px;font-weight:600;color:#7a8a7a;text-transform:uppercase;letter-spacing:0.6px">${filtered.length} produit(s)</div>
-    <button onclick="openForm()" style="background:#1D9E75;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer;font-weight:500">+ Ajouter</button>
-  </div>`;
-
-  if (filtered.length === 0) {
-    html += `<div style="text-align:center;padding:40px 16px;color:#9aaa9a">
-      <div style="font-size:44px;margin-bottom:10px">✓</div>
-      <div style="font-size:14px">Aucun produit pour ces filtres</div>
-    </div>`;
-  } else {
-    filtered.forEach(p => {
-      const st = statusOf(p.expiry);
-      const days = daysUntil(p.expiry);
-      const daysTxt = days<0 ? `${Math.abs(days)}j dépassé` : days===0 ? "Aujourd'hui" : `${days}j`;
-      const isEditing = editingId === p.id;
-      html += `<div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-          <div style="flex:1;min-width:0">
-            <div class="prod-name">${p.name}</div>
-            <div class="prod-sub">${p.rayon} · ${p.magasin}</div>
-          </div>
-          ${badge(st)}
-        </div>
-        <div class="meta-row">
-          <div class="meta-item" style="flex:1">
-            <div class="meta-label">DLC</div>
-            ${isEditing
-              ? `<input class="edit-input" type="date" value="${p.expiry}" id="edit-${p.id}">`
-              : `<div class="meta-val" style="color:${STATUS[st].text}">${fmtDate(p.expiry)}</div>`}
-          </div>
-          <div class="meta-item">
-            <div class="meta-label">Jours</div>
-            <div class="meta-val" style="color:${STATUS[st].text}">${daysTxt}</div>
-          </div>
-          <div class="meta-item">
-            <div class="meta-label">Qté</div>
-            <div class="meta-val">${p.qty}</div>
-          </div>
-          <div style="display:flex;gap:5px;align-self:flex-end;margin-left:auto">
-            ${isEditing
-              ? `<button class="icon-btn" onclick="saveEdit('${p.id}')" style="background:#1D9E75;border-color:#1D9E75;color:#fff">✓</button>
-                 <button class="icon-btn" onclick="cancelEdit()">✕</button>`
-              : `<button class="icon-btn" onclick="startEdit('${p.id}')">✏</button>
-                 <button class="icon-btn danger" onclick="deleteProduct('${p.id}')">🗑</button>`}
-          </div>
-        </div>
-        <div class="gencod-tag">${p.gencod}</div>
-      </div>`;
-    });
-  }
-  return html;
-}
-
-// ═══════════════════════════════════════════════
-// SCAN
-// ═══════════════════════════════════════════════
-function renderScan() {
-  const locInfo = currentLocation
-    ? `<div style="font-size:11px;color:#1D9E75;margin-top:6px">📍 GPS actif · ${currentLocation.lat.toFixed(4)}, ${currentLocation.lng.toFixed(4)}</div>`
-    : `<div style="font-size:11px;color:#9aaa9a;margin-top:6px">GPS non disponible</div>`;
-
-  let html = `<div class="scan-zone" onclick="document.getElementById('photo-input').click()">
-    <div style="font-size:52px;margin-bottom:14px">📷</div>
-    <div style="font-size:16px;font-weight:600;color:#0F6E56;margin-bottom:6px">Scanner un produit</div>
-    <div style="font-size:12px;color:#1D9E75;margin-bottom:16px">Gemini IA analyse la photo et extrait<br>le gencod et la DLC automatiquement</div>
-    <div style="background:#1D9E75;color:#fff;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:500">Prendre une photo</div>
-    ${locInfo}
-  </div>
-  <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event)">
-  <button class="btn btn-outline" style="margin:0 16px;width:calc(100% - 32px)" onclick="openForm()">✏ Saisir manuellement</button>
-  <div class="section-title">Connexion N8N</div>
-  <div class="info-card" style="background:#E1F5EE;border-color:#9FE1CB">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-      <div style="width:8px;height:8px;border-radius:50%;background:#1D9E75"></div>
-      <div style="font-size:13px;font-weight:500;color:#0F6E56">Workflow actif</div>
-    </div>
-    <div style="font-size:11px;color:#1D9E75;line-height:1.6">
-      📸 Photo → Gemini IA → Extraction DLC + Gencod<br>
-      📊 Enregistrement Google Sheets + Bubble<br>
-      📧 Alerte Gmail si périmé<br>
-      📅 Google Calendar mis à jour
-    </div>
-  </div>
-  <div class="section-title">Derniers scans</div>`;
-
-  [...products].reverse().slice(0,5).forEach(p => {
-    const st = statusOf(p.expiry);
-    html += `<div class="card" style="display:flex;align-items:center;gap:12px">
-      <div style="width:40px;height:40px;border-radius:10px;background:${STATUS[st].bg};display:flex;align-items:center;justify-content:center;color:${STATUS[st].text};font-size:18px;flex-shrink:0;border:1px solid ${STATUS[st].border}">
-        ${st==='expired'?'✕':st==='critical'?'!':st==='warning'?'~':'✓'}
-      </div>
-      <div style="flex:1;min-width:0">
-        <div class="prod-name">${p.name}</div>
-        <div class="prod-sub">${p.rayon} · DLC: ${fmtDate(p.expiry)}</div>
-      </div>
-      ${badge(st)}
-    </div>`;
+  // Filtres statut
+  ['Tous','Périmés','Critique','Attention','OK'].forEach(v => {
+    document.getElementById('fsr').innerHTML = ['Tous','Périmés','Critique','Attention','OK'].map(v=>
+      `<button class="fpill ${fStatus===v?'on':''}" onclick="setFS('${v}')">${v}</button>`
+    ).join('');
   });
-  return html;
+
+  // Filtres magasins
+  document.getElementById('fmr').innerHTML = getMags().map(m=>
+    `<button class="fpill ${fMag===m?'on':''}" onclick="setFM('${m}')">${m}</button>`
+  ).join('');
+
+  // Liste produits
+  const map={Périmés:'exp',Critique:'crit',Attention:'warn',OK:'ok'};
+  let list = [...products];
+  if(fMag!=='Tous') list = list.filter(p=>p.magasin===fMag);
+  if(fStatus!=='Tous') list = list.filter(p=>stOf(p.expiry)===map[fStatus]);
+  list.sort((a,b)=>new Date(a.expiry)-new Date(b.expiry));
+
+  document.getElementById('pcount').textContent = `${list.length} produit${list.length>1?'s':''}`;
+
+  if(!list.length){
+    document.getElementById('plist').innerHTML=`<div class="empty"><div class="ei">✅</div><p>Aucun produit ici</p></div>`;
+    return;
+  }
+
+  document.getElementById('plist').innerHTML = list.map(p=>{
+    const st=stOf(p.expiry), d=daysLeft(p.expiry);
+    const dtxt = d<0?`${Math.abs(d)}j dépassé`: d===0?"Aujourd'hui":`${d}j`;
+    return `<div class="pi">
+      <div class="pi-dot" style="background:${ST[st].dot}"></div>
+      <div class="pi-info">
+        <div class="pi-name">${p.name}</div>
+        <div class="pi-meta">${p.gencod} · ${p.rayon} · Qté ${p.qty} · ${p.magasin}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+        <span class="pi-badge" style="background:${ST[st].bg};color:${ST[st].tx}">${fmt(p.expiry)}</span>
+        <span style="font-size:10px;font-weight:600;color:${ST[st].tx}">${dtxt}</span>
+      </div>
+      <button class="btn-icon" onclick="openForm(products.find(x=>x.id==='${p.id}'))">✏️</button>
+    </div>`;
+  }).join('');
 }
 
-// ═══════════════════════════════════════════════
+function setFS(v){fStatus=v; renderAll();}
+function setFM(v){fMag=v; updateHdr(); renderAll();}
+
+// ═══════════════════════════════════════════
 // ALERTES
-// ═══════════════════════════════════════════════
-function renderAlerts() {
-  const byMag = {};
-  products.forEach(p => {
-    const st = statusOf(p.expiry);
-    if (st==='ok') return;
-    if (!byMag[p.magasin]) byMag[p.magasin] = [];
-    byMag[p.magasin].push(p);
-  });
-
-  let html = `<div class="info-card" style="background:#E1F5EE;border-color:#9FE1CB;margin-top:14px">
-    <div style="font-size:13px;font-weight:600;color:#0F6E56;margin-bottom:4px">Automatisation N8N active</div>
-    <div style="font-size:12px;color:#1D9E75;line-height:1.6">
-      ⏰ Email récap chaque matin à 7h<br>
-      📅 Google Calendar mis à jour automatiquement<br>
-      🔔 Alertes anticipées J-7, J-3, J-1
-    </div>
-  </div>`;
-
-  if (Object.keys(byMag).length === 0) {
-    html += `<div style="text-align:center;padding:48px 16px;color:#9aaa9a">
-      <div style="font-size:44px;margin-bottom:10px">✓</div>
-      <div style="font-size:15px;font-weight:500">Aucune alerte active</div>
-      <div style="font-size:12px;margin-top:6px">Tous les produits sont dans les délais</div>
-    </div>`;
-    return html;
+// ═══════════════════════════════════════════
+function renderAlertes() {
+  const urgent = products.filter(p=>['exp','crit'].includes(stOf(p.expiry)));
+  urgent.sort((a,b)=>new Date(a.expiry)-new Date(b.expiry));
+  if(!urgent.length){
+    document.getElementById('alert-list').innerHTML=`<div class="empty"><div class="ei">🎉</div><p>Aucun produit urgent</p></div>`;
+    return;
   }
-
-  Object.entries(byMag).forEach(([mag, prods]) => {
-    html += `<div class="section-title">${mag}</div>`;
-    prods.sort((a,b)=>new Date(a.expiry)-new Date(b.expiry)).forEach(p => {
-      const st = statusOf(p.expiry);
-      const days = daysUntil(p.expiry);
-      html += `<div class="card" style="display:flex;align-items:center;gap:12px">
-        <div style="width:46px;height:46px;border-radius:11px;background:${STATUS[st].bg};border:1px solid ${STATUS[st].border};display:flex;align-items:center;justify-content:center;color:${STATUS[st].text};font-size:22px;flex-shrink:0;font-weight:700">
-          ${st==='expired'?'✕':st==='critical'?'!':'~'}
-        </div>
-        <div style="flex:1;min-width:0">
-          <div class="prod-name">${p.name}</div>
-          <div class="prod-sub">${p.rayon} · ${p.gencod}</div>
-          <div class="prod-sub">DLC: ${fmtDate(p.expiry)}</div>
-        </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-size:20px;font-weight:700;color:${STATUS[st].text}">${days<0?'+'+Math.abs(days)+'j':days===0?'Auj.':days+'j'}</div>
-          <div style="font-size:10px;color:#9aaa9a">${days<0?'dépassé':'restants'}</div>
-        </div>
-      </div>`;
-    });
-  });
-  return html;
+  document.getElementById('alert-list').innerHTML = urgent.map(p=>{
+    const st=stOf(p.expiry), d=daysLeft(p.expiry);
+    return `<div class="al-item al-${st}">
+      <div style="font-weight:700;font-size:14px">${p.name}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">${p.magasin} · DLC ${fmt(p.expiry)} · Qté ${p.qty}</div>
+      <div style="font-size:12px;font-weight:700;color:${ST[st].tx};margin-top:4px">
+        ${d<0?`Périmé depuis ${Math.abs(d)}j`:d===0?"Expire aujourd'hui !":(`Expire dans ${d}j`)}
+      </div>
+    </div>`;
+  }).join('');
 }
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════
 // PLANNING
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════
 function renderPlanning() {
+  const mags = getMags().filter(m=>m!=='Tous');
   const jours = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
-  const mags = getMagasins().filter(m=>m!=='Tous');
-
-  let html = `<div class="info-card" style="background:#E6F1FB;border-color:#B5D4F4;margin-top:14px">
-    <div style="font-size:13px;font-weight:600;color:#185FA5;margin-bottom:4px">Planning de visite</div>
-    <div style="font-size:12px;color:#378ADD">Les alertes Google Calendar tiennent compte de vos jours de passage pour chaque magasin</div>
-  </div>`;
-
-  mags.forEach(mag => {
-    const activeDays = planning[mag] || [];
-    html += `<div class="section-title">${mag}</div>
-    <div class="info-card">
-      <div style="font-size:12px;color:#9aaa9a;margin-bottom:10px">Jours de visite</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        ${jours.map(j=>`<button class="day-btn${activeDays.includes(j)?' active':''}" onclick="toggleDay('${mag}','${j}')">${j}</button>`).join('')}
-      </div>
-      <div style="margin-top:12px;background:#f7f9f7;border-radius:8px;padding:8px 12px">
-        <div style="font-size:11px;color:#9aaa9a">Jours configurés</div>
-        <div style="font-size:13px;font-weight:500;color:#1a2a1a;margin-top:2px">${activeDays.length>0?activeDays.join(', '):'Aucun jour configuré'}</div>
+  document.getElementById('planning-list').innerHTML = mags.map(mag=>{
+    if(!planning[mag]) planning[mag]=[];
+    return `<div class="pmag">
+      <h3>🏪 ${mag}</h3>
+      <div class="dg">
+        ${jours.map(j=>`<button class="db ${planning[mag].includes(j)?'on':''}" onclick="toggleDay('${mag}','${j}')">${j}</button>`).join('')}
       </div>
     </div>`;
+  }).join('');
+}
+
+function toggleDay(mag,j){
+  if(!planning[mag])planning[mag]=[];
+  const i=planning[mag].indexOf(j);
+  if(i>=0)planning[mag].splice(i,1); else planning[mag].push(j);
+  save(); renderPlanning();
+}
+
+// ═══════════════════════════════════════════
+// SCANNER — RECENT SCANS
+// ═══════════════════════════════════════════
+function renderScanner(){
+  const el=document.getElementById('recent-scans');
+  if(!recentScans.length){el.innerHTML='<p style="color:var(--muted);font-size:13px">Aucun scan récent</p>';return;}
+  el.innerHTML=recentScans.slice(0,6).map(s=>`
+    <div class="rs-item">
+      <div style="font-size:22px">${s.found?'✅':'🚫'}</div>
+      <div>
+        <div style="font-size:13px;font-weight:600">${s.name}</div>
+        <div style="font-size:11px;color:var(--muted)">${s.gencod} · ${s.time}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════
+// RENDER ALL
+// ═══════════════════════════════════════════
+function renderAll(){
+  updateHdr();
+  if(curTab==='dashboard') renderDash();
+  else if(curTab==='scanner') renderScanner();
+  else if(curTab==='alertes') renderAlertes();
+  else if(curTab==='planning') renderPlanning();
+}
+
+// ═══════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════
+function switchTab(t){
+  curTab=t;
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('on'));
+  document.getElementById('tab-'+t).classList.add('on');
+  document.querySelectorAll('.tb').forEach(el=>el.classList.remove('on'));
+  document.getElementById('tbtn-'+t).classList.add('on');
+  document.getElementById('fab').style.display = t==='dashboard'?'flex':'none';
+  document.getElementById('nf-card').style.display = 'none';
+  renderAll();
+}
+
+// ═══════════════════════════════════════════
+// FORM
+// ═══════════════════════════════════════════
+function openForm(p, fromScan=false){
+  const isEdit = p && !fromScan && products.some(x=>x.id===p.id);
+  document.getElementById('form-title').textContent =
+    fromScan ? '✅ Vérifier le produit scanné' : isEdit ? 'Modifier le produit' : 'Ajouter un produit';
+  document.getElementById('f-id').value     = p?.id    || '';
+  document.getElementById('f-gencod').value = p?.gencod|| '';
+  document.getElementById('f-name').value   = p?.name  || '';
+  document.getElementById('f-rayon').value  = p?.rayon || 'Épicerie';
+  document.getElementById('f-qty').value    = p?.qty   || 1;
+  document.getElementById('f-expiry').value = p?.expiry|| '';
+  const mags = getMags().filter(m=>m!=='Tous');
+  document.getElementById('f-magasin').innerHTML = mags.map(m=>`<option ${m===p?.magasin?'selected':''}>${m}</option>`).join('');
+  document.getElementById('btn-del').style.display = isEdit?'block':'none';
+  updatePrev();
+  document.getElementById('form-ov').style.display='flex';
+}
+
+function closeForm(){document.getElementById('form-ov').style.display='none';}
+
+function updatePrev(){
+  const e=document.getElementById('f-expiry').value;
+  const el=document.getElementById('sprev');
+  if(!e){el.style.display='none';return;}
+  const st=stOf(e), d=daysLeft(e);
+  const txt=d<0?`${Math.abs(d)}j dépassé`:d===0?"Aujourd'hui":`${d} jours restants`;
+  el.style.display='block'; el.style.background=ST[st].bg; el.style.color=ST[st].tx;
+  el.textContent=`${ST[st].lbl} · ${txt}`;
+}
+
+function submitForm(){
+  const g=document.getElementById('f-gencod').value.trim();
+  const n=document.getElementById('f-name').value.trim();
+  const r=document.getElementById('f-rayon').value;
+  const q=parseInt(document.getElementById('f-qty').value)||1;
+  const e=document.getElementById('f-expiry').value;
+  const m=document.getElementById('f-magasin').value;
+  const id=document.getElementById('f-id').value;
+  if(!g||!n||!e){toast('⚠ Remplissez les champs obligatoires *');return;}
+  if(id){
+    const i=products.findIndex(p=>p.id===id);
+    if(i>=0) products[i]={...products[i],gencod:g,name:n,rayon:r,qty:q,expiry:e,magasin:m};
+  } else {
+    products.push({id:uid(),gencod:g,name:n,rayon:r,qty:q,expiry:e,magasin:m});
+  }
+  save(); closeForm(); toast('✓ Produit enregistré'); switchTab('dashboard');
+}
+
+function deleteProduct(){
+  const id=document.getElementById('f-id').value;
+  if(!id||!confirm('Supprimer ce produit ?'))return;
+  products=products.filter(p=>p.id!==id);
+  save(); closeForm(); toast('🗑 Supprimé'); renderAll();
+}
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+function toast(msg,dur=3000){
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t=document.createElement('div');
+  t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),dur);
+}
+
+// ═══════════════════════════════════════════
+// SCAN — ÉTAPE 1 : analyse IA via /api/analyze
+// ═══════════════════════════════════════════
+async function toB64(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>res(r.result.split(',')[1]);
+    r.onerror=()=>rej(new Error('Lecture échouée'));
+    r.readAsDataURL(file);
   });
+}
 
-  // Stats par magasin
-  html += `<div class="section-title">Vue d'ensemble</div>`;
-  mags.forEach(mag => {
-    const magProds = products.filter(p=>p.magasin===mag);
-    const urgent = magProds.filter(p=>['expired','critical'].includes(statusOf(p.expiry))).length;
-    const warning = magProds.filter(p=>statusOf(p.expiry)==='warning').length;
-    html += `<div class="info-card" style="display:flex;align-items:center;gap:12px">
-      <div style="width:42px;height:42px;border-radius:10px;background:${urgent>0?'#FCEBEB':warning>0?'#FAEEDA':'#E1F5EE'};display:flex;align-items:center;justify-content:center;font-size:20px">
-        ${urgent>0?'⚠':warning>0?'~':'✓'}
-      </div>
-      <div style="flex:1">
-        <div style="font-size:14px;font-weight:500;color:#1a2a1a">${mag}</div>
-        <div style="font-size:11px;color:#9aaa9a;margin-top:2px">${magProds.length} produits · ${urgent} urgent${urgent>1?'s':''} · ${warning} attention</div>
-      </div>
-      <div style="font-size:12px;color:#9aaa9a">${(planning[mag]||[]).length}j/sem</div>
-    </div>`;
+async function analyzeAI(file){
+  const b64=await toB64(file);
+  const resp=await fetch('/api/analyze',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({image:b64, mimeType:file.type||'image/jpeg'}),
   });
-  return html;
+  if(!resp.ok) throw new Error('Erreur /api/analyze');
+  return resp.json();
+  // → { name, gencod, expiry (YYYY-MM-DD), rayon }
 }
 
-// ═══════════════════════════════════════════════
-// FORMULAIRE MANUEL
-// ═══════════════════════════════════════════════
-function openForm(prefilled={}) {
-  const mags = getMagasins().filter(m=>m!=='Tous');
-  const overlay = document.createElement('div');
-  overlay.className = 'overlay';
-  overlay.id = 'form-overlay';
-  overlay.innerHTML = `<div class="sheet" id="form-sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-title">Ajouter un produit</div>
-    <div class="form-group">
-      <label class="form-label">Code-barres / Gencod *</label>
-      <input class="form-input" type="text" id="f-gencod" placeholder="3017620422003" value="${prefilled.gencod||''}">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Nom du produit *</label>
-      <input class="form-input" type="text" id="f-name" placeholder="Ex: Yaourt Nature" value="${prefilled.name||''}">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Rayon</label>
-      <select class="form-input" id="f-rayon">
-        ${['Épicerie','Crémerie','Charcuterie','Boulangerie','Surgelés','Boissons','Traiteur','Confiserie','Fruits & Légumes'].map(r=>`<option${prefilled.rayon===r?' selected':''}>${r}</option>`).join('')}
-      </select>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="form-group">
-        <label class="form-label">Quantité</label>
-        <input class="form-input" type="number" id="f-qty" value="${prefilled.qty||1}" min="1">
-      </div>
-      <div class="form-group">
-        <label class="form-label">DLC *</label>
-        <input class="form-input" type="date" id="f-expiry" value="${prefilled.expiry||''}" oninput="updatePreview()">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Magasin</label>
-      <select class="form-input" id="f-magasin">
-        ${mags.map(m=>`<option>${m}</option>`).join('')}
-      </select>
-    </div>
-    <div id="form-preview" class="preview-badge"></div>
-    <button class="btn btn-green" id="submit-btn" onclick="submitForm()">Enregistrer le produit</button>
-    <button class="btn btn-outline" onclick="closeForm()">Annuler</button>
-  </div>`;
-  overlay.addEventListener('click', e => { if(e.target===overlay) closeForm(); });
-  document.body.appendChild(overlay);
-  if (prefilled.expiry) updatePreview();
-}
-
-function closeForm() {
-  const o = document.getElementById('form-overlay');
-  if (o) o.remove();
-}
-
-function updatePreview() {
-  const e = document.getElementById('f-expiry');
-  const p = document.getElementById('form-preview');
-  if (!e||!p) return;
-  if (e.value) {
-    const st = statusOf(e.value);
-    const days = daysUntil(e.value);
-    p.style.display = 'block';
-    p.style.background = STATUS[st].bg;
-    p.style.color = STATUS[st].text;
-    p.style.border = `1px solid ${STATUS[st].border}`;
-    const txt = days<0 ? `${Math.abs(days)}j dépassé` : days===0 ? "Expire aujourd'hui" : `${days} jours restants`;
-    p.textContent = `${STATUS[st].label} · ${txt}`;
-  } else { p.style.display='none'; }
-}
-
-function submitForm() {
-  const g = document.getElementById('f-gencod').value.trim();
-  const n = document.getElementById('f-name').value.trim();
-  const r = document.getElementById('f-rayon').value;
-  const q = parseInt(document.getElementById('f-qty').value)||1;
-  const e = document.getElementById('f-expiry').value;
-  const m = document.getElementById('f-magasin').value;
-  if (!g||!n||!e) { toast('⚠ Remplissez les champs obligatoires *'); return; }
-  products.push({id:uid(),gencod:g,name:n,rayon:r,qty:q,expiry:e,magasin:m});
-  save();
-  closeForm();
-  filterStatus='Tous'; filterMag='Tous';
-  toast('✓ Produit ajouté avec succès');
-  switchTab('dashboard');
-}
-
-// ═══════════════════════════════════════════════
-// GESTION PHOTO → N8N
-// ═══════════════════════════════════════════════
-async function handlePhoto(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  // Affiche le loader
-  const loaderDiv = document.createElement('div');
-  loaderDiv.className = 'overlay';
-  loaderDiv.id = 'loader-overlay';
-  loaderDiv.innerHTML = `<div class="sheet" style="text-align:center;padding:40px 20px">
-    <div style="font-size:48px;margin-bottom:16px">🤖</div>
-    <div style="font-size:16px;font-weight:600;color:#1a2a1a;margin-bottom:8px">Analyse en cours...</div>
-    <div style="font-size:12px;color:#9aaa9a;margin-bottom:24px">Gemini IA extrait le gencod et la DLC</div>
-    <div style="display:flex;justify-content:center;gap:6px">
-      <div style="width:8px;height:8px;border-radius:50%;background:#1D9E75;animation:pulse 1s infinite"></div>
-      <div style="width:8px;height:8px;border-radius:50%;background:#1D9E75;animation:pulse 1s .2s infinite"></div>
-      <div style="width:8px;height:8px;border-radius:50%;background:#1D9E75;animation:pulse 1s .4s infinite"></div>
-    </div>
-  </div>`;
-  document.body.appendChild(loaderDiv);
+// ═══════════════════════════════════════════
+// SCAN — ÉTAPE 2 : vérification catalogue N8N
+// ═══════════════════════════════════════════
+async function checkCatalogue(gencod, expiry){
+  // Construit le payload AVEC les coordonnées GPS si disponibles
+  const payload = {
+    gencod,
+    date_peremption: expiry ? expiry.split('-').reverse().join('-') : '',
+    magasin:   getActiveMag(),
+    latitude:  gps?.lat ?? '',
+    longitude: gps?.lng ?? '',
+    accuracy:  gps?.acc ?? '',
+  };
 
   try {
-    const magasin = getMagasins().filter(m=>m!=='Tous')[0] || 'Magasin';
-    const result = await sendToN8N(file, magasin);
-    document.getElementById('loader-overlay')?.remove();
+    const resp=await fetch(N8N,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload),
+    });
+    if(!resp.ok) return {found:false};
+    const data=await resp.json();
 
-    // Ajoute le produit localement aussi
-    const newProduct = {
-      id: uid(),
-      gencod: result.gencod || '',
-      name: result.produit || 'Produit scanné',
-      rayon: result.type_produit || 'Épicerie',
-      qty: 1,
-      expiry: result.date_peremption ? result.date_peremption.split('-').reverse().join('-') : addDays(30),
-      magasin: magasin,
+    // N8N correctement configuré → renvoie { found: true/false, produit, type_produit }
+    if(typeof data.found === 'boolean') return data;
+
+    // N8N pas encore en mode "Respond to Webhook" → répond { message: "Workflow was started" }
+    // Dans ce cas on ne peut pas savoir → on laisse passer (comportement permissif)
+    if(data.message) return {found:true, produit:null};
+
+    // N8N renvoie les données produit sans champ "found" → produit trouvé
+    if(data.produit||data.name) return {found:true, ...data};
+
+    return {found:false};
+  } catch {
+    // N8N injoignable → permissif (ne pas bloquer l'utilisateur)
+    return {found:true, produit:null};
+  }
+}
+
+// ═══════════════════════════════════════════
+// SCAN — ORCHESTRATION PRINCIPALE
+// ═══════════════════════════════════════════
+async function handlePhoto(event){
+  const file=event.target.files?.[0];
+  if(!file) return;
+  event.target.value='';                              // reset pour re-scanner
+  document.getElementById('nf-card').style.display='none'; // reset carte erreur
+
+  document.getElementById('ldr').style.display='flex';     // afficher loader
+
+  try {
+    // ① IA lit la photo
+    const ai = await analyzeAI(file);
+
+    // ② N8N vérifie dans le catalogue Léa Nature
+    const cat = await checkCatalogue(ai.gencod, ai.expiry);
+
+    document.getElementById('ldr').style.display='none';
+
+    // ③ Produit absent du catalogue → BLOQUER + message
+    if(!cat.found){
+      document.getElementById('nf-card').style.display='block';
+      document.getElementById('nf-msg').textContent =
+        `Gencod ${ai.gencod||'illisible'} absent du catalogue Léa Nature.`;
+      recentScans.unshift({
+        found:false,
+        name: ai.name||'Produit inconnu',
+        gencod: ai.gencod||'—',
+        time: new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),
+      });
+      renderScanner();
+      return; // ← PAS de formulaire
+    }
+
+    // ④ Produit trouvé → pré-remplir le formulaire
+    const product={
+      id:     uid(),
+      gencod: cat.gencod       || ai.gencod  || '',
+      name:   cat.produit      || ai.name    || 'Produit scanné',
+      rayon:  cat.type_produit || ai.rayon   || 'Épicerie',
+      qty:    1,
+      expiry: ai.expiry || addDays(30),
+      magasin: getActiveMag(),
     };
-    products.push(newProduct);
-    save();
-    toast('✓ Produit analysé et enregistré !');
-    openForm(newProduct); // Ouvre le form pour corriger si besoin
 
-  } catch (err) {
-    document.getElementById('loader-overlay')?.remove();
-    toast('⚠ Erreur N8N · Saisie manuelle ?', 3000);
-    openForm();
-  }
-  event.target.value = '';
-}
+    recentScans.unshift({
+      found:true,
+      name:product.name, gencod:product.gencod,
+      time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),
+    });
+    renderScanner();
 
-// ═══════════════════════════════════════════════
-// ACTIONS
-// ═══════════════════════════════════════════════
-function setFilter(key) {
-  const map = {expired:'Périmé',critical:'Critique',warning:'Attention',ok:'OK'};
-  filterStatus = map[key];
-  if (currentTab!=='dashboard') switchTab('dashboard');
-  else render();
-}
-function setStatusFilter(f) { filterStatus=f; render(); }
-function setMagFilter(m) { filterMag=m; render(); }
-function startEdit(id) { editingId=id; render(); }
-function cancelEdit() { editingId=null; render(); }
-function saveEdit(id) {
-  const input = document.getElementById('edit-'+id);
-  if (input?.value) {
-    products = products.map(p=>p.id===id?{...p,expiry:input.value}:p);
-    save();
-    toast('✓ DLC mise à jour');
-  }
-  editingId=null; render();
-}
-function deleteProduct(id) {
-  if (confirm('Supprimer ce produit ?')) {
-    products = products.filter(p=>p.id!==id);
-    save();
-    render();
-    toast('Produit supprimé');
+    toast('✓ Produit reconnu — vérifiez et corrigez la DLC si besoin');
+    openForm(product, true);
+
+  } catch(err){
+    document.getElementById('ldr').style.display='none';
+    console.error('Scan error:', err);
+    toast('⚠ Analyse impossible — réessayez');
   }
 }
-function toggleDay(mag, day) {
-  if (!planning[mag]) planning[mag]=[];
-  const idx = planning[mag].indexOf(day);
-  if (idx>-1) planning[mag].splice(idx,1);
-  else planning[mag].push(day);
-  save();
-  render();
+
+// Lier l'input au handler
+document.getElementById('scan-input').addEventListener('change', handlePhoto);
+
+// ═══════════════════════════════════════════
+// POPUP DÉMARRAGE
+// ═══════════════════════════════════════════
+function checkStartup(){
+  const u=products.filter(p=>['exp','crit'].includes(stOf(p.expiry)));
+  if(u.length){
+    document.getElementById('popup-txt').textContent=
+      `${u.length} produit${u.length>1?'s':''} nécessite${u.length>1?'nt':''} votre attention immédiate.`;
+    document.getElementById('popup').style.display='flex';
+  }
 }
 
-// ═══════════════════════════════════════════════
-// RENDU PRINCIPAL
-// ═══════════════════════════════════════════════
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+tab)?.classList.add('active');
-  render();
-}
-
-function render() {
-  updateHeader();
-  let html = '';
-  if (currentTab==='dashboard') html = renderDashboard();
-  else if (currentTab==='scan') html = renderScan();
-  else if (currentTab==='alerts') html = renderAlerts();
-  else if (currentTab==='planning') html = renderPlanning();
-  document.getElementById('content').innerHTML = html;
-}
-
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════
 // INIT
-// ═══════════════════════════════════════════════
-getLocation();
-render();
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  initGPS();
+  renderAll();
+  setTimeout(checkStartup, 1000);
+});
 </script>
 </body>
 </html>
