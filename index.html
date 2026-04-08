@@ -585,28 +585,47 @@ function toast(msg,dur=3000){
 // ═══════════════════════════════════════════
 // SCAN — ÉTAPE 1 : analyse IA via /api/analyze
 // ═══════════════════════════════════════════
-// Compresse la photo à max 1024px et qualité 0.7 → réduit de 4MB à ~150KB
+// Compresse la photo avant envoi (iOS Safari compatible)
 async function compressAndB64(file) {
-  return new Promise((resolve, reject) => {
+  // Fallback direct FileReader si canvas indispo
+  const tryCanvas = () => new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
     img.onload = () => {
-      const MAX = 1024;
-      let w = img.width, h = img.height;
-      if (w > MAX || h > MAX) {
-        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-        else { w = Math.round(w * MAX / h); h = MAX; }
-      }
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      URL.revokeObjectURL(url);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
-      resolve(dataUrl.split(',')[1]);
+      try {
+        const MAX = 800;
+        let w = img.width || MAX, h = img.height || MAX;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('Canvas non supporté');
+        ctx.drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(url);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        resolve(dataUrl.split(',')[1]);
+      } catch(e) { URL.revokeObjectURL(url); reject(e); }
     };
-    img.onerror = () => reject(new Error('Chargement image échoué'));
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Chargement image échoué')); };
     img.src = url;
   });
+
+  // Fallback : FileReader direct (sans compression)
+  const tryFileReader = () => new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result.split(',')[1]);
+    r.onerror = () => reject(new Error('FileReader échoué'));
+    r.readAsDataURL(file);
+  });
+
+  try { return await tryCanvas(); }
+  catch(e) {
+    console.warn('Canvas failed, fallback FileReader:', e.message);
+    return await tryFileReader();
+  }
 }
 
 async function analyzeAI(file){
@@ -720,7 +739,7 @@ async function handlePhoto(event){
   } catch(err){
     document.getElementById('ldr').style.display='none';
     console.error('Scan error:', err);
-    toast('⚠ Analyse impossible — réessayez');
+    toast('⚠ ' + (err.message || 'Erreur inconnue'), 6000);
   }
 }
 
