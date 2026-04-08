@@ -166,11 +166,20 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
       <span id="gps-txt">Localisation…</span>
     </div>
 
-    <div class="scan-zone">
-      <input type="file" id="scan-input" accept="image/*" capture="environment">
-      <div class="scan-ic">📸</div>
-      <h2>Scanner un produit</h2>
-      <p>Photographiez le code-barres et la date de péremption</p>
+    <!-- ÉTAPE 1 : Code-barres -->
+    <div class="scan-zone" id="scan-step1">
+      <input type="file" id="scan-input-barcode" accept="image/*" capture="environment">
+      <div class="scan-ic">📦</div>
+      <h2>Photo 1 — Code-barres</h2>
+      <p>Photographiez le code-barres EAN du produit</p>
+    </div>
+
+    <!-- ÉTAPE 2 : Date (apparaît après la photo 1) -->
+    <div class="scan-zone" id="scan-step2" style="display:none;border-color:#EF9F27">
+      <input type="file" id="scan-input-expiry" accept="image/*" capture="environment">
+      <div class="scan-ic">📅</div>
+      <h2>Photo 2 — Date de péremption</h2>
+      <p>Photographiez la date DLC / DLUO du produit</p>
     </div>
 
     <div id="nf-card" class="nf-card">
@@ -582,49 +591,13 @@ function toast(msg,dur=3000){
   setTimeout(()=>t.remove(),dur);
 }
 
+// SCAN 2 PHOTOS
 // ═══════════════════════════════════════════
-// SCAN — ÉTAPE 1 : analyse IA directement via Anthropic API
-// ═══════════════════════════════════════════
-const ANTHROPIC_KEY = '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'; // sk-ant-...
+let scanDataBarcode = null; // résultat photo 1
 
-async function compressAndB64(file) {
-  const tryCanvas = () => new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      try {
-        const MAX = 800;
-        let w = img.width || MAX, h = img.height || MAX;
-        if (w > MAX || h > MAX) {
-          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-          else { w = Math.round(w * MAX / h); h = MAX; }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) throw new Error('Canvas non supporté');
-        ctx.drawImage(img, 0, 0, w, h);
-        URL.revokeObjectURL(url);
-        resolve(canvas.toDataURL('image/jpeg', 0.7).split(',')[1]);
-      } catch(e) { URL.revokeObjectURL(url); reject(e); }
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image échouée')); };
-    img.src = url;
-  });
-  const tryFileReader = () => new Promise((resolve, reject) => {
-    const r = new FileReader();
-    r.onload = () => resolve(r.result.split(',')[1]);
-    r.onerror = () => reject(new Error('FileReader échoué'));
-    r.readAsDataURL(file);
-  });
-  try { return await tryCanvas(); }
-  catch(e) { return await tryFileReader(); }
-}
-
-async function analyzeAI(file){
+async function analyzeBarcode(file) {
   const b64 = await compressAndB64(file);
   const mimeType = file.type || 'image/jpeg';
-
   const resp = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -635,139 +608,119 @@ async function analyzeAI(file){
     },
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 500,
-      messages: [{
-        role: 'user',
-        content: [
-          { type: 'image', source: { type: 'base64', media_type: mimeType, data: b64 } },
-          { type: 'text', text: 'Analyse cette image de produit alimentaire. Réponds UNIQUEMENT en JSON valide, sans markdown :\n{"name":"nom complet du produit","gencod":"EAN 13 chiffres ou vide","expiry":"date YYYY-MM-DD ou vide","rayon":"Épicerie ou Crémerie ou Charcuterie ou Boulangerie ou Surgelés ou Boissons ou Hygiène ou Confiserie ou Traiteur"}\nSi une info n est pas visible, mets "". Ne mets jamais null.' },
-        ],
-      }],
+      max_tokens: 300,
+      messages: [{ role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: mimeType, data: b64 } },
+        { type: 'text', text: 'Analyse cette image de produit alimentaire. Réponds UNIQUEMENT en JSON valide, sans markdown :\n{"name":"nom complet du produit","gencod":"code EAN 13 chiffres ou vide","rayon":"Épicerie ou Crémerie ou Charcuterie ou Boulangerie ou Surgelés ou Boissons ou Hygiène ou Confiserie ou Traiteur"}\nSi une info n est pas visible, mets "". Ne mets jamais null.' }
+      ]}],
     }),
   });
-
-  if(!resp.ok) {
-    const e = await resp.json().catch(()=>({}));
-    throw new Error('Anthropic ' + resp.status + ': ' + (e?.error?.message || 'erreur'));
-  }
+  if(!resp.ok) { const e=await resp.json().catch(()=>({})); throw new Error('Anthropic '+resp.status+': '+(e?.error?.message||'erreur')); }
   const data = await resp.json();
   const text = data.content?.[0]?.text || '{}';
-  let parsed;
-  try { parsed = JSON.parse(text.replace(/```json|```/g,'').trim()); }
-  catch { parsed = {}; }
-  return {
-    name:   parsed.name   || '',
-    gencod: parsed.gencod || '',
-    expiry: parsed.expiry || '',
-    rayon:  parsed.rayon  || 'Épicerie',
-  };
+  let parsed; try { parsed = JSON.parse(text.replace(/```json|```/g,'').trim()); } catch { parsed={}; }
+  return { name: parsed.name||'', gencod: parsed.gencod||'', rayon: parsed.rayon||'Épicerie' };
 }
 
-// ═══════════════════════════════════════════
-// SCAN — ÉTAPE 2 : vérification catalogue N8N
-// ═══════════════════════════════════════════
-async function checkCatalogue(gencod, expiry){
-  // Construit le payload AVEC les coordonnées GPS si disponibles
-  const payload = {
-    gencod,
-    date_peremption: expiry ? expiry.split('-').reverse().join('-') : '',
-    magasin:   getActiveMag(),
-    latitude:  gps?.lat ?? '',
-    longitude: gps?.lng ?? '',
-    accuracy:  gps?.acc ?? '',
-  };
-
-  try {
-    const resp=await fetch(N8N,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payload),
-    });
-    if(!resp.ok) return {found:false};
-    const data=await resp.json();
-
-    // N8N correctement configuré → renvoie { found: true/false, produit, type_produit }
-    if(typeof data.found === 'boolean') return data;
-
-    // N8N pas encore en mode "Respond to Webhook" → répond { message: "Workflow was started" }
-    // Dans ce cas on ne peut pas savoir → on laisse passer (comportement permissif)
-    if(data.message) return {found:true, produit:null};
-
-    // N8N renvoie les données produit sans champ "found" → produit trouvé
-    if(data.produit||data.name) return {found:true, ...data};
-
-    return {found:false};
-  } catch {
-    // N8N injoignable → permissif (ne pas bloquer l'utilisateur)
-    return {found:true, produit:null};
-  }
+async function analyzeExpiry(file) {
+  const b64 = await compressAndB64(file);
+  const mimeType = file.type || 'image/jpeg';
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': ANTHROPIC_KEY,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 100,
+      messages: [{ role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: mimeType, data: b64 } },
+        { type: 'text', text: 'Lis uniquement la date de péremption (DLC, DLUO, BBD, à consommer avant) sur cette image. Réponds UNIQUEMENT en JSON valide :\n{"expiry":"date au format YYYY-MM-DD ou vide si non visible"}\nNe mets jamais null.' }
+      ]}],
+    }),
+  });
+  if(!resp.ok) return { expiry: '' };
+  const data = await resp.json();
+  const text = data.content?.[0]?.text || '{}';
+  let parsed; try { parsed = JSON.parse(text.replace(/```json|```/g,'').trim()); } catch { parsed={}; }
+  return { expiry: parsed.expiry || '' };
 }
 
-// ═══════════════════════════════════════════
-// SCAN — ORCHESTRATION PRINCIPALE
-// ═══════════════════════════════════════════
-async function handlePhoto(event){
-  const file=event.target.files?.[0];
+// PHOTO 1 — Code-barres
+document.getElementById('scan-input-barcode').addEventListener('change', async function(event) {
+  const file = event.target.files?.[0];
   if(!file) return;
-  event.target.value='';                              // reset pour re-scanner
-  document.getElementById('nf-card').style.display='none'; // reset carte erreur
-
-  document.getElementById('ldr').style.display='flex';     // afficher loader
-
+  event.target.value = '';
+  document.getElementById('nf-card').style.display = 'none';
+  document.getElementById('ldr').style.display = 'flex';
   try {
-    // ① IA lit la photo
-    const ai = await analyzeAI(file);
+    scanDataBarcode = await analyzeBarcode(file);
+    document.getElementById('ldr').style.display = 'none';
+    // Passer à l'étape 2
+    document.getElementById('scan-step1').style.display = 'none';
+    document.getElementById('scan-step2').style.display = 'block';
+    toast('✓ Code-barres lu — photographiez maintenant la date');
+  } catch(err) {
+    document.getElementById('ldr').style.display = 'none';
+    toast('⚠ ' + (err.message || 'Erreur photo 1'), 6000);
+  }
+});
 
-    // ② N8N vérifie dans le catalogue Léa Nature
-    const cat = await checkCatalogue(ai.gencod, ai.expiry);
+// PHOTO 2 — Date de péremption
+document.getElementById('scan-input-expiry').addEventListener('change', async function(event) {
+  const file = event.target.files?.[0];
+  if(!file) return;
+  event.target.value = '';
+  document.getElementById('ldr').style.display = 'flex';
+  try {
+    const expiryData = await analyzeExpiry(file);
+    document.getElementById('ldr').style.display = 'none';
 
-    document.getElementById('ldr').style.display='none';
+    // Remettre l'étape 1 pour le prochain scan
+    document.getElementById('scan-step2').style.display = 'none';
+    document.getElementById('scan-step1').style.display = 'block';
 
-    // ③ Produit absent du catalogue → BLOQUER + message
-    if(!cat.found){
-      document.getElementById('nf-card').style.display='block';
-      document.getElementById('nf-msg').textContent =
-        `Gencod ${ai.gencod||'illisible'} absent du catalogue Léa Nature.`;
-      recentScans.unshift({
-        found:false,
-        name: ai.name||'Produit inconnu',
-        gencod: ai.gencod||'—',
-        time: new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),
-      });
-      renderScanner();
-      return; // ← PAS de formulaire
-    }
-
-    // ④ Produit trouvé → pré-remplir le formulaire
-    const product={
-      id:     uid(),
-      gencod: cat.gencod       || ai.gencod  || '',
-      name:   cat.produit      || ai.name    || 'Produit scanné',
-      rayon:  cat.type_produit || ai.rayon   || 'Épicerie',
-      qty:    1,
-      expiry: ai.expiry || addDays(30),
+    // Fusionner les deux résultats
+    const product = {
+      id:      uid(),
+      gencod:  scanDataBarcode?.gencod  || '',
+      name:    scanDataBarcode?.name    || 'Produit scanné',
+      rayon:   scanDataBarcode?.rayon   || 'Épicerie',
+      qty:     1,
+      expiry:  expiryData.expiry        || addDays(30),
       magasin: getActiveMag(),
     };
 
-    recentScans.unshift({
-      found:true,
-      name:product.name, gencod:product.gencod,
-      time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),
-    });
+    // Vérif catalogue N8N en arrière-plan
+    const cat = await checkCatalogue(product.gencod, product.expiry);
+    if(!cat.found) {
+      document.getElementById('nf-card').style.display = 'block';
+      document.getElementById('nf-msg').textContent = `Gencod ${product.gencod||'illisible'} absent du catalogue Léa Nature.`;
+      recentScans.unshift({ found:false, name:product.name, gencod:product.gencod, time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) });
+      renderScanner(); return;
+    }
+
+    if(cat.produit) product.name = cat.produit;
+    if(cat.type_produit) product.rayon = cat.type_produit;
+
+    recentScans.unshift({ found:true, name:product.name, gencod:product.gencod, time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) });
     renderScanner();
-
-    toast('✓ Produit reconnu — vérifiez et corrigez la DLC si besoin');
+    toast('✓ Produit reconnu — vérifiez et corrigez si besoin');
     openForm(product, true);
+    scanDataBarcode = null;
 
-  } catch(err){
-    document.getElementById('ldr').style.display='none';
-    console.error('Scan error:', err);
-    toast('⚠ ' + (err.message || 'Erreur inconnue'), 6000);
+  } catch(err) {
+    document.getElementById('ldr').style.display = 'none';
+    // Même si la date échoue, ouvrir le form avec ce qu'on a
+    const product = { id:uid(), gencod:scanDataBarcode?.gencod||'', name:scanDataBarcode?.name||'Produit scanné', rayon:scanDataBarcode?.rayon||'Épicerie', qty:1, expiry:addDays(30), magasin:getActiveMag() };
+    openForm(product, true);
+    scanDataBarcode = null;
+    toast('Date non lue — saisissez-la manuellement', 4000);
   }
-}
-
-// Lier l'input au handler
-document.getElementById('scan-input').addEventListener('change', handlePhoto);
+});
 
 // ═══════════════════════════════════════════
 // POPUP DÉMARRAGE
