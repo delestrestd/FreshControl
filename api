@@ -1,26 +1,40 @@
-export const config = { api: { bodyParser: { sizeLimit: '10mb' } } };
+// Augmente la limite body à 10MB pour les photos
+module.exports.config = { api: { bodyParser: { sizeLimit: '10mb' } } };
 
-export default async function handler(req, res) {
-  // Autorise CORS
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' });
+
+  if (req.method === 'GET') {
+    const keyOk = !!process.env.ANTHROPIC_API_KEY;
+    return res.status(200).json({
+      status: 'ok',
+      key_present: keyOk,
+      key_prefix: keyOk ? process.env.ANTHROPIC_API_KEY.slice(0, 10) + '...' : 'MANQUANTE',
+    });
+  }
+
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const { image, mimeType } = req.body || {};
+  if (!image) return res.status(400).json({ error: 'Image manquante' });
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'Clé API manquante' });
 
   try {
-    const { image, mimeType } = req.body;
-    if (!image) return res.status(400).json({ error: 'Image manquante' });
-
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 500,
         messages: [{
           role: 'user',
@@ -31,36 +45,26 @@ export default async function handler(req, res) {
             },
             {
               type: 'text',
-              text: `Analyse cette image de produit alimentaire. Réponds UNIQUEMENT en JSON valide, sans markdown, sans explication :
-{
-  "name": "nom complet du produit",
-  "gencod": "code-barres EAN 13 chiffres ou vide si non visible",
-  "expiry": "date péremption au format YYYY-MM-DD ou vide si non visible",
-  "rayon": "un parmi : Épicerie, Crémerie, Charcuterie, Boulangerie, Surgelés, Boissons, Hygiène, Confiserie, Traiteur"
-}
-Si tu ne vois pas une information, laisse la chaîne vide. Ne mets jamais null.`,
+              text: `Analyse cette image de produit alimentaire. Réponds UNIQUEMENT en JSON valide, sans markdown :
+{"name":"nom complet du produit","gencod":"EAN 13 chiffres ou vide","expiry":"date YYYY-MM-DD ou vide","rayon":"Épicerie ou Crémerie ou Charcuterie ou Boulangerie ou Surgelés ou Boissons ou Hygiène ou Confiserie ou Traiteur"}
+Si une info n'est pas visible, mets "". Ne mets jamais null.`,
             },
           ],
         }],
       }),
     });
 
+    const raw = await response.text();
     if (!response.ok) {
-      const err = await response.text();
-      console.error('Anthropic error:', err);
-      return res.status(500).json({ error: 'Erreur API analyse' });
+      console.error('Anthropic error:', response.status, raw);
+      return res.status(500).json({ error: `Anthropic ${response.status}`, detail: raw.slice(0, 300) });
     }
 
-    const data = await response.json();
+    const data = JSON.parse(raw);
     const text = data.content?.[0]?.text || '{}';
-
-    // Parse JSON robuste
     let parsed;
-    try {
-      parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
-    } catch {
-      parsed = { name: '', gencod: '', expiry: '', rayon: 'Épicerie' };
-    }
+    try { parsed = JSON.parse(text.replace(/```json|```/g, '').trim()); }
+    catch { parsed = {}; }
 
     return res.status(200).json({
       name:   parsed.name   || '',
@@ -70,7 +74,7 @@ Si tu ne vois pas une information, laisse la chaîne vide. Ne mets jamais null.`
     });
 
   } catch (err) {
-    console.error('Handler error:', err);
+    console.error('Handler error:', err.message);
     return res.status(500).json({ error: err.message });
   }
-}
+};
