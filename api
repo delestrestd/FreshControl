@@ -1,7 +1,4 @@
-// Augmente la limite body à 10MB pour les photos
-module.exports.config = { api: { bodyParser: { sizeLimit: '10mb' } } };
-
-module.exports = async function handler(req, res) {
+const handler = async function (req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -39,16 +36,10 @@ module.exports = async function handler(req, res) {
         messages: [{
           role: 'user',
           content: [
-            {
-              type: 'image',
-              source: { type: 'base64', media_type: mimeType || 'image/jpeg', data: image },
-            },
-            {
-              type: 'text',
-              text: `Analyse cette image de produit alimentaire. Réponds UNIQUEMENT en JSON valide, sans markdown :
+            { type: 'image', source: { type: 'base64', media_type: mimeType || 'image/jpeg', data: image } },
+            { type: 'text', text: `Analyse cette image de produit alimentaire. Réponds UNIQUEMENT en JSON valide, sans markdown :
 {"name":"nom complet du produit","gencod":"EAN 13 chiffres ou vide","expiry":"date YYYY-MM-DD ou vide","rayon":"Épicerie ou Crémerie ou Charcuterie ou Boulangerie ou Surgelés ou Boissons ou Hygiène ou Confiserie ou Traiteur"}
-Si une info n'est pas visible, mets "". Ne mets jamais null.`,
-            },
+Si une info n'est pas visible, mets "". Ne mets jamais null.` },
           ],
         }],
       }),
@@ -78,3 +69,6 @@ Si une info n'est pas visible, mets "". Ne mets jamais null.`,
     return res.status(500).json({ error: err.message });
   }
 };
+
+handler.config = { api: { bodyParser: { sizeLimit: '10mb' } } };
+module.exports = handler;
