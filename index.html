@@ -583,11 +583,11 @@ function toast(msg,dur=3000){
 }
 
 // ═══════════════════════════════════════════
-// SCAN — ÉTAPE 1 : analyse IA via /api/analyze
+// SCAN — ÉTAPE 1 : analyse IA directement via Anthropic API
 // ═══════════════════════════════════════════
-// Compresse la photo avant envoi (iOS Safari compatible)
+const ANTHROPIC_KEY = 'METTEZ_VOTRE_CLE_ICI'; // sk-ant-...
+
 async function compressAndB64(file) {
-  // Fallback direct FileReader si canvas indispo
   const tryCanvas = () => new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
@@ -605,42 +605,62 @@ async function compressAndB64(file) {
         if (!ctx) throw new Error('Canvas non supporté');
         ctx.drawImage(img, 0, 0, w, h);
         URL.revokeObjectURL(url);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-        resolve(dataUrl.split(',')[1]);
+        resolve(canvas.toDataURL('image/jpeg', 0.7).split(',')[1]);
       } catch(e) { URL.revokeObjectURL(url); reject(e); }
     };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Chargement image échoué')); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image échouée')); };
     img.src = url;
   });
-
-  // Fallback : FileReader direct (sans compression)
   const tryFileReader = () => new Promise((resolve, reject) => {
     const r = new FileReader();
     r.onload = () => resolve(r.result.split(',')[1]);
     r.onerror = () => reject(new Error('FileReader échoué'));
     r.readAsDataURL(file);
   });
-
   try { return await tryCanvas(); }
-  catch(e) {
-    console.warn('Canvas failed, fallback FileReader:', e.message);
-    return await tryFileReader();
-  }
+  catch(e) { return await tryFileReader(); }
 }
 
 async function analyzeAI(file){
-  const b64=await compressAndB64(file);
-  const resp=await fetch('/api/analyze',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({image:b64, mimeType:file.type||'image/jpeg'}),
+  const b64 = await compressAndB64(file);
+  const mimeType = file.type || 'image/jpeg';
+
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': ANTHROPIC_KEY,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 500,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: mimeType, data: b64 } },
+          { type: 'text', text: 'Analyse cette image de produit alimentaire. Réponds UNIQUEMENT en JSON valide, sans markdown :\n{"name":"nom complet du produit","gencod":"EAN 13 chiffres ou vide","expiry":"date YYYY-MM-DD ou vide","rayon":"Épicerie ou Crémerie ou Charcuterie ou Boulangerie ou Surgelés ou Boissons ou Hygiène ou Confiserie ou Traiteur"}\nSi une info n est pas visible, mets "". Ne mets jamais null.' },
+        ],
+      }],
+    }),
   });
+
   if(!resp.ok) {
-    let detail = '';
-    try { const e = await resp.json(); detail = e.error || e.detail || ''; } catch{}
-    throw new Error('API ' + resp.status + (detail ? ' - ' + detail : ''));
+    const e = await resp.json().catch(()=>({}));
+    throw new Error('Anthropic ' + resp.status + ': ' + (e?.error?.message || 'erreur'));
   }
-  return resp.json();
+  const data = await resp.json();
+  const text = data.content?.[0]?.text || '{}';
+  let parsed;
+  try { parsed = JSON.parse(text.replace(/```json|```/g,'').trim()); }
+  catch { parsed = {}; }
+  return {
+    name:   parsed.name   || '',
+    gencod: parsed.gencod || '',
+    expiry: parsed.expiry || '',
+    rayon:  parsed.rayon  || 'Épicerie',
+  };
 }
 
 // ═══════════════════════════════════════════
