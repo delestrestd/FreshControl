@@ -263,7 +263,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 // CONFIG — remplacez la clé ici
 // ═══════════════════════════════════════════
 const N8N = 'https://stephane1377.app.n8n.cloud/webhook/scan-produit-magasin';
-const ANTHROPIC_KEY = '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'; // sk-ant-...
+const ANTHROPIC_KEY = 'METTEZ_VOTRE_CLE_ICI'; // sk-ant-...
 const MAGS_DEF = ['Monoprix Marseille', 'Casino Nice'];
 
 // ═══════════════════════════════════════════
@@ -300,23 +300,26 @@ const save = () => {
 // RGPD
 // ═══════════════════════════════════════════
 function initRGPD() {
-  const consent = localStorage.getItem('fc_rgpd');
+  const consent = localStorage.getItem('fc_rgpd_v3');
+  // GPS démarre toujours pour le bon fonctionnement de l'app
+  initGPS();
   if (!consent) {
-    document.getElementById('rgpd-overlay').style.display = 'flex';
-  } else if (consent === 'accepted') {
-    initGPS();
+    // Afficher RGPD après 1s pour ne pas bloquer l'interface
+    setTimeout(() => {
+      document.getElementById('rgpd-overlay').style.display = 'flex';
+    }, 1000);
   }
 }
 
 function rgpdAccept() {
-  localStorage.setItem('fc_rgpd', 'accepted');
+  localStorage.setItem('fc_rgpd_v3', 'accepted');
   document.getElementById('rgpd-overlay').style.display = 'none';
   initGPS();
   toast('✓ Consentement enregistré');
 }
 
 function rgpdDecline() {
-  localStorage.setItem('fc_rgpd', 'declined');
+  localStorage.setItem('fc_rgpd_v3', 'declined');
   document.getElementById('rgpd-overlay').style.display = 'none';
   document.getElementById('gps-pill').style.display = 'none';
   toast('GPS désactivé');
@@ -328,15 +331,26 @@ function rgpdDecline() {
 function initGPS() {
   const pill = document.getElementById('gps-pill');
   const txt  = document.getElementById('gps-txt');
-  if (!navigator.geolocation) return;
+  if (!navigator.geolocation) { 
+    pill.style.display = 'inline-flex';
+    txt.textContent = 'GPS non supporté';
+    return; 
+  }
   pill.style.display = 'inline-flex';
+  txt.textContent = 'Localisation…';
   navigator.geolocation.watchPosition(
     pos => {
       gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: Math.round(pos.coords.accuracy) };
       txt.textContent = `GPS actif · ±${gps.acc}m`;
+      pill.style.background = 'var(--green-light)';
+      pill.style.color = 'var(--green)';
     },
-    () => { txt.textContent = 'GPS non disponible'; },
-    { enableHighAccuracy: true, maximumAge: 15000, timeout: 12000 }
+    err => { 
+      txt.textContent = 'GPS refusé · activez la localisation';
+      pill.style.background = '#FAEEDA';
+      pill.style.color = '#854F0B';
+    },
+    { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
   );
 }
 
@@ -604,11 +618,9 @@ async function checkCatalogue(gencod){
     const data = await resp.json();
     // N8N répond avec "Respond to Webhook" → { found, produit, type_produit }
     if(typeof data.found === 'boolean') return data;
-    // N8N répond { message: "Workflow was started" } → pas encore configuré
-    if(data.message) return { found: true, produit: null };
-    // N8N répond avec les données directement
     if(data.produit || data.name) return { found: true, produit: data.produit||data.name, type_produit: data.type_produit||data.rayon };
-    return { found: false };
+    // N8N répond { message: ... } → catalogue indisponible → on laisse passer avec nom IA
+    return { found: true, produit: null };
   } catch { return { found: true, produit: null }; }
 }
 
@@ -653,10 +665,10 @@ async function readGencod(file){
     },
     body:JSON.stringify({
       model:'claude-haiku-4-5-20251001',
-      max_tokens:200,
+      max_tokens:300,
       messages:[{role:'user',content:[
         {type:'image',source:{type:'base64',media_type:mimeType,data:b64}},
-        {type:'text',text:'Lis uniquement le code-barres EAN (13 chiffres) sur cette image. Réponds UNIQUEMENT en JSON valide sans markdown :\n{"gencod":"13 chiffres ou chaine vide si non visible"}\nNe mets jamais null.'},
+        {type:'text',text:'Analyse cette image de produit alimentaire. Réponds UNIQUEMENT en JSON valide sans markdown :\n{"gencod":"code EAN 13 chiffres ou vide si non visible","name":"nom complet du produit tel qu il apparait sur l emballage ou vide","rayon":"Épicerie ou Crémerie ou Charcuterie ou Boulangerie ou Surgelés ou Boissons ou Hygiène ou Confiserie ou Traiteur"}\nNe mets jamais null.'},
       ]}],
     }),
   });
@@ -664,7 +676,7 @@ async function readGencod(file){
   const data=await resp.json();
   const text=data.content?.[0]?.text||'{}';
   let parsed; try{parsed=JSON.parse(text.replace(/```json|```/g,'').trim());}catch{parsed={};}
-  return parsed.gencod||'';
+  return { gencod: parsed.gencod||'', name: parsed.name||'', rayon: parsed.rayon||'Épicerie' };
 }
 
 // ═══════════════════════════════════════════
@@ -677,35 +689,38 @@ document.getElementById('scan-input').addEventListener('change', async function(
   document.getElementById('ldr').style.display='flex';
 
   try{
-    // 1. IA lit le gencod
-    const gencod = await readGencod(file);
+    // 1. IA lit gencod + nom + rayon depuis la photo
+    const ai = await readGencod(file);
+    const gencod = ai.gencod;
+
     if(!gencod){
       document.getElementById('ldr').style.display='none';
       toast('⚠ Code-barres illisible — saisissez le gencod manuellement',5000);
-      openForm({id:uid(),gencod:'',name:'',rayon:'Épicerie',qty:1,expiry:'',magasin:getActiveMag()}, true);
+      openForm({id:uid(),gencod:'',name:ai.name||'',rayon:ai.rayon||'Épicerie',qty:1,expiry:'',magasin:getActiveMag()}, true);
       return;
     }
 
-    // 2. N8N vérifie dans le catalogue
+    // 2. N8N vérifie dans le catalogue (attend la réponse)
     const cat = await checkCatalogue(gencod);
     document.getElementById('ldr').style.display='none';
 
-    // 3. Produit absent → bloquer
+    // 3. Produit absent du catalogue → BLOQUER
     if(!cat.found){
       document.getElementById('nf-card').style.display='block';
-      document.getElementById('nf-msg').textContent=`Gencod ${gencod} absent du catalogue Léa Nature.`;
-      recentScans.unshift({found:false,name:'Produit inconnu',gencod,time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});
+      document.getElementById('nf-msg').textContent=`Gencod ${gencod} (${ai.name||'?'}) absent du catalogue Léa Nature.`;
+      recentScans.unshift({found:false,name:ai.name||'Produit inconnu',gencod,time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});
       save(); renderScanner(); return;
     }
 
-    // 4. Produit trouvé → formulaire pré-rempli (date à saisir manuellement)
+    // 4. N8N pas encore configuré (répond "Workflow was started") → utiliser le nom lu par l'IA
+    // 5. Produit trouvé → formulaire pré-rempli avec nom catalogue (ou nom IA si catalogue indisponible)
     const product={
       id:      uid(),
       gencod:  gencod,
-      name:    cat.produit    || '',
-      rayon:   cat.type_produit || 'Épicerie',
+      name:    cat.produit      || ai.name  || '',   // Nom catalogue en priorité, sinon nom IA
+      rayon:   cat.type_produit || ai.rayon || 'Épicerie',
       qty:     1,
-      expiry:  '',  // Toujours saisi manuellement
+      expiry:  '',  // Date toujours saisie manuellement
       magasin: getActiveMag(),
     };
     recentScans.unshift({found:true,name:product.name||gencod,gencod,time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});
