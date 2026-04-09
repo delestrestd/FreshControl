@@ -20,32 +20,22 @@
   --tab-h:64px;--hdr-h:72px;
 }
 html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text);overflow:hidden}
-
-/* HEADER */
 #hdr{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--green);color:#fff;padding:14px 20px 12px;height:var(--hdr-h);display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(29,158,117,.3)}
 #hdr h1{font-size:20px;font-weight:700}
 #hdr-sub{font-size:11px;opacity:.8;margin-top:2px}
 .badge-urgent{background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px}
-
-/* MAIN */
 #main{position:fixed;top:var(--hdr-h);bottom:var(--tab-h);left:0;right:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px}
-
-/* TABBAR */
 #tabbar{position:fixed;bottom:0;left:0;right:0;z-index:100;background:#fff;height:var(--tab-h);display:flex;border-top:1px solid var(--border);box-shadow:0 -2px 12px rgba(0,0,0,.06)}
 .tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:transparent;font-size:10px;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color .2s}
 .tb .ic{font-size:22px}
 .tb.on{color:var(--green)}
 .tab{display:none}.tab.on{display:block}
-
-/* CARDS & STATS */
 .card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
 .stat{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);border-left:4px solid currentColor;cursor:pointer}
 .stat-num{font-size:28px;font-weight:800}
 .stat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
 .c-exp{color:var(--red)}.c-crit{color:var(--orange)}.c-warn{color:#639922}.c-ok{color:var(--blue)}
-
-/* PRODUCT ITEMS */
 .pi{background:var(--card);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
 .pi-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .pi-info{flex:1;min-width:0}
@@ -53,31 +43,17 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 .pi-meta{font-size:12px;color:var(--muted);margin-top:2px}
 .pi-badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:8px;white-space:nowrap}
 .btn-icon{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;flex-shrink:0}
-
-/* FILTERS */
 .frow{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
 .frow::-webkit-scrollbar{display:none}
 .fpill{flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:#fff;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent}
 .fpill.on{background:var(--green);color:#fff;border-color:var(--green)}
-
-/* SCAN */
 .scan-zone{background:var(--card);border-radius:var(--radius);padding:36px 20px;text-align:center;box-shadow:var(--shadow);margin-bottom:16px;border:2px dashed var(--green);cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative}
 .scan-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .scan-ic{font-size:56px;margin-bottom:12px}
-.scan-zone h2{font-size:17px;font-weight:700;color:var(--green)}
-.scan-zone p{font-size:13px;color:var(--muted);margin-top:6px}
-
-/* GPS */
 .gps-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;background:var(--green-light);color:var(--green);margin-bottom:14px;width:100%}
 .gps-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;flex-shrink:0}
-
-/* NOT FOUND */
 .nf-card{background:var(--red-light);border-radius:var(--radius);padding:24px 20px;text-align:center;margin-bottom:16px;border:1px solid #F7C1C1;display:none}
-.nf-card .nf-ic{font-size:44px;margin-bottom:10px}
-.nf-card h3{font-size:17px;font-weight:800;color:var(--red)}
-.nf-card p{font-size:13px;color:#A32D2D;margin-top:6px}
-
-/* FORM OVERLAY */
+.nf-ic{font-size:44px;margin-bottom:10px}
 .overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.5);display:flex;flex-direction:column;justify-content:flex-end}
 .sheet{background:#fff;border-radius:24px 24px 0 0;padding:24px 20px 44px;max-height:90vh;overflow-y:auto}
 .handle{width:40px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 20px}
@@ -88,50 +64,62 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 .fi:focus{outline:none;border-color:var(--green);background:#fff}
 select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A8A7A' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
 .status-prev{padding:10px 14px;border-radius:10px;font-size:13px;font-weight:600;margin-top:8px;display:none}
-
-/* BUTTONS */
 .btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:16px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:6px}
 .btn-p{background:var(--green);color:#fff}
 .btn-s{background:var(--bg);color:var(--muted)}
 .btn-d{background:var(--red-light);color:var(--red)}
 .fab{position:fixed;bottom:calc(var(--tab-h)+16px);right:16px;z-index:90;width:52px;height:52px;border-radius:50%;background:var(--green);color:#fff;font-size:26px;border:none;box-shadow:0 4px 16px rgba(29,158,117,.4);display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
-
-/* ALERTS */
 .al-item{background:var(--card);border-radius:12px;padding:14px;margin-bottom:8px;border-left:4px solid}
 .al-exp{border-color:var(--red)}.al-crit{border-color:var(--orange)}
-
-/* PLANNING */
 .pmag{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px}
 .pmag h3{font-size:15px;font-weight:700;margin-bottom:12px}
 .dg{display:flex;gap:6px}
 .db{flex:1;padding:8px 2px;border-radius:8px;border:1.5px solid var(--border);font-size:11px;font-weight:600;background:#fff;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent}
 .db.on{background:var(--green);color:#fff;border-color:var(--green)}
-
-/* LOADER */
 #ldr{display:none}
 #ldr .sheet{padding:52px 20px;text-align:center}
-
-/* TOAST */
 .toast{position:fixed;bottom:calc(var(--tab-h)+16px);left:50%;transform:translateX(-50%);background:#1a2a1a;color:#fff;padding:12px 20px;border-radius:20px;font-size:14px;font-weight:500;z-index:999;white-space:nowrap;pointer-events:none;animation:fiu .3s ease}
-
-/* RECENT SCANS */
 .rs-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
 .rs-item:last-child{border-bottom:none}
-
-/* EMPTY */
 .empty{text-align:center;padding:40px 20px;color:var(--muted)}
 .empty .ei{font-size:48px;margin-bottom:12px}
-
-/* SECTION HDR */
 .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .sh-t{font-size:15px;font-weight:700}
 .sh-c{font-size:12px;color:var(--muted)}
-
+/* RGPD */
+#rgpd-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.7);display:flex;align-items:flex-end}
+#rgpd-box{background:#fff;width:100%;border-radius:24px 24px 0 0;padding:28px 20px 44px}
+#rgpd-box h2{font-size:18px;font-weight:800;margin-bottom:10px}
+#rgpd-box p{font-size:13px;color:#555;line-height:1.6;margin-bottom:8px}
+#rgpd-box ul{font-size:13px;color:#555;line-height:1.8;padding-left:20px;margin-bottom:16px}
+.rgpd-btns{display:flex;gap:10px;margin-top:16px}
+.rgpd-btns button{flex:1;padding:14px;border-radius:12px;border:none;font-size:15px;font-weight:700;cursor:pointer}
+.rgpd-accept{background:var(--green);color:#fff}
+.rgpd-decline{background:#f0f0f0;color:#555}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes fiu{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 </style>
 </head>
 <body>
+
+<!-- RGPD -->
+<div id="rgpd-overlay" style="display:none">
+  <div id="rgpd-box">
+    <div style="font-size:32px;margin-bottom:12px">🔒</div>
+    <h2>Protection de vos données</h2>
+    <p>FreshControl collecte les données suivantes pour fonctionner :</p>
+    <ul>
+      <li><b>Localisation GPS</b> — pour identifier le magasin scanné</li>
+      <li><b>Photos de produits</b> — analysées par Anthropic AI (Claude) pour lire le code-barres</li>
+      <li><b>Données produits</b> — stockées dans Google Sheets via N8N</li>
+    </ul>
+    <p>Aucune donnée n'est vendue à des tiers. Vous pouvez retirer votre consentement à tout moment.</p>
+    <div class="rgpd-btns">
+      <button class="rgpd-decline" onclick="rgpdDecline()">Refuser</button>
+      <button class="rgpd-accept" onclick="rgpdAccept()">✓ Accepter</button>
+    </div>
+  </div>
+</div>
 
 <!-- HEADER -->
 <div id="hdr">
@@ -166,26 +154,17 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
       <span id="gps-txt">Localisation…</span>
     </div>
 
-    <!-- ÉTAPE 1 : Code-barres -->
-    <div class="scan-zone" id="scan-step1">
-      <input type="file" id="scan-input-barcode" accept="image/*" capture="environment">
+    <div class="scan-zone">
+      <input type="file" id="scan-input" accept="image/*" capture="environment">
       <div class="scan-ic">📦</div>
-      <h2>Photo 1 — Code-barres</h2>
-      <p>Photographiez le code-barres EAN du produit</p>
-    </div>
-
-    <!-- ÉTAPE 2 : Date (apparaît après la photo 1) -->
-    <div class="scan-zone" id="scan-step2" style="display:none;border-color:#EF9F27">
-      <input type="file" id="scan-input-expiry" accept="image/*" capture="environment">
-      <div class="scan-ic">📅</div>
-      <h2>Photo 2 — Date de péremption</h2>
-      <p>Photographiez la date DLC / DLUO du produit</p>
+      <h2 style="color:var(--green)">Scanner le code-barres</h2>
+      <p style="color:var(--muted);font-size:13px;margin-top:6px">Photographiez le code-barres EAN du produit</p>
     </div>
 
     <div id="nf-card" class="nf-card">
       <div class="nf-ic">🚫</div>
-      <h3>Produit inexistant</h3>
-      <p id="nf-msg">Ce produit ne figure pas dans le catalogue Léa Nature.</p>
+      <h3 style="font-size:17px;font-weight:800;color:var(--red)">Produit inexistant</h3>
+      <p id="nf-msg" style="font-size:13px;color:#A32D2D;margin-top:6px">Ce produit ne figure pas dans le catalogue Léa Nature.</p>
     </div>
 
     <div class="card">
@@ -257,7 +236,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   <div class="sheet">
     <div style="font-size:52px;margin-bottom:16px">🤖</div>
     <div style="font-size:17px;font-weight:700;margin-bottom:8px">Analyse en cours…</div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:28px">L'IA lit le gencod et la DLC</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:28px">Lecture du code-barres + vérification catalogue</div>
     <div style="display:flex;justify-content:center;gap:8px">
       <div style="width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1s infinite"></div>
       <div style="width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1s .2s infinite"></div>
@@ -281,7 +260,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
 <script>
 // ═══════════════════════════════════════════
-// CONFIG
+// CONFIG — remplacez la clé ici
 // ═══════════════════════════════════════════
 const N8N = 'https://stephane1377.app.n8n.cloud/webhook/scan-produit-magasin';
 const ANTHROPIC_KEY = 'REDACTED-REVOKED-KEY'; // sk-ant-...
@@ -305,49 +284,58 @@ const ST = {
 // ═══════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════
-let products = JSON.parse(localStorage.getItem('fc_p')||'null') || [
-  {id:uid(),gencod:'3760020500665',name:"Sirop d'Agave BIO",  rayon:'Épicerie',   qty:8, expiry:addDays(-3),magasin:'Monoprix Marseille'},
-  {id:uid(),gencod:'3289196040640',name:'Boisson Citron Gingembre',rayon:'Boissons',qty:4,expiry:addDays(1),magasin:'Monoprix Marseille'},
-  {id:uid(),gencod:'3228857000166',name:'Yaourt Nature Danone',rayon:'Crémerie',  qty:12,expiry:addDays(4), magasin:'Casino Nice'},
-  {id:uid(),gencod:'3274080005003',name:'Lait Demi-Écrémé 1L',rayon:'Crémerie',  qty:6, expiry:addDays(6), magasin:'Monoprix Marseille'},
-  {id:uid(),gencod:'8410076480781',name:'Jambon Fumé Aoste',  rayon:'Charcuterie',qty:3, expiry:addDays(-1),magasin:'Casino Nice'},
-];
-let planning = JSON.parse(localStorage.getItem('fc_pl')||'null') || {
-  'Monoprix Marseille':['Lun','Ven'],
-  'Casino Nice':['Mar','Jeu'],
-};
-let curTab='dashboard', fStatus='Tous', fMag='Tous';
-let gps=null;               // { lat, lng, accuracy }
+let products  = JSON.parse(localStorage.getItem('fc_p')  || 'null') || [];
+let planning  = JSON.parse(localStorage.getItem('fc_pl') || 'null') || { 'Monoprix Marseille':['Lun','Ven'], 'Casino Nice':['Mar','Jeu'] };
 let recentScans = JSON.parse(localStorage.getItem('fc_scans') || '[]');
+let curTab='dashboard', fStatus='Tous', fMag='Tous';
+let gps = null;
 
 const save = () => {
-  localStorage.setItem('fc_p',  JSON.stringify(products));
-  localStorage.setItem('fc_pl', JSON.stringify(planning));
+  localStorage.setItem('fc_p',     JSON.stringify(products));
+  localStorage.setItem('fc_pl',    JSON.stringify(planning));
   localStorage.setItem('fc_scans', JSON.stringify(recentScans.slice(0,20)));
 };
 
 // ═══════════════════════════════════════════
-// GEOLOCATION — watchPosition pour maintenir à jour
+// RGPD
+// ═══════════════════════════════════════════
+function initRGPD() {
+  const consent = localStorage.getItem('fc_rgpd');
+  if (!consent) {
+    document.getElementById('rgpd-overlay').style.display = 'flex';
+  } else if (consent === 'accepted') {
+    initGPS();
+  }
+}
+
+function rgpdAccept() {
+  localStorage.setItem('fc_rgpd', 'accepted');
+  document.getElementById('rgpd-overlay').style.display = 'none';
+  initGPS();
+  toast('✓ Consentement enregistré');
+}
+
+function rgpdDecline() {
+  localStorage.setItem('fc_rgpd', 'declined');
+  document.getElementById('rgpd-overlay').style.display = 'none';
+  document.getElementById('gps-pill').style.display = 'none';
+  toast('GPS désactivé');
+}
+
+// ═══════════════════════════════════════════
+// GPS
 // ═══════════════════════════════════════════
 function initGPS() {
   const pill = document.getElementById('gps-pill');
   const txt  = document.getElementById('gps-txt');
   if (!navigator.geolocation) return;
-
   pill.style.display = 'inline-flex';
-
   navigator.geolocation.watchPosition(
     pos => {
       gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: Math.round(pos.coords.accuracy) };
       txt.textContent = `GPS actif · ±${gps.acc}m`;
-      pill.style.background = 'var(--green-light)';
-      pill.style.color = 'var(--green)';
     },
-    err => {
-      txt.textContent = 'GPS non disponible';
-      pill.style.background = '#FAEEDA';
-      pill.style.color = '#854F0B';
-    },
+    () => { txt.textContent = 'GPS non disponible'; },
     { enableHighAccuracy: true, maximumAge: 15000, timeout: 12000 }
   );
 }
@@ -368,15 +356,10 @@ function stats() {
   };
 }
 
-// ═══════════════════════════════════════════
-// HEADER
-// ═══════════════════════════════════════════
 function updateHdr() {
-  const s = stats();
-  const u = s.exp.length + s.crit.length;
-  const mag = fMag!=='Tous' ? fMag : 'Tous les magasins';
+  const s=stats(); const u=s.exp.length+s.crit.length;
   document.getElementById('hdr-sub').textContent =
-    `${mag} · ${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}`;
+    `${fMag!=='Tous'?fMag:'Tous les magasins'} · ${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}`;
   document.getElementById('urgent-badge').innerHTML =
     u>0 ? `<div class="badge-urgent">${u} urgent${u>1?'s':''}</div>` : '';
 }
@@ -385,41 +368,31 @@ function updateHdr() {
 // DASHBOARD
 // ═══════════════════════════════════════════
 function renderDash() {
-  const s = stats();
+  const s=stats();
   document.getElementById('cn-exp').textContent  = s.exp.length;
   document.getElementById('cn-crit').textContent = s.crit.length;
   document.getElementById('cn-warn').textContent = s.warn.length;
   document.getElementById('cn-ok').textContent   = s.ok.length;
 
-  // Filtres statut
-  ['Tous','Périmés','Critique','Attention','OK'].forEach(v => {
-    document.getElementById('fsr').innerHTML = ['Tous','Périmés','Critique','Attention','OK'].map(v=>
-      `<button class="fpill ${fStatus===v?'on':''}" onclick="setFS('${v}')">${v}</button>`
-    ).join('');
-  });
-
-  // Filtres magasins
+  document.getElementById('fsr').innerHTML = ['Tous','Périmés','Critique','Attention','OK'].map(v=>
+    `<button class="fpill ${fStatus===v?'on':''}" onclick="setFS('${v}')">${v}</button>`).join('');
   document.getElementById('fmr').innerHTML = getMags().map(m=>
-    `<button class="fpill ${fMag===m?'on':''}" onclick="setFM('${m}')">${m}</button>`
-  ).join('');
+    `<button class="fpill ${fMag===m?'on':''}" onclick="setFM('${m}')">${m}</button>`).join('');
 
-  // Liste produits
   const map={Périmés:'exp',Critique:'crit',Attention:'warn',OK:'ok'};
-  let list = [...products];
-  if(fMag!=='Tous') list = list.filter(p=>p.magasin===fMag);
-  if(fStatus!=='Tous') list = list.filter(p=>stOf(p.expiry)===map[fStatus]);
+  let list=[...products];
+  if(fMag!=='Tous') list=list.filter(p=>p.magasin===fMag);
+  if(fStatus!=='Tous') list=list.filter(p=>stOf(p.expiry)===map[fStatus]);
   list.sort((a,b)=>new Date(a.expiry)-new Date(b.expiry));
-
-  document.getElementById('pcount').textContent = `${list.length} produit${list.length>1?'s':''}`;
+  document.getElementById('pcount').textContent=`${list.length} produit${list.length>1?'s':''}`;
 
   if(!list.length){
     document.getElementById('plist').innerHTML=`<div class="empty"><div class="ei">✅</div><p>Aucun produit ici</p></div>`;
     return;
   }
-
-  document.getElementById('plist').innerHTML = list.map(p=>{
-    const st=stOf(p.expiry), d=daysLeft(p.expiry);
-    const dtxt = d<0?`${Math.abs(d)}j dépassé`: d===0?"Aujourd'hui":`${d}j`;
+  document.getElementById('plist').innerHTML=list.map(p=>{
+    const st=stOf(p.expiry),d=daysLeft(p.expiry);
+    const dtxt=d<0?`${Math.abs(d)}j dépassé`:d===0?"Aujourd'hui":`${d}j`;
     return `<div class="pi">
       <div class="pi-dot" style="background:${ST[st].dot}"></div>
       <div class="pi-info">
@@ -435,21 +408,18 @@ function renderDash() {
   }).join('');
 }
 
-function setFS(v){fStatus=v; renderAll();}
-function setFM(v){fMag=v; updateHdr(); renderAll();}
+function setFS(v){fStatus=v;renderAll();}
+function setFM(v){fMag=v;updateHdr();renderAll();}
 
 // ═══════════════════════════════════════════
 // ALERTES
 // ═══════════════════════════════════════════
-function renderAlertes() {
-  const urgent = products.filter(p=>['exp','crit'].includes(stOf(p.expiry)));
+function renderAlertes(){
+  const urgent=products.filter(p=>['exp','crit'].includes(stOf(p.expiry)));
   urgent.sort((a,b)=>new Date(a.expiry)-new Date(b.expiry));
-  if(!urgent.length){
-    document.getElementById('alert-list').innerHTML=`<div class="empty"><div class="ei">🎉</div><p>Aucun produit urgent</p></div>`;
-    return;
-  }
-  document.getElementById('alert-list').innerHTML = urgent.map(p=>{
-    const st=stOf(p.expiry), d=daysLeft(p.expiry);
+  if(!urgent.length){document.getElementById('alert-list').innerHTML=`<div class="empty"><div class="ei">🎉</div><p>Aucun produit urgent</p></div>`;return;}
+  document.getElementById('alert-list').innerHTML=urgent.map(p=>{
+    const st=stOf(p.expiry),d=daysLeft(p.expiry);
     return `<div class="al-item al-${st}">
       <div style="font-weight:700;font-size:14px">${p.name}</div>
       <div style="font-size:12px;color:var(--muted);margin-top:4px">${p.magasin} · DLC ${fmt(p.expiry)} · Qté ${p.qty}</div>
@@ -463,17 +433,14 @@ function renderAlertes() {
 // ═══════════════════════════════════════════
 // PLANNING
 // ═══════════════════════════════════════════
-function renderPlanning() {
-  const mags = getMags().filter(m=>m!=='Tous');
-  const jours = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
-  document.getElementById('planning-list').innerHTML = mags.map(mag=>{
-    if(!planning[mag]) planning[mag]=[];
-    return `<div class="pmag">
-      <h3>🏪 ${mag}</h3>
-      <div class="dg">
-        ${jours.map(j=>`<button class="db ${planning[mag].includes(j)?'on':''}" onclick="toggleDay('${mag}','${j}')">${j}</button>`).join('')}
-      </div>
-    </div>`;
+function renderPlanning(){
+  const mags=getMags().filter(m=>m!=='Tous');
+  const jours=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  document.getElementById('planning-list').innerHTML=mags.map(mag=>{
+    if(!planning[mag])planning[mag]=[];
+    return `<div class="pmag"><h3>🏪 ${mag}</h3><div class="dg">
+      ${jours.map(j=>`<button class="db ${planning[mag].includes(j)?'on':''}" onclick="toggleDay('${mag}','${j}')">${j}</button>`).join('')}
+    </div></div>`;
   }).join('');
 }
 
@@ -481,20 +448,20 @@ function toggleDay(mag,j){
   if(!planning[mag])planning[mag]=[];
   const i=planning[mag].indexOf(j);
   if(i>=0)planning[mag].splice(i,1); else planning[mag].push(j);
-  save(); renderPlanning();
+  save();renderPlanning();
 }
 
 // ═══════════════════════════════════════════
-// SCANNER — RECENT SCANS
+// SCANNER — HISTORIQUE
 // ═══════════════════════════════════════════
 function renderScanner(){
   const el=document.getElementById('recent-scans');
   if(!recentScans.length){el.innerHTML='<p style="color:var(--muted);font-size:13px">Aucun scan récent</p>';return;}
-  el.innerHTML=recentScans.slice(0,6).map(s=>`
+  el.innerHTML=recentScans.slice(0,8).map(s=>`
     <div class="rs-item">
       <div style="font-size:22px">${s.found?'✅':'🚫'}</div>
-      <div>
-        <div style="font-size:13px;font-weight:600">${s.name}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.name}</div>
         <div style="font-size:11px;color:var(--muted)">${s.gencod} · ${s.time}</div>
       </div>
     </div>`).join('');
@@ -511,17 +478,14 @@ function renderAll(){
   else if(curTab==='planning') renderPlanning();
 }
 
-// ═══════════════════════════════════════════
-// TABS
-// ═══════════════════════════════════════════
 function switchTab(t){
   curTab=t;
   document.querySelectorAll('.tab').forEach(el=>el.classList.remove('on'));
   document.getElementById('tab-'+t).classList.add('on');
   document.querySelectorAll('.tb').forEach(el=>el.classList.remove('on'));
   document.getElementById('tbtn-'+t).classList.add('on');
-  document.getElementById('fab').style.display = t==='dashboard'?'flex':'none';
-  document.getElementById('nf-card').style.display = 'none';
+  document.getElementById('fab').style.display=t==='dashboard'?'flex':'none';
+  document.getElementById('nf-card').style.display='none';
   renderAll();
 }
 
@@ -538,9 +502,9 @@ function openForm(p, fromScan=false){
   document.getElementById('f-rayon').value  = p?.rayon || 'Épicerie';
   document.getElementById('f-qty').value    = p?.qty   || 1;
   document.getElementById('f-expiry').value = p?.expiry|| '';
-  const mags = getMags().filter(m=>m!=='Tous');
-  document.getElementById('f-magasin').innerHTML = mags.map(m=>`<option ${m===p?.magasin?'selected':''}>${m}</option>`).join('');
-  document.getElementById('btn-del').style.display = isEdit?'block':'none';
+  const mags=getMags().filter(m=>m!=='Tous');
+  document.getElementById('f-magasin').innerHTML=mags.map(m=>`<option ${m===p?.magasin?'selected':''}>${m}</option>`).join('');
+  document.getElementById('btn-del').style.display=isEdit?'block':'none';
   updatePrev();
   document.getElementById('form-ov').style.display='flex';
 }
@@ -551,56 +515,10 @@ function updatePrev(){
   const e=document.getElementById('f-expiry').value;
   const el=document.getElementById('sprev');
   if(!e){el.style.display='none';return;}
-  const st=stOf(e), d=daysLeft(e);
+  const st=stOf(e),d=daysLeft(e);
   const txt=d<0?`${Math.abs(d)}j dépassé`:d===0?"Aujourd'hui":`${d} jours restants`;
-  el.style.display='block'; el.style.background=ST[st].bg; el.style.color=ST[st].tx;
+  el.style.display='block';el.style.background=ST[st].bg;el.style.color=ST[st].tx;
   el.textContent=`${ST[st].lbl} · ${txt}`;
-}
-
-// ═══════════════════════════════════════════
-// CATALOGUE N8N
-// ═══════════════════════════════════════════
-async function checkCatalogue(gencod, expiry) {
-  try {
-    const payload = {
-      gencod,
-      date_peremption: expiry ? expiry.split('-').reverse().join('-') : '',
-      magasin: getActiveMag(),
-      latitude:  gps?.lat ?? '',
-      longitude: gps?.lng ?? '',
-    };
-    const resp = await fetch(N8N, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (!resp.ok) return { found: true, produit: null };
-    const data = await resp.json();
-    if (typeof data.found === 'boolean') return data;
-    if (data.produit || data.name) return { found: true, ...data };
-    if (data.message) return { found: true, produit: null };
-    return { found: false };
-  } catch { return { found: true, produit: null }; }
-}
-
-// Envoi N8N après validation formulaire
-async function sendToN8N(product) {
-  try {
-    await fetch(N8N, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        produit:         product.name,
-        gencod:          product.gencod,
-        date_peremption: product.expiry ? product.expiry.split('-').reverse().join('-') : '',
-        type_produit:    product.rayon,
-        magasin:         product.magasin,
-        quantite:        product.qty,
-        latitude:        gps?.lat ?? '',
-        longitude:       gps?.lng ?? '',
-      }),
-    });
-  } catch { console.warn('N8N non joignable'); }
 }
 
 function submitForm(){
@@ -612,23 +530,25 @@ function submitForm(){
   const m=document.getElementById('f-magasin').value;
   const id=document.getElementById('f-id').value;
   if(!g||!n||!e){toast('⚠ Remplissez les champs obligatoires *');return;}
-  const product = {id: id||uid(), gencod:g, name:n, rayon:r, qty:q, expiry:e, magasin:m};
+  const product={id:id||uid(),gencod:g,name:n,rayon:r,qty:q,expiry:e,magasin:m};
   if(id){
     const i=products.findIndex(p=>p.id===id);
-    if(i>=0) products[i]=product;
+    if(i>=0) products[i]=product; else products.push(product);
   } else {
     products.push(product);
   }
   save();
   sendToN8N(product); // Envoi N8N en arrière-plan
-  closeForm(); toast('✓ Produit enregistré et envoyé'); switchTab('dashboard');
+  closeForm();
+  toast('✓ Produit enregistré et envoyé');
+  switchTab('dashboard');
 }
 
 function deleteProduct(){
   const id=document.getElementById('f-id').value;
   if(!id||!confirm('Supprimer ce produit ?'))return;
   products=products.filter(p=>p.id!==id);
-  save(); closeForm(); toast('🗑 Supprimé'); renderAll();
+  save();closeForm();toast('🗑 Supprimé');renderAll();
 }
 
 // ═══════════════════════════════════════════
@@ -637,174 +557,166 @@ function deleteProduct(){
 function toast(msg,dur=3000){
   document.querySelectorAll('.toast').forEach(t=>t.remove());
   const t=document.createElement('div');
-  t.className='toast'; t.textContent=msg;
+  t.className='toast';t.textContent=msg;
   document.body.appendChild(t);
   setTimeout(()=>t.remove(),dur);
 }
 
-// SCAN 2 PHOTOS
 // ═══════════════════════════════════════════
-let scanDataBarcode = null;
+// N8N — ENVOI APRÈS VALIDATION
+// ═══════════════════════════════════════════
+async function sendToN8N(product){
+  try {
+    await fetch(N8N,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        produit:         product.name,
+        gencod:          product.gencod,
+        date_peremption: product.expiry ? product.expiry.split('-').reverse().join('-') : '',
+        type_produit:    product.rayon,
+        magasin:         product.magasin,
+        quantite:        product.qty,
+        latitude:        gps?.lat ?? '',
+        longitude:       gps?.lng ?? '',
+      }),
+    });
+  } catch{ console.warn('N8N non joignable'); }
+}
 
-// Compression photo (iOS Safari compatible)
-async function compressAndB64(file) {
-  const tryCanvas = () => new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      try {
-        const MAX = 800;
-        let w = img.width || MAX, h = img.height || MAX;
-        if (w > MAX || h > MAX) {
-          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-          else { w = Math.round(w * MAX / h); h = MAX; }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) throw new Error('Canvas non supporté');
-        ctx.drawImage(img, 0, 0, w, h);
-        URL.revokeObjectURL(url);
-        resolve(canvas.toDataURL('image/jpeg', 0.7).split(',')[1]);
-      } catch(e) { URL.revokeObjectURL(url); reject(e); }
+// ═══════════════════════════════════════════
+// N8N — VÉRIFICATION CATALOGUE (gencod → nom officiel)
+// ═══════════════════════════════════════════
+async function checkCatalogue(gencod){
+  try {
+    const resp = await fetch(N8N, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        action:    'check_catalogue',
+        gencod:    gencod,
+        magasin:   getActiveMag(),
+        latitude:  gps?.lat ?? '',
+        longitude: gps?.lng ?? '',
+      }),
+    });
+    if(!resp.ok) return { found: true, produit: null };
+    const data = await resp.json();
+    // N8N répond avec "Respond to Webhook" → { found, produit, type_produit }
+    if(typeof data.found === 'boolean') return data;
+    // N8N répond { message: "Workflow was started" } → pas encore configuré
+    if(data.message) return { found: true, produit: null };
+    // N8N répond avec les données directement
+    if(data.produit || data.name) return { found: true, produit: data.produit||data.name, type_produit: data.type_produit||data.rayon };
+    return { found: false };
+  } catch { return { found: true, produit: null }; }
+}
+
+// ═══════════════════════════════════════════
+// IA — LIT UNIQUEMENT LE GENCOD
+// ═══════════════════════════════════════════
+async function compressAndB64(file){
+  const tryCanvas=()=>new Promise((resolve,reject)=>{
+    const img=new Image(), url=URL.createObjectURL(file);
+    img.onload=()=>{
+      try{
+        const MAX=800; let w=img.width||MAX,h=img.height||MAX;
+        if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+        const canvas=document.createElement('canvas'); canvas.width=w;canvas.height=h;
+        const ctx=canvas.getContext('2d'); if(!ctx)throw new Error('no ctx');
+        ctx.drawImage(img,0,0,w,h); URL.revokeObjectURL(url);
+        resolve(canvas.toDataURL('image/jpeg',0.7).split(',')[1]);
+      }catch(e){URL.revokeObjectURL(url);reject(e);}
     };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image échouée')); };
-    img.src = url;
+    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('img error'));};
+    img.src=url;
   });
-  const tryFileReader = () => new Promise((resolve, reject) => {
-    const r = new FileReader();
-    r.onload = () => resolve(r.result.split(',')[1]);
-    r.onerror = () => reject(new Error('FileReader échoué'));
+  const tryFR=()=>new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>resolve(r.result.split(',')[1]);
+    r.onerror=()=>reject(new Error('FR error'));
     r.readAsDataURL(file);
   });
-  try { return await tryCanvas(); }
-  catch(e) { return await tryFileReader(); }
-} // résultat photo 1
+  try{return await tryCanvas();}catch{return await tryFR();}
+}
 
-async function analyzeBarcode(file) {
-  const b64 = await compressAndB64(file);
-  const mimeType = file.type || 'image/jpeg';
-  const resp = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': ANTHROPIC_KEY,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
+async function readGencod(file){
+  const b64=await compressAndB64(file);
+  const mimeType=file.type||'image/jpeg';
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key':ANTHROPIC_KEY,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true',
     },
-    body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 300,
-      messages: [{ role: 'user', content: [
-        { type: 'image', source: { type: 'base64', media_type: mimeType, data: b64 } },
-        { type: 'text', text: 'Analyse cette image de produit alimentaire. Réponds UNIQUEMENT en JSON valide, sans markdown :\n{"name":"nom complet du produit","gencod":"code EAN 13 chiffres ou vide","rayon":"Épicerie ou Crémerie ou Charcuterie ou Boulangerie ou Surgelés ou Boissons ou Hygiène ou Confiserie ou Traiteur"}\nSi une info n est pas visible, mets "". Ne mets jamais null.' }
+    body:JSON.stringify({
+      model:'claude-haiku-4-5-20251001',
+      max_tokens:200,
+      messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:mimeType,data:b64}},
+        {type:'text',text:'Lis uniquement le code-barres EAN (13 chiffres) sur cette image. Réponds UNIQUEMENT en JSON valide sans markdown :\n{"gencod":"13 chiffres ou chaine vide si non visible"}\nNe mets jamais null.'},
       ]}],
     }),
   });
-  if(!resp.ok) { const e=await resp.json().catch(()=>({})); throw new Error('Anthropic '+resp.status+': '+(e?.error?.message||'erreur')); }
-  const data = await resp.json();
-  const text = data.content?.[0]?.text || '{}';
-  let parsed; try { parsed = JSON.parse(text.replace(/```json|```/g,'').trim()); } catch { parsed={}; }
-  return { name: parsed.name||'', gencod: parsed.gencod||'', rayon: parsed.rayon||'Épicerie' };
+  if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error('Anthropic '+resp.status+': '+(e?.error?.message||'erreur'));}
+  const data=await resp.json();
+  const text=data.content?.[0]?.text||'{}';
+  let parsed; try{parsed=JSON.parse(text.replace(/```json|```/g,'').trim());}catch{parsed={};}
+  return parsed.gencod||'';
 }
 
-async function analyzeExpiry(file) {
-  const b64 = await compressAndB64(file);
-  const mimeType = file.type || 'image/jpeg';
-  const resp = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': ANTHROPIC_KEY,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 100,
-      messages: [{ role: 'user', content: [
-        { type: 'image', source: { type: 'base64', media_type: mimeType, data: b64 } },
-        { type: 'text', text: 'Lis la date de péremption sur cette image. Elle peut être indiquée par : DLC, DLUO, BBD, EXP, à consommer avant, best before, MHD, TMC. La date peut être sous forme JJ/MM/AAAA, MM/AAAA, JJ.MM.AAAA, AAAA-MM-JJ ou similaire. Réponds UNIQUEMENT en JSON valide, sans markdown :\n{"expiry":"date au format YYYY-MM-DD. Si seulement mois/année visible, mets le dernier jour du mois. Chaine vide si aucune date trouvée."}\nNe mets jamais null.' }
-      ]}],
-    }),
-  });
-  if(!resp.ok) return { expiry: '' };
-  const data = await resp.json();
-  const text = data.content?.[0]?.text || '{}';
-  let parsed; try { parsed = JSON.parse(text.replace(/```json|```/g,'').trim()); } catch { parsed={}; }
-  return { expiry: parsed.expiry || '' };
-}
+// ═══════════════════════════════════════════
+// SCAN — ORCHESTRATION
+// ═══════════════════════════════════════════
+document.getElementById('scan-input').addEventListener('change', async function(event){
+  const file=event.target.files?.[0]; if(!file)return;
+  event.target.value='';
+  document.getElementById('nf-card').style.display='none';
+  document.getElementById('ldr').style.display='flex';
 
-// PHOTO 1 — Code-barres
-document.getElementById('scan-input-barcode').addEventListener('change', async function(event) {
-  const file = event.target.files?.[0];
-  if(!file) return;
-  event.target.value = '';
-  document.getElementById('nf-card').style.display = 'none';
-  document.getElementById('ldr').style.display = 'flex';
-  try {
-    scanDataBarcode = await analyzeBarcode(file);
-    document.getElementById('ldr').style.display = 'none';
-    // Passer à l'étape 2
-    document.getElementById('scan-step1').style.display = 'none';
-    document.getElementById('scan-step2').style.display = 'block';
-    toast('✓ Code-barres lu — photographiez maintenant la date');
-  } catch(err) {
-    document.getElementById('ldr').style.display = 'none';
-    toast('⚠ ' + (err.message || 'Erreur photo 1'), 6000);
-  }
-});
-
-// PHOTO 2 — Date de péremption
-document.getElementById('scan-input-expiry').addEventListener('change', async function(event) {
-  const file = event.target.files?.[0];
-  if(!file) return;
-  event.target.value = '';
-  document.getElementById('ldr').style.display = 'flex';
-  try {
-    const expiryData = await analyzeExpiry(file);
-    document.getElementById('ldr').style.display = 'none';
-
-    // Remettre l'étape 1 pour le prochain scan
-    document.getElementById('scan-step2').style.display = 'none';
-    document.getElementById('scan-step1').style.display = 'block';
-
-    // Fusionner les deux résultats
-    const product = {
-      id:      uid(),
-      gencod:  scanDataBarcode?.gencod  || '',
-      name:    scanDataBarcode?.name    || 'Produit scanné',
-      rayon:   scanDataBarcode?.rayon   || 'Épicerie',
-      qty:     1,
-      expiry:  expiryData.expiry        || addDays(30),
-      magasin: getActiveMag(),
-    };
-
-    // Vérif catalogue N8N en arrière-plan
-    const cat = await checkCatalogue(product.gencod, product.expiry);
-    if(!cat.found) {
-      document.getElementById('nf-card').style.display = 'block';
-      document.getElementById('nf-msg').textContent = `Gencod ${product.gencod||'illisible'} absent du catalogue Léa Nature.`;
-      recentScans.unshift({ found:false, name:product.name, gencod:product.gencod, time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) });
-      renderScanner(); return;
+  try{
+    // 1. IA lit le gencod
+    const gencod = await readGencod(file);
+    if(!gencod){
+      document.getElementById('ldr').style.display='none';
+      toast('⚠ Code-barres illisible — saisissez le gencod manuellement',5000);
+      openForm({id:uid(),gencod:'',name:'',rayon:'Épicerie',qty:1,expiry:'',magasin:getActiveMag()}, true);
+      return;
     }
 
-    if(cat.produit) product.name = cat.produit;
-    if(cat.type_produit) product.rayon = cat.type_produit;
+    // 2. N8N vérifie dans le catalogue
+    const cat = await checkCatalogue(gencod);
+    document.getElementById('ldr').style.display='none';
 
-    recentScans.unshift({ found:true, name:product.name, gencod:product.gencod, time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) });
+    // 3. Produit absent → bloquer
+    if(!cat.found){
+      document.getElementById('nf-card').style.display='block';
+      document.getElementById('nf-msg').textContent=`Gencod ${gencod} absent du catalogue Léa Nature.`;
+      recentScans.unshift({found:false,name:'Produit inconnu',gencod,time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});
+      save(); renderScanner(); return;
+    }
+
+    // 4. Produit trouvé → formulaire pré-rempli (date à saisir manuellement)
+    const product={
+      id:      uid(),
+      gencod:  gencod,
+      name:    cat.produit    || '',
+      rayon:   cat.type_produit || 'Épicerie',
+      qty:     1,
+      expiry:  '',  // Toujours saisi manuellement
+      magasin: getActiveMag(),
+    };
+    recentScans.unshift({found:true,name:product.name||gencod,gencod,time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});
     save(); renderScanner();
-    toast('✓ Produit reconnu — vérifiez et corrigez si besoin');
+    toast('✓ Produit reconnu — saisissez la date de péremption');
     openForm(product, true);
-    scanDataBarcode = null;
 
-  } catch(err) {
-    document.getElementById('ldr').style.display = 'none';
-    // Même si la date échoue, ouvrir le form avec ce qu'on a
-    const product = { id:uid(), gencod:scanDataBarcode?.gencod||'', name:scanDataBarcode?.name||'Produit scanné', rayon:scanDataBarcode?.rayon||'Épicerie', qty:1, expiry:addDays(30), magasin:getActiveMag() };
-    openForm(product, true);
-    scanDataBarcode = null;
-    toast('Date non lue — saisissez-la manuellement', 4000);
+  }catch(err){
+    document.getElementById('ldr').style.display='none';
+    console.error(err);
+    toast('⚠ '+( err.message||'Erreur scan'),6000);
   }
 });
 
@@ -814,8 +726,7 @@ document.getElementById('scan-input-expiry').addEventListener('change', async fu
 function checkStartup(){
   const u=products.filter(p=>['exp','crit'].includes(stOf(p.expiry)));
   if(u.length){
-    document.getElementById('popup-txt').textContent=
-      `${u.length} produit${u.length>1?'s':''} nécessite${u.length>1?'nt':''} votre attention immédiate.`;
+    document.getElementById('popup-txt').textContent=`${u.length} produit${u.length>1?'s':''} nécessite${u.length>1?'nt':''} votre attention immédiate.`;
     document.getElementById('popup').style.display='flex';
   }
 }
@@ -823,56 +734,12 @@ function checkStartup(){
 // ═══════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════
-// ═══════════════════════════════════════════
-// RGPD
-// ═══════════════════════════════════════════
-function checkRGPD() {
-  const consent = localStorage.getItem('fc_rgpd');
-  if(!consent) {
-    document.getElementById('rgpd-banner').style.display = 'block';
-    return false;
-  }
-  return consent === 'accepted';
-}
-
-function acceptRGPD() {
-  localStorage.setItem('fc_rgpd', 'accepted');
-  document.getElementById('rgpd-banner').style.display = 'none';
-  initGPS(); // Démarrer GPS seulement après accord
-}
-
-function declineRGPD() {
-  localStorage.setItem('fc_rgpd', 'declined');
-  document.getElementById('rgpd-banner').style.display = 'none';
-  const pill = document.getElementById('gps-pill');
-  if(pill) pill.style.display = 'none';
-}
-
 document.addEventListener('DOMContentLoaded',()=>{
   if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  initRGPD();
   renderAll();
-  setTimeout(checkStartup, 1000);
-  // GPS seulement si consentement déjà donné
-  const rgpd = localStorage.getItem('fc_rgpd');
-  if(rgpd === 'accepted') {
-    initGPS();
-  } else {
-    // Toujours afficher si pas encore accepté
-    setTimeout(() => {
-      document.getElementById('rgpd-banner').style.display = 'block';
-    }, 1200);
-  }
+  setTimeout(checkStartup,1000);
 });
 </script>
-
-<!-- RGPD BANNER -->
-<div id="rgpd-banner" style="display:none;position:fixed;bottom:var(--tab-h);left:0;right:0;z-index:500;background:#1a2a1a;color:#fff;padding:16px 20px;font-size:13px;line-height:1.5">
-  <div style="font-weight:700;margin-bottom:6px">🔒 Données personnelles</div>
-  <div style="opacity:.85;margin-bottom:12px">Cette app collecte votre <b>localisation GPS</b> et les <b>photos</b> de produits pour la gestion des dates de péremption. Ces données sont traitées par N8N et Anthropic AI, et stockées dans Google Sheets. Aucune donnée n'est vendue à des tiers.</div>
-  <div style="display:flex;gap:8px">
-    <button onclick="acceptRGPD()" style="flex:1;padding:10px;border-radius:8px;border:none;background:var(--green);color:#fff;font-weight:700;cursor:pointer">✓ Accepter</button>
-    <button onclick="declineRGPD()" style="flex:1;padding:10px;border-radius:8px;border:none;background:#333;color:#fff;font-weight:600;cursor:pointer">Refuser</button>
-  </div>
-</div>
 </body>
 </html>
