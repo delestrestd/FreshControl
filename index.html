@@ -154,11 +154,20 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
       <span id="gps-txt">Localisation…</span>
     </div>
 
-    <div class="scan-zone">
-      <input type="file" id="scan-input" accept="image/*" capture="environment">
+    <!-- ÉTAPE 1 : Code-barres -->
+    <div class="scan-zone" id="scan-step1">
+      <input type="file" id="scan-input-barcode" accept="image/*" capture="environment">
       <div class="scan-ic">📦</div>
-      <h2 style="color:var(--green)">Scanner le code-barres</h2>
-      <p style="color:var(--muted);font-size:13px;margin-top:6px">Photographiez le code-barres EAN du produit</p>
+      <h2 style="color:var(--green)">Photo 1 — Code-barres EAN</h2>
+      <p style="color:var(--muted);font-size:13px;margin-top:6px">Photographiez le code-barres du produit</p>
+    </div>
+
+    <!-- ÉTAPE 2 : Nom produit (si gencod pas trouvé) -->
+    <div class="scan-zone" id="scan-step2" style="display:none;border-color:var(--orange)">
+      <input type="file" id="scan-input-name" accept="image/*" capture="environment">
+      <div class="scan-ic">🏷️</div>
+      <h2 style="color:var(--orange)">Photo 2 — Nom du produit</h2>
+      <p style="color:var(--muted);font-size:13px;margin-top:6px">Gencod non trouvé — photographiez le nom du produit</p>
     </div>
 
     <div id="nf-card" class="nf-card">
@@ -168,7 +177,10 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
     </div>
 
     <div class="card">
-      <div class="sh-t" style="margin-bottom:12px">Derniers scans</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="sh-t">Derniers scans</div>
+        <button onclick="clearScans()" style="font-size:11px;font-weight:600;color:var(--red);background:var(--red-light);border:none;border-radius:8px;padding:4px 10px;cursor:pointer">🗑 Effacer</button>
+      </div>
       <div id="recent-scans"><p style="color:var(--muted);font-size:13px">Aucun scan récent</p></div>
     </div>
   </div>
@@ -682,56 +694,123 @@ async function readGencod(file){
 // ═══════════════════════════════════════════
 // SCAN — ORCHESTRATION
 // ═══════════════════════════════════════════
-document.getElementById('scan-input').addEventListener('change', async function(event){
-  const file=event.target.files?.[0]; if(!file)return;
-  event.target.value='';
-  document.getElementById('nf-card').style.display='none';
-  document.getElementById('ldr').style.display='flex';
+// ═══════════════════════════════════════════
+// SCAN — ÉTAT GLOBAL
+// ═══════════════════════════════════════════
+let scanGencod = '';
+let scanAIName = '';
+let scanAIRayon = '';
 
-  try{
-    // 1. IA lit gencod + nom + rayon depuis la photo
+function resetScan() {
+  scanGencod = ''; scanAIName = ''; scanAIRayon = '';
+  document.getElementById('scan-step1').style.display = 'block';
+  document.getElementById('scan-step2').style.display = 'none';
+  document.getElementById('nf-card').style.display = 'none';
+}
+
+function clearScans() {
+  if(!confirm('Effacer tout l\'historique des scans ?')) return;
+  recentScans = [];
+  save(); renderScanner();
+  toast('🗑 Historique effacé');
+}
+
+// PHOTO 1 — Code-barres
+document.getElementById('scan-input-barcode').addEventListener('change', async function(event){
+  const file = event.target.files?.[0]; if(!file) return;
+  event.target.value = '';
+  document.getElementById('nf-card').style.display = 'none';
+  document.getElementById('ldr').style.display = 'flex';
+
+  try {
+    // IA lit gencod + nom sur la photo du code-barres
     const ai = await readGencod(file);
-    const gencod = ai.gencod;
+    scanAIName = ai.name || '';
+    scanAIRayon = ai.rayon || 'Épicerie';
+    scanGencod = ai.gencod || '';
 
-    if(!gencod){
-      document.getElementById('ldr').style.display='none';
-      toast('⚠ Code-barres illisible — saisissez le gencod manuellement',5000);
-      openForm({id:uid(),gencod:'',name:ai.name||'',rayon:ai.rayon||'Épicerie',qty:1,expiry:'',magasin:getActiveMag()}, true);
+    if(!scanGencod) {
+      // Gencod illisible → passer directement à photo 2
+      document.getElementById('ldr').style.display = 'none';
+      document.getElementById('scan-step1').style.display = 'none';
+      document.getElementById('scan-step2').style.display = 'block';
+      toast('⚠ Code-barres illisible — photographiez le nom du produit', 4000);
       return;
     }
 
-    // 2. N8N vérifie dans le catalogue (attend la réponse)
-    const cat = await checkCatalogue(gencod);
-    document.getElementById('ldr').style.display='none';
+    // N8N vérifie dans le catalogue
+    const cat = await checkCatalogue(scanGencod);
+    document.getElementById('ldr').style.display = 'none';
 
-    // 3. Produit absent du catalogue → BLOQUER
-    if(!cat.found){
-      document.getElementById('nf-card').style.display='block';
-      document.getElementById('nf-msg').textContent=`Gencod ${gencod} (${ai.name||'?'}) absent du catalogue Léa Nature.`;
-      recentScans.unshift({found:false,name:ai.name||'Produit inconnu',gencod,time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});
-      save(); renderScanner(); return;
+    if(cat.found && (cat.produit || scanAIName)) {
+      // Produit trouvé → formulaire direct
+      const product = {
+        id: uid(), gencod: scanGencod,
+        name:  cat.produit      || scanAIName  || '',
+        rayon: cat.type_produit || scanAIRayon || 'Épicerie',
+        qty: 1, expiry: '', magasin: getActiveMag(),
+      };
+      recentScans.unshift({found:true, name:product.name||scanGencod, gencod:scanGencod, time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});
+      save(); renderScanner();
+      toast('✓ Produit reconnu — saisissez la date de péremption');
+      openForm(product, true);
+      resetScan();
+    } else {
+      // Gencod pas dans catalogue → Photo 2 pour confirmer le nom
+      document.getElementById('scan-step1').style.display = 'none';
+      document.getElementById('scan-step2').style.display = 'block';
+      toast('Gencod absent du catalogue — photographiez le nom du produit', 4000);
     }
 
-    // 4. N8N pas encore configuré (répond "Workflow was started") → utiliser le nom lu par l'IA
-    // 5. Produit trouvé → formulaire pré-rempli avec nom catalogue (ou nom IA si catalogue indisponible)
-    const product={
-      id:      uid(),
-      gencod:  gencod,
-      name:    cat.produit      || ai.name  || '',   // Nom catalogue en priorité, sinon nom IA
-      rayon:   cat.type_produit || ai.rayon || 'Épicerie',
-      qty:     1,
-      expiry:  '',  // Date toujours saisie manuellement
-      magasin: getActiveMag(),
-    };
-    recentScans.unshift({found:true,name:product.name||gencod,gencod,time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});
-    save(); renderScanner();
-    toast('✓ Produit reconnu — saisissez la date de péremption');
-    openForm(product, true);
-
-  }catch(err){
-    document.getElementById('ldr').style.display='none';
+  } catch(err) {
+    document.getElementById('ldr').style.display = 'none';
     console.error(err);
-    toast('⚠ '+( err.message||'Erreur scan'),6000);
+    toast('⚠ ' + (err.message || 'Erreur scan'), 6000);
+  }
+});
+
+// PHOTO 2 — Nom du produit (si gencod pas trouvé)
+document.getElementById('scan-input-name').addEventListener('change', async function(event){
+  const file = event.target.files?.[0]; if(!file) return;
+  event.target.value = '';
+  document.getElementById('ldr').style.display = 'flex';
+
+  try {
+    // IA lit le nom sur la photo
+    const ai = await readGencod(file);
+    const nomProduit = ai.name || scanAIName || '';
+
+    document.getElementById('ldr').style.display = 'none';
+
+    if(!nomProduit) {
+      toast('⚠ Nom illisible — saisissez manuellement', 4000);
+      openForm({id:uid(), gencod:scanGencod, name:'', rayon:scanAIRayon||'Épicerie', qty:1, expiry:'', magasin:getActiveMag()}, true);
+      resetScan(); return;
+    }
+
+    // Produit non dans catalogue mais nom lu → enregistrement avec statut "à vérifier"
+    const product = {
+      id: uid(), gencod: scanGencod,
+      name:  nomProduit,
+      rayon: ai.rayon || scanAIRayon || 'Épicerie',
+      qty: 1, expiry: '', magasin: getActiveMag(),
+    };
+
+    recentScans.unshift({found:false, name:nomProduit, gencod:scanGencod||'—', time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});
+
+    // Afficher carte "produit inexistant" mais permettre l'enregistrement
+    document.getElementById('nf-card').style.display = 'block';
+    document.getElementById('nf-msg').textContent = `"${nomProduit}" (${scanGencod||'gencod illisible'}) absent du catalogue Léa Nature — vous pouvez quand même l'enregistrer.`;
+
+    save(); renderScanner();
+    toast('⚠ Produit hors catalogue — vérifiez les infos');
+    openForm(product, true);
+    resetScan();
+
+  } catch(err) {
+    document.getElementById('ldr').style.display = 'none';
+    toast('⚠ ' + (err.message || 'Erreur'), 6000);
+    resetScan();
   }
 });
 
