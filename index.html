@@ -330,6 +330,23 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;
   </div>
 </div>
 
+<!-- ═══ STORE SEARCH MODAL ══════════════════════════════════════════════ -->
+<div id="store-search-modal" style="position:fixed;inset:0;z-index:760;display:none;align-items:flex-end;backdrop-filter:blur(8px);background:rgba(0,0,0,.32)">
+  <div style="background:rgba(255,255,255,.82);backdrop-filter:blur(32px) saturate(200%);border-radius:28px 28px 0 0;
+              width:100%;max-width:480px;margin:0 auto;padding:24px 20px 36px;border:1px solid rgba(255,255,255,.75);
+              box-shadow:var(--spec),0 -12px 48px rgba(0,0,0,.18)">
+    <div style="font-size:18px;font-weight:900;margin-bottom:14px;letter-spacing:-.5px">🔍 Rechercher un magasin</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <input id="ssm-input" class="rf-input" placeholder="Nom ou ville…" oninput="filterStoreSearch(this.value)"
+        style="flex:1;border-radius:100px">
+      <button onclick="closeStoreSearch()"
+        style="padding:12px 16px;border-radius:100px;border:1.5px solid rgba(0,0,0,.08);background:rgba(255,255,255,.6);
+               color:var(--muted);font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font)">✕</button>
+    </div>
+    <div id="ssm-list" style="max-height:50vh;overflow-y:auto"></div>
+  </div>
+</div>
+
 <!-- ═══ EMAIL REMINDER MODAL ════════════════════════════════════════════════ -->
 <div id="email-modal">
   <div class="email-sheet">
@@ -413,6 +430,28 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;
         <button class="gps-fix-btn" id="gps-retry-btn" onclick="retryGPS()" style="display:none" id="lbl-retry">Réessayer</button>
       </div>
 
+      <!-- Sélecteur manuel de magasin -->
+      <div id="store-selector-zone" style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:900;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">
+          🏪 <span id="lbl-store-select">Magasin sélectionné</span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <select id="store-select" onchange="onStoreSelect(this.value)"
+            style="flex:1;padding:12px 16px;border-radius:100px;border:1.5px solid rgba(255,255,255,.3);
+                   background:rgba(255,255,255,.18);backdrop-filter:blur(12px);
+                   color:#fff;font-size:14px;font-weight:700;font-family:var(--font);outline:none;
+                   -webkit-appearance:none;appearance:none;cursor:pointer">
+            <option value="">— Sélectionner un magasin —</option>
+          </select>
+          <button onclick="openStoreSearch()"
+            style="padding:12px 16px;border-radius:100px;border:1.5px solid rgba(255,255,255,.3);
+                   background:rgba(255,255,255,.18);backdrop-filter:blur(12px);
+                   color:#fff;font-size:14px;cursor:pointer;font-family:var(--font);font-weight:800;white-space:nowrap">
+            🔍
+          </button>
+        </div>
+      </div>
+
       <div class="scan-zone">
         <input type="file" id="scan-input" accept="image/*" capture="environment">
         <span class="scan-ic">📦</span>
@@ -471,6 +510,50 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;
 
     <!-- ADMIN -->
     <div id="tab-admin" class="tab">
+      <!-- Gestion magasins -->
+      <div class="admin-section">
+        <div class="admin-sec-title" id="adm-stores-title">🏪 Magasins</div>
+        <div id="store-list"></div>
+        <div style="margin-top:16px">
+          <!-- Recherche par adresse (géocodage) -->
+          <div class="rf-field">
+            <div class="rf-label" id="adm-lbl-store-name">Nom du magasin</div>
+            <input class="rf-input" id="as-name" placeholder="Ex: Carrefour Lyon Part-Dieu">
+          </div>
+          <div class="rf-field">
+            <div class="rf-label" id="adm-lbl-store-addr">Adresse</div>
+            <div style="display:flex;gap:8px">
+              <input class="rf-input" id="as-address" placeholder="Ex: 17 rue de la République, Lyon" style="flex:1">
+              <button onclick="geocodeAddress()"
+                style="padding:12px 18px;border-radius:100px;border:none;background:rgba(18,168,118,.85);color:#fff;font-size:14px;font-weight:900;cursor:pointer;font-family:var(--font);white-space:nowrap;box-shadow:var(--spec-dark),var(--shadow-green)"
+                id="adm-geocode-btn">
+                🔍 Trouver
+              </button>
+            </div>
+          </div>
+          <!-- Résultats géocodage -->
+          <div id="geocode-results" style="display:none;margin-bottom:12px"></div>
+          <!-- Coord manuelles -->
+          <div class="rf-row" id="as-coords-row" style="display:none">
+            <div class="rf-field">
+              <div class="rf-label">Latitude</div>
+              <input class="rf-input" id="as-lat" type="number" step="0.0001" placeholder="43.2965">
+            </div>
+            <div class="rf-field">
+              <div class="rf-label">Longitude</div>
+              <input class="rf-input" id="as-lng" type="number" step="0.0001" placeholder="5.3798">
+            </div>
+            <div class="rf-field" style="max-width:90px">
+              <div class="rf-label">Rayon (m)</div>
+              <input class="rf-input" id="as-radius" type="number" placeholder="500" value="500">
+            </div>
+          </div>
+          <button class="rf-save" onclick="addStore()" id="adm-add-store-btn" style="font-size:14px;padding:13px">
+            + Ajouter le magasin
+          </button>
+        </div>
+      </div>
+
       <!-- Gestion utilisateurs -->
       <div class="admin-section">
         <div class="admin-sec-title" id="adm-users-title">Utilisateurs</div>
@@ -593,11 +676,11 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;
 ═══════════════════════════════════════════════════════════════════════════ */
 const DEFAULT_WEBHOOK = 'https://VOTRE-INSTANCE.app.n8n.cloud/webhook/scan-produit-magasin';
 
-// Magasins (lat/lng approximatifs — à adapter)
-const STORES = [
-  { name: 'Monoprix Marseille Centre', lat: 43.2965, lng: 5.3798, r: 500 },
-  { name: 'Carrefour Aubagne',          lat: 43.2964, lng: 5.5728, r: 600 },
-  { name: 'Intermarché La Ciotat',      lat: 43.1765, lng: 5.6051, r: 600 },
+// Magasins par défaut (chargés une seule fois si localStorage vide)
+const DEFAULT_STORES = [
+  { id:'s1', name:'Monoprix Marseille Centre', address:'Rue Saint-Ferréol, Marseille', lat:43.2965, lng:5.3798, r:500 },
+  { id:'s2', name:'Carrefour Aubagne',          address:'Avenue des Paluds, Aubagne',   lat:43.2964, lng:5.5728, r:600 },
+  { id:'s3', name:'Intermarché La Ciotat',      address:'Avenue Fernand Gassion, La Ciotat', lat:43.1765, lng:5.6051, r:600 },
 ];
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -759,6 +842,13 @@ let products = JSON.parse(localStorage.getItem('fc_products') || '[]');
 let users    = JSON.parse(localStorage.getItem('fc_users') || 'null');
 let planning = JSON.parse(localStorage.getItem('fc_planning') || '{}');
 let webhook  = localStorage.getItem('fc_webhook') || DEFAULT_WEBHOOK;
+let stores   = JSON.parse(localStorage.getItem('fc_stores') || 'null');
+
+// Init default stores if first launch
+if(!stores){ stores = DEFAULT_STORES; saveStores(); }
+
+function saveStores(){ localStorage.setItem('fc_stores', JSON.stringify(stores)); }
+function genId(){ return 's' + Date.now().toString(36); }
 
 let gps = null;
 let filterStatus = null;
@@ -934,6 +1024,7 @@ function launchApp(){
   }
 
   renderDashboard();
+  refreshStoreDropdown();
   applyLang();
 
   // Startup popup (after short delay, if enabled and there are alerts)
@@ -1002,6 +1093,7 @@ function onGPSSuccess(pos){
     document.getElementById('hdr-sub').textContent = store.name;
     if(document.getElementById('rf-magasin'))
       document.getElementById('rf-magasin').value = store.name;
+    autoSelectStore(store.name);
   } else {
     document.getElementById('gps-txt').textContent = `📍 ${gps.lat.toFixed(4)}, ${gps.lng.toFixed(4)}`;
     document.getElementById('hdr-sub').textContent = t('hdr_sub_no_store');
@@ -1056,9 +1148,9 @@ function setGPSState(s){
 }
 
 function findNearestStore(lat, lng){
-  for(const s of STORES){
+  for(const s of stores){
     const d = dist(lat, lng, s.lat, s.lng);
-    if(d < s.r) return s;
+    if(d < (s.r || 500)) return s;
   }
   return null;
 }
@@ -1079,7 +1171,7 @@ function showTab(name){
   if(tabEl) tabEl.classList.add('on');
   if(tbEl)  tbEl.classList.add('on');
   currentTab = name;
-  if(name === 'scanner') initGPSForScan();
+  if(name === 'scanner') { initGPSForScan(); refreshStoreDropdown(); }
   if(name === 'alertes') renderAlertes();
   if(name === 'planning') renderPlanning();
   if(name === 'admin') renderAdmin();
@@ -1266,7 +1358,7 @@ function resetScan(){
 
 function saveProduct(){
   const dlc     = document.getElementById('rf-date').value;
-  const magasin = document.getElementById('rf-magasin').value.trim();
+  const magasin = document.getElementById('rf-magasin').value.trim() || selectedStore?.name || '';
   const name    = document.getElementById('rf-prod-name').textContent;
   if(!dlc){ showToast(t('err_fill')); return }
 
@@ -1364,6 +1456,7 @@ function togglePlanDay(store, idx){
    ADMIN
 ═══════════════════════════════════════════════════════════════════════════ */
 function renderAdmin(){
+  renderStoreList();
   // Users list
   const ul = document.getElementById('user-list');
   ul.innerHTML = users.map((u,i)=>`
@@ -1415,6 +1508,192 @@ function saveWebhook(){
   webhook = document.getElementById('adm-webhook').value.trim();
   localStorage.setItem('fc_webhook', webhook);
   showToast(t('saved'));
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   STORE MANAGEMENT
+═══════════════════════════════════════════════════════════════════════════ */
+let selectedStore = null; // store object currently selected (GPS or manual)
+
+// Populate the scanner dropdown with all stores
+function refreshStoreDropdown(){
+  const sel = document.getElementById('store-select');
+  if(!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Sélectionner un magasin —</option>';
+  stores.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = s.name;
+    if(s.id === cur) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function onStoreSelect(id){
+  const s = stores.find(x => x.id === id);
+  selectedStore = s || null;
+  const magasinInput = document.getElementById('rf-magasin');
+  if(magasinInput) magasinInput.value = s ? s.name : '';
+  if(s){
+    document.getElementById('gps-pill').style.display = 'inline-flex';
+    document.getElementById('gps-pill').classList.remove('gps-err');
+    document.getElementById('gps-txt').textContent = '🏪 ' + s.name;
+    document.getElementById('hdr-sub').textContent = s.name;
+    document.getElementById('gps-retry-btn').style.display = 'none';
+  }
+}
+
+// Called after GPS finds location — auto-select nearest store
+function autoSelectStore(storeName){
+  const found = stores.find(s => s.name === storeName);
+  if(found){
+    selectedStore = found;
+    const sel = document.getElementById('store-select');
+    if(sel) sel.value = found.id;
+  }
+}
+
+// Store search modal (quick picker in scanner)
+function openStoreSearch(){
+  const modal = document.getElementById('store-search-modal');
+  modal.style.display = 'flex';
+  document.getElementById('ssm-input').value = '';
+  filterStoreSearch('');
+  setTimeout(()=>document.getElementById('ssm-input').focus(), 100);
+}
+function closeStoreSearch(){ document.getElementById('store-search-modal').style.display = 'none'; }
+function filterStoreSearch(q){
+  const list = document.getElementById('ssm-list');
+  const filtered = stores.filter(s =>
+    !q || s.name.toLowerCase().includes(q.toLowerCase()) ||
+           (s.address||'').toLowerCase().includes(q.toLowerCase())
+  );
+  if(filtered.length === 0){
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Aucun magasin trouvé</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(s => `
+    <div onclick="pickStore('${s.id}')"
+      style="padding:14px 16px;border-radius:14px;margin-bottom:8px;cursor:pointer;
+             background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.72);
+             box-shadow:var(--spec);transition:transform .15s"
+      onmousedown="this.style.transform='scale(.98)'" onmouseup="this.style.transform=''">
+      <div style="font-size:14px;font-weight:800;color:var(--text)">${s.name}</div>
+      ${s.address ? `<div style="font-size:12px;color:var(--muted);margin-top:3px;font-weight:600">📍 ${s.address}</div>` : ''}
+    </div>`).join('');
+}
+function pickStore(id){
+  closeStoreSearch();
+  const sel = document.getElementById('store-select');
+  if(sel){ sel.value = id; onStoreSelect(id); }
+}
+
+/* ── GEOCODING (Nominatim / OpenStreetMap — gratuit, sans clé) ─────────── */
+async function geocodeAddress(){
+  const addr = document.getElementById('as-address').value.trim();
+  if(!addr){ showToast(t('err_fill')); return; }
+  const btn = document.getElementById('adm-geocode-btn');
+  btn.textContent = '⏳';
+  btn.disabled = true;
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addr)}&format=json&limit=5&accept-language=${lang}`;
+    const res = await fetch(url, { headers:{ 'Accept-Language': lang } });
+    const results = await res.json();
+    const box = document.getElementById('geocode-results');
+    if(!results.length){
+      box.style.display = 'block';
+      box.innerHTML = `<div style="color:var(--red);font-size:13px;font-weight:700;padding:10px 0">❌ Adresse non trouvée — essayez avec plus de détails</div>`;
+      return;
+    }
+    box.style.display = 'block';
+    box.innerHTML = results.map((r,i) => `
+      <div onclick="selectGeoResult(${r.lat},${r.lon},'${(r.display_name||'').replace(/'/g,"\\'")}',${i})"
+        style="padding:12px 14px;border-radius:12px;margin-bottom:7px;cursor:pointer;
+               background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.72);
+               box-shadow:var(--spec)" id="geo-r-${i}">
+        <div style="font-size:13px;font-weight:800;color:var(--text)">${r.display_name.split(',').slice(0,3).join(', ')}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">📍 ${parseFloat(r.lat).toFixed(5)}, ${parseFloat(r.lon).toFixed(5)}</div>
+      </div>`).join('');
+  } catch(e){
+    showToast('❌ Erreur réseau');
+  } finally {
+    btn.textContent = '🔍 Trouver';
+    btn.disabled = false;
+  }
+}
+
+function selectGeoResult(lat, lon, displayName, idx){
+  // Highlight selected
+  document.querySelectorAll('[id^="geo-r-"]').forEach(el => el.style.borderColor = 'rgba(255,255,255,.72)');
+  const el = document.getElementById('geo-r-'+idx);
+  if(el) el.style.borderColor = 'var(--green)';
+  // Fill coords
+  document.getElementById('as-lat').value = parseFloat(lat).toFixed(5);
+  document.getElementById('as-lng').value = parseFloat(lon).toFixed(5);
+  // Auto-fill address if empty
+  if(!document.getElementById('as-address').value.trim())
+    document.getElementById('as-address').value = displayName.split(',').slice(0,3).join(', ');
+  document.getElementById('as-coords-row').style.display = 'flex';
+}
+
+function addStore(){
+  const name   = document.getElementById('as-name').value.trim();
+  const addr   = document.getElementById('as-address').value.trim();
+  const lat    = parseFloat(document.getElementById('as-lat').value);
+  const lng    = parseFloat(document.getElementById('as-lng').value);
+  const radius = parseInt(document.getElementById('as-radius').value) || 500;
+  if(!name){ showToast(t('err_fill')); return; }
+  if(isNaN(lat) || isNaN(lng)){
+    showToast('❌ Utilisez 🔍 Trouver ou saisissez lat/lng manuellement');
+    document.getElementById('as-coords-row').style.display = 'flex';
+    return;
+  }
+  stores.push({ id: genId(), name, address: addr, lat, lng, r: radius });
+  saveStores();
+  refreshStoreDropdown();
+  // Reset form
+  ['as-name','as-address','as-lat','as-lng'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('as-radius').value = '500';
+  document.getElementById('geocode-results').style.display = 'none';
+  document.getElementById('as-coords-row').style.display = 'none';
+  showToast('🏪 Magasin ajouté');
+  renderAdmin();
+}
+
+function deleteStore(id){
+  stores = stores.filter(s => s.id !== id);
+  saveStores();
+  if(selectedStore?.id === id) selectedStore = null;
+  refreshStoreDropdown();
+  showToast(t('deleted'));
+  renderAdmin();
+}
+
+/* Store list in admin */
+function renderStoreList(){
+  const el = document.getElementById('store-list');
+  if(!el) return;
+  if(!stores.length){
+    el.innerHTML = `<div style="font-size:13px;color:var(--muted);padding:8px 0">Aucun magasin enregistré</div>`;
+    return;
+  }
+  el.innerHTML = stores.map(s => `
+    <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.05)">
+      <div style="width:38px;height:38px;border-radius:12px;background:rgba(18,168,118,.15);
+                  display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;
+                  border:1px solid rgba(255,255,255,.7);box-shadow:var(--spec)">🏪</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:800;color:var(--text)">${s.name}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;font-weight:600">
+          ${s.address ? '📍 ' + s.address + ' · ' : ''}${s.lat.toFixed(4)}, ${s.lng.toFixed(4)} · rayon: ${s.r}m
+        </div>
+      </div>
+      <button onclick="deleteStore('${s.id}')"
+        style="border:1px solid rgba(240,62,62,.3);background:rgba(240,62,62,.12);color:var(--red);
+               border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:14px;font-weight:900;
+               flex-shrink:0">🗑</button>
+    </div>`).join('');
 }
 
 function saveEmailConfig(){
@@ -1575,6 +1854,26 @@ function showToast(msg){
    INIT
 ═══════════════════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', ()=>{
+
+  // ── EMERGENCY RESET via ?reset=1 ──────────────────────────────────────
+  if(new URLSearchParams(location.search).get('reset') === '1'){
+    ['fc_users','fc_session','fc_rgpd','fc_products','fc_planning',
+     'fc_lang','fc_webhook','fc_default_email','fc_popup_enabled'].forEach(k=>localStorage.removeItem(k));
+    // Rebuild default users
+    users = [
+      { name:'Administrateur', username:'admin', password:'freshcontrol2024', role:'admin' },
+      { name:'Agent 1',        username:'agent1', password:'agent123',        role:'agent' },
+    ];
+    saveUsers();
+    // Remove ?reset=1 from URL without reload
+    history.replaceState(null,'',location.pathname);
+    // Show reset confirmation on login screen
+    setTimeout(()=>{
+      const err = document.getElementById('login-err');
+      if(err){ err.style.color='#a0ffd6'; err.textContent='✅ Réinitialisé — admin / freshcontrol2024'; }
+    }, 200);
+  }
+
   applyLang();
 
   // Login on Enter
