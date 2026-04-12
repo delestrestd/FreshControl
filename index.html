@@ -8,832 +8,1590 @@
 <meta name="theme-color" content="#1D9E75">
 <title>FreshControl</title>
 <link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+/* ═══ RESET & ROOT ══════════════════════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --green:#1D9E75;--green-light:#E8F8F2;--green-dark:#167A5B;
-  --red:#E24B4A;--red-light:#FCEBEB;
-  --orange:#EF9F27;--orange-light:#FAEEDA;
-  --blue:#378ADD;--blue-light:#E6F1FB;
-  --bg:#F5F7F5;--card:#FFF;--text:#1A2A1A;--muted:#7A8A7A;--border:#E8EDE8;
-  --radius:16px;--shadow:0 2px 12px rgba(0,0,0,.08);
-  --tab-h:64px;--hdr-h:72px;
+  --g1:#0A6B47;--g2:#12A876;--g3:#1FD994;
+  --red:#F03E3E;--red-d:#C0392B;
+  --orange:#F59E0B;--blue:#3B82F6;
+  --green:#12A876;--green-d:#0A6B47;
+  --glass-bg:rgba(255,255,255,.55);
+  --glass-bg-dark:rgba(255,255,255,.18);
+  --glass-border:rgba(255,255,255,.65);
+  --glass-blur:blur(28px) saturate(200%);
+  --glass-blur-sm:blur(16px) saturate(180%);
+  --spec:inset 0 1.5px 0 rgba(255,255,255,.85);
+  --spec-dark:inset 0 1.5px 0 rgba(255,255,255,.4);
+  --shadow-soft:0 8px 32px rgba(0,0,0,.10);
+  --shadow-lift:0 16px 48px rgba(0,0,0,.15);
+  --shadow-green:0 8px 28px rgba(18,168,118,.3);
+  --shadow-red:0 8px 28px rgba(240,62,62,.25);
+  --text:#0D1F0D;--muted:rgba(13,31,13,.5);
+  --tab-h:76px;--hdr-h:74px;
+  --r-xl:28px;--r-lg:22px;--r-md:16px;--r-pill:100px;
+  --font:'Nunito',sans-serif;
 }
-html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text);overflow:hidden}
-#hdr{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--green);color:#fff;padding:14px 20px 12px;height:var(--hdr-h);display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(29,158,117,.3)}
-#hdr h1{font-size:20px;font-weight:700}
-#hdr-sub{font-size:11px;opacity:.8;margin-top:2px}
-.badge-urgent{background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px}
-#main{position:fixed;top:var(--hdr-h);bottom:var(--tab-h);left:0;right:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px}
-#tabbar{position:fixed;bottom:0;left:0;right:0;z-index:100;background:#fff;height:var(--tab-h);display:flex;border-top:1px solid var(--border);box-shadow:0 -2px 12px rgba(0,0,0,.06)}
-.tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:transparent;font-size:10px;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color .2s}
-.tb .ic{font-size:22px}
+html,body{height:100%;font-family:var(--font);color:var(--text);overflow:hidden;-webkit-text-size-adjust:100%}
+body::before{content:'';position:fixed;inset:0;z-index:-2;
+  background:radial-gradient(ellipse 80% 60% at 20% 10%,#1FD994 0%,transparent 55%),
+             radial-gradient(ellipse 60% 50% at 85% 80%,#0A6B47 0%,transparent 55%),
+             radial-gradient(ellipse 70% 70% at 50% 50%,#12A876 0%,transparent 60%),
+             linear-gradient(160deg,#064D30 0%,#0A6B47 50%,#0D7A55 100%)}
+body::after{content:'';position:fixed;inset:0;z-index:-1;
+  background:radial-gradient(ellipse 40% 30% at 75% 20%,rgba(255,255,255,.08) 0%,transparent 60%),
+             radial-gradient(ellipse 30% 25% at 15% 85%,rgba(255,255,255,.05) 0%,transparent 50%)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes glow{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
+@keyframes slideIn{from{transform:translateX(110%)}to{transform:translateX(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes bounceIn{0%{transform:scale(.8);opacity:0}70%{transform:scale(1.03)}100%{transform:scale(1);opacity:1}}
+
+/* ═══ SPLASH ══════════════════════════════════════════════════════════ */
+#splash{position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px 44px}
+#splash.hide{animation:fadeIn .35s reverse forwards}
+.splash-logo{display:flex;flex-direction:column;align-items:center;margin-bottom:32px}
+.splash-lockup{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.splash-icon{width:58px;height:58px;border-radius:18px;background:rgba(255,255,255,.22);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1.5px solid rgba(255,255,255,.5);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.4),0 8px 28px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0}
+.splash-name{font-size:36px;font-weight:900;color:#fff;letter-spacing:-2px;line-height:1;text-shadow:0 2px 16px rgba(0,0,0,.2)}
+.splash-tagline{font-size:13px;color:rgba(255,255,255,.65);font-weight:700;letter-spacing:.4px}
+.lang-row{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;justify-content:center}
+.lang-btn{padding:8px 18px;border-radius:var(--r-pill);background:rgba(255,255,255,.15);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1.5px solid rgba(255,255,255,.3);color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);transition:all .2s;box-shadow:var(--spec-dark)}
+.lang-btn.active{background:rgba(255,255,255,.3);border-color:rgba(255,255,255,.75)}
+.lang-btn:hover{background:rgba(255,255,255,.22)}
+.login-card{width:100%;max-width:360px;background:rgba(255,255,255,.18);backdrop-filter:blur(32px) saturate(200%);-webkit-backdrop-filter:blur(32px) saturate(200%);border-radius:var(--r-xl);border:1.5px solid rgba(255,255,255,.35);box-shadow:var(--spec-dark),0 20px 60px rgba(0,0,0,.22),inset 0 -1px 0 rgba(0,0,0,.08);padding:28px 22px;animation:fadeUp .5s ease .15s both}
+.login-label{font-size:11px;font-weight:900;color:rgba(255,255,255,.7);letter-spacing:1.4px;text-transform:uppercase;margin-bottom:7px}
+.login-input{width:100%;padding:15px 18px;border-radius:var(--r-pill);background:rgba(255,255,255,.2);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1.5px solid rgba(255,255,255,.3);color:#fff;font-size:16px;font-family:var(--font);font-weight:700;outline:none;transition:all .2s;margin-bottom:14px;box-shadow:var(--spec-dark)}
+.login-input::placeholder{color:rgba(255,255,255,.4);font-weight:600}
+.login-input:focus{border-color:rgba(255,255,255,.7);background:rgba(255,255,255,.28)}
+.login-input.err{border-color:rgba(255,120,120,.8);animation:shake .35s}
+.login-btn{width:100%;padding:17px;border-radius:var(--r-pill);border:none;background:rgba(255,255,255,.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:var(--green-d);font-size:17px;font-weight:900;font-family:var(--font);cursor:pointer;transition:all .2s;margin-top:4px;box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 8px 24px rgba(0,0,0,.2)}
+.login-btn:active{transform:scale(.96)}
+.login-btn:disabled{opacity:.5}
+.login-err{color:rgba(255,180,180,.95);font-size:13px;font-weight:700;text-align:center;margin-top:10px;min-height:18px}
+.login-version{color:rgba(255,255,255,.3);font-size:11px;font-weight:700;text-align:center;margin-top:18px;letter-spacing:.5px}
+
+/* ═══ RGPD ══════════════════════════════════════════════════════════════ */
+#rgpd-overlay{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.4);display:flex;align-items:flex-end;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+#rgpd-overlay.hide{display:none}
+.rgpd-sheet{background:rgba(255,255,255,.82);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:26px 22px 38px;max-height:72vh;overflow-y:auto;width:100%;border-top:1px solid rgba(255,255,255,.7);box-shadow:var(--spec),0 -8px 40px rgba(0,0,0,.15)}
+.rgpd-title{font-size:18px;font-weight:900;margin-bottom:10px}
+.rgpd-text{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:22px;font-weight:600}
+.rgpd-btns{display:flex;gap:10px}
+.rgpd-accept{flex:2;padding:15px;border-radius:var(--r-pill);border:none;background:rgba(18,168,118,.85);color:#fff;font-size:16px;font-weight:900;cursor:pointer;font-family:var(--font);box-shadow:var(--spec-dark),var(--shadow-green)}
+.rgpd-decline{flex:1;padding:15px;border-radius:var(--r-pill);border:1.5px solid rgba(0,0,0,.1);background:rgba(0,0,0,.05);color:var(--muted);font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font)}
+
+/* ═══ MAIN APP ══════════════════════════════════════════════════════════ */
+#app{display:none;height:100%;flex-direction:column}
+#app.show{display:flex}
+#hdr{background:rgba(10,107,71,.72);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-bottom:1px solid rgba(255,255,255,.2);color:#fff;padding:0 18px;height:var(--hdr-h);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:var(--spec-dark),0 4px 24px rgba(0,0,0,.15)}
+#hdr-left{display:flex;align-items:center;gap:12px}
+#hdr-logo{width:40px;height:40px;background:rgba(255,255,255,.2);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:14px;border:1.5px solid rgba(255,255,255,.35);box-shadow:var(--spec-dark);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+#hdr-info h1{font-size:19px;font-weight:900;line-height:1;letter-spacing:-.6px;text-shadow:0 1px 6px rgba(0,0,0,.15)}
+#hdr-info small{font-size:11px;opacity:.75;font-weight:700}
+#hdr-right{display:flex;align-items:center;gap:10px}
+.badge-urgent{background:rgba(240,62,62,.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;font-size:11px;font-weight:900;padding:5px 13px;border-radius:var(--r-pill);border:1px solid rgba(255,255,255,.25);box-shadow:var(--spec-dark)}
+#btn-menu{background:rgba(255,255,255,.18);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1.5px solid rgba(255,255,255,.28);color:#fff;width:40px;height:40px;border-radius:13px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:var(--spec-dark);transition:background .15s}
+#btn-menu:active{background:rgba(255,255,255,.32)}
+
+/* ═══ SIDEBAR ════════════════════════════════════════════════════════════ */
+#sidebar{position:fixed;inset:0;z-index:800;display:none}
+#sidebar.open{display:block}
+#sidebar-bg{position:absolute;inset:0;background:rgba(0,0,0,.3);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#sidebar-panel{position:absolute;right:0;top:0;bottom:0;width:288px;background:rgba(230,248,240,.82);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-left:1px solid rgba(255,255,255,.65);box-shadow:var(--spec),-16px 0 48px rgba(0,0,0,.18);display:flex;flex-direction:column;animation:slideIn .26s ease;border-radius:var(--r-xl) 0 0 var(--r-xl);overflow:hidden}
+.sb-head{background:rgba(10,107,71,.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:28px 20px 22px;color:#fff;border-bottom:1px solid rgba(255,255,255,.2);box-shadow:var(--spec-dark)}
+.sb-user{font-size:20px;font-weight:900;letter-spacing:-.5px}
+.sb-role{font-size:12px;opacity:.75;margin-top:3px;font-weight:700}
+.sb-body{flex:1;overflow-y:auto;padding:10px}
+.sb-section{font-size:10px;font-weight:900;color:var(--muted);letter-spacing:1.4px;text-transform:uppercase;padding:14px 12px 6px}
+.sb-item{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:var(--r-md);cursor:pointer;font-size:15px;font-weight:700;color:var(--text);transition:all .15s}
+.sb-item:hover,.sb-item.active{background:rgba(18,168,118,.12);color:var(--green-d)}
+.sb-item-ico{width:36px;height:36px;border-radius:12px;background:rgba(18,168,118,.12);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.sb-footer{padding:16px}
+.sb-logout{width:100%;padding:14px;border-radius:var(--r-pill);background:rgba(240,62,62,.1);backdrop-filter:blur(8px);border:1.5px solid rgba(240,62,62,.25);color:var(--red);font-size:15px;font-weight:900;cursor:pointer;font-family:var(--font)}
+
+/* ═══ LAYOUT ════════════════════════════════════════════════════════════ */
+#main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px calc(var(--tab-h) + 14px)}
+.tab{display:none}
+.tab.on{display:block;animation:fadeIn .22s ease}
+#tabbar{background:rgba(240,255,250,.62);backdrop-filter:blur(32px) saturate(200%);-webkit-backdrop-filter:blur(32px) saturate(200%);border-top:1px solid rgba(255,255,255,.72);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 -4px 32px rgba(0,0,0,.08);height:var(--tab-h);display:flex;flex-shrink:0}
+.tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;background:transparent;font-size:10px;font-weight:800;color:rgba(13,31,13,.38);cursor:pointer;font-family:var(--font);transition:color .15s;-webkit-tap-highlight-color:transparent;padding-bottom:6px;letter-spacing:.3px}
 .tb.on{color:var(--green)}
-.tab{display:none}.tab.on{display:block}
-.card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.stat{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);border-left:4px solid currentColor;cursor:pointer}
-.stat-num{font-size:28px;font-weight:800}
-.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
-.c-exp{color:var(--red)}.c-crit{color:var(--orange)}.c-warn{color:#639922}.c-ok{color:var(--blue)}
-.pi{background:var(--card);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
-.pi-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.pi-info{flex:1;min-width:0}
-.pi-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pi-meta{font-size:12px;color:var(--muted);margin-top:2px}
-.pi-badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:8px;white-space:nowrap}
-.btn-icon{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;flex-shrink:0}
-.frow{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
+.tb-ico{font-size:22px;line-height:1;transition:transform .2s}
+.tb.on .tb-ico{transform:scale(1.18)}
+
+/* ═══ STAT CARDS ═════════════════════════════════════════════════════════ */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.stat{border-radius:var(--r-lg);padding:20px 16px 17px;cursor:pointer;transition:transform .15s;position:relative;overflow:hidden;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.35)}
+.stat:active{transform:scale(.95)}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,.18) 0%,transparent 100%);pointer-events:none}
+.stat::after{content:'';position:absolute;bottom:-14px;right:-12px;width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.1)}
+.stat-num{font-size:38px;font-weight:900;line-height:1;letter-spacing:-2px;color:#fff;position:relative}
+.stat-lbl{font-size:11px;font-weight:800;color:rgba(255,255,255,.8);margin-top:5px;text-transform:uppercase;letter-spacing:.6px;position:relative}
+.stat.c-exp{background:rgba(192,57,43,.72)}
+.stat.c-crit{background:rgba(180,110,0,.68)}
+.stat.c-warn{background:rgba(37,99,235,.68)}
+.stat.c-ok{background:rgba(10,107,71,.72)}
+
+/* ═══ FILTERS ════════════════════════════════════════════════════════════ */
+.frow{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin-bottom:10px}
 .frow::-webkit-scrollbar{display:none}
-.fpill{flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:#fff;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent}
-.fpill.on{background:var(--green);color:#fff;border-color:var(--green)}
-.scan-zone{background:var(--card);border-radius:var(--radius);padding:36px 20px;text-align:center;box-shadow:var(--shadow);margin-bottom:16px;border:2px dashed var(--green);cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative}
-.scan-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.scan-ic{font-size:56px;margin-bottom:12px}
-.gps-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;background:var(--green-light);color:var(--green);margin-bottom:14px;width:100%}
-.gps-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;flex-shrink:0}
-.nf-card{background:var(--red-light);border-radius:var(--radius);padding:24px 20px;text-align:center;margin-bottom:16px;border:1px solid #F7C1C1;display:none}
-.nf-ic{font-size:44px;margin-bottom:10px}
-.overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.5);display:flex;flex-direction:column;justify-content:flex-end}
-.sheet{background:#fff;border-radius:24px 24px 0 0;padding:24px 20px 44px;max-height:90vh;overflow-y:auto}
-.handle{width:40px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 20px}
-.sh-title{font-size:18px;font-weight:700;margin-bottom:20px}
-.fg{margin-bottom:14px}
-.fl{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;display:block}
-.fi{width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:15px;font-family:inherit;color:var(--text);background:var(--bg);-webkit-appearance:none;appearance:none}
-.fi:focus{outline:none;border-color:var(--green);background:#fff}
-select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A8A7A' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
-.status-prev{padding:10px 14px;border-radius:10px;font-size:13px;font-weight:600;margin-top:8px;display:none}
-.btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:16px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:6px}
-.btn-p{background:var(--green);color:#fff}
-.btn-s{background:var(--bg);color:var(--muted)}
-.btn-d{background:var(--red-light);color:var(--red)}
-.fab{position:fixed;bottom:calc(var(--tab-h)+16px);right:16px;z-index:90;width:52px;height:52px;border-radius:50%;background:var(--green);color:#fff;font-size:26px;border:none;box-shadow:0 4px 16px rgba(29,158,117,.4);display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.al-item{background:var(--card);border-radius:12px;padding:14px;margin-bottom:8px;border-left:4px solid}
-.al-exp{border-color:var(--red)}.al-crit{border-color:var(--orange)}
-.pmag{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px}
-.pmag h3{font-size:15px;font-weight:700;margin-bottom:12px}
-.dg{display:flex;gap:6px}
-.db{flex:1;padding:8px 2px;border-radius:8px;border:1.5px solid var(--border);font-size:11px;font-weight:600;background:#fff;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent}
-.db.on{background:var(--green);color:#fff;border-color:var(--green)}
-#ldr{display:none}
-#ldr .sheet{padding:52px 20px;text-align:center}
-.toast{position:fixed;bottom:calc(var(--tab-h)+16px);left:50%;transform:translateX(-50%);background:#1a2a1a;color:#fff;padding:12px 20px;border-radius:20px;font-size:14px;font-weight:500;z-index:999;white-space:nowrap;pointer-events:none;animation:fiu .3s ease}
-.rs-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
-.rs-item:last-child{border-bottom:none}
-.empty{text-align:center;padding:40px 20px;color:var(--muted)}
-.empty .ei{font-size:48px;margin-bottom:12px}
-.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.sh-t{font-size:15px;font-weight:700}
-.sh-c{font-size:12px;color:var(--muted)}
-/* RGPD */
-#rgpd-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.7);display:flex;align-items:flex-end}
-#rgpd-box{background:#fff;width:100%;border-radius:24px 24px 0 0;padding:28px 20px 44px}
-#rgpd-box h2{font-size:18px;font-weight:800;margin-bottom:10px}
-#rgpd-box p{font-size:13px;color:#555;line-height:1.6;margin-bottom:8px}
-#rgpd-box ul{font-size:13px;color:#555;line-height:1.8;padding-left:20px;margin-bottom:16px}
-.rgpd-btns{display:flex;gap:10px;margin-top:16px}
-.rgpd-btns button{flex:1;padding:14px;border-radius:12px;border:none;font-size:15px;font-weight:700;cursor:pointer}
-.rgpd-accept{background:var(--green);color:#fff}
-.rgpd-decline{background:#f0f0f0;color:#555}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-@keyframes fiu{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.fc{padding:8px 18px;border-radius:var(--r-pill);background:rgba(255,255,255,.55);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.68);box-shadow:var(--spec);font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;transition:all .2s;font-family:var(--font);color:var(--muted)}
+.fc.on{background:rgba(18,168,118,.82);backdrop-filter:blur(16px);color:#fff;border-color:rgba(255,255,255,.3);box-shadow:var(--spec-dark),var(--shadow-green)}
+
+/* ═══ PRODUCT CARDS ══════════════════════════════════════════════════════ */
+.sh{display:flex;align-items:center;justify-content:space-between;margin:14px 0 10px}
+.sh-t{font-size:12px;font-weight:900;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px}
+.sh-c{font-size:12px;font-weight:700;color:rgba(255,255,255,.5)}
+.pcard{background:rgba(255,255,255,.62);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:var(--r-md);padding:14px 16px;margin-bottom:10px;box-shadow:var(--spec),var(--shadow-soft);border:1px solid rgba(255,255,255,.72);display:flex;align-items:center;gap:13px;transition:transform .15s}
+.pcard:active{transform:scale(.98)}
+.pcard.s-exp{background:rgba(240,62,62,.2);border-color:rgba(240,62,62,.3)}
+.pcard.s-crit{background:rgba(245,158,11,.16);border-color:rgba(245,158,11,.3)}
+.pcard.s-warn{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.3)}
+.pcard.s-ok{background:rgba(18,168,118,.14);border-color:rgba(18,168,118,.3)}
+.pcard-ico{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:1px solid rgba(255,255,255,.75);box-shadow:var(--spec)}
+.pcard-info{flex:1;min-width:0}
+.pcard-name{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pcard-sub{font-size:12px;color:var(--muted);margin-top:3px;font-weight:600}
+.pcard-badge{font-size:11px;font-weight:900;padding:5px 12px;border-radius:var(--r-pill);flex-shrink:0;letter-spacing:.3px;border:1px solid rgba(255,255,255,.3);box-shadow:var(--spec-dark)}
+.b-exp{background:rgba(192,57,43,.85);color:#fff}
+.b-crit{background:rgba(180,110,0,.85);color:#fff}
+.b-warn{background:rgba(37,99,235,.85);color:#fff}
+.b-ok{background:rgba(10,107,71,.85);color:#fff}
+
+/* ═══ SCANNER ════════════════════════════════════════════════════════════ */
+.gps-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(18,168,118,.8);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:var(--r-pill);padding:9px 16px;font-size:13px;font-weight:800;color:#fff;margin-bottom:16px;border:1px solid rgba(255,255,255,.3);box-shadow:var(--spec-dark),var(--shadow-green)}
+.gps-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:glow 1.5s ease-in-out infinite}
+.gps-err{background:rgba(192,57,43,.8);box-shadow:var(--spec-dark),var(--shadow-red)}
+.gps-err .gps-dot{animation:none}
+.gps-fix-btn{background:none;border:none;color:rgba(255,255,255,.8);font-weight:900;cursor:pointer;font-size:12px;text-decoration:underline;margin-left:4px;font-family:var(--font)}
+.scan-zone{background:rgba(255,255,255,.52);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:var(--r-xl);padding:34px 22px 28px;text-align:center;border:1px solid rgba(255,255,255,.72);box-shadow:var(--spec),var(--shadow-lift);margin-bottom:16px;position:relative;overflow:hidden}
+.scan-zone::before{content:'';position:absolute;top:0;left:0;right:0;height:55%;background:linear-gradient(180deg,rgba(255,255,255,.18) 0%,transparent 100%);pointer-events:none}
+.scan-zone>*{position:relative}
+.scan-ic{font-size:60px;margin-bottom:12px;display:block;filter:drop-shadow(0 4px 12px rgba(0,0,0,.12))}
+#scan-input{display:none}
+.scan-btn{display:inline-flex;align-items:center;gap:9px;padding:17px 30px;border-radius:var(--r-pill);background:rgba(18,168,118,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:#fff;font-size:17px;font-weight:900;cursor:pointer;font-family:var(--font);margin-top:16px;border:1px solid rgba(255,255,255,.3);box-shadow:var(--spec-dark),var(--shadow-green);transition:all .2s}
+.scan-btn:active{transform:scale(.96)}
+#scan-status{margin-top:14px;font-size:13px;font-weight:700;color:var(--muted);min-height:20px}
+
+/* ═══ FORMS ══════════════════════════════════════════════════════════════ */
+#scan-result{background:rgba(255,255,255,.62);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:var(--r-xl);padding:22px;border:1px solid rgba(255,255,255,.72);box-shadow:var(--spec),var(--shadow-soft);margin-bottom:14px;display:none}
+.rf-title{font-size:16px;font-weight:900;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+.rf-field{margin-bottom:15px}
+.rf-label{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
+.rf-input{width:100%;padding:13px 18px;border-radius:var(--r-pill);background:rgba(255,255,255,.68);backdrop-filter:blur(8px);border:1.5px solid rgba(0,0,0,.07);font-size:15px;font-family:var(--font);font-weight:700;outline:none;color:var(--text);transition:border-color .2s;box-shadow:var(--spec)}
+.rf-input:focus{border-color:rgba(18,168,118,.55)}
+.rf-row{display:flex;gap:10px}
+.rf-row .rf-field{flex:1}
+.rf-save{width:100%;padding:16px;border-radius:var(--r-pill);border:none;background:rgba(18,168,118,.85);backdrop-filter:blur(12px);color:#fff;font-size:16px;font-weight:900;cursor:pointer;font-family:var(--font);margin-top:4px;border:1px solid rgba(255,255,255,.25);box-shadow:var(--spec-dark),var(--shadow-green);transition:all .2s}
+.rf-save:active{transform:scale(.97)}
+.rf-cancel{width:100%;padding:14px;border-radius:var(--r-pill);background:rgba(255,255,255,.5);backdrop-filter:blur(8px);color:var(--muted);border:1.5px solid rgba(0,0,0,.08);font-size:15px;font-weight:800;cursor:pointer;font-family:var(--font);margin-top:10px;box-shadow:var(--spec)}
+.not-found-card{background:rgba(240,62,62,.18);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1.5px solid rgba(240,62,62,.35);border-radius:var(--r-lg);padding:24px;text-align:center;display:none;margin-bottom:14px;animation:bounceIn .4s ease;box-shadow:var(--spec-dark),var(--shadow-red)}
+.not-found-card .nf-ico{font-size:40px;margin-bottom:10px}
+.not-found-card .nf-title{font-size:17px;font-weight:900;color:var(--red);margin-bottom:5px}
+.not-found-card .nf-sub{font-size:13px;color:rgba(192,57,43,.85);font-weight:600}
+.nf-retry{margin-top:16px;padding:12px 24px;border-radius:var(--r-pill);border:1px solid rgba(255,255,255,.25);background:rgba(192,57,43,.85);color:#fff;font-size:14px;font-weight:900;cursor:pointer;font-family:var(--font);box-shadow:var(--spec-dark)}
+
+/* ═══ ALERTES & PLANNING ═════════════════════════════════════════════════ */
+.astore{background:rgba(255,255,255,.55);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border-radius:var(--r-lg);padding:18px;border:1px solid rgba(255,255,255,.72);box-shadow:var(--spec),var(--shadow-soft);margin-bottom:13px}
+.astore-hd{font-size:15px;font-weight:900;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.aitem{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+.aitem:last-child{border-bottom:none}
+.aitem-name{font-size:14px;font-weight:800}
+.aitem-date{font-size:12px;color:var(--muted);margin-top:2px;font-weight:600}
+.plan-store{background:rgba(255,255,255,.55);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border-radius:var(--r-lg);padding:18px;border:1px solid rgba(255,255,255,.72);box-shadow:var(--spec),var(--shadow-soft);margin-bottom:13px}
+.plan-store-name{font-size:15px;font-weight:900;margin-bottom:14px}
+.day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day-cell{aspect-ratio:1;border-radius:12px;font-size:10px;font-weight:900;color:var(--muted);cursor:pointer;transition:all .2s;font-family:var(--font);display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.7);box-shadow:var(--spec)}
+.day-cell.on{background:rgba(18,168,118,.8);color:#fff;border-color:rgba(255,255,255,.3);box-shadow:var(--spec-dark),var(--shadow-green)}
+
+/* ═══ ADMIN ══════════════════════════════════════════════════════════════ */
+#tab-admin{display:none}
+#tab-admin.on{display:block;animation:fadeIn .22s ease}
+.admin-section{background:rgba(255,255,255,.55);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border-radius:var(--r-lg);padding:18px;border:1px solid rgba(255,255,255,.72);box-shadow:var(--spec),var(--shadow-soft);margin-bottom:14px}
+.admin-sec-title{font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:15px}
+.user-row{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+.user-row:last-child{border-bottom:none}
+.user-avatar{width:40px;height:40px;border-radius:14px;background:rgba(18,168,118,.15);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:1px solid rgba(255,255,255,.7);box-shadow:var(--spec)}
+.user-info{flex:1}
+.user-name{font-size:14px;font-weight:800}
+.user-role-badge{font-size:10px;font-weight:900;padding:3px 10px;border-radius:var(--r-pill);display:inline-block;margin-top:3px}
+.role-admin{background:rgba(245,158,11,.2);color:#92400e}
+.role-agent{background:rgba(18,168,118,.15);color:var(--green-d)}
+.user-del{border:1px solid rgba(240,62,62,.3);background:rgba(240,62,62,.12);color:var(--red);border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:15px;font-weight:900}
+.add-user-form{display:flex;flex-direction:column;gap:10px}
+.au-row{display:flex;gap:8px}
+.au-input{flex:1;padding:12px 16px;border-radius:var(--r-pill);background:rgba(255,255,255,.65);backdrop-filter:blur(8px);border:1.5px solid rgba(0,0,0,.07);font-size:14px;font-family:var(--font);font-weight:700;outline:none;color:var(--text);box-shadow:var(--spec)}
+.au-input:focus{border-color:rgba(18,168,118,.5)}
+.au-select{padding:12px 14px;border-radius:var(--r-pill);background:rgba(255,255,255,.65);backdrop-filter:blur(8px);border:1.5px solid rgba(0,0,0,.07);font-size:14px;font-family:var(--font);font-weight:700;outline:none;color:var(--text)}
+.au-add{padding:12px 18px;border-radius:var(--r-pill);border:1px solid rgba(255,255,255,.28);background:rgba(18,168,118,.82);backdrop-filter:blur(8px);color:#fff;font-size:14px;font-weight:900;cursor:pointer;font-family:var(--font);white-space:nowrap;box-shadow:var(--spec-dark),var(--shadow-green)}
+.lang-setting-row{display:flex;gap:8px;flex-wrap:wrap}
+.lang-setting-btn{padding:10px 20px;border-radius:var(--r-pill);background:rgba(255,255,255,.62);backdrop-filter:blur(8px);border:1.5px solid rgba(0,0,0,.07);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);color:var(--muted);transition:all .2s;box-shadow:var(--spec)}
+.lang-setting-btn.active{background:rgba(18,168,118,.8);color:#fff;border-color:rgba(255,255,255,.25);box-shadow:var(--spec-dark),var(--shadow-green)}
+
+/* ═══ STARTUP POPUP ═══════════════════════════════════════════════════ */
+#startup-popup{position:fixed;inset:0;z-index:700;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(0,0,0,.32)}
+#startup-popup.open{display:flex;animation:fadeIn .3s ease}
+.startup-sheet{background:rgba(255,248,248,.82);backdrop-filter:blur(32px) saturate(200%);-webkit-backdrop-filter:blur(32px) saturate(200%);border-radius:var(--r-xl);width:100%;max-width:400px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(255,255,255,.72);box-shadow:var(--spec),0 24px 70px rgba(0,0,0,.28)}
+.startup-hd{background:rgba(192,57,43,.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:22px 20px 18px;color:#fff;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.2);box-shadow:var(--spec-dark)}
+.startup-hd-top{display:flex;align-items:flex-start;justify-content:space-between}
+.startup-hd h2{font-size:19px;font-weight:900;margin-bottom:4px;letter-spacing:-.5px}
+.startup-hd p{font-size:13px;opacity:.85;font-weight:600}
+.startup-close{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.startup-body{flex:1;overflow-y:auto;padding:16px}
+.startup-store-group{margin-bottom:18px}
+.startup-store-lbl{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px;display:flex;align-items:center;gap:6px}
+.startup-prow{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:14px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.75);box-shadow:var(--spec);margin-bottom:7px}
+.startup-prow-name{font-size:14px;font-weight:800}
+.startup-prow-sub{font-size:12px;color:var(--muted);font-weight:600}
+.startup-footer{padding:14px 16px;border-top:1px solid rgba(0,0,0,.05);display:flex;gap:10px;flex-shrink:0}
+.startup-btn-mail{flex:1;padding:14px;border-radius:var(--r-pill);border:1px solid rgba(255,255,255,.25);background:rgba(18,168,118,.82);color:#fff;font-size:14px;font-weight:900;cursor:pointer;font-family:var(--font);box-shadow:var(--spec-dark),var(--shadow-green)}
+.startup-btn-close{flex:1;padding:14px;border-radius:var(--r-pill);border:1.5px solid rgba(0,0,0,.08);background:rgba(255,255,255,.62);color:var(--text);font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font);box-shadow:var(--spec)}
+
+/* ═══ EMAIL MODAL ════════════════════════════════════════════════════════ */
+#email-modal{position:fixed;inset:0;z-index:750;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(0,0,0,.32)}
+#email-modal.open{display:flex;animation:fadeIn .25s ease}
+.email-sheet{background:rgba(255,255,255,.8);backdrop-filter:blur(32px) saturate(200%);-webkit-backdrop-filter:blur(32px) saturate(200%);border-radius:var(--r-xl) var(--r-xl) 0 0;width:100%;max-width:480px;padding:26px 20px 38px;max-height:87vh;overflow-y:auto;border:1px solid rgba(255,255,255,.75);border-bottom:none;box-shadow:var(--spec),0 -12px 48px rgba(0,0,0,.18)}
+.email-title{font-size:18px;font-weight:900;margin-bottom:4px;letter-spacing:-.5px}
+.email-sub{font-size:13px;color:var(--muted);margin-bottom:18px;font-weight:600}
+.email-field{margin-bottom:15px}
+.email-label{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
+.email-input{width:100%;padding:13px 18px;border-radius:var(--r-pill);background:rgba(255,255,255,.72);border:1.5px solid rgba(0,0,0,.07);font-size:15px;font-family:var(--font);font-weight:700;outline:none;color:var(--text);box-shadow:var(--spec);transition:border-color .2s}
+.email-input:focus{border-color:rgba(18,168,118,.5)}
+.email-textarea{width:100%;padding:14px 18px;border-radius:20px;background:rgba(255,255,255,.72);border:1.5px solid rgba(0,0,0,.07);font-size:13px;font-family:var(--font);font-weight:600;outline:none;color:var(--text);min-height:140px;resize:vertical;line-height:1.7;box-shadow:var(--spec)}
+.email-textarea:focus{border-color:rgba(18,168,118,.5)}
+.email-actions{display:flex;gap:10px;margin-top:16px}
+.email-send-n8n{flex:2;padding:15px;border-radius:var(--r-pill);border:1px solid rgba(255,255,255,.25);background:rgba(18,168,118,.82);color:#fff;font-size:15px;font-weight:900;cursor:pointer;font-family:var(--font);box-shadow:var(--spec-dark),var(--shadow-green)}
+.email-send-mailto{flex:1;padding:15px;border-radius:var(--r-pill);border:1.5px solid rgba(0,0,0,.08);background:rgba(255,255,255,.65);color:var(--text);font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font);text-align:center;box-shadow:var(--spec)}
+.email-cancel{width:100%;padding:14px;border-radius:var(--r-pill);border:1.5px solid rgba(0,0,0,.07);background:rgba(255,255,255,.52);color:var(--muted);font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font);margin-top:10px;box-shadow:var(--spec)}
+.email-store-tag{display:inline-block;background:rgba(18,168,118,.15);color:var(--green-d);border-radius:var(--r-pill);padding:5px 14px;font-size:12px;font-weight:900;margin-bottom:14px;border:1px solid rgba(18,168,118,.2)}
+
+/* ═══ UTILITIES ══════════════════════════════════════════════════════════ */
+.empty{text-align:center;padding:44px 20px;color:rgba(255,255,255,.55);font-size:14px;font-weight:700}
+.toast{position:fixed;bottom:calc(var(--tab-h) + 14px);left:50%;transform:translateX(-50%);background:rgba(13,31,13,.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);color:#fff;padding:13px 24px;border-radius:var(--r-pill);font-size:13px;font-weight:800;z-index:500;animation:fadeUp .3s;white-space:nowrap;pointer-events:none;border:1px solid rgba(255,255,255,.2);box-shadow:var(--spec-dark),0 8px 28px rgba(0,0,0,.25)}
+.spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:7px}
 </style>
 </head>
 <body>
 
-<!-- RGPD -->
-<div id="rgpd-overlay" style="display:none">
-  <div id="rgpd-box">
-    <div style="font-size:32px;margin-bottom:12px">🔒</div>
-    <h2>Protection de vos données</h2>
-    <p>FreshControl collecte les données suivantes pour fonctionner :</p>
-    <ul>
-      <li><b>Localisation GPS</b> — pour identifier le magasin scanné</li>
-      <li><b>Photos de produits</b> — analysées par Anthropic AI (Claude) pour lire le code-barres</li>
-      <li><b>Données produits</b> — stockées dans Google Sheets via N8N</li>
-    </ul>
-    <p>Aucune donnée n'est vendue à des tiers. Vous pouvez retirer votre consentement à tout moment.</p>
-    <div class="rgpd-btns">
-      <button class="rgpd-decline" onclick="rgpdDecline()">Refuser</button>
-      <button class="rgpd-accept" onclick="rgpdAccept()">✓ Accepter</button>
+<!-- ═══ SPLASH / LOGIN ════════════════════════════════════════════════════════ -->
+<div id="splash">
+  <div class="splash-logo">
+    <div class="splash-lockup">
+      <div class="splash-icon">🌿</div>
+      <div class="splash-name">FreshControl</div>
     </div>
+    <div class="splash-tagline" id="sp-tagline">Gestion intelligente des périmés</div>
   </div>
+
+  <!-- Sélecteur de langue -->
+  <div class="lang-row" id="lang-row">
+    <button class="lang-btn active" onclick="setLang('fr')">🇫🇷 FR</button>
+    <button class="lang-btn" onclick="setLang('en')">🇬🇧 EN</button>
+    <button class="lang-btn" onclick="setLang('es')">🇪🇸 ES</button>
+    <button class="lang-btn" onclick="setLang('zh')">🇨🇳 中文</button>
+  </div>
+
+  <!-- Formulaire de connexion -->
+  <div class="login-card">
+    <div class="login-label" id="lbl-user">Identifiant</div>
+    <input class="login-input" id="login-user" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="nom.utilisateur">
+    <div class="login-label" id="lbl-pass">Mot de passe</div>
+    <input class="login-input" id="login-pass" type="password" autocomplete="current-password" placeholder="••••••••">
+    <button class="login-btn" id="login-btn" onclick="doLogin()">
+      <span id="login-btn-txt">Se connecter</span>
+    </button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+  <div class="login-version">FreshControl v2.1 · Bunga.corp</div>
 </div>
 
-<!-- HEADER -->
-<div id="hdr">
-  <div>
-    <h1>🌿 FreshControl</h1>
-    <div id="hdr-sub">Chargement…</div>
-  </div>
-  <div id="urgent-badge"></div>
-</div>
-
-<!-- MAIN -->
-<div id="main">
-
-  <!-- DASHBOARD -->
-  <div id="tab-dashboard" class="tab on">
-    <div class="stat-grid">
-      <div class="stat c-exp" onclick="setFS('Périmés')"><div class="stat-num" id="cn-exp">0</div><div class="stat-lbl">Périmés</div></div>
-      <div class="stat c-crit" onclick="setFS('Critique')"><div class="stat-num" id="cn-crit">0</div><div class="stat-lbl">Critiques ≤ 2j</div></div>
-      <div class="stat c-warn" onclick="setFS('Attention')"><div class="stat-num" id="cn-warn">0</div><div class="stat-lbl">Attention ≤ 7j</div></div>
-      <div class="stat c-ok" onclick="setFS('OK')"><div class="stat-num" id="cn-ok">0</div><div class="stat-lbl">OK</div></div>
-    </div>
-    <div class="frow" id="fsr"></div>
-    <div class="frow" id="fmr"></div>
-    <div class="sh"><span class="sh-t">Produits</span><span class="sh-c" id="pcount"></span></div>
-    <div id="plist"></div>
-  </div>
-
-  <!-- SCANNER -->
-  <div id="tab-scanner" class="tab">
-    <div id="gps-pill" class="gps-pill" style="display:none">
-      <div class="gps-dot"></div>
-      <span id="gps-txt">Localisation…</span>
-    </div>
-
-    <!-- ÉTAPE 1 : Code-barres -->
-    <div class="scan-zone" id="scan-step1">
-      <input type="file" id="scan-input-barcode" accept="image/*" capture="environment">
-      <div class="scan-ic">📦</div>
-      <h2 style="color:var(--green)">Photo 1 — Code-barres EAN</h2>
-      <p style="color:var(--muted);font-size:13px;margin-top:6px">Photographiez le code-barres du produit</p>
-    </div>
-
-    <!-- ÉTAPE 2 : Nom produit (si gencod pas trouvé) -->
-    <div class="scan-zone" id="scan-step2" style="display:none;border-color:var(--orange)">
-      <input type="file" id="scan-input-name" accept="image/*" capture="environment">
-      <div class="scan-ic">🏷️</div>
-      <h2 style="color:var(--orange)">Photo 2 — Nom du produit</h2>
-      <p style="color:var(--muted);font-size:13px;margin-top:6px">Gencod non trouvé — photographiez le nom du produit</p>
-    </div>
-
-    <div id="nf-card" class="nf-card">
-      <div class="nf-ic">🚫</div>
-      <h3 style="font-size:17px;font-weight:800;color:var(--red)">Produit inexistant</h3>
-      <p id="nf-msg" style="font-size:13px;color:#A32D2D;margin-top:6px">Ce produit ne figure pas dans le catalogue Léa Nature.</p>
-    </div>
-
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div class="sh-t">Derniers scans</div>
-        <button onclick="clearScans()" style="font-size:11px;font-weight:600;color:var(--red);background:var(--red-light);border:none;border-radius:8px;padding:4px 10px;cursor:pointer">🗑 Effacer</button>
+<!-- ═══ STARTUP ALERT POPUP ════════════════════════════════════════════════ -->
+<div id="startup-popup">
+  <div class="startup-sheet">
+    <div class="startup-hd">
+      <div class="startup-hd-top">
+        <div>
+          <h2 id="sp-title">⚠️ Alertes produits</h2>
+          <p id="sp-subtitle">Produits expirés ou critiques détectés</p>
+        </div>
+        <button class="startup-close" onclick="closeStartupPopup()">✕</button>
       </div>
-      <div id="recent-scans"><p style="color:var(--muted);font-size:13px">Aucun scan récent</p></div>
     </div>
-  </div>
-
-  <!-- ALERTES -->
-  <div id="tab-alertes" class="tab">
-    <div class="card" style="background:var(--orange-light);border:1px solid #FAC775;margin-bottom:16px">
-      <div style="font-size:13px;font-weight:600;color:#854F0B;margin-bottom:4px">📊 Automatisation active</div>
-      <div style="font-size:12px;color:#854F0B">Gmail + Google Calendar via N8N · recap 7h chaque matin</div>
-    </div>
-    <div id="alert-list"></div>
-  </div>
-
-  <!-- PLANNING -->
-  <div id="tab-planning" class="tab">
-    <div class="card" style="margin-bottom:16px">
-      <div style="font-size:13px;color:var(--muted)">Définissez les jours de visite par magasin pour déclencher les alertes Calendar au bon moment.</div>
-    </div>
-    <div id="planning-list"></div>
-  </div>
-
-</div>
-
-<!-- FAB -->
-<button class="fab" id="fab" onclick="openForm(null)">+</button>
-
-<!-- TABBAR -->
-<div id="tabbar">
-  <button class="tb on" id="tbtn-dashboard" onclick="switchTab('dashboard')"><span class="ic">🏠</span>Tableau de bord</button>
-  <button class="tb" id="tbtn-scanner"   onclick="switchTab('scanner')"><span class="ic">📷</span>Scanner</button>
-  <button class="tb" id="tbtn-alertes"   onclick="switchTab('alertes')"><span class="ic">🔔</span>Alertes</button>
-  <button class="tb" id="tbtn-planning"  onclick="switchTab('planning')"><span class="ic">📅</span>Planning</button>
-</div>
-
-<!-- FORM OVERLAY -->
-<div id="form-ov" class="overlay" style="display:none" onclick="if(event.target===this)closeForm()">
-  <div class="sheet">
-    <div class="handle"></div>
-    <div class="sh-title" id="form-title">Ajouter un produit</div>
-    <div class="fg"><label class="fl">Gencod / EAN *</label><input type="number" id="f-gencod" class="fi" placeholder="3289196040640"></div>
-    <div class="fg"><label class="fl">Nom du produit *</label><input type="text" id="f-name" class="fi" placeholder="Boisson Citron Gingembre"></div>
-    <div class="fg"><label class="fl">Rayon</label>
-      <select id="f-rayon" class="fi">
-        <option>Épicerie</option><option>Crémerie</option><option>Charcuterie</option>
-        <option>Boulangerie</option><option>Surgelés</option><option>Boissons</option>
-        <option>Hygiène</option><option>Confiserie</option><option>Traiteur</option>
-      </select>
-    </div>
-    <div class="fg"><label class="fl">Quantité</label><input type="number" id="f-qty" class="fi" value="1" min="1"></div>
-    <div class="fg">
-      <label class="fl">Date de péremption *</label>
-      <input type="date" id="f-expiry" class="fi" oninput="updatePrev()">
-      <div class="status-prev" id="sprev"></div>
-    </div>
-    <div class="fg"><label class="fl">Magasin</label><select id="f-magasin" class="fi"></select></div>
-    <input type="hidden" id="f-id">
-    <button class="btn btn-p" onclick="submitForm()">✓ Enregistrer</button>
-    <button class="btn btn-s" onclick="closeForm()">Annuler</button>
-    <button class="btn btn-d" id="btn-del" onclick="deleteProduct()" style="display:none">🗑 Supprimer</button>
-  </div>
-</div>
-
-<!-- SCAN LOADER -->
-<div id="ldr" class="overlay">
-  <div class="sheet">
-    <div style="font-size:52px;margin-bottom:16px">🤖</div>
-    <div style="font-size:17px;font-weight:700;margin-bottom:8px">Analyse en cours…</div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:28px">Lecture du code-barres + vérification catalogue</div>
-    <div style="display:flex;justify-content:center;gap:8px">
-      <div style="width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1s infinite"></div>
-      <div style="width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1s .2s infinite"></div>
-      <div style="width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1s .4s infinite"></div>
+    <div class="startup-body" id="startup-body"></div>
+    <div class="startup-footer">
+      <button class="startup-btn-mail" id="sp-mail-btn" onclick="openEmailFromStartup()">📧 Envoyer par mail</button>
+      <button class="startup-btn-close" id="sp-close-btn" onclick="closeStartupPopup()">Fermer</button>
     </div>
   </div>
 </div>
 
-<!-- POPUP ALERTE -->
-<div id="popup" class="overlay" style="display:none">
-  <div class="sheet" onclick="event.stopPropagation()">
-    <div class="handle"></div>
-    <div style="text-align:center;padding:8px 0 16px">
-      <div style="font-size:48px;margin-bottom:12px">⚠️</div>
-      <div style="font-size:18px;font-weight:800;color:var(--red);margin-bottom:8px">Produits urgents !</div>
-      <div id="popup-txt" style="font-size:14px;color:var(--muted)"></div>
+<!-- ═══ EMAIL REMINDER MODAL ════════════════════════════════════════════════ -->
+<div id="email-modal">
+  <div class="email-sheet">
+    <div class="email-title" id="em-title">📧 Envoyer un rappel</div>
+    <div class="email-sub" id="em-sub">Rappel par e-mail des produits urgents</div>
+    <div class="email-store-tag" id="em-store-tag"></div>
+    <div class="email-field">
+      <div class="email-label" id="em-lbl-to">Destinataire(s)</div>
+      <input class="email-input" id="em-to" placeholder="responsable@magasin.fr" type="email">
     </div>
-    <button class="btn btn-p" onclick="document.getElementById('popup').style.display='none';switchTab('alertes')">Voir les alertes →</button>
+    <div class="email-field">
+      <div class="email-label" id="em-lbl-subj">Objet</div>
+      <input class="email-input" id="em-subject" type="text">
+    </div>
+    <div class="email-field">
+      <div class="email-label" id="em-lbl-body">Corps du message</div>
+      <textarea class="email-textarea" id="em-body"></textarea>
+    </div>
+    <div class="email-actions">
+      <button class="email-send-n8n" id="em-send-n8n" onclick="sendEmailViaN8N()">🚀 Envoyer via N8N</button>
+      <button class="email-send-mailto" onclick="sendEmailMailto()">✉️ Ouvrir</button>
+    </div>
+    <button class="email-cancel" id="em-cancel" onclick="closeEmailModal()">Annuler</button>
+  </div>
+</div>
+
+<!-- ═══ RGPD ══════════════════════════════════════════════════════════════════ -->
+<div id="rgpd-overlay" class="hide">
+  <div class="rgpd-sheet">
+    <div class="rgpd-title" id="rgpd-title">🔒 Données & Confidentialité</div>
+    <p class="rgpd-text" id="rgpd-text">
+      FreshControl utilise votre <strong>géolocalisation</strong> pour identifier le magasin visité et pré-remplir les données de scan. Ces données restent sur votre appareil et dans votre espace Google Sheets privé. Vous pouvez retirer votre consentement à tout moment depuis les paramètres.
+    </p>
+    <div class="rgpd-btns">
+      <button class="rgpd-decline" id="rgpd-dec" onclick="rgpdDecline()">Refuser</button>
+      <button class="rgpd-accept" id="rgpd-acc" onclick="rgpdAccept()">✓ Accepter</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN APP ════════════════════════════════════════════════════════════════ -->
+<div id="app">
+  <!-- Header -->
+  <div id="hdr">
+    <div id="hdr-left">
+      <div id="hdr-logo">🌿</div>
+      <div id="hdr-info">
+        <h1>FreshControl</h1>
+        <small id="hdr-sub">Chargement…</small>
+      </div>
+    </div>
+    <div id="hdr-right">
+      <div id="urgent-badge"></div>
+      <button id="btn-menu" onclick="toggleSidebar()">☰</button>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div id="main">
+
+    <!-- DASHBOARD -->
+    <div id="tab-dashboard" class="tab on">
+      <div class="stat-grid">
+        <div class="stat c-exp" onclick="setFS('exp')"><div class="stat-num" id="cn-exp">0</div><div class="stat-lbl" id="lbl-exp">Périmés</div></div>
+        <div class="stat c-crit" onclick="setFS('crit')"><div class="stat-num" id="cn-crit">0</div><div class="stat-lbl" id="lbl-crit">Critiques ≤2j</div></div>
+        <div class="stat c-warn" onclick="setFS('warn')"><div class="stat-num" id="cn-warn">0</div><div class="stat-lbl" id="lbl-warn">Attention ≤7j</div></div>
+        <div class="stat c-ok" onclick="setFS('ok')"><div class="stat-num" id="cn-ok">0</div><div class="stat-lbl" id="lbl-ok">OK</div></div>
+      </div>
+      <div class="frow" id="fsr"></div>
+      <div class="frow" id="fmr"></div>
+      <div class="sh"><span class="sh-t" id="lbl-produits">Produits</span><span class="sh-c" id="pcount"></span></div>
+      <div id="plist"></div>
+    </div>
+
+    <!-- SCANNER -->
+    <div id="tab-scanner" class="tab">
+      <!-- GPS pill -->
+      <div id="gps-pill" class="gps-pill" style="display:none">
+        <div class="gps-dot"></div>
+        <span id="gps-txt">Localisation…</span>
+        <button class="gps-fix-btn" id="gps-retry-btn" onclick="retryGPS()" style="display:none" id="lbl-retry">Réessayer</button>
+      </div>
+
+      <div class="scan-zone">
+        <input type="file" id="scan-input" accept="image/*" capture="environment">
+        <span class="scan-ic">📦</span>
+        <h2 style="color:var(--green);font-size:18px" id="sc-title">Scanner un produit</h2>
+        <p style="color:var(--muted);font-size:13px;margin-top:6px" id="sc-sub">Photographiez le code-barres EAN du produit</p>
+        <button class="scan-btn" onclick="document.getElementById('scan-input').click()">
+          📷 <span id="sc-btn">Prendre une photo</span>
+        </button>
+        <div id="scan-status"></div>
+      </div>
+
+      <!-- Produit non trouvé -->
+      <div class="not-found-card" id="nf-card">
+        <div class="nf-ico">🔍</div>
+        <div class="nf-title" id="nf-title">Produit non référencé</div>
+        <div class="nf-sub" id="nf-sub">Ce gencod n'existe pas dans le catalogue Bunga.corp.</div>
+        <button class="nf-retry" onclick="resetScan()" id="nf-btn">Nouveau scan</button>
+      </div>
+
+      <!-- Formulaire résultat -->
+      <div id="scan-result">
+        <div class="rf-title">✅ <span id="rf-prod-name"></span></div>
+        <div class="rf-row">
+          <div class="rf-field">
+            <div class="rf-label" id="lbl-gencod">Gencod</div>
+            <input class="rf-input" id="rf-gencod" readonly style="background:var(--bg);color:var(--muted)">
+          </div>
+          <div class="rf-field">
+            <div class="rf-label" id="lbl-type">Type</div>
+            <input class="rf-input" id="rf-type" readonly style="background:var(--bg);color:var(--muted)">
+          </div>
+        </div>
+        <div class="rf-field">
+          <div class="rf-label" id="lbl-dlc">Date limite (DLC)</div>
+          <input class="rf-input" type="date" id="rf-date">
+        </div>
+        <div class="rf-field">
+          <div class="rf-label" id="lbl-magasin">Magasin</div>
+          <input class="rf-input" id="rf-magasin">
+        </div>
+        <button class="rf-save" onclick="saveProduct()" id="rf-save-btn">💾 Enregistrer</button>
+        <button class="rf-cancel" onclick="resetScan()" id="rf-cancel-btn">Annuler</button>
+      </div>
+    </div>
+
+    <!-- ALERTES -->
+    <div id="tab-alertes" class="tab">
+      <button class="rf-save" id="alert-global-mail-btn" onclick="openEmailModal(null)" style="margin-bottom:14px;font-size:14px;padding:12px">📧 <span id="lbl-send-all-mail">Envoyer le récap global</span></button>
+      <div id="alertes-list"></div>
+    </div>
+
+    <!-- PLANNING -->
+    <div id="tab-planning" class="tab">
+      <div id="planning-list"></div>
+    </div>
+
+    <!-- ADMIN -->
+    <div id="tab-admin" class="tab">
+      <!-- Gestion utilisateurs -->
+      <div class="admin-section">
+        <div class="admin-sec-title" id="adm-users-title">Utilisateurs</div>
+        <div id="user-list"></div>
+        <div class="add-user-form" style="margin-top:16px">
+          <div class="au-row">
+            <input class="au-input" id="au-name" placeholder="Nom affiché">
+            <input class="au-input" id="au-user" placeholder="identifiant" autocapitalize="none">
+          </div>
+          <div class="au-row">
+            <input class="au-input" id="au-pass" type="password" placeholder="Mot de passe">
+            <select class="au-select" id="au-role">
+              <option value="agent">Agent</option>
+              <option value="admin">Admin</option>
+            </select>
+            <button class="au-add" onclick="addUser()" id="adm-add-btn">+ Ajouter</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Langue -->
+      <div class="admin-section">
+        <div class="admin-sec-title" id="adm-lang-title">Langue de l'application</div>
+        <div class="lang-setting-row" id="lang-setting-row">
+          <button class="lang-setting-btn" onclick="setLang('fr')">🇫🇷 Français</button>
+          <button class="lang-setting-btn" onclick="setLang('en')">🇬🇧 English</button>
+          <button class="lang-setting-btn" onclick="setLang('es')">🇪🇸 Español</button>
+          <button class="lang-setting-btn" onclick="setLang('zh')">🇨🇳 中文</button>
+        </div>
+      </div>
+
+      <!-- Email config -->
+      <div class="admin-section">
+        <div class="admin-sec-title" id="adm-email-title">Configuration e-mail</div>
+        <div class="rf-field">
+          <div class="rf-label" id="adm-lbl-default-to">Destinataire par défaut</div>
+          <input class="rf-input" id="adm-default-email" placeholder="responsable@bungacorp.fr" type="email">
+        </div>
+        <div class="rf-field">
+          <div class="rf-label" id="adm-lbl-popup">Popup au démarrage</div>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 0">
+            <input type="checkbox" id="adm-popup-toggle" style="width:20px;height:20px;accent-color:var(--green)">
+            <span id="adm-popup-lbl" style="font-size:14px;color:var(--text)">Afficher les alertes au démarrage</span>
+          </label>
+        </div>
+        <button class="rf-save" onclick="saveEmailConfig()" id="adm-save-email-btn" style="font-size:14px;padding:12px">💾 Sauvegarder</button>
+      </div>
+
+      <!-- Config N8N -->
+      <div class="admin-section">
+        <div class="admin-sec-title">Configuration N8N</div>
+        <div class="rf-field">
+          <div class="rf-label">URL Webhook</div>
+          <input class="rf-input" id="adm-webhook" placeholder="https://..." style="font-size:13px">
+        </div>
+        <button class="rf-save" onclick="saveWebhook()" style="font-size:14px;padding:12px">💾 Sauvegarder</button>
+      </div>
+
+      <!-- Infos session -->
+      <div class="admin-section">
+        <div class="admin-sec-title" id="adm-session-title">Session</div>
+        <div id="session-info" style="font-size:13px;color:var(--muted);line-height:1.8"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab bar -->
+  <div id="tabbar">
+    <button class="tb on" id="tb-dashboard" onclick="showTab('dashboard')">
+      <span class="tb-ico">📊</span><span id="tb-lbl-dash">Tableau</span>
+    </button>
+    <button class="tb" id="tb-scanner" onclick="showTab('scanner')">
+      <span class="tb-ico">📷</span><span id="tb-lbl-scan">Scanner</span>
+    </button>
+    <button class="tb" id="tb-alertes" onclick="showTab('alertes')">
+      <span class="tb-ico">🔔</span><span id="tb-lbl-alerts">Alertes</span>
+    </button>
+    <button class="tb" id="tb-planning" onclick="showTab('planning')">
+      <span class="tb-ico">📅</span><span id="tb-lbl-plan">Planning</span>
+    </button>
+    <button class="tb" id="tb-admin" onclick="showTab('admin')" style="display:none">
+      <span class="tb-ico">⚙️</span><span id="tb-lbl-admin">Admin</span>
+    </button>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div id="sidebar-bg" onclick="closeSidebar()"></div>
+  <div id="sidebar-panel">
+    <div class="sb-head">
+      <div class="sb-user" id="sb-username">—</div>
+      <div class="sb-role" id="sb-role-lbl">—</div>
+    </div>
+    <div class="sb-body">
+      <div class="sb-section" id="sb-nav-lbl">Navigation</div>
+      <div class="sb-item active" onclick="showTab('dashboard');closeSidebar()"><div class="sb-item-ico">📊</div><span id="sb-dash">Tableau de bord</span></div>
+      <div class="sb-item" onclick="showTab('scanner');closeSidebar()"><div class="sb-item-ico">📷</div><span id="sb-scan">Scanner</span></div>
+      <div class="sb-item" onclick="showTab('alertes');closeSidebar()"><div class="sb-item-ico">🔔</div><span id="sb-alerts">Alertes</span></div>
+      <div class="sb-item" onclick="showTab('planning');closeSidebar()"><div class="sb-item-ico">📅</div><span id="sb-plan">Planning</span></div>
+      <div class="sb-item" id="sb-admin-item" onclick="showTab('admin');closeSidebar()" style="display:none"><div class="sb-item-ico">⚙️</div><span id="sb-admin">Administration</span></div>
+
+      <div class="sb-section" id="sb-lang-lbl">Langue</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;padding:4px 12px">
+        <button class="lang-btn" onclick="setLang('fr');closeSidebar()" style="color:var(--text);border-color:var(--border)">🇫🇷 FR</button>
+        <button class="lang-btn" onclick="setLang('en');closeSidebar()" style="color:var(--text);border-color:var(--border)">🇬🇧 EN</button>
+        <button class="lang-btn" onclick="setLang('es');closeSidebar()" style="color:var(--text);border-color:var(--border)">🇪🇸 ES</button>
+        <button class="lang-btn" onclick="setLang('zh');closeSidebar()" style="color:var(--text);border-color:var(--border)">🇨🇳 中文</button>
+      </div>
+    </div>
+    <div class="sb-footer">
+      <button class="sb-logout" onclick="doLogout()" id="sb-logout-btn">🚪 Déconnexion</button>
+    </div>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════
-// CONFIG — remplacez la clé ici
-// ═══════════════════════════════════════════
-const N8N = 'https://stephane1377.app.n8n.cloud/webhook/scan-produit-magasin';
-const ANTHROPIC_KEY = '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'; // sk-ant-...
-const MAGS_DEF = ['Monoprix Marseille', 'Casino Nice'];
+/* ═══════════════════════════════════════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════════════════════════════════════ */
+const DEFAULT_WEBHOOK = 'https://VOTRE-INSTANCE.app.n8n.cloud/webhook/scan-produit-magasin';
 
-// ═══════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════
-const uid = () => Math.random().toString(36).slice(2,10);
-const addDays = n => { const d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; };
-const fmt = d => d ? new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'}) : '—';
-const daysLeft = d => Math.ceil((new Date(d+'T12:00:00')-new Date())/86400000);
-const stOf = d => { const n=daysLeft(d); if(n<0)return'exp'; if(n<=2)return'crit'; if(n<=7)return'warn'; return'ok'; };
-const ST = {
-  exp:  {lbl:'Périmé',   bg:'#FCEBEB',tx:'#A32D2D',dot:'#E24B4A'},
-  crit: {lbl:'Critique', bg:'#FAEEDA',tx:'#854F0B',dot:'#EF9F27'},
-  warn: {lbl:'Attention',bg:'#EAF3DE',tx:'#3B6D11',dot:'#639922'},
-  ok:   {lbl:'OK',       bg:'#E6F1FB',tx:'#185FA5',dot:'#378ADD'},
+// Magasins (lat/lng approximatifs — à adapter)
+const STORES = [
+  { name: 'Monoprix Marseille Centre', lat: 43.2965, lng: 5.3798, r: 500 },
+  { name: 'Carrefour Aubagne',          lat: 43.2964, lng: 5.5728, r: 600 },
+  { name: 'Intermarché La Ciotat',      lat: 43.1765, lng: 5.6051, r: 600 },
+];
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TRANSLATIONS
+═══════════════════════════════════════════════════════════════════════════ */
+const I18N = {
+  fr:{
+    tagline:'Gestion intelligente des périmés',
+    lbl_user:'Identifiant', lbl_pass:'Mot de passe', login_btn:'Se connecter',
+    login_err_empty:'Veuillez remplir tous les champs', login_err_wrong:'Identifiant ou mot de passe incorrect',
+    rgpd_title:'🔒 Données & Confidentialité',
+    rgpd_text:'FreshControl utilise votre géolocalisation pour identifier le magasin visité. Ces données restent dans votre espace Google Sheets privé.',
+    rgpd_acc:'✓ Accepter', rgpd_dec:'Refuser',
+    hdr_sub_loading:'Chargement…', hdr_sub_no_store:'Magasin non détecté',
+    lbl_exp:'Périmés', lbl_crit:'Critiques ≤2j', lbl_warn:'Attention ≤7j', lbl_ok:'OK',
+    lbl_produits:'Produits', all:'Tous',
+    sc_title:'Scanner un produit', sc_sub:'Photographiez le code-barres EAN du produit', sc_btn:'Prendre une photo',
+    scan_analyzing:'🔍 Analyse en cours…', scan_ok:'✅ Produit reconnu !', scan_err:'❌ Erreur de connexion',
+    lbl_gencod:'Gencod', lbl_type:'Type', lbl_dlc:'Date limite (DLC)', lbl_magasin:'Magasin',
+    rf_save:'💾 Enregistrer', rf_cancel:'Annuler',
+    nf_title:'Produit non référencé', nf_sub:"Ce gencod n'existe pas dans le catalogue Bunga.corp.", nf_btn:'Nouveau scan',
+    gps_loading:'Localisation…', gps_denied:'GPS refusé', gps_error:'Erreur GPS', gps_retry:'Réessayer',
+    gps_ok_prefix:'📍 ',
+    tb_dash:'Tableau', tb_scan:'Scanner', tb_alerts:'Alertes', tb_plan:'Planning', tb_admin:'Admin',
+    sb_nav:'Navigation', sb_lang:'Langue', sb_dash:'Tableau de bord', sb_scan:'Scanner',
+    sb_alerts:'Alertes', sb_plan:'Planning', sb_admin:'Administration', sb_logout:'🚪 Déconnexion',
+    adm_users:'Utilisateurs', adm_lang:'Langue de l\'application', adm_add:'+ Ajouter',
+    adm_session:'Session', saved:'✅ Sauvegardé', deleted:'🗑 Supprimé', user_added:'👤 Utilisateur ajouté',
+    err_fill:'Remplissez tous les champs', no_products:'Aucun produit',
+    days:['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'],
+    badge_exp:'Périmé', badge_crit:'J-{{d}}', badge_warn:'J-{{d}}', badge_ok:'J+{{d}}',
+    // email/popup
+    send_all_mail:'Envoyer le récap global', popup_title:'⚠️ Alertes produits', popup_subtitle:'Produits expirés ou critiques détectés',
+    em_title:'📧 Envoyer un rappel', em_sub:'Rappel par e-mail des produits urgents',
+    em_lbl_to:'Destinataire(s)', em_lbl_subj:'Objet', em_lbl_body:'Corps du message',
+    em_send_n8n:'🚀 Envoyer via N8N', em_cancel:'Annuler',
+    sp_mail_btn:'📧 Envoyer par mail', sp_close_btn:'Fermer',
+    adm_email:'Configuration e-mail', adm_lbl_default_to:'Destinataire par défaut',
+    adm_lbl_popup:'Popup au démarrage', adm_popup_lbl:'Afficher les alertes au démarrage',
+    email_sent:'✅ E-mail envoyé', email_err:'❌ Erreur d\'envoi',
+    email_subj_tpl:'[FreshControl] Produits urgents — {{store}} — {{date}}',
+  },
+  en:{
+    tagline:'Smart expiry date management',
+    lbl_user:'Username', lbl_pass:'Password', login_btn:'Sign in',
+    login_err_empty:'Please fill in all fields', login_err_wrong:'Incorrect username or password',
+    rgpd_title:'🔒 Privacy & Data',
+    rgpd_text:'FreshControl uses your geolocation to identify the visited store. Data stays in your private Google Sheets.',
+    rgpd_acc:'✓ Accept', rgpd_dec:'Decline',
+    hdr_sub_loading:'Loading…', hdr_sub_no_store:'Store not detected',
+    lbl_exp:'Expired', lbl_crit:'Critical ≤2d', lbl_warn:'Warning ≤7d', lbl_ok:'OK',
+    lbl_produits:'Products', all:'All',
+    sc_title:'Scan a product', sc_sub:'Photograph the EAN barcode of the product', sc_btn:'Take a photo',
+    scan_analyzing:'🔍 Analyzing…', scan_ok:'✅ Product recognized!', scan_err:'❌ Connection error',
+    lbl_gencod:'Barcode', lbl_type:'Type', lbl_dlc:'Expiry date', lbl_magasin:'Store',
+    rf_save:'💾 Save', rf_cancel:'Cancel',
+    nf_title:'Product not found', nf_sub:"This barcode doesn't exist in the Bunga.corp catalogue.", nf_btn:'New scan',
+    gps_loading:'Locating…', gps_denied:'GPS denied', gps_error:'GPS error', gps_retry:'Retry',
+    gps_ok_prefix:'📍 ',
+    tb_dash:'Dashboard', tb_scan:'Scanner', tb_alerts:'Alerts', tb_plan:'Planning', tb_admin:'Admin',
+    sb_nav:'Navigation', sb_lang:'Language', sb_dash:'Dashboard', sb_scan:'Scanner',
+    sb_alerts:'Alerts', sb_plan:'Planning', sb_admin:'Administration', sb_logout:'🚪 Sign out',
+    adm_users:'Users', adm_lang:'App language', adm_add:'+ Add',
+    adm_session:'Session', saved:'✅ Saved', deleted:'🗑 Deleted', user_added:'👤 User added',
+    err_fill:'Please fill all fields', no_products:'No products',
+    days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    badge_exp:'Expired', badge_crit:'D-{{d}}', badge_warn:'D-{{d}}', badge_ok:'D+{{d}}',
+    // email/popup
+    send_all_mail:'Send global summary', popup_title:'⚠️ Product alerts', popup_subtitle:'Expired or critical products detected',
+    em_title:'📧 Send reminder', em_sub:'Email reminder for urgent products',
+    em_lbl_to:'Recipient(s)', em_lbl_subj:'Subject', em_lbl_body:'Message body',
+    em_send_n8n:'🚀 Send via N8N', em_cancel:'Cancel',
+    sp_mail_btn:'📧 Send by email', sp_close_btn:'Close',
+    adm_email:'Email configuration', adm_lbl_default_to:'Default recipient',
+    adm_lbl_popup:'Startup popup', adm_popup_lbl:'Show alerts on startup',
+    email_sent:'✅ Email sent', email_err:'❌ Send error',
+    email_subj_tpl:'[FreshControl] Urgent products — {{store}} — {{date}}',
+  },
+  es:{
+    tagline:'Gestión inteligente de caducidades',
+    lbl_user:'Usuario', lbl_pass:'Contraseña', login_btn:'Iniciar sesión',
+    login_err_empty:'Por favor rellene todos los campos', login_err_wrong:'Usuario o contraseña incorrectos',
+    rgpd_title:'🔒 Privacidad y Datos',
+    rgpd_text:'FreshControl utiliza su geolocalización para identificar la tienda visitada. Los datos permanecen en su Google Sheets privado.',
+    rgpd_acc:'✓ Aceptar', rgpd_dec:'Rechazar',
+    hdr_sub_loading:'Cargando…', hdr_sub_no_store:'Tienda no detectada',
+    lbl_exp:'Caducados', lbl_crit:'Crítico ≤2d', lbl_warn:'Atención ≤7d', lbl_ok:'OK',
+    lbl_produits:'Productos', all:'Todos',
+    sc_title:'Escanear producto', sc_sub:'Fotografíe el código de barras EAN', sc_btn:'Tomar foto',
+    scan_analyzing:'🔍 Analizando…', scan_ok:'✅ ¡Producto reconocido!', scan_err:'❌ Error de conexión',
+    lbl_gencod:'Código de barras', lbl_type:'Tipo', lbl_dlc:'Fecha de caducidad', lbl_magasin:'Tienda',
+    rf_save:'💾 Guardar', rf_cancel:'Cancelar',
+    nf_title:'Producto no encontrado', nf_sub:'Este código no existe en el catálogo Bunga.corp.', nf_btn:'Nuevo escaneo',
+    gps_loading:'Localizando…', gps_denied:'GPS denegado', gps_error:'Error GPS', gps_retry:'Reintentar',
+    gps_ok_prefix:'📍 ',
+    tb_dash:'Panel', tb_scan:'Escáner', tb_alerts:'Alertas', tb_plan:'Planif.', tb_admin:'Admin',
+    sb_nav:'Navegación', sb_lang:'Idioma', sb_dash:'Panel de control', sb_scan:'Escáner',
+    sb_alerts:'Alertas', sb_plan:'Planificación', sb_admin:'Administración', sb_logout:'🚪 Cerrar sesión',
+    adm_users:'Usuarios', adm_lang:'Idioma de la app', adm_add:'+ Agregar',
+    adm_session:'Sesión', saved:'✅ Guardado', deleted:'🗑 Eliminado', user_added:'👤 Usuario agregado',
+    err_fill:'Por favor rellene todos los campos', no_products:'Sin productos',
+    days:['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],
+    badge_exp:'Caducado', badge_crit:'D-{{d}}', badge_warn:'D-{{d}}', badge_ok:'D+{{d}}',
+    // email/popup
+    send_all_mail:'Enviar resumen global', popup_title:'⚠️ Alertas de productos', popup_subtitle:'Productos caducados o críticos detectados',
+    em_title:'📧 Enviar recordatorio', em_sub:'Recordatorio por correo de productos urgentes',
+    em_lbl_to:'Destinatario(s)', em_lbl_subj:'Asunto', em_lbl_body:'Cuerpo del mensaje',
+    em_send_n8n:'🚀 Enviar vía N8N', em_cancel:'Cancelar',
+    sp_mail_btn:'📧 Enviar por correo', sp_close_btn:'Cerrar',
+    adm_email:'Configuración de correo', adm_lbl_default_to:'Destinatario por defecto',
+    adm_lbl_popup:'Popup al inicio', adm_popup_lbl:'Mostrar alertas al inicio',
+    email_sent:'✅ Correo enviado', email_err:'❌ Error al enviar',
+    email_subj_tpl:'[FreshControl] Productos urgentes — {{store}} — {{date}}',
+  },
+  zh:{
+    tagline:'智能保质期管理系统',
+    lbl_user:'用户名', lbl_pass:'密码', login_btn:'登录',
+    login_err_empty:'请填写所有字段', login_err_wrong:'用户名或密码错误',
+    rgpd_title:'🔒 数据与隐私',
+    rgpd_text:'FreshControl使用您的地理位置来识别访问的门店。数据存储在您的私人Google Sheets中。',
+    rgpd_acc:'✓ 接受', rgpd_dec:'拒绝',
+    hdr_sub_loading:'加载中…', hdr_sub_no_store:'未检测到门店',
+    lbl_exp:'已过期', lbl_crit:'紧急 ≤2天', lbl_warn:'注意 ≤7天', lbl_ok:'正常',
+    lbl_produits:'产品', all:'全部',
+    sc_title:'扫描产品', sc_sub:'拍摄产品EAN条形码', sc_btn:'拍照',
+    scan_analyzing:'🔍 分析中…', scan_ok:'✅ 产品已识别！', scan_err:'❌ 连接错误',
+    lbl_gencod:'条形码', lbl_type:'类型', lbl_dlc:'有效期', lbl_magasin:'门店',
+    rf_save:'💾 保存', rf_cancel:'取消',
+    nf_title:'产品未找到', nf_sub:'此条形码不在Bunga.corp目录中。', nf_btn:'重新扫描',
+    gps_loading:'定位中…', gps_denied:'GPS被拒绝', gps_error:'GPS错误', gps_retry:'重试',
+    gps_ok_prefix:'📍 ',
+    tb_dash:'仪表盘', tb_scan:'扫描', tb_alerts:'警报', tb_plan:'计划', tb_admin:'管理',
+    sb_nav:'导航', sb_lang:'语言', sb_dash:'仪表盘', sb_scan:'扫描仪',
+    sb_alerts:'警报', sb_plan:'计划', sb_admin:'管理员', sb_logout:'🚪 退出登录',
+    adm_users:'用户管理', adm_lang:'应用语言', adm_add:'+ 添加',
+    adm_session:'会话', saved:'✅ 已保存', deleted:'🗑 已删除', user_added:'👤 用户已添加',
+    err_fill:'请填写所有字段', no_products:'无产品',
+    days:['周一','周二','周三','周四','周五','周六','周日'],
+    badge_exp:'已过期', badge_crit:'还剩{{d}}天', badge_warn:'还剩{{d}}天', badge_ok:'+{{d}}天',
+    // email/popup
+    send_all_mail:'发送全局摘要', popup_title:'⚠️ 产品警报', popup_subtitle:'检测到已过期或紧急产品',
+    em_title:'📧 发送提醒', em_sub:'通过电子邮件发送紧急产品提醒',
+    em_lbl_to:'收件人', em_lbl_subj:'主题', em_lbl_body:'邮件内容',
+    em_send_n8n:'🚀 通过N8N发送', em_cancel:'取消',
+    sp_mail_btn:'📧 发送邮件', sp_close_btn:'关闭',
+    adm_email:'邮件配置', adm_lbl_default_to:'默认收件人',
+    adm_lbl_popup:'启动弹窗', adm_popup_lbl:'启动时显示警报',
+    email_sent:'✅ 邮件已发送', email_err:'❌ 发送失败',
+    email_subj_tpl:'[FreshControl] 紧急产品 — {{store}} — {{date}}',
+  }
 };
 
-// ═══════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════
-let products  = JSON.parse(localStorage.getItem('fc_p')  || 'null') || [];
-let planning  = JSON.parse(localStorage.getItem('fc_pl') || 'null') || { 'Monoprix Marseille':['Lun','Ven'], 'Casino Nice':['Mar','Jeu'] };
-let recentScans = JSON.parse(localStorage.getItem('fc_scans') || '[]');
-let curTab='dashboard', fStatus='Tous', fMag='Tous';
+/* ═══════════════════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════════════════ */
+let lang     = localStorage.getItem('fc_lang') || 'fr';
+let session  = JSON.parse(localStorage.getItem('fc_session') || 'null');
+let products = JSON.parse(localStorage.getItem('fc_products') || '[]');
+let users    = JSON.parse(localStorage.getItem('fc_users') || 'null');
+let planning = JSON.parse(localStorage.getItem('fc_planning') || '{}');
+let webhook  = localStorage.getItem('fc_webhook') || DEFAULT_WEBHOOK;
+
 let gps = null;
+let filterStatus = null;
+let filterStore  = null;
+let currentTab   = 'dashboard';
+let scanData     = null;
 
-const save = () => {
-  localStorage.setItem('fc_p',     JSON.stringify(products));
-  localStorage.setItem('fc_pl',    JSON.stringify(planning));
-  localStorage.setItem('fc_scans', JSON.stringify(recentScans.slice(0,20)));
-};
+/* ═══════════════════════════════════════════════════════════════════════════
+   DEFAULT USERS
+═══════════════════════════════════════════════════════════════════════════ */
+if (!users) {
+  users = [
+    { name:'Administrateur', username:'admin', password:'freshcontrol2024', role:'admin' },
+    { name:'Agent 1',        username:'agent1', password:'agent123',        role:'agent' },
+  ];
+  saveUsers();
+}
 
-// ═══════════════════════════════════════════
-// RGPD
-// ═══════════════════════════════════════════
-function initRGPD() {
-  const consent = localStorage.getItem('fc_rgpd_v3');
-  // GPS démarre toujours pour le bon fonctionnement de l'app
-  initGPS();
-  if (!consent) {
-    // Afficher RGPD après 1s pour ne pas bloquer l'interface
-    setTimeout(() => {
-      document.getElementById('rgpd-overlay').style.display = 'flex';
-    }, 1000);
+function saveUsers(){ localStorage.setItem('fc_users', JSON.stringify(users)) }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   I18N — Apply translations
+═══════════════════════════════════════════════════════════════════════════ */
+function t(k){ return (I18N[lang]||I18N.fr)[k] || k }
+
+function applyLang(){
+  const T = I18N[lang]||I18N.fr;
+  // splash
+  document.getElementById('sp-tagline').textContent = T.tagline;
+  document.getElementById('lbl-user').textContent   = T.lbl_user;
+  document.getElementById('lbl-pass').textContent   = T.lbl_pass;
+  document.getElementById('login-btn-txt').textContent = T.login_btn;
+  // rgpd
+  document.getElementById('rgpd-title').textContent = T.rgpd_title;
+  document.getElementById('rgpd-text').textContent  = T.rgpd_text;
+  document.getElementById('rgpd-acc').textContent   = T.rgpd_acc;
+  document.getElementById('rgpd-dec').textContent   = T.rgpd_dec;
+  // stats
+  document.getElementById('lbl-exp').textContent  = T.lbl_exp;
+  document.getElementById('lbl-crit').textContent = T.lbl_crit;
+  document.getElementById('lbl-warn').textContent = T.lbl_warn;
+  document.getElementById('lbl-ok').textContent   = T.lbl_ok;
+  document.getElementById('lbl-produits').textContent = T.lbl_produits;
+  // scanner
+  document.getElementById('sc-title').textContent = T.sc_title;
+  document.getElementById('sc-sub').textContent   = T.sc_sub;
+  document.getElementById('sc-btn').textContent   = T.sc_btn;
+  document.getElementById('lbl-gencod').textContent  = T.lbl_gencod;
+  document.getElementById('lbl-type').textContent    = T.lbl_type;
+  document.getElementById('lbl-dlc').textContent     = T.lbl_dlc;
+  document.getElementById('lbl-magasin').textContent = T.lbl_magasin;
+  document.getElementById('rf-save-btn').textContent   = T.rf_save;
+  document.getElementById('rf-cancel-btn').textContent = T.rf_cancel;
+  document.getElementById('nf-title').textContent = T.nf_title;
+  document.getElementById('nf-sub').textContent   = T.nf_sub;
+  document.getElementById('nf-btn').textContent   = T.nf_btn;
+  document.getElementById('gps-retry-btn').textContent = T.gps_retry;
+  // email/popup UI
+  document.getElementById('lbl-send-all-mail').textContent  = T.send_all_mail || T.tb_alerts;
+  document.getElementById('sp-title').textContent           = T.popup_title;
+  document.getElementById('sp-subtitle').textContent        = T.popup_subtitle;
+  document.getElementById('sp-mail-btn').textContent        = T.sp_mail_btn;
+  document.getElementById('sp-close-btn').textContent       = T.sp_close_btn;
+  document.getElementById('em-title').textContent           = T.em_title;
+  document.getElementById('em-sub').textContent             = T.em_sub;
+  document.getElementById('em-lbl-to').textContent          = T.em_lbl_to;
+  document.getElementById('em-lbl-subj').textContent        = T.em_lbl_subj;
+  document.getElementById('em-lbl-body').textContent        = T.em_lbl_body;
+  document.getElementById('em-send-n8n').textContent        = T.em_send_n8n;
+  document.getElementById('em-cancel').textContent          = T.em_cancel;
+  if(document.getElementById('adm-email-title'))
+    document.getElementById('adm-email-title').textContent  = T.adm_email || 'Email';
+  if(document.getElementById('adm-lbl-default-to'))
+    document.getElementById('adm-lbl-default-to').textContent = T.adm_lbl_default_to || '';
+  if(document.getElementById('adm-popup-lbl'))
+    document.getElementById('adm-popup-lbl').textContent    = T.adm_popup_lbl || '';
+  // tabbar
+  document.getElementById('tb-lbl-dash').textContent   = T.tb_dash;
+  document.getElementById('tb-lbl-scan').textContent   = T.tb_scan;
+  document.getElementById('tb-lbl-alerts').textContent = T.tb_alerts;
+  document.getElementById('tb-lbl-plan').textContent   = T.tb_plan;
+  document.getElementById('tb-lbl-admin').textContent  = T.tb_admin;
+  // sidebar
+  document.getElementById('sb-logout-btn').textContent = T.sb_logout;
+  document.getElementById('sb-nav-lbl').textContent    = T.sb_nav;
+  document.getElementById('sb-lang-lbl').textContent   = T.sb_lang;
+  document.getElementById('sb-dash').textContent       = T.sb_dash;
+  document.getElementById('sb-scan').textContent       = T.sb_scan;
+  document.getElementById('sb-alerts').textContent     = T.sb_alerts;
+  document.getElementById('sb-plan').textContent       = T.sb_plan;
+  document.getElementById('sb-admin').textContent      = T.sb_admin;
+  // admin
+  document.getElementById('adm-users-title').textContent = T.adm_users;
+  document.getElementById('adm-lang-title').textContent  = T.adm_lang;
+  document.getElementById('adm-add-btn').textContent     = T.adm_add;
+  document.getElementById('adm-session-title').textContent = T.adm_session;
+  // lang buttons highlight
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.lang-setting-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll(`[onclick*="setLang('${lang}')"]`).forEach(b => b.classList.add('active'));
+  // GPS
+  updateGPSPill();
+}
+
+function setLang(l){
+  lang = l;
+  localStorage.setItem('fc_lang', l);
+  applyLang();
+  if(currentTab) renderCurrentTab();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════════════════════════════════════ */
+function doLogin(){
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-err');
+  const btn = document.getElementById('login-btn');
+  const T = I18N[lang]||I18N.fr;
+
+  if(!u || !p){ errEl.textContent = T.login_err_empty; return }
+
+  const user = users.find(x => x.username === u && x.password === p);
+  if(!user){
+    errEl.textContent = T.login_err_wrong;
+    ['login-user','login-pass'].forEach(id=>{
+      const el = document.getElementById(id);
+      el.classList.add('err');
+      setTimeout(()=>el.classList.remove('err'), 400);
+    });
+    return;
   }
+
+  session = { username: u, name: user.name, role: user.role, loginTime: Date.now() };
+  localStorage.setItem('fc_session', JSON.stringify(session));
+  document.getElementById('login-err').textContent = '';
+  launchApp();
 }
 
-function rgpdAccept() {
-  localStorage.setItem('fc_rgpd_v3', 'accepted');
-  document.getElementById('rgpd-overlay').style.display = 'none';
+function doLogout(){
+  session = null;
+  localStorage.removeItem('fc_session');
+  closeSidebar();
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('splash').style.display = 'flex';
+  document.getElementById('login-pass').value = '';
+  document.getElementById('login-err').textContent = '';
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   APP LAUNCH
+═══════════════════════════════════════════════════════════════════════════ */
+function launchApp(){
+  document.getElementById('splash').classList.add('hide');
+  setTimeout(()=>{ document.getElementById('splash').style.display='none' }, 350);
+  document.getElementById('app').classList.add('show');
+
+  // Sidebar user info
+  document.getElementById('sb-username').textContent = session.name;
+  document.getElementById('sb-role-lbl').textContent = session.role === 'admin' ? '👑 Administrateur' : '👤 Agent';
+
+  // Show admin tab only for admins
+  const isAdmin = session.role === 'admin';
+  document.getElementById('tb-admin').style.display = isAdmin ? 'flex' : 'none';
+  document.getElementById('sb-admin-item').style.display = isAdmin ? 'flex' : 'none';
+
+  // Check RGPD
+  if(!localStorage.getItem('fc_rgpd')){
+    document.getElementById('rgpd-overlay').classList.remove('hide');
+  } else {
+    initGPS();
+  }
+
+  renderDashboard();
+  applyLang();
+
+  // Startup popup (after short delay, if enabled and there are alerts)
+  const popupEnabled = localStorage.getItem('fc_popup_enabled') !== '0';
+  if(popupEnabled){
+    setTimeout(checkStartupAlerts, 800);
+  }
+
+  // Session info
+  const loginDate = new Date(session.loginTime);
+  document.getElementById('session-info').innerHTML =
+    `<strong>${session.name}</strong> (${session.role})<br>
+     🕐 Connexion : ${loginDate.toLocaleString(lang)}<br>
+     🔑 Identifiant : ${session.username}`;
+
+  // Webhook value
+  document.getElementById('adm-webhook').value = webhook;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RGPD
+═══════════════════════════════════════════════════════════════════════════ */
+function rgpdAccept(){
+  localStorage.setItem('fc_rgpd','1');
+  document.getElementById('rgpd-overlay').classList.add('hide');
   initGPS();
-  toast('✓ Consentement enregistré');
+}
+function rgpdDecline(){
+  localStorage.setItem('fc_rgpd','0');
+  document.getElementById('rgpd-overlay').classList.add('hide');
 }
 
-function rgpdDecline() {
-  localStorage.setItem('fc_rgpd_v3', 'declined');
-  document.getElementById('rgpd-overlay').style.display = 'none';
-  document.getElementById('gps-pill').style.display = 'none';
-  toast('GPS désactivé');
-}
+/* ═══════════════════════════════════════════════════════════════════════════
+   GEOLOCATION — robuste iOS/Android
+═══════════════════════════════════════════════════════════════════════════ */
+let gpsWatchId = null;
 
-// ═══════════════════════════════════════════
-// GPS
-// ═══════════════════════════════════════════
-function initGPS() {
+function initGPS(){
+  if(localStorage.getItem('fc_rgpd') !== '1') return;
+  if(!navigator.geolocation){ setGPSState('unsupported'); return }
+
+  // Show pill immediately
   const pill = document.getElementById('gps-pill');
-  const txt  = document.getElementById('gps-txt');
-  if (!navigator.geolocation) { 
-    pill.style.display = 'inline-flex';
-    txt.textContent = 'GPS non supporté';
-    return; 
-  }
   pill.style.display = 'inline-flex';
-  txt.textContent = 'Localisation…';
-  navigator.geolocation.watchPosition(
-    pos => {
-      gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: Math.round(pos.coords.accuracy) };
-      txt.textContent = `GPS actif · ±${gps.acc}m`;
-      pill.style.background = 'var(--green-light)';
-      pill.style.color = 'var(--green)';
-    },
-    err => { 
-      txt.textContent = 'GPS refusé · activez la localisation';
-      pill.style.background = '#FAEEDA';
-      pill.style.color = '#854F0B';
-    },
-    { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
+  pill.classList.remove('gps-err');
+  document.getElementById('gps-txt').textContent = t('gps_loading');
+  document.getElementById('gps-retry-btn').style.display = 'none';
+
+  // iOS requires getCurrentPosition first, then watchPosition
+  navigator.geolocation.getCurrentPosition(
+    pos => onGPSSuccess(pos),
+    err => onGPSError(err),
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
   );
 }
 
-// ═══════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════
-const getMags = () => ['Tous', ...new Set([...MAGS_DEF, ...products.map(p=>p.magasin), ...Object.keys(planning)])];
-const getActiveMag = () => getMags().filter(m=>m!=='Tous')[0] || 'Magasin';
+function onGPSSuccess(pos){
+  gps = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+  const store = findNearestStore(gps.lat, gps.lng);
+  const pill = document.getElementById('gps-pill');
+  pill.classList.remove('gps-err');
+  document.getElementById('gps-retry-btn').style.display = 'none';
 
-function stats() {
-  const base = fMag==='Tous' ? products : products.filter(p=>p.magasin===fMag);
-  return {
-    exp:  base.filter(p=>stOf(p.expiry)==='exp'),
-    crit: base.filter(p=>stOf(p.expiry)==='crit'),
-    warn: base.filter(p=>stOf(p.expiry)==='warn'),
-    ok:   base.filter(p=>stOf(p.expiry)==='ok'),
-  };
+  if(store){
+    document.getElementById('gps-txt').textContent = t('gps_ok_prefix') + store.name;
+    document.getElementById('hdr-sub').textContent = store.name;
+    if(document.getElementById('rf-magasin'))
+      document.getElementById('rf-magasin').value = store.name;
+  } else {
+    document.getElementById('gps-txt').textContent = `📍 ${gps.lat.toFixed(4)}, ${gps.lng.toFixed(4)}`;
+    document.getElementById('hdr-sub').textContent = t('hdr_sub_no_store');
+  }
+
+  // Continue watching (won't re-prompt on iOS after first success)
+  if(gpsWatchId === null){
+    gpsWatchId = navigator.geolocation.watchPosition(
+      onGPSSuccess,
+      ()=>{}, // silent on subsequent errors
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+    );
+  }
 }
 
-function updateHdr() {
-  const s=stats(); const u=s.exp.length+s.crit.length;
-  document.getElementById('hdr-sub').textContent =
-    `${fMag!=='Tous'?fMag:'Tous les magasins'} · ${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}`;
-  document.getElementById('urgent-badge').innerHTML =
-    u>0 ? `<div class="badge-urgent">${u} urgent${u>1?'s':''}</div>` : '';
+function onGPSError(err){
+  console.warn('GPS error', err.code, err.message);
+  const pill = document.getElementById('gps-pill');
+  pill.style.display = 'inline-flex';
+  pill.classList.add('gps-err');
+  document.getElementById('gps-retry-btn').style.display = 'inline';
+
+  if(err.code === 1){ // PERMISSION_DENIED
+    document.getElementById('gps-txt').textContent = t('gps_denied');
+    document.getElementById('hdr-sub').textContent = t('hdr_sub_no_store');
+    // On iOS, can only ask user to go to Settings
+    if(/iphone|ipad/i.test(navigator.userAgent)){
+      setTimeout(()=>showToast('Activez la localisation dans Réglages → Safari → Localisation'), 500);
+    }
+  } else {
+    document.getElementById('gps-txt').textContent = t('gps_error');
+    document.getElementById('hdr-sub').textContent = t('hdr_sub_no_store');
+  }
 }
 
-// ═══════════════════════════════════════════
-// DASHBOARD
-// ═══════════════════════════════════════════
-function renderDash() {
-  const s=stats();
-  document.getElementById('cn-exp').textContent  = s.exp.length;
-  document.getElementById('cn-crit').textContent = s.crit.length;
-  document.getElementById('cn-warn').textContent = s.warn.length;
-  document.getElementById('cn-ok').textContent   = s.ok.length;
+function retryGPS(){
+  if(gpsWatchId !== null){ navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = null }
+  initGPS();
+}
 
-  document.getElementById('fsr').innerHTML = ['Tous','Périmés','Critique','Attention','OK'].map(v=>
-    `<button class="fpill ${fStatus===v?'on':''}" onclick="setFS('${v}')">${v}</button>`).join('');
-  document.getElementById('fmr').innerHTML = getMags().map(m=>
-    `<button class="fpill ${fMag===m?'on':''}" onclick="setFM('${m}')">${m}</button>`).join('');
+function updateGPSPill(){
+  // Called when lang changes — just re-label if state is loading
+  const pill = document.getElementById('gps-pill');
+  if(!gps && pill && pill.style.display !== 'none' && !pill.classList.contains('gps-err')){
+    document.getElementById('gps-txt').textContent = t('gps_loading');
+  }
+}
 
-  const map={Périmés:'exp',Critique:'crit',Attention:'warn',OK:'ok'};
-  let list=[...products];
-  if(fMag!=='Tous') list=list.filter(p=>p.magasin===fMag);
-  if(fStatus!=='Tous') list=list.filter(p=>stOf(p.expiry)===map[fStatus]);
-  list.sort((a,b)=>new Date(a.expiry)-new Date(b.expiry));
-  document.getElementById('pcount').textContent=`${list.length} produit${list.length>1?'s':''}`;
+function setGPSState(s){
+  const pill = document.getElementById('gps-pill');
+  if(s === 'unsupported') return; // just leave hidden
+}
 
-  if(!list.length){
-    document.getElementById('plist').innerHTML=`<div class="empty"><div class="ei">✅</div><p>Aucun produit ici</p></div>`;
+function findNearestStore(lat, lng){
+  for(const s of STORES){
+    const d = dist(lat, lng, s.lat, s.lng);
+    if(d < s.r) return s;
+  }
+  return null;
+}
+function dist(la1,ln1,la2,ln2){
+  const R=6371000, dLa=(la2-la1)*Math.PI/180, dLn=(ln2-ln1)*Math.PI/180;
+  const a=Math.sin(dLa/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLn/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TAB NAVIGATION
+═══════════════════════════════════════════════════════════════════════════ */
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  const tabEl = document.getElementById('tab-'+name);
+  const tbEl  = document.getElementById('tb-'+name);
+  if(tabEl) tabEl.classList.add('on');
+  if(tbEl)  tbEl.classList.add('on');
+  currentTab = name;
+  if(name === 'scanner') initGPSForScan();
+  if(name === 'alertes') renderAlertes();
+  if(name === 'planning') renderPlanning();
+  if(name === 'admin') renderAdmin();
+}
+
+function renderCurrentTab(){
+  if(currentTab === 'dashboard') renderDashboard();
+  else if(currentTab === 'alertes') renderAlertes();
+  else if(currentTab === 'planning') renderPlanning();
+  else if(currentTab === 'admin') renderAdmin();
+}
+
+function initGPSForScan(){
+  const pill = document.getElementById('gps-pill');
+  pill.style.display = 'inline-flex';
+  if(!gps && localStorage.getItem('fc_rgpd') === '1') initGPS();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════════════════════════════════ */
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open') }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open') }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════════════════════════════════════ */
+function daysDiff(dlc){
+  return Math.ceil((new Date(dlc)-new Date())/86400000);
+}
+function statusOf(dlc){
+  const d=daysDiff(dlc);
+  if(d<0) return 'exp';
+  if(d<=2) return 'crit';
+  if(d<=7) return 'warn';
+  return 'ok';
+}
+
+function renderDashboard(){
+  const T = I18N[lang]||I18N.fr;
+  const counts = { exp:0, crit:0, warn:0, ok:0 };
+  const stores = new Set(); const rayon = new Set();
+  products.forEach(p=>{
+    const s = statusOf(p.dlc);
+    counts[s]++;
+    if(p.magasin) stores.add(p.magasin);
+    if(p.type) rayon.add(p.type);
+  });
+  document.getElementById('cn-exp').textContent  = counts.exp;
+  document.getElementById('cn-crit').textContent = counts.crit;
+  document.getElementById('cn-warn').textContent = counts.warn;
+  document.getElementById('cn-ok').textContent   = counts.ok;
+
+  // Badge urgent
+  const ub = document.getElementById('urgent-badge');
+  if(counts.exp > 0) ub.innerHTML=`<span class="badge-urgent">⚠ ${counts.exp}</span>`;
+  else ub.innerHTML='';
+
+  // Store filters
+  const fsr = document.getElementById('fsr');
+  fsr.innerHTML = '';
+  if(stores.size > 0){
+    const all = document.createElement('button');
+    all.className='fc'+(filterStore===null?' on':'');
+    all.textContent = T.all;
+    all.onclick = ()=>{ filterStore=null; renderDashboard() };
+    fsr.appendChild(all);
+    stores.forEach(s=>{
+      const b = document.createElement('button');
+      b.className='fc'+(filterStore===s?' on':'');
+      b.textContent = s.length > 20 ? s.substring(0,18)+'…' : s;
+      b.onclick = ()=>{ filterStore=s; renderDashboard() };
+      fsr.appendChild(b);
+    });
+  }
+
+  // Status filters
+  const fmr = document.getElementById('fmr');
+  fmr.innerHTML = '';
+  [['all',T.all],['exp',T.lbl_exp],['crit',T.lbl_crit],['warn',T.lbl_warn],['ok',T.lbl_ok]].forEach(([k,lbl])=>{
+    const b = document.createElement('button');
+    const isAll = k==='all';
+    b.className='fc'+((isAll&&filterStatus===null)||filterStatus===k?' on':'');
+    b.textContent = lbl;
+    b.onclick = ()=>{ filterStatus= isAll?null:k; renderDashboard() };
+    fmr.appendChild(b);
+  });
+
+  // List
+  let list = products.filter(p=>{
+    if(filterStore && p.magasin !== filterStore) return false;
+    if(filterStatus && statusOf(p.dlc) !== filterStatus) return false;
+    return true;
+  }).sort((a,b)=>new Date(a.dlc)-new Date(b.dlc));
+
+  document.getElementById('pcount').textContent = `(${list.length})`;
+  const plist = document.getElementById('plist');
+  if(list.length === 0){
+    plist.innerHTML = `<div class="empty">${T.no_products}</div>`;
     return;
   }
-  document.getElementById('plist').innerHTML=list.map(p=>{
-    const st=stOf(p.expiry),d=daysLeft(p.expiry);
-    const dtxt=d<0?`${Math.abs(d)}j dépassé`:d===0?"Aujourd'hui":`${d}j`;
-    return `<div class="pi">
-      <div class="pi-dot" style="background:${ST[st].dot}"></div>
-      <div class="pi-info">
-        <div class="pi-name">${p.name}</div>
-        <div class="pi-meta">${p.gencod} · ${p.rayon} · Qté ${p.qty} · ${p.magasin}</div>
+  plist.innerHTML = list.map(p=>{
+    const s = statusOf(p.dlc);
+    const d = daysDiff(p.dlc);
+    const badgeTxt = s==='exp' ? T.badge_exp
+      : (s==='ok' ? T.badge_ok : T.badge_crit).replace('{{d}}', Math.abs(d));
+    const badgeCls = {exp:'b-exp',crit:'b-crit',warn:'b-warn',ok:'b-ok'}[s];
+    const ico = {'exp':'💀','crit':'⚠️','warn':'⏰','ok':'✅'}[s];
+    return `<div class="pcard s-${s}">
+      <div class="pcard-ico">${ico}</div>
+      <div class="pcard-info">
+        <div class="pcard-name">${p.name||'—'}</div>
+        <div class="pcard-sub">${p.type||''} · ${p.magasin||''} · DLC: ${fmtDate(p.dlc)}</div>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
-        <span class="pi-badge" style="background:${ST[st].bg};color:${ST[st].tx}">${fmt(p.expiry)}</span>
-        <span style="font-size:10px;font-weight:600;color:${ST[st].tx}">${dtxt}</span>
-      </div>
-      <button class="btn-icon" onclick="openForm(products.find(x=>x.id==='${p.id}'))">✏️</button>
+      <span class="pcard-badge ${badgeCls}">${badgeTxt}</span>
     </div>`;
   }).join('');
 }
 
-function setFS(v){fStatus=v;renderAll();}
-function setFM(v){fMag=v;updateHdr();renderAll();}
+function setFS(s){ filterStatus=s; renderDashboard() }
+function fmtDate(d){ if(!d)return'—'; const [y,m,j]=d.split('-'); return `${j}/${m}/${y}` }
 
-// ═══════════════════════════════════════════
-// ALERTES
-// ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCAN
+═══════════════════════════════════════════════════════════════════════════ */
+document.getElementById('scan-input').addEventListener('change', async function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  e.target.value = '';
+
+  document.getElementById('scan-result').style.display  = 'none';
+  document.getElementById('nf-card').style.display      = 'none';
+  document.getElementById('scan-status').innerHTML =
+    `<span class="spinner"></span> ${t('scan_analyzing')}`;
+
+  // Build payload
+  const b64 = await toBase64(file);
+  const payload = new FormData();
+  payload.append('image', file);
+  if(gps){ payload.append('lat', gps.lat); payload.append('lng', gps.lng) }
+
+  try {
+    const res = await fetch(webhook, { method:'POST', body: payload });
+    const data = await res.json();
+    document.getElementById('scan-status').textContent = '';
+    handleScanResult(data);
+  } catch(err){
+    console.error(err);
+    document.getElementById('scan-status').textContent = t('scan_err');
+  }
+});
+
+function toBase64(file){
+  return new Promise(resolve=>{
+    const r=new FileReader();
+    r.onload=()=>resolve(r.result.split(',')[1]);
+    r.readAsDataURL(file);
+  });
+}
+
+function handleScanResult(data){
+  // data.found = true/false | data.produit | data.gencod | data.type_produit
+  const found = data.found !== false && (data.produit || data.name);
+  if(!found){
+    document.getElementById('nf-card').style.display='block';
+    return;
+  }
+  scanData = data;
+  const prodName = data.produit || data.name;
+  document.getElementById('rf-prod-name').textContent = prodName;
+  document.getElementById('rf-gencod').value  = data.gencod || '';
+  document.getElementById('rf-type').value    = data.type_produit || '';
+  document.getElementById('rf-date').value    = '';
+  document.getElementById('rf-magasin').value = (gps && findNearestStore(gps.lat,gps.lng)?.name) || '';
+  document.getElementById('scan-result').style.display='block';
+}
+
+function resetScan(){
+  document.getElementById('scan-result').style.display='none';
+  document.getElementById('nf-card').style.display='none';
+  document.getElementById('scan-status').textContent='';
+  scanData = null;
+}
+
+function saveProduct(){
+  const dlc     = document.getElementById('rf-date').value;
+  const magasin = document.getElementById('rf-magasin').value.trim();
+  const name    = document.getElementById('rf-prod-name').textContent;
+  if(!dlc){ showToast(t('err_fill')); return }
+
+  const product = {
+    id: Date.now(),
+    name,
+    gencod:  document.getElementById('rf-gencod').value,
+    type:    document.getElementById('rf-type').value,
+    dlc,
+    magasin,
+    scannedAt: new Date().toISOString(),
+    scannedBy: session?.username || '?',
+    lat: gps?.lat, lng: gps?.lng
+  };
+
+  products.unshift(product);
+  localStorage.setItem('fc_products', JSON.stringify(products));
+  resetScan();
+  showToast(t('saved'));
+  renderDashboard();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ALERTES
+═══════════════════════════════════════════════════════════════════════════ */
 function renderAlertes(){
-  const urgent=products.filter(p=>['exp','crit'].includes(stOf(p.expiry)));
-  urgent.sort((a,b)=>new Date(a.expiry)-new Date(b.expiry));
-  if(!urgent.length){document.getElementById('alert-list').innerHTML=`<div class="empty"><div class="ei">🎉</div><p>Aucun produit urgent</p></div>`;return;}
-  document.getElementById('alert-list').innerHTML=urgent.map(p=>{
-    const st=stOf(p.expiry),d=daysLeft(p.expiry);
-    return `<div class="al-item al-${st}">
-      <div style="font-weight:700;font-size:14px">${p.name}</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:4px">${p.magasin} · DLC ${fmt(p.expiry)} · Qté ${p.qty}</div>
-      <div style="font-size:12px;font-weight:700;color:${ST[st].tx};margin-top:4px">
-        ${d<0?`Périmé depuis ${Math.abs(d)}j`:d===0?"Expire aujourd'hui !":(`Expire dans ${d}j`)}
+  const critical = products.filter(p=>statusOf(p.dlc) === 'exp' || statusOf(p.dlc) === 'crit')
+                           .sort((a,b)=>new Date(a.dlc)-new Date(b.dlc));
+  const byStore = {};
+  critical.forEach(p=>{
+    const k = p.magasin || '—';
+    if(!byStore[k]) byStore[k] = [];
+    byStore[k].push(p);
+  });
+  const el = document.getElementById('alertes-list');
+  if(Object.keys(byStore).length === 0){
+    el.innerHTML = `<div class="empty">✅ Aucune alerte</div>`; return;
+  }
+  el.innerHTML = Object.entries(byStore).map(([store,prods])=>`
+    <div class="astore">
+      <div class="astore-hd" style="justify-content:space-between">
+        <span>🏪 ${store} <span class="pcard-badge b-exp">${prods.length}</span></span>
+        <button onclick="openEmailModal('${store.replace(/'/g,"\\'")}');event.stopPropagation()"
+          style="background:var(--green-l);border:none;color:var(--green-d);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">
+          📧 Mail
+        </button>
       </div>
-    </div>`;
-  }).join('');
-}
-
-// ═══════════════════════════════════════════
-// PLANNING
-// ═══════════════════════════════════════════
-function renderPlanning(){
-  const mags=getMags().filter(m=>m!=='Tous');
-  const jours=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
-  document.getElementById('planning-list').innerHTML=mags.map(mag=>{
-    if(!planning[mag])planning[mag]=[];
-    return `<div class="pmag"><h3>🏪 ${mag}</h3><div class="dg">
-      ${jours.map(j=>`<button class="db ${planning[mag].includes(j)?'on':''}" onclick="toggleDay('${mag}','${j}')">${j}</button>`).join('')}
-    </div></div>`;
-  }).join('');
-}
-
-function toggleDay(mag,j){
-  if(!planning[mag])planning[mag]=[];
-  const i=planning[mag].indexOf(j);
-  if(i>=0)planning[mag].splice(i,1); else planning[mag].push(j);
-  save();renderPlanning();
-}
-
-// ═══════════════════════════════════════════
-// SCANNER — HISTORIQUE
-// ═══════════════════════════════════════════
-function renderScanner(){
-  const el=document.getElementById('recent-scans');
-  if(!recentScans.length){el.innerHTML='<p style="color:var(--muted);font-size:13px">Aucun scan récent</p>';return;}
-  el.innerHTML=recentScans.slice(0,8).map(s=>`
-    <div class="rs-item">
-      <div style="font-size:22px">${s.found?'✅':'🚫'}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.name}</div>
-        <div style="font-size:11px;color:var(--muted)">${s.gencod} · ${s.time}</div>
-      </div>
+      ${prods.map(p=>{
+        const d=daysDiff(p.dlc);
+        const s=statusOf(p.dlc);
+        return `<div class="aitem">
+          <div>
+            <div class="aitem-name">${p.name}</div>
+            <div class="aitem-date">DLC: ${fmtDate(p.dlc)}</div>
+          </div>
+          <span class="pcard-badge ${s==='exp'?'b-exp':'b-crit'}">${s==='exp'?t('badge_exp'):'J'+d}</span>
+        </div>`
+      }).join('')}
     </div>`).join('');
 }
 
-// ═══════════════════════════════════════════
-// RENDER ALL
-// ═══════════════════════════════════════════
-function renderAll(){
-  updateHdr();
-  if(curTab==='dashboard') renderDash();
-  else if(curTab==='scanner') renderScanner();
-  else if(curTab==='alertes') renderAlertes();
-  else if(curTab==='planning') renderPlanning();
-}
-
-function switchTab(t){
-  curTab=t;
-  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('on'));
-  document.getElementById('tab-'+t).classList.add('on');
-  document.querySelectorAll('.tb').forEach(el=>el.classList.remove('on'));
-  document.getElementById('tbtn-'+t).classList.add('on');
-  document.getElementById('fab').style.display=t==='dashboard'?'flex':'none';
-  document.getElementById('nf-card').style.display='none';
-  renderAll();
-}
-
-// ═══════════════════════════════════════════
-// FORM
-// ═══════════════════════════════════════════
-function openForm(p, fromScan=false){
-  const isEdit = p && !fromScan && products.some(x=>x.id===p.id);
-  document.getElementById('form-title').textContent =
-    fromScan ? '✅ Vérifier le produit scanné' : isEdit ? 'Modifier le produit' : 'Ajouter un produit';
-  document.getElementById('f-id').value     = p?.id    || '';
-  document.getElementById('f-gencod').value = p?.gencod|| '';
-  document.getElementById('f-name').value   = p?.name  || '';
-  document.getElementById('f-rayon').value  = p?.rayon || 'Épicerie';
-  document.getElementById('f-qty').value    = p?.qty   || 1;
-  document.getElementById('f-expiry').value = p?.expiry|| '';
-  const mags=getMags().filter(m=>m!=='Tous');
-  document.getElementById('f-magasin').innerHTML=mags.map(m=>`<option ${m===p?.magasin?'selected':''}>${m}</option>`).join('');
-  document.getElementById('btn-del').style.display=isEdit?'block':'none';
-  updatePrev();
-  document.getElementById('form-ov').style.display='flex';
-}
-
-function closeForm(){document.getElementById('form-ov').style.display='none';}
-
-function updatePrev(){
-  const e=document.getElementById('f-expiry').value;
-  const el=document.getElementById('sprev');
-  if(!e){el.style.display='none';return;}
-  const st=stOf(e),d=daysLeft(e);
-  const txt=d<0?`${Math.abs(d)}j dépassé`:d===0?"Aujourd'hui":`${d} jours restants`;
-  el.style.display='block';el.style.background=ST[st].bg;el.style.color=ST[st].tx;
-  el.textContent=`${ST[st].lbl} · ${txt}`;
-}
-
-function submitForm(){
-  const g=document.getElementById('f-gencod').value.trim();
-  const n=document.getElementById('f-name').value.trim();
-  const r=document.getElementById('f-rayon').value;
-  const q=parseInt(document.getElementById('f-qty').value)||1;
-  const e=document.getElementById('f-expiry').value;
-  const m=document.getElementById('f-magasin').value;
-  const id=document.getElementById('f-id').value;
-  if(!g||!n||!e){toast('⚠ Remplissez les champs obligatoires *');return;}
-  const product={id:id||uid(),gencod:g,name:n,rayon:r,qty:q,expiry:e,magasin:m};
-  if(id){
-    const i=products.findIndex(p=>p.id===id);
-    if(i>=0) products[i]=product; else products.push(product);
-  } else {
-    products.push(product);
+/* ═══════════════════════════════════════════════════════════════════════════
+   PLANNING
+═══════════════════════════════════════════════════════════════════════════ */
+function renderPlanning(){
+  const stores = [...new Set(products.map(p=>p.magasin).filter(Boolean))];
+  const DAYS = I18N[lang]?.days || I18N.fr.days;
+  const el = document.getElementById('planning-list');
+  if(stores.length === 0){
+    el.innerHTML = `<div class="empty">Aucun magasin détecté</div>`; return;
   }
-  save();
-  sendToN8N(product); // Envoi N8N en arrière-plan
-  closeForm();
-  toast('✓ Produit enregistré et envoyé');
-  switchTab('dashboard');
+  el.innerHTML = stores.map(store=>{
+    const plan = planning[store] || [];
+    return `<div class="plan-store">
+      <div class="plan-store-name">🏪 ${store}</div>
+      <div class="day-grid">
+        ${DAYS.map((d,i)=>`
+          <div class="day-cell${plan.includes(i)?' on':''}" onclick="togglePlanDay('${store}',${i})">
+            ${d}
+          </div>`).join('')}
+      </div>
+    </div>`
+  }).join('');
 }
 
-function deleteProduct(){
-  const id=document.getElementById('f-id').value;
-  if(!id||!confirm('Supprimer ce produit ?'))return;
-  products=products.filter(p=>p.id!==id);
-  save();closeForm();toast('🗑 Supprimé');renderAll();
+function togglePlanDay(store, idx){
+  if(!planning[store]) planning[store]=[];
+  const i = planning[store].indexOf(idx);
+  if(i>=0) planning[store].splice(i,1); else planning[store].push(idx);
+  localStorage.setItem('fc_planning', JSON.stringify(planning));
+  renderPlanning();
 }
 
-// ═══════════════════════════════════════════
-// TOAST
-// ═══════════════════════════════════════════
-function toast(msg,dur=3000){
-  document.querySelectorAll('.toast').forEach(t=>t.remove());
-  const t=document.createElement('div');
-  t.className='toast';t.textContent=msg;
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(),dur);
+/* ═══════════════════════════════════════════════════════════════════════════
+   ADMIN
+═══════════════════════════════════════════════════════════════════════════ */
+function renderAdmin(){
+  // Users list
+  const ul = document.getElementById('user-list');
+  ul.innerHTML = users.map((u,i)=>`
+    <div class="user-row">
+      <div class="user-avatar">${u.role==='admin'?'👑':'👤'}</div>
+      <div class="user-info">
+        <div class="user-name">${u.name}</div>
+        <span class="user-role-badge role-${u.role}">${u.role}</span>
+        <span style="font-size:11px;color:var(--muted);margin-left:6px">@${u.username}</span>
+      </div>
+      ${u.username !== session?.username ?
+        `<button class="user-del" onclick="deleteUser(${i})">🗑</button>` : ''}
+    </div>`).join('');
+
+  // Lang buttons
+  document.querySelectorAll('.lang-setting-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll(`#lang-setting-row [onclick*="setLang('${lang}')"]`).forEach(b=>b.classList.add('active'));
+
+  // Email config
+  document.getElementById('adm-default-email').value = localStorage.getItem('fc_default_email') || '';
+  document.getElementById('adm-popup-toggle').checked = localStorage.getItem('fc_popup_enabled') !== '0';
 }
 
-// ═══════════════════════════════════════════
-// N8N — ENVOI APRÈS VALIDATION
-// ═══════════════════════════════════════════
-async function sendToN8N(product){
+function addUser(){
+  const name = document.getElementById('au-name').value.trim();
+  const user = document.getElementById('au-user').value.trim().toLowerCase();
+  const pass = document.getElementById('au-pass').value;
+  const role = document.getElementById('au-role').value;
+  if(!name||!user||!pass){ showToast(t('err_fill')); return }
+  if(users.find(u=>u.username===user)){ showToast('Identifiant déjà utilisé'); return }
+  users.push({name,username:user,password:pass,role});
+  saveUsers();
+  document.getElementById('au-name').value='';
+  document.getElementById('au-user').value='';
+  document.getElementById('au-pass').value='';
+  showToast(t('user_added'));
+  renderAdmin();
+}
+
+function deleteUser(i){
+  if(users[i].username === session?.username) return;
+  users.splice(i,1);
+  saveUsers();
+  showToast(t('deleted'));
+  renderAdmin();
+}
+
+function saveWebhook(){
+  webhook = document.getElementById('adm-webhook').value.trim();
+  localStorage.setItem('fc_webhook', webhook);
+  showToast(t('saved'));
+}
+
+function saveEmailConfig(){
+  const email = document.getElementById('adm-default-email').value.trim();
+  const popupOn = document.getElementById('adm-popup-toggle').checked;
+  localStorage.setItem('fc_default_email', email);
+  localStorage.setItem('fc_popup_enabled', popupOn ? '1' : '0');
+  showToast(t('saved'));
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   STARTUP ALERT POPUP
+═══════════════════════════════════════════════════════════════════════════ */
+let startupEmailStore = null;
+
+function checkStartupAlerts(){
+  const urgent = products.filter(p => {
+    const s = statusOf(p.dlc);
+    return s === 'exp' || s === 'crit';
+  }).sort((a,b) => new Date(a.dlc) - new Date(b.dlc));
+
+  if(urgent.length === 0) return;
+
+  // Group by store
+  const byStore = {};
+  urgent.forEach(p => {
+    const k = p.magasin || '—';
+    if(!byStore[k]) byStore[k] = [];
+    byStore[k].push(p);
+  });
+
+  const body = document.getElementById('startup-body');
+  body.innerHTML = Object.entries(byStore).map(([store, prods]) => `
+    <div class="startup-store-group">
+      <div class="startup-store-lbl">🏪 ${store} <span class="pcard-badge b-exp">${prods.length}</span></div>
+      ${prods.map(p => {
+        const d = daysDiff(p.dlc);
+        const s = statusOf(p.dlc);
+        return `<div class="startup-prow">
+          <div>
+            <div class="startup-prow-name">${p.name}</div>
+            <div class="startup-prow-sub">DLC: ${fmtDate(p.dlc)}</div>
+          </div>
+          <span class="pcard-badge ${s==='exp'?'b-exp':'b-crit'}">${s==='exp'?t('badge_exp'):'J'+d}</span>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+
+  document.getElementById('startup-popup').classList.add('open');
+}
+
+function closeStartupPopup(){
+  document.getElementById('startup-popup').classList.remove('open');
+}
+
+function openEmailFromStartup(){
+  closeStartupPopup();
+  openEmailModal(null);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EMAIL MODAL
+═══════════════════════════════════════════════════════════════════════════ */
+let emailTargetStore = null;
+
+function openEmailModal(store){
+  emailTargetStore = store;
+  const defaultTo = localStorage.getItem('fc_default_email') || '';
+  const now = new Date().toLocaleDateString(lang === 'zh' ? 'zh-CN' : lang === 'en' ? 'en-GB' : lang + '-FR');
+
+  // Filter products
+  const prods = store
+    ? products.filter(p => p.magasin === store && ['exp','crit'].includes(statusOf(p.dlc)))
+    : products.filter(p => ['exp','crit'].includes(statusOf(p.dlc)));
+  prods.sort((a,b) => new Date(a.dlc) - new Date(b.dlc));
+
+  const storeName = store || '— Tous magasins —';
+  const T = I18N[lang]||I18N.fr;
+
+  // Subject
+  const subj = (T.email_subj_tpl || '[FreshControl] Urgents — {{store}} — {{date}}')
+    .replace('{{store}}', storeName).replace('{{date}}', now);
+
+  // Body text
+  const bodyLines = ['FreshControl — ' + now, ''];
+  if(store) bodyLines.push('Magasin : ' + store, '');
+  bodyLines.push('Produits urgents :', '');
+  prods.forEach(p => {
+    const d = daysDiff(p.dlc);
+    const s = statusOf(p.dlc);
+    const badge = s === 'exp' ? '[PÉRIMÉ]' : `[J${d}]`;
+    bodyLines.push(`${badge} ${p.name} — DLC: ${fmtDate(p.dlc)} — ${p.magasin||''}`);
+  });
+  bodyLines.push('', `Total urgent : ${prods.length} produit(s)`, '', '— Envoyé via FreshControl');
+
+  document.getElementById('em-to').value      = defaultTo;
+  document.getElementById('em-subject').value = subj;
+  document.getElementById('em-body').value    = bodyLines.join('\n');
+  document.getElementById('em-store-tag').textContent = store ? `🏪 ${store}` : '🌐 Tous les magasins';
+  document.getElementById('em-store-tag').style.display = 'inline-block';
+
+  document.getElementById('email-modal').classList.add('open');
+}
+
+function closeEmailModal(){
+  document.getElementById('email-modal').classList.remove('open');
+}
+
+async function sendEmailViaN8N(){
+  const to      = document.getElementById('em-to').value.trim();
+  const subject = document.getElementById('em-subject').value.trim();
+  const body    = document.getElementById('em-body').value.trim();
+  if(!to){ showToast(t('err_fill')); return }
+
+  const btn = document.getElementById('em-send-n8n');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+
   try {
-    await fetch(N8N,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        produit:         product.name,
-        gencod:          product.gencod,
-        date_peremption: product.expiry ? product.expiry.split('-').reverse().join('-') : '',
-        type_produit:    product.rayon,
-        magasin:         product.magasin,
-        quantite:        product.qty,
-        latitude:        gps?.lat ?? '',
-        longitude:       gps?.lng ?? '',
-      }),
+    const payload = { action: 'email_reminder', to, subject, body, store: emailTargetStore, lang };
+    const res = await fetch(webhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
-  } catch{ console.warn('N8N non joignable'); }
-}
-
-// ═══════════════════════════════════════════
-// N8N — VÉRIFICATION CATALOGUE (gencod → nom officiel)
-// ═══════════════════════════════════════════
-async function checkCatalogue(gencod){
-  try {
-    const resp = await fetch(N8N, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        action:    'check_catalogue',
-        gencod:    gencod,
-        magasin:   getActiveMag(),
-        latitude:  gps?.lat ?? '',
-        longitude: gps?.lng ?? '',
-      }),
-    });
-    if(!resp.ok) return { found: true, produit: null };
-    const data = await resp.json();
-    // N8N répond avec "Respond to Webhook" → { found, produit, type_produit }
-    if(typeof data.found === 'boolean') return data;
-    if(data.produit || data.name) return { found: true, produit: data.produit||data.name, type_produit: data.type_produit||data.rayon };
-    // N8N répond { message: ... } → catalogue indisponible → on laisse passer avec nom IA
-    return { found: true, produit: null };
-  } catch { return { found: true, produit: null }; }
-}
-
-// ═══════════════════════════════════════════
-// IA — LIT UNIQUEMENT LE GENCOD
-// ═══════════════════════════════════════════
-async function compressAndB64(file){
-  const tryCanvas=()=>new Promise((resolve,reject)=>{
-    const img=new Image(), url=URL.createObjectURL(file);
-    img.onload=()=>{
-      try{
-        const MAX=800; let w=img.width||MAX,h=img.height||MAX;
-        if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
-        const canvas=document.createElement('canvas'); canvas.width=w;canvas.height=h;
-        const ctx=canvas.getContext('2d'); if(!ctx)throw new Error('no ctx');
-        ctx.drawImage(img,0,0,w,h); URL.revokeObjectURL(url);
-        resolve(canvas.toDataURL('image/jpeg',0.7).split(',')[1]);
-      }catch(e){URL.revokeObjectURL(url);reject(e);}
-    };
-    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('img error'));};
-    img.src=url;
-  });
-  const tryFR=()=>new Promise((resolve,reject)=>{
-    const r=new FileReader();
-    r.onload=()=>resolve(r.result.split(',')[1]);
-    r.onerror=()=>reject(new Error('FR error'));
-    r.readAsDataURL(file);
-  });
-  try{return await tryCanvas();}catch{return await tryFR();}
-}
-
-async function readGencod(file){
-  const b64=await compressAndB64(file);
-  const mimeType=file.type||'image/jpeg';
-  const resp=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'x-api-key':ANTHROPIC_KEY,
-      'anthropic-version':'2023-06-01',
-      'anthropic-dangerous-direct-browser-access':'true',
-    },
-    body:JSON.stringify({
-      model:'claude-haiku-4-5-20251001',
-      max_tokens:300,
-      messages:[{role:'user',content:[
-        {type:'image',source:{type:'base64',media_type:mimeType,data:b64}},
-        {type:'text',text:'Analyse cette image de produit alimentaire. Réponds UNIQUEMENT en JSON valide sans markdown :\n{"gencod":"code EAN 13 chiffres ou vide si non visible","name":"nom complet du produit tel qu il apparait sur l emballage ou vide","rayon":"Épicerie ou Crémerie ou Charcuterie ou Boulangerie ou Surgelés ou Boissons ou Hygiène ou Confiserie ou Traiteur"}\nNe mets jamais null.'},
-      ]}],
-    }),
-  });
-  if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error('Anthropic '+resp.status+': '+(e?.error?.message||'erreur'));}
-  const data=await resp.json();
-  const text=data.content?.[0]?.text||'{}';
-  let parsed; try{parsed=JSON.parse(text.replace(/```json|```/g,'').trim());}catch{parsed={};}
-  return { gencod: parsed.gencod||'', name: parsed.name||'', rayon: parsed.rayon||'Épicerie' };
-}
-
-// ═══════════════════════════════════════════
-// SCAN — ORCHESTRATION
-// ═══════════════════════════════════════════
-// ═══════════════════════════════════════════
-// SCAN — ÉTAT GLOBAL
-// ═══════════════════════════════════════════
-let scanGencod = '';
-let scanAIName = '';
-let scanAIRayon = '';
-
-function resetScan() {
-  scanGencod = ''; scanAIName = ''; scanAIRayon = '';
-  document.getElementById('scan-step1').style.display = 'block';
-  document.getElementById('scan-step2').style.display = 'none';
-  document.getElementById('nf-card').style.display = 'none';
-}
-
-function clearScans() {
-  if(!confirm('Effacer tout l\'historique des scans ?')) return;
-  recentScans = [];
-  save(); renderScanner();
-  toast('🗑 Historique effacé');
-}
-
-// PHOTO 1 — Code-barres
-document.getElementById('scan-input-barcode').addEventListener('change', async function(event){
-  const file = event.target.files?.[0]; if(!file) return;
-  event.target.value = '';
-  document.getElementById('nf-card').style.display = 'none';
-  document.getElementById('ldr').style.display = 'flex';
-
-  try {
-    // IA lit gencod + nom sur la photo du code-barres
-    const ai = await readGencod(file);
-    scanAIName = ai.name || '';
-    scanAIRayon = ai.rayon || 'Épicerie';
-    scanGencod = ai.gencod || '';
-
-    if(!scanGencod) {
-      // Gencod illisible → passer directement à photo 2
-      document.getElementById('ldr').style.display = 'none';
-      document.getElementById('scan-step1').style.display = 'none';
-      document.getElementById('scan-step2').style.display = 'block';
-      toast('⚠ Code-barres illisible — photographiez le nom du produit', 4000);
-      return;
-    }
-
-    // N8N vérifie dans le catalogue
-    const cat = await checkCatalogue(scanGencod);
-    document.getElementById('ldr').style.display = 'none';
-
-    if(cat.found && (cat.produit || scanAIName)) {
-      // Produit trouvé → formulaire direct
-      const product = {
-        id: uid(), gencod: scanGencod,
-        name:  cat.produit      || scanAIName  || '',
-        rayon: cat.type_produit || scanAIRayon || 'Épicerie',
-        qty: 1, expiry: '', magasin: getActiveMag(),
-      };
-      recentScans.unshift({found:true, name:product.name||scanGencod, gencod:scanGencod, time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});
-      save(); renderScanner();
-      toast('✓ Produit reconnu — saisissez la date de péremption');
-      openForm(product, true);
-      resetScan();
-    } else {
-      // Gencod pas dans catalogue → Photo 2 pour confirmer le nom
-      document.getElementById('scan-step1').style.display = 'none';
-      document.getElementById('scan-step2').style.display = 'block';
-      toast('Gencod absent du catalogue — photographiez le nom du produit', 4000);
-    }
-
-  } catch(err) {
-    document.getElementById('ldr').style.display = 'none';
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    closeEmailModal();
+    showToast(t('email_sent'));
+  } catch(err){
     console.error(err);
-    toast('⚠ ' + (err.message || 'Erreur scan'), 6000);
-  }
-});
-
-// PHOTO 2 — Nom du produit (si gencod pas trouvé)
-document.getElementById('scan-input-name').addEventListener('change', async function(event){
-  const file = event.target.files?.[0]; if(!file) return;
-  event.target.value = '';
-  document.getElementById('ldr').style.display = 'flex';
-
-  try {
-    // IA lit le nom sur la photo
-    const ai = await readGencod(file);
-    const nomProduit = ai.name || scanAIName || '';
-
-    document.getElementById('ldr').style.display = 'none';
-
-    if(!nomProduit) {
-      toast('⚠ Nom illisible — saisissez manuellement', 4000);
-      openForm({id:uid(), gencod:scanGencod, name:'', rayon:scanAIRayon||'Épicerie', qty:1, expiry:'', magasin:getActiveMag()}, true);
-      resetScan(); return;
-    }
-
-    // Produit non dans catalogue mais nom lu → enregistrement avec statut "à vérifier"
-    const product = {
-      id: uid(), gencod: scanGencod,
-      name:  nomProduit,
-      rayon: ai.rayon || scanAIRayon || 'Épicerie',
-      qty: 1, expiry: '', magasin: getActiveMag(),
-    };
-
-    recentScans.unshift({found:false, name:nomProduit, gencod:scanGencod||'—', time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});
-
-    // Afficher carte "produit inexistant" mais permettre l'enregistrement
-    document.getElementById('nf-card').style.display = 'block';
-    document.getElementById('nf-msg').textContent = `"${nomProduit}" (${scanGencod||'gencod illisible'}) absent du catalogue Léa Nature — vous pouvez quand même l'enregistrer.`;
-
-    save(); renderScanner();
-    toast('⚠ Produit hors catalogue — vérifiez les infos');
-    openForm(product, true);
-    resetScan();
-
-  } catch(err) {
-    document.getElementById('ldr').style.display = 'none';
-    toast('⚠ ' + (err.message || 'Erreur'), 6000);
-    resetScan();
-  }
-});
-
-// ═══════════════════════════════════════════
-// POPUP DÉMARRAGE
-// ═══════════════════════════════════════════
-function checkStartup(){
-  const u=products.filter(p=>['exp','crit'].includes(stOf(p.expiry)));
-  if(u.length){
-    document.getElementById('popup-txt').textContent=`${u.length} produit${u.length>1?'s':''} nécessite${u.length>1?'nt':''} votre attention immédiate.`;
-    document.getElementById('popup').style.display='flex';
+    showToast(t('email_err'));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = t('em_send_n8n');
   }
 }
 
-// ═══════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════
-document.addEventListener('DOMContentLoaded',()=>{
-  if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
-  initRGPD();
-  renderAll();
-  setTimeout(checkStartup,1000);
+function sendEmailMailto(){
+  const to      = encodeURIComponent(document.getElementById('em-to').value.trim());
+  const subject = encodeURIComponent(document.getElementById('em-subject').value.trim());
+  const body    = encodeURIComponent(document.getElementById('em-body').value.trim());
+  window.open(`mailto:${to}?subject=${subject}&body=${body}`, '_blank');
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════════════════════════ */
+let toastTimer;
+function showToast(msg){
+  let t = document.querySelector('.toast');
+  if(!t){ t=document.createElement('div'); t.className='toast'; document.body.appendChild(t) }
+  t.textContent = msg;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.remove(), 2500);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', ()=>{
+  applyLang();
+
+  // Login on Enter
+  ['login-user','login-pass'].forEach(id=>{
+    document.getElementById(id).addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin() });
+  });
+
+  // Auto-reconnect if session exists and is < 8h
+  if(session && (Date.now()-session.loginTime) < 8*3600*1000){
+    launchApp();
+  }
 });
+
+// Service Worker (PWA offline)
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js').catch(()=>{});
+}
 </script>
 </body>
 </html>
