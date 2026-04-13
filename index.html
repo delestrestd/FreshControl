@@ -33,6 +33,8 @@
   --tab-h:76px;--hdr-h:74px;
   --r-xl:28px;--r-lg:22px;--r-md:16px;--r-pill:100px;
   --font:'Nunito',sans-serif;
+  --bdr:rgba(13,31,13,.12);
+  --border:rgba(13,31,13,.12);
 }
 html,body{height:100%;font-family:var(--font);color:var(--text);overflow:hidden;-webkit-text-size-adjust:100%}
 body::before{content:'';position:fixed;inset:0;z-index:-2;
@@ -391,7 +393,7 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;
 <div id="app">
   <!-- Header -->
   <div id="hdr">
-    <div id="hdr-left">
+    <div id="hdr-left" onclick="showTab('dashboard')" style="cursor:pointer;-webkit-tap-highlight-color:transparent">
       <div id="hdr-logo">🌿</div>
       <div id="hdr-info">
         <h1>FreshControl</h1>
@@ -649,24 +651,64 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;
       <div class="sb-role" id="sb-role-lbl">—</div>
     </div>
     <div class="sb-body">
+
+      <!-- Navigation -->
       <div class="sb-section" id="sb-nav-lbl">Navigation</div>
-      <div class="sb-item active" onclick="showTab('dashboard');closeSidebar()"><div class="sb-item-ico">📊</div><span id="sb-dash">Tableau de bord</span></div>
+      <div class="sb-item" onclick="showTab('dashboard');closeSidebar()"><div class="sb-item-ico">📊</div><span id="sb-dash">Tableau de bord</span></div>
       <div class="sb-item" onclick="showTab('scanner');closeSidebar()"><div class="sb-item-ico">📷</div><span id="sb-scan">Scanner</span></div>
       <div class="sb-item" onclick="showTab('alertes');closeSidebar()"><div class="sb-item-ico">🔔</div><span id="sb-alerts">Alertes</span></div>
       <div class="sb-item" onclick="showTab('planning');closeSidebar()"><div class="sb-item-ico">📅</div><span id="sb-plan">Planning</span></div>
       <div class="sb-item" id="sb-admin-item" onclick="showTab('admin');closeSidebar()" style="display:none"><div class="sb-item-ico">⚙️</div><span id="sb-admin">Administration</span></div>
 
+      <!-- Outils -->
+      <div class="sb-section">Outils</div>
+      <div class="sb-item" onclick="toolEmailRecap();closeSidebar()"><div class="sb-item-ico">📧</div><span>Récap alertes par magasin</span></div>
+      <div class="sb-item" onclick="toolExportCSV();closeSidebar()"><div class="sb-item-ico">📥</div><span>Exporter produits CSV</span></div>
+      <div class="sb-item" onclick="toolShowArchive();closeSidebar()"><div class="sb-item-ico">🗂</div><span>Historique / Archive</span></div>
+      <div class="sb-item" onclick="toolShowStats();closeSidebar()"><div class="sb-item-ico">📈</div><span>Statistiques</span></div>
+
+      <!-- Langue -->
       <div class="sb-section" id="sb-lang-lbl">Langue</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;padding:4px 12px">
-        <button class="lang-btn" onclick="setLang('fr');closeSidebar()" style="color:var(--text);border-color:var(--border)">🇫🇷 FR</button>
-        <button class="lang-btn" onclick="setLang('en');closeSidebar()" style="color:var(--text);border-color:var(--border)">🇬🇧 EN</button>
-        <button class="lang-btn" onclick="setLang('es');closeSidebar()" style="color:var(--text);border-color:var(--border)">🇪🇸 ES</button>
-        <button class="lang-btn" onclick="setLang('zh');closeSidebar()" style="color:var(--text);border-color:var(--border)">🇨🇳 中文</button>
+        <button class="lang-btn" onclick="setLang('fr');closeSidebar()" style="color:var(--text);border-color:var(--bdr)">🇫🇷 FR</button>
+        <button class="lang-btn" onclick="setLang('en');closeSidebar()" style="color:var(--text);border-color:var(--bdr)">🇬🇧 EN</button>
+        <button class="lang-btn" onclick="setLang('es');closeSidebar()" style="color:var(--text);border-color:var(--bdr)">🇪🇸 ES</button>
+        <button class="lang-btn" onclick="setLang('zh');closeSidebar()" style="color:var(--text);border-color:var(--bdr)">🇨🇳 中文</button>
       </div>
     </div>
     <div class="sb-footer">
       <button class="sb-logout" onclick="doLogout()" id="sb-logout-btn">🚪 Déconnexion</button>
     </div>
+  </div>
+</div>
+
+<!-- ═══ ARCHIVE MODAL ══════════════════════════════════════════════════════ -->
+<div id="archive-modal" style="position:fixed;inset:0;z-index:760;display:none;align-items:flex-end;backdrop-filter:blur(8px);background:rgba(0,0,0,.32)">
+  <div style="background:rgba(255,255,255,.82);backdrop-filter:blur(32px) saturate(200%);border-radius:28px 28px 0 0;
+              width:100%;max-width:520px;margin:0 auto;padding:22px 20px 36px;max-height:85vh;overflow-y:auto;
+              border:1px solid rgba(255,255,255,.75);box-shadow:var(--spec),0 -12px 48px rgba(0,0,0,.18)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:18px;font-weight:900;letter-spacing:-.5px">🗂 Historique & Archive</div>
+      <button onclick="closeArchive()"
+        style="padding:8px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,.08);background:rgba(255,255,255,.6);
+               color:var(--muted);font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font)">✕</button>
+    </div>
+    <div id="archive-list"></div>
+  </div>
+</div>
+
+<!-- ═══ STATS MODAL ════════════════════════════════════════════════════════ -->
+<div id="stats-modal" style="position:fixed;inset:0;z-index:760;display:none;align-items:flex-end;backdrop-filter:blur(8px);background:rgba(0,0,0,.32)">
+  <div style="background:rgba(255,255,255,.82);backdrop-filter:blur(32px) saturate(200%);border-radius:28px 28px 0 0;
+              width:100%;max-width:520px;margin:0 auto;padding:22px 20px 36px;max-height:85vh;overflow-y:auto;
+              border:1px solid rgba(255,255,255,.75);box-shadow:var(--spec),0 -12px 48px rgba(0,0,0,.18)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:18px;font-weight:900;letter-spacing:-.5px">📈 Statistiques</div>
+      <button onclick="closeStats()"
+        style="padding:8px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,.08);background:rgba(255,255,255,.6);
+               color:var(--muted);font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font)">✕</button>
+    </div>
+    <div id="stats-content"></div>
   </div>
 </div>
 
@@ -967,7 +1009,6 @@ function doLogin(){
   const u = document.getElementById('login-user').value.trim();
   const p = document.getElementById('login-pass').value;
   const errEl = document.getElementById('login-err');
-  const btn = document.getElementById('login-btn');
   const T = I18N[lang]||I18N.fr;
 
   if(!u || !p){ errEl.textContent = T.login_err_empty; return }
@@ -984,19 +1025,23 @@ function doLogin(){
   }
 
   session = { username: u, name: user.name, role: user.role, loginTime: Date.now() };
-  localStorage.setItem('fc_session', JSON.stringify(session));
+  // sessionStorage : session active uniquement pendant que l'app est ouverte
+  sessionStorage.setItem('fc_active_session', JSON.stringify(session));
   document.getElementById('login-err').textContent = '';
+  document.getElementById('login-pass').value = '';
   launchApp();
 }
 
 function doLogout(){
   session = null;
-  localStorage.removeItem('fc_session');
+  sessionStorage.removeItem('fc_active_session');
   closeSidebar();
   document.getElementById('app').classList.remove('show');
   document.getElementById('splash').style.display = 'flex';
   document.getElementById('login-pass').value = '';
+  document.getElementById('login-user').value = '';
   document.getElementById('login-err').textContent = '';
+  showTab('dashboard');
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1213,11 +1258,11 @@ function statusOf(dlc){
 function renderDashboard(){
   const T = I18N[lang]||I18N.fr;
   const counts = { exp:0, crit:0, warn:0, ok:0 };
-  const stores = new Set(); const rayon = new Set();
+  const storeNames = new Set(); const rayon = new Set();
   products.forEach(p=>{
     const s = statusOf(p.dlc);
     counts[s]++;
-    if(p.magasin) stores.add(p.magasin);
+    if(p.magasin) storeNames.add(p.magasin);
     if(p.type) rayon.add(p.type);
   });
   document.getElementById('cn-exp').textContent  = counts.exp;
@@ -1233,13 +1278,13 @@ function renderDashboard(){
   // Store filters
   const fsr = document.getElementById('fsr');
   fsr.innerHTML = '';
-  if(stores.size > 0){
+  if(storeNames.size > 0){
     const all = document.createElement('button');
     all.className='fc'+(filterStore===null?' on':'');
     all.textContent = T.all;
     all.onclick = ()=>{ filterStore=null; renderDashboard() };
     fsr.appendChild(all);
-    stores.forEach(s=>{
+    storeNames.forEach(s=>{
       const b = document.createElement('button');
       b.className='fc'+(filterStore===s?' on':'');
       b.textContent = s.length > 20 ? s.substring(0,18)+'…' : s;
@@ -1280,13 +1325,22 @@ function renderDashboard(){
       : (s==='ok' ? T.badge_ok : T.badge_crit).replace('{{d}}', Math.abs(d));
     const badgeCls = {exp:'b-exp',crit:'b-crit',warn:'b-warn',ok:'b-ok'}[s];
     const ico = {'exp':'💀','crit':'⚠️','warn':'⏰','ok':'✅'}[s];
-    return `<div class="pcard s-${s}">
+    return `<div class="pcard s-${s}" id="pc-${p.id}">
       <div class="pcard-ico">${ico}</div>
       <div class="pcard-info">
         <div class="pcard-name">${p.name||'—'}</div>
         <div class="pcard-sub">${p.type||''} · ${p.magasin||''} · DLC: ${fmtDate(p.dlc)}</div>
+        <div class="pcard-sub" style="margin-top:2px;font-size:10px;opacity:.65">par ${p.scannedBy||'?'} · ${p.scannedAt ? new Date(p.scannedAt).toLocaleDateString(lang) : ''}</div>
       </div>
-      <span class="pcard-badge ${badgeCls}">${badgeTxt}</span>
+      <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex-shrink:0">
+        <span class="pcard-badge ${badgeCls}">${badgeTxt}</span>
+        <button onclick="archiveProduct(${p.id})"
+          style="background:rgba(18,168,118,.12);border:1px solid rgba(18,168,118,.3);color:var(--green-d);
+                 border-radius:8px;padding:4px 10px;font-size:11px;font-weight:900;cursor:pointer;
+                 font-family:var(--font);white-space:nowrap">
+          ✓ Traité
+        </button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -1839,6 +1893,140 @@ function sendEmailMailto(){
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   ARCHIVE — suppression avec traçabilité
+═══════════════════════════════════════════════════════════════════════════ */
+let archive = JSON.parse(localStorage.getItem('fc_archive') || '[]');
+function saveArchive(){ localStorage.setItem('fc_archive', JSON.stringify(archive)); }
+
+function archiveProduct(id){
+  const p = products.find(x => x.id === id);
+  if(!p) return;
+  // Animate removal
+  const el = document.getElementById('pc-' + id);
+  if(el){ el.style.transition='opacity .3s,transform .3s'; el.style.opacity='0'; el.style.transform='translateX(40px)'; }
+  setTimeout(()=>{
+    // Move to archive with trace
+    archive.unshift({
+      ...p,
+      archivedAt:  new Date().toISOString(),
+      archivedBy:  session?.username || '?',
+      archiveNote: 'Traité',
+    });
+    products = products.filter(x => x.id !== id);
+    localStorage.setItem('fc_products', JSON.stringify(products));
+    saveArchive();
+    renderDashboard();
+    showToast('✅ Produit archivé avec traçabilité');
+  }, 300);
+}
+
+function toolShowArchive(){
+  const modal = document.getElementById('archive-modal');
+  modal.style.display = 'flex';
+  const list = document.getElementById('archive-list');
+  if(!archive.length){
+    list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);font-size:14px;font-weight:700">Aucun produit archivé</div>';
+    return;
+  }
+  list.innerHTML = archive.slice(0,100).map(p => {
+    const s = statusOf(p.dlc);
+    const ico = {'exp':'💀','crit':'⚠️','warn':'⏰','ok':'✅'}[s] || '📦';
+    return `<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.05)">
+      <div style="font-size:22px;flex-shrink:0">${ico}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:800;color:var(--text)">${p.name||'—'}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;font-weight:600">
+          ${p.magasin||'—'} · DLC: ${fmtDate(p.dlc)}
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">
+          🗂 Archivé le ${new Date(p.archivedAt).toLocaleString(lang)} par <strong>${p.archivedBy}</strong>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function closeArchive(){ document.getElementById('archive-modal').style.display='none'; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   STATS
+═══════════════════════════════════════════════════════════════════════════ */
+function toolShowStats(){
+  document.getElementById('stats-modal').style.display='flex';
+  const el = document.getElementById('stats-content');
+
+  const total = products.length;
+  const archTotal = archive.length;
+  const byStore = {};
+  products.forEach(p=>{
+    const k = p.magasin||'Inconnu';
+    if(!byStore[k]) byStore[k]={exp:0,crit:0,warn:0,ok:0,total:0};
+    byStore[k][statusOf(p.dlc)]++;
+    byStore[k].total++;
+  });
+  const agentCounts = {};
+  archive.forEach(p=>{ agentCounts[p.archivedBy||'?'] = (agentCounts[p.archivedBy||'?']||0)+1; });
+
+  const statCard = (ico,val,lbl,col) =>
+    `<div style="flex:1;min-width:0;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.72);
+                 border-radius:16px;padding:14px;text-align:center;box-shadow:var(--spec)">
+       <div style="font-size:28px;font-weight:900;color:${col};font-family:var(--font)">${val}</div>
+       <div style="font-size:11px;font-weight:800;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px">${ico} ${lbl}</div>
+     </div>`;
+
+  el.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      ${statCard('📦',total,'En cours','var(--text)')}
+      ${statCard('🗂',archTotal,'Traités','var(--green-d)')}
+    </div>
+    <div style="font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Par magasin</div>
+    ${Object.entries(byStore).map(([store,c])=>`
+      <div style="background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.72);border-radius:14px;padding:12px;margin-bottom:8px;box-shadow:var(--spec)">
+        <div style="font-size:13px;font-weight:800;margin-bottom:8px">🏪 ${store}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${c.exp?`<span style="background:rgba(192,57,43,.85);color:#fff;border-radius:100px;padding:3px 10px;font-size:11px;font-weight:900">💀 ${c.exp} périmé${c.exp>1?'s':''}</span>`:''}
+          ${c.crit?`<span style="background:rgba(180,110,0,.85);color:#fff;border-radius:100px;padding:3px 10px;font-size:11px;font-weight:900">⚠️ ${c.crit} critique${c.crit>1?'s':''}</span>`:''}
+          ${c.warn?`<span style="background:rgba(37,99,235,.85);color:#fff;border-radius:100px;padding:3px 10px;font-size:11px;font-weight:900">⏰ ${c.warn} attention</span>`:''}
+          ${c.ok?`<span style="background:rgba(10,107,71,.85);color:#fff;border-radius:100px;padding:3px 10px;font-size:11px;font-weight:900">✅ ${c.ok} OK</span>`:''}
+        </div>
+      </div>`).join('')}
+    ${Object.keys(agentCounts).length ? `
+      <div style="font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:14px 0 10px">Traitements par agent</div>
+      ${Object.entries(agentCounts).sort((a,b)=>b[1]-a[1]).map(([ag,n])=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(255,255,255,.6);
+                    border:1px solid rgba(255,255,255,.72);border-radius:12px;margin-bottom:7px;box-shadow:var(--spec)">
+          <span style="font-size:13px;font-weight:800">👤 ${ag}</span>
+          <span style="font-size:13px;font-weight:900;color:var(--green-d)">${n} traité${n>1?'s':''}</span>
+        </div>`).join('')}` : ''}`;
+}
+function closeStats(){ document.getElementById('stats-modal').style.display='none'; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EXPORT CSV
+═══════════════════════════════════════════════════════════════════════════ */
+function toolExportCSV(){
+  const all = [...products.map(p=>({...p,status:'actif'})), ...archive.map(p=>({...p,status:'archivé'}))];
+  if(!all.length){ showToast('Aucun produit à exporter'); return; }
+  const cols = ['id','name','gencod','type','dlc','magasin','scannedBy','scannedAt','status','archivedBy','archivedAt'];
+  const rows = [cols.join(';'), ...all.map(p => cols.map(c=>`"${(p[c]||'').toString().replace(/"/g,'""')}"`).join(';'))];
+  const blob = new Blob(['\uFEFF'+rows.join('\n')], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `FreshControl_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('📥 Export CSV téléchargé');
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOOL — Récap e-mail par magasin (ouvre le modal email pré-rempli)
+═══════════════════════════════════════════════════════════════════════════ */
+function toolEmailRecap(){
+  // Regroupe les produits urgents par magasin et ouvre le modal email global
+  openEmailModal(null);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    TOAST
 ═══════════════════════════════════════════════════════════════════════════ */
 let toastTimer;
@@ -1881,9 +2069,15 @@ document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById(id).addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin() });
   });
 
-  // Auto-reconnect if session exists and is < 8h
-  if(session && (Date.now()-session.loginTime) < 8*3600*1000){
-    launchApp();
+  // ── SESSION : Login obligatoire à chaque ouverture de l'app ─────────────
+  // On utilise sessionStorage (efface quand l'app est fermée)
+  // localStorage ne garde que les données persistantes (produits, users, etc.)
+  const sessionData = sessionStorage.getItem('fc_active_session');
+  if(sessionData){
+    try{
+      session = JSON.parse(sessionData);
+      launchApp();
+    } catch(e){ sessionStorage.removeItem('fc_active_session'); }
   }
 });
 
