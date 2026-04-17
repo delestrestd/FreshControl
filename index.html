@@ -1209,50 +1209,132 @@ function saveAddProduct(){
   ['ap-name','ap-gencod','ap-type','ap-dlc','ap-mag'].forEach(id=>document.getElementById(id).value='');
 }
 
-/* ═══ SCAN ═══════════════════════════════════════════════════════════════════ */
-document.getElementById('scan-in').addEventListener('change',async function(e){
-  const file=e.target.files[0];if(!file)return;
-  e.target.value='';
-  document.getElementById('scan-res').style.display='none';
-  document.getElementById('nf-card').style.display='none';
-  document.getElementById('scan-st').innerHTML=`<span class="spin"></span>${T().scanning}`;
-  const payload=new FormData();
-  payload.append('image',file);
-  if(gps){payload.append('lat',gps.lat);payload.append('lng',gps.lng)}
-  if(selStore){payload.append('magasin',selStore.name);payload.append('store_id',selStore.id)}
-  if(session){payload.append('user',session.username)}
-  try{
-    const res=await fetch(webhook,{method:'POST',body:payload});
-    const data=await res.json();
-    document.getElementById('scan-st').textContent='';
+/* ═══ SCAN ═══════════════════════════════════════════════════════════════════
+   Flux : Photo → FormData POST → N8N Webhook → Gemini (gencod) →
+          Google Sheets catalogue → Respond to Webhook → handleScanResult
+   N8N doit être en mode "Using Respond to Webhook node" (pas "Immediately")
+   La réponse attendue : {found:true, produit:"...", gencod:"...", type_produit:"..."}
+   ou {found:false}
+═══════════════════════════════════════════════════════════════════════════ */
+document.getElementById('scan-in').addEventListener('change', async function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  e.target.value = '';
+
+  // Reset UI
+  document.getElementById('scan-res').style.display  = 'none';
+  document.getElementById('nf-card').style.display   = 'none';
+  document.getElementById('scan-st').innerHTML =
+    `<span class="spin"></span> ${T().scanning}`;
+
+  // Build FormData — image + contexte GPS/magasin/user
+  const payload = new FormData();
+  payload.append('image', file, file.name || 'scan.jpg');
+  // Pas de champ "action" — la branche scan est la branche par défaut dans N8N
+  if(gps){
+    payload.append('lat', gps.lat);
+    payload.append('lng', gps.lng);
+  }
+  if(selStore){
+    payload.append('magasin', selStore.name);
+    payload.append('store_id', selStore.id);
+  }
+  if(session) payload.append('user', session.username);
+
+  let rawText = '';
+  try {
+    const res = await fetch(webhook, { method:'POST', body: payload });
+    rawText = await res.text();          // toujours lire le texte brut d'abord
+
+    // Essayer de parser en JSON
+    let data;
+    try { data = JSON.parse(rawText); }
+    catch(_){ data = null; }
+
+    document.getElementById('scan-st').textContent = '';
+
+    if(!data){
+      // N8N a répondu autre chose que du JSON — webhook mal configuré
+      showScanError('N8N a répondu du texte non-JSON. Vérifiez le node "Respond to Webhook".', rawText);
+      return;
+    }
+
+    // N8N en mode "Immediately" → {"message":"Workflow was started"}
+    if(data.message === 'Workflow was started' || data.message === 'Workflow was started.'){
+      showScanError(
+        'N8N répond immédiatement sans attendre Gemini.\n' +
+        'Ouvrez le node Webhook → Parameters → Respond → sélectionnez "Using Respond to Webhook node".',
+        rawText
+      );
+      return;
+    }
+
     handleScanResult(data);
-  }catch(err){
-    console.error(err);
-    document.getElementById('scan-st').innerHTML=
-      `<span style="color:var(--r)">${T().scan_err}</span>
+
+  } catch(err) {
+    console.error('[Scan] Erreur fetch:', err, '| Raw:', rawText);
+    document.getElementById('scan-st').innerHTML =
+      `<div style="color:var(--r);font-size:12px;font-weight:700;margin-bottom:6px">${T().scan_err}</div>
+       <div style="color:var(--muted);font-size:10px;font-weight:600;margin-bottom:8px">Vérifiez la connexion et l'URL N8N</div>
        <button onclick="document.getElementById('scan-in').click()"
-         style="display:block;margin:8px auto 0;padding:8px 18px;border-radius:var(--rr);border:none;
-                background:rgba(224,60,60,.85);color:#fff;font-size:12px;font-weight:900;cursor:pointer;
-                font-family:var(--font)">🔄 Réessayer</button>`;
+         style="padding:8px 16px;border-radius:var(--rr);border:none;background:rgba(224,60,60,.85);
+                color:#fff;font-size:12px;font-weight:900;cursor:pointer;font-family:var(--font)">
+         🔄 Réessayer</button>`;
   }
 });
 
 function handleScanResult(data){
-  const found=data.found!==false&&(data.produit||data.name);
-  if(!found){document.getElementById('nf-card').style.display='block';return}
-  const nm=data.produit||data.name;
-  document.getElementById('rf-pn').textContent=nm;
-  document.getElementById('rf-gc').value=data.gencod||'';
-  document.getElementById('rf-ty').value=data.type_produit||'';
-  document.getElementById('rf-dlc').value='';
-  document.getElementById('rf-mag').value=selStore?.name||'';
-  document.getElementById('scan-res').style.display='block';
+  /* Normalise les différents formats de réponse N8N :
+     Format A : {found:true, produit:"Yaourt", gencod:"32891...", type_produit:"Laitier"}
+     Format B : {found:true, name:"Yaourt", gencod:"...", type:"Laitier"}
+     Format C : tableau → prendre le premier élément
+     Format D : {found:false} ou {found:false, message:"..."} → produit absent du catalogue
+  */
+  // Si N8N retourne un tableau, prendre le premier item
+  if(Array.isArray(data)) data = data[0] || {};
+
+  // Extraire les champs (supporte plusieurs noms de champs)
+  const prodNom  = data.produit || data.name || data.produit_nom || data.nom || '';
+  const gencod   = data.gencod  || data.ean  || data.barcode     || '';
+  const typeProd = data.type_produit || data.type || data.rayon  || '';
+  const found    = data.found !== false && prodNom.length > 0;
+
+  if(!found){
+    // Log pour debug si besoin
+    console.warn('[handleScanResult] Produit non trouvé. Réponse N8N:', data);
+    document.getElementById('nf-card').style.display = 'block';
+    return;
+  }
+
+  // Remplir le formulaire
+  document.getElementById('rf-pn').textContent    = prodNom;
+  document.getElementById('rf-gc').value          = gencod;
+  document.getElementById('rf-ty').value          = typeProd;
+  document.getElementById('rf-dlc').value         = '';           // DLC toujours saisie manuelle
+  document.getElementById('rf-mag').value         = selStore?.name || '';
+  document.getElementById('scan-res').style.display = 'block';
+}
+
+function showScanError(msg, raw){
+  const isAdmin = session?.role === 'admin';
+  document.getElementById('scan-st').innerHTML =
+    `<div style="background:rgba(224,60,60,.12);border:1px solid rgba(224,60,60,.28);border-radius:12px;padding:12px;text-align:left">
+       <div style="font-size:12px;font-weight:900;color:var(--r);margin-bottom:6px">❌ Problème N8N</div>
+       <div style="font-size:11px;color:var(--muted);font-weight:600;white-space:pre-wrap">${msg}</div>
+       ${isAdmin && raw ? `<details style="margin-top:8px"><summary style="font-size:10px;color:var(--muted);cursor:pointer;font-weight:700">Réponse brute N8N</summary>
+         <div style="font-family:monospace;font-size:10px;color:var(--muted);margin-top:4px;word-break:break-all">${raw.slice(0,400)}</div>
+       </details>` : ''}
+       <button onclick="document.getElementById('scan-in').click()"
+         style="display:block;margin-top:10px;width:100%;padding:9px;border-radius:var(--rr);border:none;
+                background:rgba(224,60,60,.85);color:#fff;font-size:12px;font-weight:900;cursor:pointer;font-family:var(--font)">
+         🔄 Réessayer</button>
+     </div>`;
 }
 
 function resetScan(){
-  document.getElementById('scan-res').style.display='none';
-  document.getElementById('nf-card').style.display='none';
-  document.getElementById('scan-st').textContent='';
+  document.getElementById('scan-res').style.display  = 'none';
+  document.getElementById('nf-card').style.display   = 'none';
+  document.getElementById('scan-st').textContent     = '';
 }
 
 // Called from "Saisir manuellement" button on nf-card — pre-fills magasin
