@@ -282,11 +282,39 @@ select.store-sel option{background:#0A6B47;color:#fff}
 <!-- ═══ RGPD ══════════════════════════════════════════════════════════ -->
 <div id="rgpd" class="off">
   <div class="rgpd-sh">
-    <div class="rgpd-t" id="rg-t">🔒 Données & Confidentialité</div>
-    <p class="rgpd-p" id="rg-p">FreshControl utilise votre <strong>géolocalisation</strong> pour identifier le magasin visité. Ces données restent sur votre appareil. Votre consentement est demandé à chaque démarrage.</p>
+    <div class="rgpd-t">🔒 Politique de données & Usage professionnel</div>
+
+    <!-- Bloc 1 — Géolocalisation -->
+    <div style="background:rgba(18,168,118,.08);border:1px solid rgba(18,168,118,.2);border-radius:12px;padding:12px 14px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:900;color:var(--gd);margin-bottom:5px">📍 Géolocalisation</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;font-weight:600">FreshControl utilise votre position GPS pour identifier automatiquement le magasin visité. La localisation est traitée <strong>uniquement sur cet appareil</strong>, en mémoire temporaire, et n'est jamais transmise à un tiers. Elle n'est pas stockée de façon permanente.</p>
+    </div>
+
+    <!-- Bloc 2 — Appareil personnel usage pro -->
+    <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:12px 14px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:900;color:#92400e;margin-bottom:5px">📱 Utilisation d'un appareil personnel (BYOD)</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;font-weight:600">En utilisant FreshControl sur votre téléphone personnel dans le cadre de votre activité professionnelle, vous reconnaissez :<br>
+      • Avoir été informé(e) par votre employeur de cette modalité d'usage<br>
+      • Que les données professionnelles saisies (produits, magasins, alertes) sont stockées localement sur votre appareil dans votre navigateur (localStorage)<br>
+      • Que la suppression de l'application ou la réinitialisation du navigateur entraîne la perte définitive de ces données<br>
+      • Qu'aucune donnée personnelle (contacts, photos personnelles, autres apps) n'est accédée par FreshControl</p>
+    </div>
+
+    <!-- Bloc 3 — Responsabilité & assurance -->
+    <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:12px;padding:12px 14px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:900;color:#1E40AF;margin-bottom:5px">⚖️ Responsabilité & garantie de l'appareil</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;font-weight:600">L'utilisation de FreshControl sur un appareil personnel ne modifie pas la garantie de votre téléphone et n'installe aucun logiciel natif (application web PWA). En cas de dommage survenu <strong>lors d'une mission professionnelle</strong>, la prise en charge relève de la politique BYOD de votre employeur. Consultez votre contrat de travail ou votre responsable RH pour connaître les conditions applicables.</p>
+    </div>
+
+    <!-- Bloc 4 — RGPD -->
+    <div style="background:rgba(224,60,60,.07);border:1px solid rgba(224,60,60,.18);border-radius:12px;padding:12px 14px;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:900;color:var(--rd);margin-bottom:5px">🇪🇺 Vos droits (RGPD)</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;font-weight:600">Conformément au Règlement Général sur la Protection des Données (RGPD — UE 2016/679), vous disposez des droits d'accès, de rectification, d'effacement et d'opposition sur vos données. Toutes les données sont stockées localement sur votre appareil. Pour exercer vos droits ou pour toute question : <strong>contact@bunga.corp</strong><br>Ce consentement vous est présenté à chaque démarrage. Vous pouvez refuser sans impact sur l'utilisation de l'application (la géolocalisation sera désactivée).</p>
+    </div>
+
     <div class="rgpd-row">
-      <button class="rgpd-no" id="rg-n" onclick="rgpdNo()">Refuser</button>
-      <button class="rgpd-ok" id="rg-y" onclick="rgpdYes()">✓ Accepter</button>
+      <button class="rgpd-no" id="rg-n" onclick="rgpdNo()">Refuser la géoloc.</button>
+      <button class="rgpd-ok" id="rg-y" onclick="rgpdYes()">✓ J'accepte et je continue</button>
     </div>
   </div>
 </div>
@@ -320,6 +348,53 @@ select.store-sel option{background:#0A6B47;color:#fff}
       <button onclick="sendMailto()" style="flex:1;padding:13px;border-radius:var(--rr);border:1.5px solid var(--bdr);background:rgba(255,255,255,.6);color:var(--txt);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font)">✉️ Ouvrir</button>
     </div>
     <button class="rfcancel" onclick="closeModal('email-modal')" id="em-cancel">Annuler</button>
+  </div>
+</div>
+
+<!-- ═══ MAGASINS MODAL ════════════════════════════════════════════════ -->
+<div id="stores-modal" class="modal-bg">
+  <div class="modal-sh">
+    <div class="mhd-row" style="margin-bottom:14px">
+      <div class="mhd-t">🏪 Gestion des magasins</div>
+      <button class="mcl" onclick="closeModal('stores-modal')">✕</button>
+    </div>
+
+    <!-- Liste des magasins -->
+    <div id="stores-modal-list" style="margin-bottom:16px"></div>
+
+    <!-- Séparateur -->
+    <div style="height:1px;background:var(--bdr);margin-bottom:14px"></div>
+    <div style="font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;margin-bottom:11px">➕ Ajouter un magasin</div>
+
+    <!-- Formulaire ajout -->
+    <div class="rf-f"><div class="rf-l">Nom du magasin *</div>
+      <input class="rf-i" id="sm-name" placeholder="Ex: Carrefour Lyon Part-Dieu"></div>
+    <div class="rf-f"><div class="rf-l">Adresse</div>
+      <div style="display:flex;gap:8px">
+        <input class="rf-i" id="sm-addr" placeholder="Rue, Ville" style="flex:1">
+        <button onclick="geocodeModal()" id="sm-geo-btn"
+          style="padding:12px 15px;border-radius:var(--rr);border:none;background:rgba(18,168,118,.85);
+                 color:#fff;font-size:13px;font-weight:900;cursor:pointer;font-family:var(--font);white-space:nowrap">
+          🔍 Trouver
+        </button>
+      </div>
+    </div>
+    <div id="sm-geo-results" style="margin-bottom:10px"></div>
+    <div class="rf-row" id="sm-coord-row">
+      <div class="rf-f">
+        <div class="rf-l">Latitude *</div>
+        <input class="rf-i" id="sm-lat" type="number" step="0.00001" placeholder="43.2965">
+      </div>
+      <div class="rf-f">
+        <div class="rf-l">Longitude *</div>
+        <input class="rf-i" id="sm-lng" type="number" step="0.00001" placeholder="5.3798">
+      </div>
+      <div class="rf-f" style="max-width:85px">
+        <div class="rf-l">Rayon (m)</div>
+        <input class="rf-i" id="sm-rad" type="number" placeholder="500" value="500">
+      </div>
+    </div>
+    <button class="rfsave" onclick="addStoreFromModal()" style="font-size:14px;padding:13px">➕ Ajouter ce magasin</button>
   </div>
 </div>
 
@@ -591,6 +666,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
       <div class="sb-it" onclick="showTab('planning');closeSB()"><div class="sb-ic">📅</div>Planning</div>
       <div class="sb-it" id="sb-adm" onclick="showTab('admin');closeSB()" style="display:none"><div class="sb-ic">⚙️</div>Administration</div>
       <div class="sb-sec">Outils</div>
+      <div class="sb-it" onclick="openStoresModal();closeSB()"><div class="sb-ic">🏪</div>Gestion des magasins</div>
       <div class="sb-it" onclick="openEmailModal(null);closeSB()"><div class="sb-ic">📧</div>Récap alertes par magasin</div>
       <div class="sb-it" onclick="toolCSV();closeSB()"><div class="sb-ic">📥</div>Exporter CSV</div>
       <div class="sb-it" onclick="openModal('archive-modal');renderArchive();closeSB()"><div class="sb-ic">🗂</div>Historique / Archive</div>
@@ -1045,7 +1121,8 @@ function renderDashboard(){
     const bt={e:t.badge_e,o:t.badge_o,w:t.badge_w,k:t.badge_k}[s].replace('{{d}}',Math.abs(d));
     const bc={e:'be',o:'bo',w:'bw',k:'bk'}[s];
     const ico={e:'💀',o:'⚠️',w:'⏰',k:'✅'}[s];
-    return`<div class="pc s-${s}" id="pc-${p.id}">
+    const sid=String(p.id); // toujours string pour les data-attribute
+    return`<div class="pc s-${s}" id="pc-${sid}" data-pid="${sid}">
       <div class="pc-ic">${ico}</div>
       <div class="pc-in">
         <div class="pc-nm">${p.name||'—'}</div>
@@ -1055,9 +1132,9 @@ function renderDashboard(){
       <div class="pc-rt">
         <span class="pbadge ${bc}">${bt}</span>
         <div class="pact-row">
-          <button class="pact pact-ok" onclick="archiveProd(${p.id})">✓</button>
-          <button class="pact pact-ed" onclick="openEditProd(${p.id})">✏️</button>
-          <button class="pact pact-dl" onclick="confirmDeleteProd(${p.id})">🗑</button>
+          <button class="pact pact-ok" data-id="${sid}" onclick="archiveProd(this.dataset.id)">✓</button>
+          <button class="pact pact-ed" data-id="${sid}" onclick="openEditProd(this.dataset.id)">✏️</button>
+          <button class="pact pact-dl" data-id="${sid}" onclick="confirmDeleteProd(this.dataset.id)">🗑</button>
         </div>
       </div>
     </div>`;
@@ -1068,21 +1145,24 @@ function setFS(s){fsStatus=s;renderDashboard()}
 function el(tag,cls){const e=document.createElement(tag);e.className=cls;return e}
 
 /* ═══ PRODUCT ACTIONS ════════════════════════════════════════════════════════ */
+function findProd(id){ return products.find(x=>String(x.id)===String(id)); }
+function findProdIdx(id){ return products.findIndex(x=>String(x.id)===String(id)); }
+
 function archiveProd(id){
-  const p=products.find(x=>x.id===id);if(!p)return;
-  const el=document.getElementById('pc-'+id);
+  const p=findProd(id); if(!p)return;
+  const el=document.getElementById('pc-'+String(id));
   if(el){el.style.transition='opacity .28s,transform .28s';el.style.opacity='0';el.style.transform='translateX(36px)'}
   setTimeout(()=>{
     archive.unshift({...p,archivedAt:new Date().toISOString(),archivedBy:session?.username||'?',note:'Traité'});
-    products=products.filter(x=>x.id!==id);
+    products=products.filter(x=>String(x.id)!==String(id));
     save('fc_products',products);save('fc_archive',archive);
     renderDashboard();toast(T().prod_archived);
   },280);
 }
 
 function openEditProd(id){
-  const p=products.find(x=>x.id===id);if(!p)return;
-  document.getElementById('ep-id').value=id;
+  const p=findProd(id); if(!p)return;
+  document.getElementById('ep-id').value=String(id);
   document.getElementById('ep-name').value=p.name||'';
   document.getElementById('ep-gencod').value=p.gencod||'';
   document.getElementById('ep-type').value=p.type||'';
@@ -1092,8 +1172,8 @@ function openEditProd(id){
   openModal('ep-modal');
 }
 function saveEditProduct(){
-  const id=parseInt(document.getElementById('ep-id').value)||document.getElementById('ep-id').value;
-  const idx=products.findIndex(x=>x.id==id);if(idx<0)return;
+  const id=document.getElementById('ep-id').value;
+  const idx=findProdIdx(id); if(idx<0){toast('❌ Produit introuvable');return;}
   products[idx]={...products[idx],
     name:document.getElementById('ep-name').value.trim(),
     gencod:document.getElementById('ep-gencod').value.trim(),
@@ -1106,8 +1186,8 @@ function saveEditProduct(){
 }
 
 function confirmDeleteProd(id){
-  showConfirm('Supprimer ce produit ?','Cette action est définitive. Le produit ne sera pas archivé.',()=>{
-    products=products.filter(x=>x.id!==id);
+  showConfirm('Supprimer ce produit ?','Suppression définitive (non archivé).',()=>{
+    products=products.filter(x=>String(x.id)!==String(id));
     save('fc_products',products);renderDashboard();toast(T().deleted);
   });
 }
@@ -1182,6 +1262,91 @@ function openManualFromScan(){
   if(mag && selStore) mag.value=selStore.name;
   fillStoreDL();
   openModal('add-product-modal');
+}
+
+/* ═══ STORES MODAL (sidebar ☰ → Gestion des magasins) ═══════════════════════ */
+function openStoresModal(){
+  openModal('stores-modal');
+  renderStoresModal();
+  document.getElementById('sm-coord-row').style.display='flex';
+}
+
+function renderStoresModal(){
+  const el=document.getElementById('stores-modal-list');
+  if(!stores.length){
+    el.innerHTML='<div style="font-size:13px;color:var(--muted);padding:6px 0;font-weight:600;text-align:center">Aucun magasin — ajoutez-en un ci-dessous</div>';
+    return;
+  }
+  el.innerHTML=stores.map(s=>`
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid rgba(0,0,0,.05)">
+      <div style="font-size:26px;flex-shrink:0;margin-top:3px">🏪</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:800;color:var(--txt)">${s.name}</div>
+        ${s.address?`<div style="font-size:11px;color:var(--muted);margin-top:2px;font-weight:600">📍 ${s.address}</div>`:''}
+        <div style="font-size:11px;color:var(--muted);margin-top:1px;font-weight:600">${s.lat.toFixed(4)}, ${s.lng.toFixed(4)} · rayon ${s.r||500}m</div>
+      </div>
+      <button data-sid="${s.id}" onclick="confirmDeleteStoreModal(this.dataset.sid)"
+        style="border:1px solid rgba(224,60,60,.28);background:rgba(224,60,60,.1);color:var(--r);
+               border-radius:9px;width:32px;height:32px;cursor:pointer;font-size:14px;flex-shrink:0">🗑</button>
+    </div>`).join('');
+}
+
+function confirmDeleteStoreModal(id){
+  const s=stores.find(x=>x.id===id);if(!s)return;
+  showConfirm(`Supprimer "${s.name}" ?`,'Les produits déjà scannés gardent le nom du magasin.',()=>{
+    stores=stores.filter(x=>x.id!==id);
+    save('fc_stores',stores);
+    if(selStore?.id===id) selStore=null;
+    refreshStoreSel(); renderStoresModal(); renderAdmin();
+    toast(T().deleted);
+  });
+}
+
+async function geocodeModal(){
+  const addr=document.getElementById('sm-addr').value.trim();
+  if(!addr){toast(T().fill_all);return}
+  const btn=document.getElementById('sm-geo-btn');
+  btn.textContent='⏳';btn.disabled=true;
+  try{
+    const res=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addr)}&format=json&limit=5&accept-language=${lang}`);
+    const data=await res.json();
+    const box=document.getElementById('sm-geo-results');
+    if(!data.length){box.innerHTML='<div style="font-size:12px;color:var(--r);padding:6px 0;font-weight:700">❌ Adresse non trouvée</div>';return}
+    box.innerHTML=data.map(r=>`
+      <div class="geo-r" data-lat="${r.lat}" data-lon="${r.lon}"
+           onclick="pickGeoModal(this.dataset.lat,this.dataset.lon)">
+        <div class="geo-r-n">${r.display_name.split(',').slice(0,3).join(', ')}</div>
+        <div class="geo-r-a">📍 ${parseFloat(r.lat).toFixed(5)}, ${parseFloat(r.lon).toFixed(5)}</div>
+      </div>`).join('');
+  }catch(e){toast('❌ Erreur réseau')}
+  finally{btn.textContent='🔍 Trouver';btn.disabled=false}
+}
+
+function pickGeoModal(lat,lon){
+  document.getElementById('sm-lat').value=parseFloat(lat).toFixed(5);
+  document.getElementById('sm-lng').value=parseFloat(lon).toFixed(5);
+  document.querySelectorAll('#sm-geo-results .geo-r').forEach(el=>{
+    el.style.borderColor=(el.dataset.lat===lat&&el.dataset.lon===lon)?'rgba(18,168,118,.8)':'rgba(255,255,255,.72)';
+  });
+  toast('📍 Position sélectionnée');
+}
+
+function addStoreFromModal(){
+  const name=document.getElementById('sm-name').value.trim();
+  const addr=document.getElementById('sm-addr').value.trim();
+  const lat=parseFloat(document.getElementById('sm-lat').value);
+  const lng=parseFloat(document.getElementById('sm-lng').value);
+  const r=parseInt(document.getElementById('sm-rad').value)||500;
+  if(!name){toast('❌ Nom obligatoire');return}
+  if(isNaN(lat)||isNaN(lng)){toast('❌ Lat/Lng requis — utilisez 🔍 Trouver ou saisissez manuellement');return}
+  stores.push({id:genId(),name,address:addr,lat,lng,r});
+  save('fc_stores',stores);
+  refreshStoreSel();
+  ['sm-name','sm-addr','sm-lat','sm-lng'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('sm-rad').value='500';
+  document.getElementById('sm-geo-results').innerHTML='';
+  renderStoresModal(); renderAdmin();
+  toast(T().store_added);
 }
 
 function saveProduct(){
