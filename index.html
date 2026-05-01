@@ -297,6 +297,16 @@ select.store-sel option{background:#0A6B47;color:#fff}
     <div class="lerr" id="l-err"></div>
   </div>
   <div class="lver">FreshControl v3.0 · Bunga.corp</div>
+
+  <!-- Bouton reset d'urgence — visible en bas de l'écran de connexion -->
+  <div style="margin-top:18px;text-align:center">
+    <button onclick="emergencyReset()"
+      style="background:none;border:none;color:rgba(255,255,255,.28);font-size:11px;
+             font-weight:700;cursor:pointer;font-family:var(--font);letter-spacing:.3px;
+             text-decoration:underline;padding:6px 12px">
+      Réinitialiser les accès
+    </button>
+  </div>
 </div>
 
 <!-- ═══ RGPD ══════════════════════════════════════════════════════════ -->
@@ -872,6 +882,33 @@ if(!users){
     {id:'u2',name:'Agent 1',       username:'agent1',  password:'agent123',        role:'agent'},
   ];
   save('fc_users',users);
+}
+
+/* Emergency reset — accessible depuis l'écran de connexion */
+function emergencyReset(){
+  const pin = prompt('Code de réinitialisation (fourni par Bunga.corp) :');
+  if(pin === null) return; // annulé
+  // PIN = "RESET" + les 4 premiers caractères du nom du magasin en majuscules
+  // Ex: magasin "Carrefour Aubagne" → PIN = "RESETCARR"
+  // Si aucun magasin configuré → PIN = "RESET2024"
+  const stored = localStorage.getItem('fc_store_name') || '';
+  const expected = 'RESET' + (stored ? stored.replace(/\s/g,'').toUpperCase().slice(0,4) : '2024');
+  if(pin.trim().toUpperCase() !== expected){
+    alert('Code incorrect. Contactez votre administrateur Bunga.corp.');
+    return;
+  }
+  if(!confirm('Réinitialiser tous les accès utilisateurs ?\n\nLes produits, le catalogue et la configuration seront conservés.\n\nCette action remet les identifiants par défaut :\nadmin / freshcontrol2024')) return;
+  // Reset uniquement les users et la session
+  localStorage.removeItem('fc_users');
+  sessionStorage.removeItem('fc_session');
+  // Recréer les users par défaut
+  const defaultUsers = [
+    {id:'u1',name:'Administrateur',username:'admin',password:'freshcontrol2024',role:'superadmin'},
+    {id:'u2',name:'Agent 1',username:'agent1',password:'agent123',role:'agent'},
+  ];
+  localStorage.setItem('fc_users', JSON.stringify(defaultUsers));
+  alert('✅ Accès réinitialisés.\n\nConnectez-vous avec :\nIdentifiant : admin\nMot de passe : freshcontrol2024');
+  location.reload();
 }
 
 function save(k,v){ localStorage.setItem(k,JSON.stringify(v)); }
