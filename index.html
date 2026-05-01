@@ -554,39 +554,40 @@ select.store-sel option{background:#0A6B47;color:#fff}
         <button class="sbtn" onclick="document.getElementById('scan-in-ean').click()">
           📷 Scanner le code-barres
         </button>
-        <div style="margin-top:10px">
+        <div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
           <button onclick="openModal('add-product-modal');fillStoreDL()"
             style="background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.1);color:var(--muted);
                    border-radius:var(--rr);padding:7px 14px;font-size:11px;font-weight:700;
                    cursor:pointer;font-family:var(--font)">
             ✏️ Saisie manuelle
           </button>
+          <button id="quick-sync-btn" onclick="quickSync()" title="Rafraîchir le catalogue"
+            style="background:rgba(255,255,255,.22);border:1.5px solid rgba(255,255,255,.32);
+                   border-radius:var(--rr);padding:7px 13px;font-size:13px;cursor:pointer;
+                   font-family:var(--font);color:#fff;backdrop-filter:blur(8px)"
+            title="Rafraîchir le catalogue depuis Sheets">
+            🔄
+          </button>
         </div>
         <div id="scan-st" style="margin-top:10px;font-size:12px;font-weight:700;color:var(--muted);min-height:18px"></div>
       </div>
 
-      <!-- ÉTAPE 2 : Photo produit (hors catalogue) -->
+      <!-- ÉTAPE 2 : Photo produit + saisie nom -->
       <div class="scan-box" id="scan-step2" style="display:none">
         <input type="file" id="scan-in-prod" accept="image/*" capture="environment">
         <div style="font-size:46px;margin-bottom:8px">📦</div>
-        <div style="font-size:15px;font-weight:900;color:var(--gd)">Étape 2 — Photo du produit</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;font-weight:600">Photographiez l'étiquette ou le nom du produit</div>
+        <div style="font-size:15px;font-weight:900;color:var(--gd)">Étape 2 — Photographier l'emballage</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;font-weight:600;line-height:1.6">Photographiez l'étiquette du produit<br>puis saisissez le nom visible</div>
         <div id="scan-ean-found" style="background:rgba(245,158,11,.15);border-radius:12px;padding:8px 14px;margin:10px 0;font-size:12px;font-weight:800;color:#92400e"></div>
         <button class="sbtn" onclick="document.getElementById('scan-in-prod').click()" style="background:rgba(59,130,246,.82);box-shadow:0 6px 20px rgba(59,130,246,.28)">
-          📷 Photographier le produit
+          📷 Photographier l'emballage
         </button>
-        <div style="display:flex;gap:8px;margin-top:10px;justify-content:center;flex-wrap:wrap">
-          <button onclick="skipPhoto2()"
-            style="padding:8px 16px;border-radius:var(--rr);border:1.5px solid var(--bdr);
-                   background:rgba(255,255,255,.5);color:var(--muted);font-size:12px;font-weight:700;
-                   cursor:pointer;font-family:var(--font)">
-            ⏭ Saisir sans photo
-          </button>
+        <div style="margin-top:10px">
           <button onclick="resetScan()"
             style="padding:8px 16px;border-radius:var(--rr);border:none;
                    background:rgba(224,60,60,.12);color:var(--r);font-size:12px;font-weight:700;
                    cursor:pointer;font-family:var(--font)">
-            🔄 Recommencer
+            🔄 Recommencer depuis le début
           </button>
         </div>
         <div id="scan-st2" style="margin-top:8px;font-size:12px;font-weight:700;color:var(--muted);min-height:16px"></div>
@@ -637,28 +638,38 @@ select.store-sel option{background:#0A6B47;color:#fff}
 
       <!-- Catalogue local (Google Sheets → localStorage) -->
       <div class="adm-sec">
-        <div class="adm-t">📋 Catalogue produits (local)</div>
-        <div id="catalogue-stats" style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:12px">—</div>
+        <div class="adm-t">📋 Catalogue produits</div>
+        <div id="catalogue-stats" style="font-size:12px;font-weight:600;margin-bottom:12px;line-height:1.7">—</div>
+
+        <div style="background:rgba(18,168,118,.08);border:1px solid rgba(18,168,118,.2);border-radius:12px;padding:12px 14px;margin-bottom:13px">
+          <div style="font-size:12px;font-weight:900;color:var(--gd);margin-bottom:5px">💡 Configuration unique</div>
+          <div style="font-size:11px;color:var(--muted);font-weight:600;line-height:1.7">
+            Collez l'URL CSV <strong>une seule fois</strong> — l'app se synchronise automatiquement à chaque démarrage si le catalogue a plus de 24h ou est vide.<br>
+            Format : <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px;font-size:10px">…/gviz/tq?tqx=out:csv&amp;sheet=NomOnglet</code><br>
+            Plusieurs marques : séparez par <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px;font-size:10px"> | </code>
+          </div>
+        </div>
+
         <div class="rf-f">
-          <div class="rf-l">URL CSV du Google Sheet (onglet public)</div>
-          <input class="rf-i" id="adm-sheet-url" placeholder="https://docs.google.com/spreadsheets/d/ID/gviz/tq?tqx=out:csv&sheet=NomOnglet" style="font-size:11px">
+          <div class="rf-l">URL(s) CSV Google Sheets</div>
+          <textarea class="rf-i" id="adm-sheet-url" rows="3"
+            style="border-radius:16px;resize:vertical;font-size:11px;line-height:1.7"
+            placeholder="https://docs.google.com/spreadsheets/d/ID/gviz/tq?tqx=out:csv&sheet=Produits"></textarea>
         </div>
-        <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:12px;line-height:1.6">
-          Format URL : <code style="background:rgba(0,0,0,.07);padding:2px 6px;border-radius:5px;font-size:10px">…/gviz/tq?tqx=out:csv&sheet=NomOnglet</code><br>
-          Le Sheet doit être <strong>public en lecture</strong>. Colonnes requises : <code style="font-size:10px">gencod</code>, <code style="font-size:10px">Libellé produit</code>, <code style="font-size:10px">Famille</code>
-        </div>
+
+        <div id="sync-status" style="margin:6px 0 10px;font-size:12px;font-weight:700;min-height:16px"></div>
+
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="af-add" onclick="syncCatalogue()" id="sync-btn" style="flex:1;padding:12px">
-            🔄 Synchroniser depuis Sheets
+          <button class="af-add" onclick="syncCatalogue()" id="sync-btn" style="flex:2;padding:12px">
+            🔄 Synchroniser maintenant
           </button>
           <button onclick="clearCatalogue()"
-            style="padding:12px 16px;border-radius:var(--rr);background:rgba(224,60,60,.1);
+            style="flex:1;padding:12px;border-radius:var(--rr);background:rgba(224,60,60,.1);
                    border:1px solid rgba(224,60,60,.28);color:var(--r);font-size:13px;font-weight:800;
                    cursor:pointer;font-family:var(--font)">
             🗑 Vider
           </button>
         </div>
-        <div id="sync-status" style="margin-top:8px;font-size:12px;font-weight:700;min-height:16px"></div>
       </div>
 
       <!-- Magasins -->
@@ -1057,7 +1068,9 @@ function launchApp(){
 
 function rgpdYes(){
   document.getElementById('rgpd').classList.add('off');
-  document.getElementById('hdr-sub').textContent = storeName || 'FreshControl';
+  document.getElementById('hdr-sub').textContent = [storeEnseigne, storeName].filter(Boolean).join(' · ') || 'FreshControl';
+  // Sync automatique si catalogue vide ou ancien (silencieuse)
+  autoSyncCatalogue();
   checkStartup();
 }
 
@@ -1224,6 +1237,7 @@ function showTab(n){
   curTab=n;
   if(n==='scanner'){
     showStoreBadge();
+    checkCatalogueWarning();
   }
   if(n==='alertes') renderAlertes();
   if(n==='planning') renderPlanning();
@@ -1439,76 +1453,159 @@ function saveAddProduct(){
 ═══════════════════════════════════════════════════════════════════════════ */
 let catalogue = JSON.parse(localStorage.getItem('fc_catalogue') || '[]');
 
-function saveCatalogue(){ localStorage.setItem('fc_catalogue', JSON.stringify(catalogue)); }
+/* ═══════════════════════════════════════════════════════════════════════════
+   CATALOGUE LOCAL — configuré UNE SEULE FOIS, sync automatique
+   ─────────────────────────────────────────────────────────────────────────
+   • L'URL CSV est sauvegardée définitivement dans localStorage
+   • Sync auto au démarrage si catalogue vide ou > 24h
+   • Sync silencieuse en arrière-plan toutes les 24h
+   • Bouton 🔄 discret dans le scanner pour rafraîchir manuellement
+═══════════════════════════════════════════════════════════════════════════ */
+function saveCatalogue(){
+  localStorage.setItem('fc_catalogue', JSON.stringify(catalogue));
+  localStorage.setItem('fc_catalogue_ts', Date.now().toString());
+}
+
+function getCatalogueAge(){
+  const ts = parseInt(localStorage.getItem('fc_catalogue_ts') || '0');
+  return ts ? Math.floor((Date.now() - ts) / 60000) : null; // en minutes
+}
 
 function lookupGencod(ean){
   const clean = String(ean).replace(/\s/g,'');
   return catalogue.find(p => String(p.gencod||'').replace(/\s/g,'') === clean) || null;
 }
 
-function renderCatalogueStats(){
-  const el = document.getElementById('catalogue-stats');
-  if(!el) return;
-  if(!catalogue.length){
-    el.textContent = 'Aucun produit — synchronisez depuis Google Sheets'; el.style.color='var(--r)';
-  } else {
-    const marques=[...new Set(catalogue.map(p=>p.marque||'—'))];
-    el.textContent=`${catalogue.length} produits · ${marques.length} marque(s) : ${marques.join(', ')}`;
-    el.style.color='var(--muted)';
-  }
-  const inp=document.getElementById('adm-sheet-url');
-  if(inp) inp.value=localStorage.getItem('fc_sheet_url')||'';
+/* ── Auto-sync : lancé au démarrage, silencieux ─────────────────────────── */
+async function autoSyncCatalogue(){
+  const savedUrl = localStorage.getItem('fc_sheet_url') || '';
+  if(!savedUrl) return; // URL jamais configurée → rien à faire
+
+  const ageMin = getCatalogueAge();
+  const isEmpty = catalogue.length === 0;
+  const isOld   = ageMin === null || ageMin > 1440; // > 24h
+
+  if(!isEmpty && !isOld) return; // catalogue frais → pas besoin
+
+  console.log('[Catalogue] Auto-sync:', isEmpty ? 'catalogue vide' : `dernière sync il y a ${ageMin}min`);
+  await runSync(savedUrl, { silent: true });
 }
 
+/* ── Sync manuelle (depuis Admin ou bouton scanner) ─────────────────────── */
 async function syncCatalogue(){
-  const url=document.getElementById('adm-sheet-url').value.trim();
-  if(!url){toast('❌ Entrez l\'URL du Google Sheet');return;}
-  localStorage.setItem('fc_sheet_url',url);
-  const btn=document.getElementById('sync-btn');
-  const st=document.getElementById('sync-status');
-  btn.textContent='⏳ Synchronisation…';btn.disabled=true;st.textContent='';
+  const urlInput = document.getElementById('adm-sheet-url');
+  const url = urlInput ? urlInput.value.trim() : localStorage.getItem('fc_sheet_url') || '';
+  if(!url){ toast('❌ Configurez d\'abord l\'URL dans Admin → Catalogue'); return; }
+  localStorage.setItem('fc_sheet_url', url);
+  await runSync(url, { silent: false });
+}
+
+/* ── Sync rapide depuis le scanner ──────────────────────────────────────── */
+async function quickSync(){
+  const url = localStorage.getItem('fc_sheet_url') || '';
+  if(!url){
+    toast('❌ URL non configurée — allez dans Admin → 📋 Catalogue');
+    return;
+  }
+  const btn = document.getElementById('quick-sync-btn');
+  if(btn){ btn.textContent='⏳'; btn.disabled=true; }
+  await runSync(url, { silent: false });
+  if(btn){ btn.textContent='🔄'; btn.disabled=false; }
+  checkCatalogueWarning();
+}
+
+/* ── Moteur de sync (partagé) ────────────────────────────────────────────── */
+async function runSync(url, { silent = false } = {}){
+  const btn = document.getElementById('sync-btn');
+  const st  = document.getElementById('sync-status');
+  if(btn && !silent){ btn.textContent='⏳ Synchronisation…'; btn.disabled=true; }
+  if(st  && !silent) st.textContent = '';
+
   try{
-    const urls=url.split('|').map(u=>u.trim()).filter(Boolean);
-    catalogue=[];let total=0;
+    const urls = url.split('|').map(u=>u.trim()).filter(Boolean);
+    const newCatalogue = [];
+    let total = 0;
+
     for(const u of urls){
-      const m=u.match(/[?&]sheet=([^&]+)/);
-      const marque=m?decodeURIComponent(m[1]):'Catalogue';
-      const res=await fetch(u);
-      if(!res.ok) throw new Error(`HTTP ${res.status} pour ${marque}`);
-      const csv=await res.text();
-      const rows=parseCSVSimple(csv);
-      if(rows.length<2) continue;
-      const headers=rows[0].map(h=>h.toLowerCase().replace(/["\s]/g,''));
-      const gi=headers.findIndex(h=>h.includes('gencod')||h.includes('ean')||h.includes('code'));
-      const ni=headers.findIndex(h=>h.includes('libell')||h.includes('nom')||h.includes('produit'));
-      const fi=headers.findIndex(h=>h.includes('famille')||h.includes('type')||h.includes('rayon'));
-      if(gi<0){st.textContent=`❌ ${marque} : colonne "gencod" introuvable`;continue;}
+      const m = u.match(/[?&]sheet=([^&]+)/);
+      const marque = m ? decodeURIComponent(m[1]) : 'Catalogue';
+
+      const res = await fetch(u, { cache: 'no-store' });
+      if(!res.ok) throw new Error(`HTTP ${res.status} (${marque})`);
+      const csv  = await res.text();
+      const rows = parseCSVSimple(csv);
+      if(rows.length < 2) continue;
+
+      const headers = rows[0].map(h=>h.toLowerCase().replace(/["\s]/g,''));
+      const gi = headers.findIndex(h=>h.includes('gencod')||h.includes('ean')||h.includes('code'));
+      const ni = headers.findIndex(h=>h.includes('libell')||h.includes('nom')||h.includes('produit'));
+      const fi = headers.findIndex(h=>h.includes('famille')||h.includes('type')||h.includes('rayon'));
+      if(gi<0) continue;
+
       for(let i=1;i<rows.length;i++){
-        const row=rows[i];
-        const gc=(row[gi]||'').replace(/["\s']/g,'');
+        const row = rows[i];
+        const gc  = (row[gi]||'').replace(/["\s']/g,'');
         if(!gc) continue;
-        catalogue.push({
-          gencod:gc,
-          nom:(ni>=0?row[ni]:'').replace(/^"|"$/g,'').trim(),
-          famille:(fi>=0?row[fi]:'').replace(/^"|"$/g,'').trim(),
+        newCatalogue.push({
+          gencod:  gc,
+          nom:     (ni>=0 ? row[ni] : '').replace(/^"|"$/g,'').trim(),
+          famille: (fi>=0 ? row[fi] : '').replace(/^"|"$/g,'').trim(),
           marque,
         });
         total++;
       }
     }
+
+    catalogue = newCatalogue;
     saveCatalogue();
-    st.textContent=`✅ ${total} produits importés`;st.style.color='var(--gd)';
-    renderCatalogueStats();toast(`✅ Catalogue : ${total} produits`);
-  }catch(e){
-    st.textContent=`❌ ${e.message}`;st.style.color='var(--r)';
-    toast('❌ Erreur synchro');console.error(e);
-  }finally{btn.textContent='🔄 Synchroniser depuis Sheets';btn.disabled=false;}
+    renderCatalogueStats();
+
+    if(!silent){
+      const msg = `✅ ${total} produit${total>1?'s':''} synchronisé${total>1?'s':''}`;
+      if(st){ st.textContent=msg; st.style.color='var(--gd)'; }
+      toast(msg);
+    }
+  } catch(e){
+    console.error('[Catalogue] Sync error:', e);
+    if(!silent){
+      if(st){ st.textContent=`❌ ${e.message}`; st.style.color='var(--r)'; }
+      toast('❌ Erreur synchronisation');
+    }
+  } finally {
+    if(btn && !silent){ btn.textContent='🔄 Synchroniser'; btn.disabled=false; }
+  }
 }
 
 function clearCatalogue(){
-  showConfirm('Vider le catalogue ?','Tous les produits locaux seront supprimés.',()=>{
-    catalogue=[];saveCatalogue();renderCatalogueStats();toast('🗑 Catalogue vidé');
+  showConfirm('Vider le catalogue ?','Tous les produits locaux seront supprimés.', ()=>{
+    catalogue=[]; localStorage.removeItem('fc_catalogue'); localStorage.removeItem('fc_catalogue_ts');
+    renderCatalogueStats(); toast('🗑 Catalogue vidé');
   });
+}
+
+function renderCatalogueStats(){
+  const el = document.getElementById('catalogue-stats');
+  if(!el) return;
+
+  const ageMin = getCatalogueAge();
+  const savedUrl = localStorage.getItem('fc_sheet_url') || '';
+
+  if(!catalogue.length){
+    const noUrl = !savedUrl;
+    el.innerHTML = noUrl
+      ? '<span style="color:var(--r);font-weight:700">❌ Aucune URL configurée — collez l\'URL ci-dessous (une seule fois)</span>'
+      : '<span style="color:var(--o);font-weight:700">⚠️ Catalogue vide — cliquez Synchroniser</span>';
+  } else {
+    const marques = [...new Set(catalogue.map(p=>p.marque||'—'))];
+    const ageStr  = ageMin !== null
+      ? (ageMin < 60 ? `il y a ${ageMin}min` : ageMin < 1440 ? `il y a ${Math.floor(ageMin/60)}h` : `il y a ${Math.floor(ageMin/1440)}j`)
+      : '';
+    el.innerHTML  = `<span style="color:var(--gd);font-weight:700">✅ ${catalogue.length} produits · ${marques.length} marque(s)</span>
+      <br><span style="font-size:11px;color:var(--muted);font-weight:600">${marques.join(', ')} ${ageStr?'· Sync '+ageStr:''}</span>`;
+  }
+
+  const inp = document.getElementById('adm-sheet-url');
+  if(inp) inp.value = savedUrl;
 }
 
 function parseCSVSimple(text){
@@ -1527,9 +1624,13 @@ function parseCSVSimple(text){
   return rows;
 }
 
-/* ═══ SCAN — ZXing (lecture code-barres 100% navigateur, 0 API, 0 serveur) ══
+/* ═══ SCAN — ZXing + fallback saisie manuelle ═══════════════════════════════
    Photo 1 : ZXing lit le gencod EAN → lookup catalogue local.
-   Photo 2 : étiquette produit (si hors catalogue) → Claude Vision optionnel.
+             Si trouvé → formulaire DLC pré-rempli.
+             Si non trouvé ou échec → formulaire manuel avec gencod pré-rempli.
+   Photo 2 : preview de l'emballage + saisie du nom produit par l'agent.
+             (L'API Anthropic n'est pas appelable directement depuis le navigateur)
+   Le catalogue doit être synchronisé depuis Admin → 📋 Catalogue.
 ═══════════════════════════════════════════════════════════════════════════ */
 let zxingReader=null;
 let currentEAN=null;
@@ -1546,89 +1647,181 @@ function getZXing(){
   return null;
 }
 
-// Photo 1 — code-barres
-document.getElementById('scan-in-ean').addEventListener('change',async function(e){
-  const file=e.target.files[0];if(!file)return;
-  e.target.value='';
-  const st=document.getElementById('scan-st');
-  st.innerHTML=`<span class="spin"></span> Lecture du code-barres…`;
-  currentEAN=null;
-  const reader=getZXing();
+// Avertissement si catalogue vide au moment d'entrer dans le scanner
+function checkCatalogueWarning(){
+  const st = document.getElementById('scan-st');
+  if(!st) return;
+  const savedUrl = localStorage.getItem('fc_sheet_url') || '';
+  if(!catalogue.length){
+    if(!savedUrl){
+      // URL jamais configurée
+      st.innerHTML = `<div style="background:rgba(224,60,60,.13);border:1px solid rgba(224,60,60,.28);
+          border-radius:12px;padding:10px 14px;font-size:12px;font-weight:700;color:var(--rd)">
+        ❌ Catalogue non configuré<br>
+        <span style="font-weight:600;opacity:.85">Allez dans <strong>☰ → Admin → 📋 Catalogue</strong><br>et collez l'URL Google Sheets une seule fois.</span>
+      </div>`;
+    } else {
+      // URL configurée mais catalogue vide (synchro en cours ou échouée)
+      st.innerHTML = `<div style="background:rgba(245,158,11,.13);border:1px solid rgba(245,158,11,.3);
+          border-radius:12px;padding:10px 14px;font-size:12px;font-weight:700;color:#92400e">
+        ⏳ Catalogue vide — synchronisation en cours…
+      </div>`;
+      // Lancer la sync automatiquement
+      quickSync();
+    }
+  } else {
+    const ageMin = getCatalogueAge();
+    if(ageMin !== null && ageMin > 1440){
+      // Vieux de plus de 24h → sync silencieuse
+      runSync(savedUrl, { silent:true }).then(checkCatalogueWarning);
+    }
+    st.textContent = ''; // catalogue OK → pas d'avertissement
+  }
+}
+
+// ── Photo 1 : code-barres ─────────────────────────────────────────────────
+document.getElementById('scan-in-ean').addEventListener('change', async function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  e.target.value = '';
+
+  const st = document.getElementById('scan-st');
+  st.innerHTML = `<span class="spin"></span> Lecture du code-barres…`;
+  currentEAN = null;
+
+  const reader = getZXing();
   if(!reader){
-    st.innerHTML=`<div style="color:var(--o);font-weight:800;margin-bottom:6px">⚠️ Lecteur barcode non disponible</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Vérifiez votre connexion internet et rechargez la page, ou utilisez la saisie manuelle.</div>
-      <button onclick="openModal('add-product-modal');fillStoreDL()"
+    // ZXing non disponible → aller direct à saisie manuelle
+    st.innerHTML = `<div style="color:var(--o);font-weight:800;margin-bottom:6px">⚠️ Lecteur barcode non chargé</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Rechargez la page ou utilisez la saisie manuelle.</div>
+      <button onclick="openManualFromScan()"
         style="padding:9px 18px;border-radius:var(--rr);border:none;background:rgba(59,130,246,.85);
                color:#fff;font-size:12px;font-weight:900;cursor:pointer;font-family:var(--font)">
         ✏️ Saisie manuelle</button>`;
     return;
   }
-  const imgUrl=URL.createObjectURL(file);
-  const img=document.createElement('img');img.src=imgUrl;
+
+  // Créer une image temporaire pour ZXing
+  const imgUrl = URL.createObjectURL(file);
+  const img = document.createElement('img');
+  img.src = imgUrl;
+
   try{
-    await new Promise(ok=>{img.onload=ok;img.onerror=ok;});
-    const result=await reader.decodeFromImageElement(img);
+    await new Promise((ok,err)=>{img.onload=ok; img.onerror=err; setTimeout(ok, 8000);});
+    const result = await reader.decodeFromImageElement(img);
     URL.revokeObjectURL(imgUrl);
-    const ean=result.getText().replace(/\s/g,'');
-    currentEAN=ean;
-    st.textContent='';
-    const produit=lookupGencod(ean);
+
+    const ean = result.getText().replace(/\s/g,'');
+    currentEAN = ean;
+    st.textContent = '';
+
+    // Chercher dans le catalogue local
+    const produit = lookupGencod(ean);
     if(produit){
-      handleScanResult({found:true,produit:produit.nom,gencod:produit.gencod,type_produit:produit.famille,marque:produit.marque});
+      // ✅ Trouvé dans le catalogue
+      handleScanResult({found:true, produit:produit.nom, gencod:produit.gencod, type_produit:produit.famille, marque:produit.marque});
     } else {
-      document.getElementById('scan-ean-found').textContent=`Gencod lu : ${ean} — absent du catalogue`;
-      document.getElementById('scan-step1').style.display='none';
-      document.getElementById('scan-step2').style.display='block';
-      const apGc=document.getElementById('ap-gencod');if(apGc) apGc.value=ean;
+      // ❌ Gencod lu mais absent du catalogue → étape 2 : photo produit + saisie nom
+      document.getElementById('scan-ean-found').innerHTML =
+        `📦 Gencod <strong>${ean}</strong> lu — absent du catalogue<br>
+         <span style="font-size:11px;font-weight:600;opacity:.8">Photographiez l'emballage pour saisir le nom</span>`;
+      document.getElementById('scan-step1').style.display = 'none';
+      document.getElementById('scan-step2').style.display = 'block';
+      // Pré-remplir le gencod dans le formulaire
+      const apGc = document.getElementById('ap-gencod');
+      if(apGc) apGc.value = ean;
     }
-  }catch(err){
+  } catch(err){
     URL.revokeObjectURL(imgUrl);
-    if(err.name==='NotFoundException'){
-      st.innerHTML=`<div style="color:var(--o);font-weight:800">⚠️ Code-barres non détecté</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px">Cadrez bien le code-barres, bon éclairage, photo nette.</div>
-        <button onclick="document.getElementById('scan-in-ean').click()"
-          style="margin-top:8px;padding:7px 16px;border-radius:var(--rr);border:none;
-                 background:rgba(18,168,118,.82);color:#fff;font-size:12px;font-weight:900;
-                 cursor:pointer;font-family:var(--font)">🔄 Réessayer</button>`;
+    if(err.name === 'NotFoundException'){
+      st.innerHTML = `
+        <div style="color:var(--o);font-weight:800;margin-bottom:4px">⚠️ Code-barres non détecté</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6">
+          • Cadrez uniquement le code-barres<br>
+          • Bon éclairage, fond clair<br>
+          • Photo nette, pas de reflet<br>
+          • Distance : 15 à 30 cm
+        </div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <button onclick="document.getElementById('scan-in-ean').click()"
+            style="padding:9px 16px;border-radius:var(--rr);border:none;background:rgba(18,168,118,.82);
+                   color:#fff;font-size:12px;font-weight:900;cursor:pointer;font-family:var(--font)">
+            🔄 Réessayer</button>
+          <button onclick="openManualFromScan()"
+            style="padding:9px 16px;border-radius:var(--rr);border:1.5px solid var(--bdr);background:rgba(255,255,255,.5);
+                   color:var(--txt);font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font)">
+            ✏️ Saisir manuellement</button>
+        </div>`;
     } else {
-      st.innerHTML=`<span style="color:var(--r)">❌ ${err.message}</span>`;
+      st.innerHTML = `<span style="color:var(--r);font-size:12px;font-weight:700">❌ Erreur : ${err.message}</span>`;
     }
   }
 });
 
-// Photo 2 — étiquette produit (hors catalogue)
-document.getElementById('scan-in-prod').addEventListener('change',async function(e){
-  const file=e.target.files[0];if(!file)return;
-  e.target.value='';
-  const st=document.getElementById('scan-st2');
-  st.innerHTML=`<span class="spin"></span> Lecture de l'étiquette…`;
+// ── Photo 2 : emballage produit + saisie nom ──────────────────────────────
+// On affiche la photo en preview et l'agent saisit le nom visible sur l'emballage.
+// L'API Anthropic ne peut pas être appelée directement depuis le navigateur (CORS).
+document.getElementById('scan-in-prod').addEventListener('change', async function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  e.target.value = '';
+
+  const st = document.getElementById('scan-st2');
+
+  // Afficher la photo en preview
   try{
-    const base64=await fileToBase64(file);
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01'},
-      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:100,
-        messages:[{role:'user',content:[
-          {type:'image',source:{type:'base64',media_type:file.type||'image/jpeg',data:base64}},
-          {type:'text',text:"Lis uniquement le nom du produit sur cet emballage alimentaire. Réponds UNIQUEMENT avec le nom, sans phrase. Ex: 'Yaourt nature bio'"}
-        ]}]})
-    });
-    const data=await res.json();
-    const nom=(data.content?.[0]?.text||'').trim();
-    st.textContent='';
-    if(nom) handleScanResult({found:true,produit:nom,gencod:currentEAN||'',type_produit:'',marque:'Hors catalogue'});
-    else skipPhoto2();
-  }catch(e){
-    st.textContent='';console.warn('Vision:',e);skipPhoto2();
+    const url = URL.createObjectURL(file);
+    st.innerHTML = `
+      <div style="margin-bottom:10px">
+        <img src="${url}" style="width:100%;max-height:160px;object-fit:cover;border-radius:12px;box-shadow:var(--ss)" 
+             onload="URL.revokeObjectURL(this.src)" onerror="this.style.display='none'">
+      </div>
+      <div style="font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">
+        Nom du produit visible sur l'emballage
+      </div>
+      <div style="display:flex;gap:8px">
+        <input id="prod-name-input" class="rf-i" placeholder="Ex: Yaourt nature bio 125g" 
+               style="flex:1;font-size:14px" autofocus>
+        <button onclick="confirmProdName()"
+          style="padding:12px 16px;border-radius:var(--rr);border:none;background:rgba(18,168,118,.85);
+                 color:#fff;font-size:14px;font-weight:900;cursor:pointer;font-family:var(--font)">
+          ✓</button>
+      </div>
+      <button onclick="skipPhoto2()"
+        style="width:100%;margin-top:8px;padding:10px;border-radius:var(--rr);border:1.5px solid var(--bdr);
+               background:rgba(255,255,255,.5);color:var(--muted);font-size:12px;font-weight:700;
+               cursor:pointer;font-family:var(--font)">
+        ⏭ Continuer sans nom (remplir manuellement)
+      </button>`;
+    // Focus sur le champ texte
+    setTimeout(()=>{ const inp=document.getElementById('prod-name-input'); if(inp) inp.focus(); }, 200);
+    // Enter = valider
+    setTimeout(()=>{
+      const inp=document.getElementById('prod-name-input');
+      if(inp) inp.addEventListener('keydown',e=>{ if(e.key==='Enter') confirmProdName(); });
+    }, 250);
+  } catch(err){
+    console.warn('Preview error:', err);
+    skipPhoto2();
   }
 });
+
+function confirmProdName(){
+  const inp = document.getElementById('prod-name-input');
+  const nom = inp ? inp.value.trim() : '';
+  if(!nom){ toast('Tapez le nom du produit visible sur la photo'); inp?.focus(); return; }
+  document.getElementById('scan-st2').textContent = '';
+  handleScanResult({found:true, produit:nom, gencod:currentEAN||'', type_produit:'', marque:'Hors catalogue'});
+}
 
 function skipPhoto2(){
-  document.getElementById('scan-step2').style.display='none';
-  document.getElementById('scan-step1').style.display='block';
-  const mag=document.getElementById('ap-mag');
-  if(mag&&selStore) mag.value=selStore.name;
-  fillStoreDL();openModal('add-product-modal');
+  document.getElementById('scan-step2').style.display = 'none';
+  document.getElementById('scan-step1').style.display = 'block';
+  document.getElementById('scan-st').textContent = '';
+  const mag = document.getElementById('ap-mag');
+  if(mag && selStore) mag.value = selStore.name;
+  fillStoreDL();
+  openModal('add-product-modal');
 }
 
 async function fileToBase64(file){
@@ -1636,25 +1829,38 @@ async function fileToBase64(file){
 }
 
 function handleScanResult(data){
-  const prodNom=data.produit||data.name||'';
-  const gencod=data.gencod||'';
-  const typeProd=data.type_produit||'';
-  const marque=data.marque||'';
-  if(data.found!==true||!prodNom){
-    const apGc=document.getElementById('ap-gencod');if(apGc&&gencod) apGc.value=gencod;
-    document.getElementById('nf-card').style.display='block';
-    document.getElementById('scan-step1').style.display='none';
-    document.getElementById('scan-step2').style.display='none';
+  const prodNom  = data.produit || data.name || '';
+  const gencod   = data.gencod  || '';
+  const typeProd = data.type_produit || '';
+  const marque   = data.marque  || '';
+
+  if(data.found!==true || !prodNom){
+    const apGc = document.getElementById('ap-gencod');
+    if(apGc && gencod) apGc.value = gencod;
+    document.getElementById('nf-card').style.display = 'block';
+    document.getElementById('scan-step1').style.display = 'none';
+    document.getElementById('scan-step2').style.display = 'none';
     return;
   }
-  document.getElementById('scan-step1').style.display='none';
-  document.getElementById('scan-step2').style.display='none';
-  document.getElementById('rf-pn').textContent=prodNom;
-  document.getElementById('rf-gc').value=gencod;
-  document.getElementById('rf-ty').value=typeProd+(marque?` · ${marque}`:'');
-  document.getElementById('rf-dlc').value='';
-  document.getElementById('rf-mag').value=selStore?.name||'';
-  document.getElementById('scan-res').style.display='block';
+
+  document.getElementById('scan-step1').style.display = 'none';
+  document.getElementById('scan-step2').style.display = 'none';
+  document.getElementById('rf-pn').textContent = prodNom;
+  document.getElementById('rf-gc').value        = gencod;
+  document.getElementById('rf-ty').value        = typeProd + (marque ? ` · ${marque}` : '');
+  document.getElementById('rf-dlc').value       = '';
+  document.getElementById('rf-mag').value       = selStore?.name || storeName || '';
+  document.getElementById('scan-res').style.display = 'block';
+  // Focus sur la date DLC
+  setTimeout(()=>{ const dlc=document.getElementById('rf-dlc'); if(dlc) dlc.focus(); }, 150);
+}
+
+function openManualFromScan(){
+  resetScan();
+  const mag = document.getElementById('ap-mag');
+  if(mag && selStore) mag.value = selStore.name;
+  fillStoreDL();
+  openModal('add-product-modal');
 }
 
 function showScanError(msg){
