@@ -9,6 +9,16 @@
 <title>FreshControl</title>
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<!-- ZXing — lecture code-barres locale. Chargé de façon asynchrone, fallback si indisponible -->
+<script>
+(function(){
+  var s=document.createElement('script');
+  s.src='https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js';
+  s.crossOrigin='anonymous';
+  s.onerror=function(){ window._zxingFailed=true; console.warn('ZXing CDN non disponible — lecture barcode désactivée'); };
+  document.head.appendChild(s);
+})();
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -65,7 +75,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .lver{color:rgba(255,255,255,.28);font-size:11px;font-weight:700;text-align:center;margin-top:16px}
 
 /* ── RGPD sheet ────────────────────────────────────────────────────── */
-#rgpd{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;backdrop-filter:blur(4px)}
+#rgpd{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;backdrop-filter:blur(6px)}
 #rgpd.off{display:none}
 .rgpd-sh{background:rgba(255,255,255,.85);backdrop-filter:blur(28px) saturate(180%);border-radius:var(--rl2) var(--rl2) 0 0;padding:24px 20px 36px;max-height:72vh;overflow-y:auto;width:100%;border-top:1px solid rgba(255,255,255,.7);box-shadow:var(--spec),0 -8px 36px rgba(0,0,0,.14)}
 .rgpd-t{font-size:17px;font-weight:900;margin-bottom:9px}
@@ -260,8 +270,18 @@ select.store-sel option{background:#0A6B47;color:#fff}
 
 <!-- ═══ SPLASH ════════════════════════════════════════════════════════ -->
 <div id="splash">
-  <div class="sp-lock"><div class="sp-ico">🌿</div><div class="sp-name">FreshControl</div></div>
-  <div class="sp-tag" id="sp-tag">Gestion intelligente des périmés</div>
+  <!-- Branding dynamique : enseigne + FreshControl + magasin -->
+  <div id="sp-brand" style="text-align:center;margin-bottom:6px">
+    <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:6px">
+      <div id="sp-ico" class="sp-ico">🌿</div>
+      <div style="text-align:left">
+        <div class="sp-name" id="sp-enseigne-name">FreshControl</div>
+        <div id="sp-store-line" style="font-size:13px;font-weight:700;color:rgba(255,255,255,.78);letter-spacing:.3px;margin-top:-2px"></div>
+      </div>
+    </div>
+    <div class="sp-tag" id="sp-tag">Gestion intelligente des périmés</div>
+    <div id="sp-powered" style="font-size:10px;color:rgba(255,255,255,.38);font-weight:700;margin-top:4px;letter-spacing:.5px">POWERED BY BUNGA.CORP</div>
+  </div>
   <div class="lang-row">
     <button class="lang-btn on" onclick="setLang('fr')">🇫🇷 FR</button>
     <button class="lang-btn" onclick="setLang('en')">🇬🇧 EN</button>
@@ -270,7 +290,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
   </div>
   <div class="lc glass-d">
     <div class="ll" id="l-user">Identifiant</div>
-    <input class="li" id="li-u" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="nom.utilisateur">
+    <input class="li" id="li-u" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="prenom.nom">
     <div class="ll" id="l-pass">Mot de passe</div>
     <input class="li" id="li-p" type="password" autocomplete="current-password" placeholder="••••••••">
     <button class="lb" id="l-btn" onclick="doLogin()"><span id="l-btn-t">Se connecter</span></button>
@@ -282,15 +302,42 @@ select.store-sel option{background:#0A6B47;color:#fff}
 <!-- ═══ RGPD ══════════════════════════════════════════════════════════ -->
 <div id="rgpd" class="off">
   <div class="rgpd-sh">
-    <div class="rgpd-t">🔒 Politique de données & Usage professionnel</div>
+    <div class="rgpd-t">📱 Charte d'usage professionnel — Appareil personnel</div>
 
-    <!-- Bloc 1 — Géolocalisation -->
-    <div style="background:rgba(18,168,118,.08);border:1px solid rgba(18,168,118,.2);border-radius:12px;padding:12px 14px;margin-bottom:10px">
-      <div style="font-size:12px;font-weight:900;color:var(--gd);margin-bottom:5px">📍 Géolocalisation</div>
-      <p style="font-size:12px;color:var(--muted);line-height:1.6;font-weight:600">FreshControl utilise votre position GPS pour identifier automatiquement le magasin visité. La localisation est traitée <strong>uniquement sur cet appareil</strong>, en mémoire temporaire, et n'est jamais transmise à un tiers. Elle n'est pas stockée de façon permanente.</p>
+    <!-- Bloc 1 — BYOD -->
+    <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);border-radius:12px;padding:12px 14px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:900;color:#92400e;margin-bottom:5px">📱 Utilisation de votre appareil personnel (BYOD)</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.65;font-weight:600">En utilisant FreshControl sur votre téléphone personnel dans le cadre de vos missions, vous reconnaissez :<br>
+      • Avoir été informé(e) par votre responsable de cette modalité d'usage<br>
+      • Utiliser votre appareil de façon volontaire pour réaliser des tâches professionnelles<br>
+      • Que l'application n'accède à <strong>aucune donnée personnelle</strong> (contacts, photos personnelles, messages ou autres apps)<br>
+      • Que seules les données produits saisies dans l'app (nom, DLC, magasin) sont enregistrées localement sur cet appareil</p>
     </div>
 
-    <!-- Bloc 2 — Appareil personnel usage pro -->
+    <!-- Bloc 2 — Données stockées -->
+    <div style="background:rgba(18,168,118,.08);border:1px solid rgba(18,168,118,.2);border-radius:12px;padding:12px 14px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:900;color:var(--gd);margin-bottom:5px">💾 Données & confidentialité</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.65;font-weight:600">Toutes les données professionnelles saisies sont stockées <strong>uniquement sur cet appareil</strong> (localStorage du navigateur). Aucune donnée n'est transmise à un tiers sans votre action. La désinstallation ou la réinitialisation du navigateur entraîne la suppression définitive de ces données.</p>
+    </div>
+
+    <!-- Bloc 3 — Responsabilité -->
+    <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:12px;padding:12px 14px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:900;color:#1E40AF;margin-bottom:5px">⚖️ Responsabilité & garantie</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.65;font-weight:600">FreshControl est une application web (PWA) qui <strong>n'installe aucun logiciel natif</strong> et ne modifie pas la garantie de votre téléphone. En cas de dommage survenu lors d'une mission professionnelle, les conditions de prise en charge relèvent de la politique BYOD de votre employeur. Consultez votre contrat ou votre service RH.</p>
+    </div>
+
+    <!-- Bloc 4 — RGPD -->
+    <div style="background:rgba(224,60,60,.07);border:1px solid rgba(224,60,60,.18);border-radius:12px;padding:12px 14px;margin-bottom:16px">
+      <div style="font-size:12px;font-weight:900;color:var(--rd);margin-bottom:5px">🇪🇺 Vos droits (RGPD — UE 2016/679)</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.65;font-weight:600">Vous disposez des droits d'accès, de rectification et d'effacement sur vos données professionnelles. Pour exercer vos droits : <strong>contact@bunga.corp</strong><br>Ce consentement est demandé à chaque démarrage de session.</p>
+    </div>
+
+    <div class="rgpd-row">
+      <button class="rgpd-no" id="rg-n" onclick="rgpdNo()">Refuser</button>
+      <button class="rgpd-ok" id="rg-y" onclick="rgpdYes()">✓ J'ai lu et j'accepte</button>
+    </div>
+  </div>
+</div>
     <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:12px 14px;margin-bottom:10px">
       <div style="font-size:12px;font-weight:900;color:#92400e;margin-bottom:5px">📱 Utilisation d'un appareil personnel (BYOD)</div>
       <p style="font-size:12px;color:var(--muted);line-height:1.6;font-weight:600">En utilisant FreshControl sur votre téléphone personnel dans le cadre de votre activité professionnelle, vous reconnaissez :<br>
@@ -299,25 +346,6 @@ select.store-sel option{background:#0A6B47;color:#fff}
       • Que la suppression de l'application ou la réinitialisation du navigateur entraîne la perte définitive de ces données<br>
       • Qu'aucune donnée personnelle (contacts, photos personnelles, autres apps) n'est accédée par FreshControl</p>
     </div>
-
-    <!-- Bloc 3 — Responsabilité & assurance -->
-    <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:12px;padding:12px 14px;margin-bottom:10px">
-      <div style="font-size:12px;font-weight:900;color:#1E40AF;margin-bottom:5px">⚖️ Responsabilité & garantie de l'appareil</div>
-      <p style="font-size:12px;color:var(--muted);line-height:1.6;font-weight:600">L'utilisation de FreshControl sur un appareil personnel ne modifie pas la garantie de votre téléphone et n'installe aucun logiciel natif (application web PWA). En cas de dommage survenu <strong>lors d'une mission professionnelle</strong>, la prise en charge relève de la politique BYOD de votre employeur. Consultez votre contrat de travail ou votre responsable RH pour connaître les conditions applicables.</p>
-    </div>
-
-    <!-- Bloc 4 — RGPD -->
-    <div style="background:rgba(224,60,60,.07);border:1px solid rgba(224,60,60,.18);border-radius:12px;padding:12px 14px;margin-bottom:14px">
-      <div style="font-size:12px;font-weight:900;color:var(--rd);margin-bottom:5px">🇪🇺 Vos droits (RGPD)</div>
-      <p style="font-size:12px;color:var(--muted);line-height:1.6;font-weight:600">Conformément au Règlement Général sur la Protection des Données (RGPD — UE 2016/679), vous disposez des droits d'accès, de rectification, d'effacement et d'opposition sur vos données. Toutes les données sont stockées localement sur votre appareil. Pour exercer vos droits ou pour toute question : <strong>contact@bunga.corp</strong><br>Ce consentement vous est présenté à chaque démarrage. Vous pouvez refuser sans impact sur l'utilisation de l'application (la géolocalisation sera désactivée).</p>
-    </div>
-
-    <div class="rgpd-row">
-      <button class="rgpd-no" id="rg-n" onclick="rgpdNo()">Refuser la géoloc.</button>
-      <button class="rgpd-ok" id="rg-y" onclick="rgpdYes()">✓ J'accepte et je continue</button>
-    </div>
-  </div>
-</div>
 
 <!-- ═══ STARTUP POPUP ═════════════════════════════════════════════════ -->
 <div id="startup-modal" class="modal-center">
@@ -508,58 +536,86 @@ select.store-sel option{background:#0A6B47;color:#fff}
 
     <!-- SCANNER -->
     <div id="tab-scanner" class="tab">
-      <div id="gps-pill" class="gps-pill" style="display:none">
-        <div class="gps-dot"></div>
-        <span id="gps-txt">Localisation…</span>
-        <button class="gps-rbtn" id="gps-rbtn" onclick="retryGPS()" style="display:none">Réessayer</button>
+
+      <!-- Magasin configuré (1 seul) -->
+      <div id="store-badge" style="display:none;margin-bottom:13px;background:rgba(18,168,118,.82);
+           backdrop-filter:blur(12px);border-radius:var(--rr);padding:10px 16px;
+           border:1px solid rgba(255,255,255,.28);box-shadow:var(--spec-d)">
+        <div style="font-size:10px;font-weight:900;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.9px;margin-bottom:2px">🏪 Magasin</div>
+        <div id="store-badge-name" style="font-size:14px;font-weight:900;color:#fff"></div>
       </div>
-      <div class="store-sel-wrap">
-        <div class="store-sel-lbl">🏪 Magasin</div>
-        <div class="store-sel-row">
-          <select class="store-sel" id="store-sel" onchange="onStoreSel(this.value)">
-            <option value="">— Sélectionner —</option>
-          </select>
-          <button class="store-srch-btn" onclick="openModal('ssm');filterSSM('')">🔍</button>
-        </div>
-      </div>
-      <div class="scan-box">
-        <input type="file" id="scan-in" accept="image/*" capture="environment">
-        <div style="font-size:54px;margin-bottom:10px;filter:drop-shadow(0 3px 8px rgba(0,0,0,.12))">📸</div>
-        <div style="font-size:16px;font-weight:900;color:var(--gd)" id="sc-t">Scanner un produit</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:5px;font-weight:600" id="sc-sub">Photographiez le code-barres EAN du produit</div>
-        <button class="sbtn" onclick="document.getElementById('scan-in').click()">
-          📷 <span id="sc-btn">Prendre une photo</span>
+
+      <!-- ÉTAPE 1 : Scan code-barres (ZXing) -->
+      <div class="scan-box" id="scan-step1">
+        <input type="file" id="scan-in-ean" accept="image/*" capture="environment">
+        <div style="font-size:46px;margin-bottom:8px">🔖</div>
+        <div style="font-size:15px;font-weight:900;color:var(--gd)">Étape 1 — Code-barres EAN</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;font-weight:600">Photographiez le code-barres du produit</div>
+        <button class="sbtn" onclick="document.getElementById('scan-in-ean').click()">
+          📷 Scanner le code-barres
         </button>
-        <div style="margin-top:12px">
+        <div style="margin-top:10px">
           <button onclick="openModal('add-product-modal');fillStoreDL()"
-            style="background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.1);color:var(--muted);border-radius:var(--rr);
-                   padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">
-            ✏️ Saisir manuellement
+            style="background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.1);color:var(--muted);
+                   border-radius:var(--rr);padding:7px 14px;font-size:11px;font-weight:700;
+                   cursor:pointer;font-family:var(--font)">
+            ✏️ Saisie manuelle
           </button>
         </div>
         <div id="scan-st" style="margin-top:10px;font-size:12px;font-weight:700;color:var(--muted);min-height:18px"></div>
       </div>
+
+      <!-- ÉTAPE 2 : Photo produit (hors catalogue) -->
+      <div class="scan-box" id="scan-step2" style="display:none">
+        <input type="file" id="scan-in-prod" accept="image/*" capture="environment">
+        <div style="font-size:46px;margin-bottom:8px">📦</div>
+        <div style="font-size:15px;font-weight:900;color:var(--gd)">Étape 2 — Photo du produit</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;font-weight:600">Photographiez l'étiquette ou le nom du produit</div>
+        <div id="scan-ean-found" style="background:rgba(245,158,11,.15);border-radius:12px;padding:8px 14px;margin:10px 0;font-size:12px;font-weight:800;color:#92400e"></div>
+        <button class="sbtn" onclick="document.getElementById('scan-in-prod').click()" style="background:rgba(59,130,246,.82);box-shadow:0 6px 20px rgba(59,130,246,.28)">
+          📷 Photographier le produit
+        </button>
+        <div style="display:flex;gap:8px;margin-top:10px;justify-content:center;flex-wrap:wrap">
+          <button onclick="skipPhoto2()"
+            style="padding:8px 16px;border-radius:var(--rr);border:1.5px solid var(--bdr);
+                   background:rgba(255,255,255,.5);color:var(--muted);font-size:12px;font-weight:700;
+                   cursor:pointer;font-family:var(--font)">
+            ⏭ Saisir sans photo
+          </button>
+          <button onclick="resetScan()"
+            style="padding:8px 16px;border-radius:var(--rr);border:none;
+                   background:rgba(224,60,60,.12);color:var(--r);font-size:12px;font-weight:700;
+                   cursor:pointer;font-family:var(--font)">
+            🔄 Recommencer
+          </button>
+        </div>
+        <div id="scan-st2" style="margin-top:8px;font-size:12px;font-weight:700;color:var(--muted);min-height:16px"></div>
+      </div>
+
+      <!-- Produit non référencé -->
       <div class="nf-card" id="nf-card">
         <div style="font-size:36px;margin-bottom:8px">🔍</div>
         <div style="font-size:16px;font-weight:900;color:var(--r)" id="nf-t">Produit non référencé</div>
-        <div style="font-size:12px;color:rgba(176,32,32,.85);font-weight:600;margin-top:4px" id="nf-sub">Ce gencod n'est pas dans le catalogue Bunga.corp.</div>
+        <div style="font-size:12px;color:rgba(176,32,32,.85);font-weight:600;margin-top:4px" id="nf-sub">Ce gencod n'est pas dans le catalogue.</div>
         <div style="display:flex;gap:8px;margin-top:14px;justify-content:center;flex-wrap:wrap">
           <button class="nf-retry" onclick="resetScan()" id="nf-btn">🔄 Nouveau scan</button>
           <button onclick="openManualFromScan()"
-            style="padding:10px 18px;border-radius:var(--rr);border:none;background:rgba(59,130,246,.85);color:#fff;
-                   font-size:12px;font-weight:900;cursor:pointer;font-family:var(--font)">
+            style="padding:10px 18px;border-radius:var(--rr);border:none;
+                   background:rgba(59,130,246,.85);color:#fff;font-size:12px;font-weight:900;
+                   cursor:pointer;font-family:var(--font)">
             ✏️ Saisir manuellement
           </button>
         </div>
       </div>
+
+      <!-- Formulaire résultat scan -->
       <div id="scan-res">
         <div class="rf-t">✅ <span id="rf-pn"></span></div>
         <div class="rf-row">
           <div class="rf-f"><div class="rf-l">Gencod</div><input class="rf-i" id="rf-gc" readonly style="background:rgba(0,0,0,.04);color:var(--muted)"></div>
-          <div class="rf-f"><div class="rf-l">Type</div><input class="rf-i" id="rf-ty" readonly style="background:rgba(0,0,0,.04);color:var(--muted)"></div>
+          <div class="rf-f"><div class="rf-l">Type / Marque</div><input class="rf-i" id="rf-ty" readonly style="background:rgba(0,0,0,.04);color:var(--muted)"></div>
         </div>
         <div class="rf-f"><div class="rf-l" id="l-dlc">Date limite (DLC)</div><input class="rf-i" type="date" id="rf-dlc"></div>
-        <div class="rf-f"><div class="rf-l">Magasin</div><input class="rf-i" id="rf-mag"></div>
         <button class="rfsave" onclick="saveProduct()" id="rf-save">💾 Enregistrer</button>
         <button class="rfcancel" onclick="resetScan()" id="rf-cancel">Annuler</button>
       </div>
@@ -578,6 +634,32 @@ select.store-sel option{background:#0A6B47;color:#fff}
 
     <!-- ADMIN -->
     <div id="tab-admin" class="tab">
+
+      <!-- Catalogue local (Google Sheets → localStorage) -->
+      <div class="adm-sec">
+        <div class="adm-t">📋 Catalogue produits (local)</div>
+        <div id="catalogue-stats" style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:12px">—</div>
+        <div class="rf-f">
+          <div class="rf-l">URL CSV du Google Sheet (onglet public)</div>
+          <input class="rf-i" id="adm-sheet-url" placeholder="https://docs.google.com/spreadsheets/d/ID/gviz/tq?tqx=out:csv&sheet=NomOnglet" style="font-size:11px">
+        </div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:12px;line-height:1.6">
+          Format URL : <code style="background:rgba(0,0,0,.07);padding:2px 6px;border-radius:5px;font-size:10px">…/gviz/tq?tqx=out:csv&sheet=NomOnglet</code><br>
+          Le Sheet doit être <strong>public en lecture</strong>. Colonnes requises : <code style="font-size:10px">gencod</code>, <code style="font-size:10px">Libellé produit</code>, <code style="font-size:10px">Famille</code>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="af-add" onclick="syncCatalogue()" id="sync-btn" style="flex:1;padding:12px">
+            🔄 Synchroniser depuis Sheets
+          </button>
+          <button onclick="clearCatalogue()"
+            style="padding:12px 16px;border-radius:var(--rr);background:rgba(224,60,60,.1);
+                   border:1px solid rgba(224,60,60,.28);color:var(--r);font-size:13px;font-weight:800;
+                   cursor:pointer;font-family:var(--font)">
+            🗑 Vider
+          </button>
+        </div>
+        <div id="sync-status" style="margin-top:8px;font-size:12px;font-weight:700;min-height:16px"></div>
+      </div>
 
       <!-- Magasins -->
       <div class="adm-sec">
@@ -599,17 +681,31 @@ select.store-sel option{background:#0A6B47;color:#fff}
         </div>
       </div>
 
-      <!-- Utilisateurs -->
+      <!-- Gestion des accès utilisateurs -->
       <div class="adm-sec">
-        <div class="adm-t">👥 Utilisateurs</div>
+        <div class="adm-t">🔑 Gestion des accès</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:12px;line-height:1.7;background:rgba(0,0,0,.04);padding:8px 12px;border-radius:10px">
+          Hiérarchie : ⚡ Super Admin → 👔 Directeur → 📋 Responsable rayon → 👤 Agent → 👁 Lecture seule
+        </div>
         <div id="user-admin-list"></div>
-        <div class="addform">
-          <div class="af-row"><input class="af-in" id="au-nm" placeholder="Nom affiché"><input class="af-in" id="au-un" placeholder="identifiant" autocapitalize="none"></div>
-          <div class="af-row">
-            <input class="af-in" id="au-pw" type="password" placeholder="Mot de passe">
-            <select class="af-sel" id="au-rl"><option value="agent">Agent</option><option value="admin">Admin</option></select>
-            <button class="af-add" onclick="addUser()">+ Ajouter</button>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bdr)">
+          <div style="font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">➕ Ajouter un accès</div>
+          <div class="af-row" style="flex-wrap:wrap;gap:7px">
+            <input class="af-in" id="au-nm" placeholder="Prénom Nom" style="flex:1;min-width:120px">
+            <input class="af-in" id="au-un" placeholder="identifiant" autocapitalize="none" style="flex:1;min-width:100px">
           </div>
+          <div class="af-row" style="margin-top:7px;flex-wrap:wrap;gap:7px">
+            <input class="af-in" id="au-pw" type="password" placeholder="Mot de passe" style="flex:2;min-width:120px">
+            <select class="af-sel" id="au-rl" style="flex:1;min-width:130px">
+              <option value="agent">👤 Agent</option>
+              <option value="responsable">📋 Responsable rayon</option>
+              <option value="directeur">👔 Directeur</option>
+              <option value="lecture">👁 Lecture seule</option>
+              <option value="superadmin">⚡ Super Admin</option>
+            </select>
+          </div>
+          <input class="af-in" id="au-rayon" placeholder="Rayon / Service (optionnel — ex: Frais, Boulangerie)" style="width:100%;margin-top:7px">
+          <button class="af-add" onclick="addUser()" style="width:100%;padding:12px;margin-top:8px">➕ Créer l'accès</button>
         </div>
       </div>
 
@@ -624,16 +720,45 @@ select.store-sel option{background:#0A6B47;color:#fff}
         </div>
       </div>
 
-      <!-- Config N8N + Email -->
+      <!-- Config Magasin & Branding -->
       <div class="adm-sec">
-        <div class="adm-t">⚙️ Configuration</div>
-        <div class="rf-f"><div class="rf-l">URL Webhook N8N</div><input class="rf-i" id="adm-wh" style="font-size:12px"></div>
-        <div class="rf-f"><div class="rf-l">E-mail destinataire par défaut</div><input class="rf-i" id="adm-email" type="email"></div>
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 0">
-          <input type="checkbox" id="adm-popup" style="width:18px;height:18px;accent-color:var(--g)">
-          <span style="font-size:13px;font-weight:700;color:var(--txt)">Popup d'alertes au démarrage</span>
-        </label>
-        <button class="rfsave" onclick="saveConfig()" style="font-size:13px;padding:12px">💾 Sauvegarder</button>
+        <div class="adm-t">⚙️ Configuration magasin & système</div>
+
+        <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">🏪 Identité du magasin</div>
+
+        <div class="af-row" style="gap:7px;margin-bottom:7px">
+          <input class="af-in" id="adm-store-emoji" placeholder="🏪" style="width:60px;flex:none;text-align:center;font-size:20px" maxlength="4">
+          <input class="rf-i" id="adm-store-name" placeholder="Nom du magasin — ex: Carrefour Aubagne" style="flex:1">
+        </div>
+        <div class="af-row" style="gap:7px;margin-bottom:7px">
+          <input class="rf-i" id="adm-store-enseigne" placeholder="Enseigne — ex: Carrefour, Monoprix, Intermarché" style="flex:1">
+          <input class="rf-i" id="adm-store-region" placeholder="Région — ex: PACA" style="flex:1">
+        </div>
+        <div class="rf-f"><div class="rf-l">Ville</div><input class="rf-i" id="adm-store-ville" placeholder="Ex: Aubagne"></div>
+
+        <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:14px 0 8px">📧 E-mails alertes & rapports</div>
+        <div class="rf-f"><div class="rf-l">Responsable magasin</div><input class="rf-i" id="adm-email-resp" type="email" placeholder="responsable@enseigne.fr"></div>
+        <div class="rf-f"><div class="rf-l">Direction / Finances</div><input class="rf-i" id="adm-email-finance" type="email" placeholder="direction@bunga.corp"></div>
+
+        <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:14px 0 8px">🔗 Backend Google Apps Script</div>
+        <div class="rf-f">
+          <div class="rf-l">URL Web App GAS</div>
+          <input class="rf-i" id="adm-gas-url" style="font-size:11px" placeholder="https://script.google.com/macros/s/ID/exec">
+        </div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:12px;line-height:1.6;background:rgba(0,0,0,.04);padding:8px 12px;border-radius:10px">
+          💡 Google Apps Script → Déployer → Application Web → Accès : Tout le monde → Copier l'URL ici.
+        </div>
+        <div id="gas-test-status" style="font-size:12px;font-weight:700;margin-bottom:10px;min-height:16px"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="rfsave" onclick="saveConfig()" style="flex:2;font-size:13px;padding:12px">💾 Sauvegarder</button>
+          <button onclick="testGAS()" style="flex:1;padding:12px;border-radius:var(--rr);background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.28);color:#1E40AF;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font)">🔌 Tester</button>
+        </div>
+        <div style="margin-top:14px">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:6px 0">
+            <input type="checkbox" id="adm-popup" style="width:18px;height:18px;accent-color:var(--g)">
+            <span style="font-size:13px;font-weight:700;color:var(--txt)">Popup d'alertes au démarrage</span>
+          </label>
+        </div>
       </div>
 
       <!-- Session -->
@@ -685,33 +810,67 @@ select.store-sel option{background:#0A6B47;color:#fff}
 
 <script>
 /* ═══ DEFAULTS ══════════════════════════════════════════════════════════════ */
-const DEF_WEBHOOK = 'https://VOTRE-INSTANCE.app.n8n.cloud/webhook/scan-produit-magasin';
-const DEF_STORES = [
-  {id:'s1',name:'Monoprix Marseille Centre',address:'Rue Saint-Ferréol, Marseille',lat:43.2965,lng:5.3798,r:500},
-  {id:'s2',name:'Carrefour Aubagne',address:'Avenue des Paluds, Aubagne',lat:43.2964,lng:5.5728,r:600},
-  {id:'s3',name:'Intermarché La Ciotat',address:'Avenue Fernand Gassion, La Ciotat',lat:43.1765,lng:5.6051,r:600},
-];
-
 /* ═══ STATE — localStorage only for persistent data ════════════════════════ */
-let lang     = localStorage.getItem('fc_lang') || 'fr';
-let users    = JSON.parse(localStorage.getItem('fc_users') || 'null');
-let stores   = JSON.parse(localStorage.getItem('fc_stores') || 'null');
+let lang     = localStorage.getItem('fc_lang')     || 'fr';
+let users    = JSON.parse(localStorage.getItem('fc_users')    || 'null');
 let products = JSON.parse(localStorage.getItem('fc_products') || '[]');
-let archive  = JSON.parse(localStorage.getItem('fc_archive') || '[]');
+let archive  = JSON.parse(localStorage.getItem('fc_archive')  || '[]');
 let planning = JSON.parse(localStorage.getItem('fc_planning') || '{}');
-let webhook  = localStorage.getItem('fc_webhook') || DEF_WEBHOOK;
-let session  = null; // ONLY in sessionStorage — cleared on app close
+let session  = null;
 
-// Init defaults
-if(!users){ users=[{id:'u1',name:'Administrateur',username:'admin',password:'freshcontrol2024',role:'admin'},{id:'u2',name:'Agent 1',username:'agent1',password:'agent123',role:'agent'}]; save('fc_users',users); }
-if(!stores){ stores=DEF_STORES; save('fc_stores',stores); }
+// ── Config magasin (branding complet) ─────────────────────────────────────
+let storeName    = localStorage.getItem('fc_store_name')    || '';
+let storeEmoji   = localStorage.getItem('fc_store_emoji')   || '🏪';
+let storeEnseigne= localStorage.getItem('fc_store_enseigne')|| ''; // Ex: Carrefour, Intermarché…
+let storeRegion  = localStorage.getItem('fc_store_region')  || ''; // Ex: PACA, Île-de-France
+let storeVille   = localStorage.getItem('fc_store_ville')   || ''; // Ex: Aubagne
+
+// ── Config emails & backend ────────────────────────────────────────────────
+let gasUrl    = localStorage.getItem('fc_gas_url')     || '';
+let emailResp = localStorage.getItem('fc_email_resp')  || '';
+let emailFin  = localStorage.getItem('fc_email_fin')   || '';
+
+// stores = tableau réactif dérivé du magasin unique configuré
+function getStores(){ return storeName ? [{ id:'s0', name:storeName, address:storeVille, lat:0, lng:0, r:500 }] : []; }
+let stores   = getStores();
+let selStore = storeName ? { name: storeName } : null;
+const webhook = ''; // legacy
+
+/* ── HIÉRARCHIE GRANDE DISTRIBUTION ──────────────────────────────────────
+   superadmin      → Bunga.corp — accès total toutes enseignes
+   directeur       → Directeur de magasin — accès total son magasin
+   responsable     → Responsable de rayon — son rayon + scan + alertes
+   agent           → Agent terrain — scan + saisie DLC uniquement
+   lecture         → Direction régionale / finances — lecture seule + rapports
+─────────────────────────────────────────────────────────────────────────── */
+const ROLES = {
+  superadmin:  { label:'⚡ Super Admin',    color:'#7c3aed', badge:'SA', level:5, tabs:['dashboard','scanner','alertes','planning','admin'] },
+  directeur:   { label:'👔 Directeur',      color:'#064D30', badge:'DR', level:4, tabs:['dashboard','scanner','alertes','planning','admin'] },
+  responsable: { label:'📋 Responsable',    color:'#0A6B47', badge:'RR', level:3, tabs:['dashboard','scanner','alertes','planning'] },
+  agent:       { label:'👤 Agent',          color:'#1E40AF', badge:'AG', level:2, tabs:['scanner','dashboard'] },
+  lecture:     { label:'👁 Lecture seule',  color:'#92400E', badge:'LT', level:1, tabs:['dashboard','alertes'] },
+};
+function getRoleInfo(role){ return ROLES[role] || ROLES.agent; }
+function canAccess(tab){ return getRoleInfo(session?.role)?.tabs?.includes(tab) ?? false; }
+function isAdminRole(){ return ['superadmin','directeur'].includes(session?.role); }
+
+// Init défauts utilisateurs
+if(!users){
+  users=[
+    {id:'u1',name:'Administrateur',username:'admin',   password:'freshcontrol2024',role:'superadmin'},
+    {id:'u2',name:'Agent 1',       username:'agent1',  password:'agent123',        role:'agent'},
+  ];
+  save('fc_users',users);
+}
 
 function save(k,v){ localStorage.setItem(k,JSON.stringify(v)); }
 function genId(){ return Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6); }
 
 /* Emergency reset */
 if(new URLSearchParams(location.search).get('reset')==='1'){
-  ['fc_users','fc_stores','fc_products','fc_archive','fc_planning','fc_lang','fc_webhook'].forEach(k=>localStorage.removeItem(k));
+  ['fc_users','fc_products','fc_archive','fc_planning','fc_lang',
+   'fc_gas_url','fc_store_name','fc_store_emoji','fc_store_enseigne','fc_store_region','fc_store_ville',
+   'fc_email_resp','fc_email_fin','fc_catalogue'].forEach(k=>localStorage.removeItem(k));
   sessionStorage.clear();
   history.replaceState(null,'',location.pathname);
   location.reload();
@@ -829,8 +988,8 @@ function doLogout(){
   // Clear GPS watch so it restarts fresh on next login
   if(gpsWid!==null){navigator.geolocation.clearWatch(gpsWid);gpsWid=null}
   clearTimeout(gpsTimer);
-  gps=null; gpsStarted=false; selStore=null;
-  document.getElementById('gps-pill').style.display='none';
+  gps=null; selStore=storeName?{name:storeName}:null;
+  // GPS pill removed from scanner
   closeSB();
   document.getElementById('app').classList.remove('on');
   document.getElementById('splash').classList.remove('off');
@@ -839,141 +998,210 @@ function doLogout(){
 }
 
 /* ═══ APP LAUNCH ════════════════════════════════════════════════════════════ */
+function updateSplashBranding(){
+  const ico  = document.getElementById('sp-ico');
+  const name = document.getElementById('sp-enseigne-name');
+  const line = document.getElementById('sp-store-line');
+  if(ico)  ico.textContent  = storeEmoji || '🌿';
+  if(name) name.textContent = storeEnseigne ? `FreshControl · ${storeEnseigne}` : 'FreshControl';
+  if(line){
+    const parts = [storeName, storeVille, storeRegion].filter(Boolean);
+    line.textContent = parts.join(' · ');
+    line.style.display = parts.length ? 'block' : 'none';
+  }
+}
+
 function launchApp(){
   document.getElementById('splash').classList.add('off');
   document.getElementById('app').classList.add('on');
-  document.getElementById('sb-un').textContent=session.name;
-  document.getElementById('sb-rl').textContent=session.role==='admin'?'👑 Administrateur':'👤 Agent';
-  const isAdmin=session.role==='admin';
-  document.getElementById('tb-adm').style.display=isAdmin?'flex':'none';
-  document.getElementById('sb-adm').style.display=isAdmin?'flex':'none';
-  document.getElementById('adm-wh').value=webhook;
-  document.getElementById('adm-email').value=localStorage.getItem('fc_email')||'';
-  document.getElementById('adm-popup').checked=localStorage.getItem('fc_popup')!=='0';
-  document.getElementById('session-info').innerHTML=`<strong>${session.name}</strong> (${session.role})<br>🕐 ${new Date(session.loginTime).toLocaleString(lang)}`;
-  refreshStoreSel();
+
+  const role = session?.role || 'agent';
+  const ri   = getRoleInfo(role);
+
+  document.getElementById('sb-un').textContent = session.name;
+  const sbRl = document.getElementById('sb-rl');
+  if(sbRl) sbRl.innerHTML = `<span style="background:${ri.color}22;color:${ri.color};border-radius:100px;padding:2px 10px;font-size:11px;font-weight:900">${ri.label}</span>`;
+
+  // Onglets visibles selon rôle
+  const tbAdm = document.getElementById('tb-adm');
+  const sbAdm = document.getElementById('sb-adm');
+  if(tbAdm) tbAdm.style.display = isAdminRole() ? 'flex' : 'none';
+  if(sbAdm) sbAdm.style.display = isAdminRole() ? 'flex' : 'none';
+
+  // Charger config admin
+  const sn=document.getElementById('adm-store-name');    if(sn) sn.value=storeName;
+  const se=document.getElementById('adm-store-emoji');   if(se) se.value=storeEmoji;
+  const sei=document.getElementById('adm-store-enseigne');if(sei) sei.value=storeEnseigne;
+  const sv=document.getElementById('adm-store-ville');   if(sv) sv.value=storeVille;
+  const sr=document.getElementById('adm-store-region');  if(sr) sr.value=storeRegion;
+  const gr=document.getElementById('adm-email-resp');    if(gr) gr.value=emailResp;
+  const gf=document.getElementById('adm-email-finance'); if(gf) gf.value=emailFin;
+  const gu=document.getElementById('adm-gas-url');       if(gu) gu.value=gasUrl;
+  const ap=document.getElementById('adm-popup');         if(ap) ap.checked=localStorage.getItem('fc_popup')!=='0';
+  const si=document.getElementById('session-info');
+  if(si) si.innerHTML=`<strong>${session.name}</strong> · ${ri.label}<br>🕐 ${new Date(session.loginTime).toLocaleString(lang)}`;
+
+  document.getElementById('hdr-sub').textContent = [storeEnseigne, storeName].filter(Boolean).join(' · ') || 'FreshControl';
+
+  // Agent = direct scanner ; autres = dashboard
+  if(role === 'agent') showTab('scanner');
+  else showTab('dashboard');
+
+  showStoreBadge();
   renderDashboard();
   applyLang();
-  // RGPD à chaque démarrage
+  // RGPD à chaque session (charte BYOD obligatoire)
   document.getElementById('rgpd').classList.remove('off');
 }
 
+
 function rgpdYes(){
   document.getElementById('rgpd').classList.add('off');
-  // Show GPS loading immediately in header
-  document.getElementById('hdr-sub').textContent = T().gps_load;
-  document.getElementById('gps-pill').style.display = 'inline-flex';
-  showGPSLoading();
-  initGPS();
+  document.getElementById('hdr-sub').textContent = storeName || 'FreshControl';
   checkStartup();
 }
+
 function rgpdNo(){
+  // Refus charte BYOD = impossible d'utiliser l'app dans le cadre professionnel
   document.getElementById('rgpd').classList.add('off');
-  document.getElementById('gps-pill').style.display='inline-flex';
-  document.getElementById('gps-pill').classList.add('gps-err');
-  document.getElementById('gps-txt').textContent=T().gps_denied;
-  document.getElementById('gps-rbtn').style.display='inline';
-  document.getElementById('hdr-sub').textContent=T().gps_denied;
-  checkStartup();
+  document.getElementById('app').classList.remove('on');
+  document.getElementById('splash').classList.remove('off');
+  document.getElementById('li-p').value = '';
+  document.getElementById('l-err').style.color = '#ffaaaa';
+  document.getElementById('l-err').textContent = "L'acceptation de la charte est obligatoire pour utiliser l'application.";
+  session = null;
+  sessionStorage.removeItem('fc_session');
 }
 
-/* ═══ GPS — robuste iOS/Android ═════════════════════════════════════════════ */
-let gps=null, gpsWid=null, gpsTimer=null, gpsStarted=false;
-let selStore=null;
+/* ═══ GPS — robuste iOS/Android ═════════════════════════════════════════════
+   Stratégie : bouton "Localiser" déclenche le GPS sur geste utilisateur.
+   watchPosition seul (plus fiable que getCurrentPosition sur iOS).
+   Timeout 20s. Pas d'auto-démarrage silencieux.
+═══════════════════════════════════════════════════════════════════════════ */
+let gps=null, gpsWid=null, gpsTimer=null;
 
-function initGPS(){
-  if(!navigator.geolocation){setGPSErr(T().gps_err);return}
-  if(gpsStarted && gps) return; // already got a fix
-  gpsStarted=true;
-  showGPSLoading();
+function triggerGPS(){
+  if(!navigator.geolocation){
+    setGPSErr('GPS non disponible');
+    return;
+  }
+  // Annuler éventuellement le watch précédent
+  if(gpsWid!==null){ navigator.geolocation.clearWatch(gpsWid); gpsWid=null; }
   clearTimeout(gpsTimer);
-  gpsTimer=setTimeout(()=>{
-    if(!gps){
-      setGPSErr(T().gps_no_store+' (timeout)');
-      if(gpsWid!==null){navigator.geolocation.clearWatch(gpsWid);gpsWid=null}
+
+  showGPSLoading();
+  document.getElementById('gps-trigger-btn').textContent = '⏳';
+  document.getElementById('gps-trigger-btn').disabled    = true;
+
+  // watchPosition est plus fiable que getCurrentPosition sur iOS Safari
+  let firstFix = true;
+  gpsWid = navigator.geolocation.watchPosition(
+    pos => {
+      clearTimeout(gpsTimer);
+      document.getElementById('gps-trigger-btn').textContent = '📍 Localiser';
+      document.getElementById('gps-trigger-btn').disabled    = false;
+      onGPSOK(pos, firstFix);
+      firstFix = false;
+    },
+    err => {
+      if(!firstFix) return; // ignorer erreurs après premier fix
+      clearTimeout(gpsTimer);
+      document.getElementById('gps-trigger-btn').textContent = '📍 Localiser';
+      document.getElementById('gps-trigger-btn').disabled    = false;
+      onGPSFail(err);
+    },
+    {
+      enableHighAccuracy: false, // false = plus rapide et plus fiable sur iOS !
+      timeout:            20000,
+      maximumAge:         0,     // toujours une position fraîche
     }
-  },13000);
-  navigator.geolocation.getCurrentPosition(
-    pos=>{clearTimeout(gpsTimer);onGPSOK(pos)},
-    err=>{clearTimeout(gpsTimer);onGPSFail(err)},
-    {enableHighAccuracy:true,timeout:12000,maximumAge:30000}
   );
+
+  // Timeout de sécurité 20s
+  gpsTimer = setTimeout(()=>{
+    if(!gps){
+      if(gpsWid!==null){ navigator.geolocation.clearWatch(gpsWid); gpsWid=null; }
+      document.getElementById('gps-trigger-btn').textContent = '📍 Localiser';
+      document.getElementById('gps-trigger-btn').disabled    = false;
+      setGPSErr('GPS : délai dépassé — choisissez manuellement');
+    }
+  }, 21000);
+}
+
+// Appel auto discret (sans forcer, juste essayer)
+function initGPS(){
+  if(navigator.geolocation && !gps){
+    navigator.geolocation.getCurrentPosition(
+      pos => { if(!gps) onGPSOK(pos, true); },
+      ()  => { /* silencieux — l'utilisateur utilisera le bouton */ },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
+    );
+  }
 }
 
 function showGPSLoading(){
   const p=document.getElementById('gps-pill');
-  p.style.display='inline-flex'; p.classList.remove('gps-err');
-  document.getElementById('gps-txt').textContent=T().gps_load;
-  document.getElementById('gps-rbtn').style.display='none';
+  if(!p) return;
+  if(p){ p.style.display='inline-flex'; p.classList.remove('gps-err'); }
+  const gt=document.getElementById('gps-txt');
+  if(gt) gt.textContent='📡 Localisation…';
+  const dot=document.getElementById('gps-dot');
+  if(dot) dot.style.animation='pulse 1.2s ease-in-out infinite';
 }
 
-function onGPSOK(pos){
-  gps={lat:pos.coords.latitude,lng:pos.coords.longitude,acc:Math.round(pos.coords.accuracy)};
-  const found=findNearestStore(gps.lat,gps.lng);
-  const p=document.getElementById('gps-pill');
-  p.style.display='inline-flex';
-  p.classList.remove('gps-err');
-  document.getElementById('gps-rbtn').style.display='none';
-  if(found){
-    document.getElementById('gps-txt').textContent='📍 '+found.name;
-    document.getElementById('hdr-sub').textContent=found.name;
-    selStore=found;
-    const sel=document.getElementById('store-sel');
-    if(sel) sel.value=found.id;
-    const rfm=document.getElementById('rf-mag');
-    if(rfm) rfm.value=found.name;
-  } else {
-    // GPS works but no store registered in range → show coords, invite manual select
-    const coords=`${gps.lat.toFixed(4)}, ${gps.lng.toFixed(4)}`;
-    document.getElementById('gps-txt').textContent='📍 '+coords+(gps.acc?` ±${gps.acc}m`:'');
-    document.getElementById('hdr-sub').textContent=T().gps_no_store;
-    // Flash store dropdown orange to invite selection
-    const sel=document.getElementById('store-sel');
-    if(sel){sel.style.borderColor='rgba(245,158,11,.9)';sel.style.borderWidth='2px';
-            setTimeout(()=>{sel.style.borderColor='';sel.style.borderWidth=''},3500)}
-  }
-  // Silent watchPosition — auto-updates store as user walks in
-  if(gpsWid===null){
-    gpsWid=navigator.geolocation.watchPosition(pos2=>{
-      gps={lat:pos2.coords.latitude,lng:pos2.coords.longitude,acc:Math.round(pos2.coords.accuracy)};
-      const f=findNearestStore(gps.lat,gps.lng);
-      if(f&&(!selStore||f.id!==selStore.id)){
-        document.getElementById('gps-txt').textContent='📍 '+f.name;
-        document.getElementById('hdr-sub').textContent=f.name;
-        selStore=f;
-        const s=document.getElementById('store-sel');
-        if(s) s.value=f.id;
-        const rfm=document.getElementById('rf-mag');
-        if(rfm) rfm.value=f.name;
-        toast('🏪 '+f.name+' détecté');
-      }
-    },()=>{},{enableHighAccuracy:true,timeout:15000,maximumAge:90000});
+function onGPSOK(pos, updateStore=true){
+  gps={lat:pos.coords.latitude, lng:pos.coords.longitude, acc:Math.round(pos.coords.accuracy||0)};
+  const found = findNearestStore(gps.lat, gps.lng);
+  const pill  = document.getElementById('gps-pill');
+  if(!pill) return;
+  if(pill){ pill.style.display='inline-flex'; pill.classList.remove('gps-err'); }
+  const dot = document.getElementById('gps-dot');
+  if(dot) dot.style.animation='';
+
+  if(found && updateStore){
+    document.getElementById('gps-txt').textContent = '📍 '+found.name;
+    document.getElementById('hdr-sub').textContent = found.name;
+    selStore = found;
+    const sel = document.getElementById('store-sel');
+    if(sel && sel.value !== found.id){ sel.value = found.id; }
+    const rfm = document.getElementById('rf-mag');
+    if(rfm && !rfm.value) rfm.value = found.name;
+  } else if(!found){
+    const acc  = gps.acc ? ` ±${gps.acc}m` : '';
+    document.getElementById('gps-txt').textContent = `📍 ${gps.lat.toFixed(4)}, ${gps.lng.toFixed(4)}${acc}`;
+    document.getElementById('hdr-sub').textContent = T().gps_no_store;
+    if(updateStore){
+      // Clignoter le sélecteur
+      const sel = document.getElementById('store-sel');
+      if(sel){ sel.style.outline='2px solid rgba(245,158,11,.8)';
+               setTimeout(()=>sel.style.outline='',3000); }
+    }
   }
 }
 
 function onGPSFail(err){
-  if(err.code===1) setGPSErr(T().gps_denied);
-  else setGPSErr(T().gps_err);
-  // iOS hint
-  if(/iphone|ipad/i.test(navigator.userAgent) && err.code===1)
-    setTimeout(()=>toast('Activez Localisation dans Réglages → Safari'),600);
+  const msg = err.code===1
+    ? T().gps_denied
+    : (err.code===2 ? 'GPS indisponible' : 'Délai GPS dépassé');
+  setGPSErr(msg);
+  if(err.code===1 && /iphone|ipad|ipod/i.test(navigator.userAgent)){
+    setTimeout(()=>toast('iOS : Réglages → Safari → Localisation → Autoriser'),700);
+  }
 }
 
 function setGPSErr(msg){
   const p=document.getElementById('gps-pill');
-  p.style.display='inline-flex'; p.classList.add('gps-err');
-  document.getElementById('gps-txt').textContent=msg;
-  document.getElementById('gps-rbtn').style.display='inline';
-  document.getElementById('hdr-sub').textContent=T().gps_no_store;
+  if(!p) return;
+  if(p){ p.style.display='inline-flex'; p.classList.add('gps-err'); }
+  const gt=document.getElementById('gps-txt');
+  if(gt) gt.textContent = msg;
+  document.getElementById('hdr-sub').textContent = T().gps_no_store;
 }
 
-function retryGPS(){
-  if(gpsWid!==null){navigator.geolocation.clearWatch(gpsWid);gpsWid=null}
-  gps=null; initGPS();
-}
+function retryGPS(){ triggerGPS(); }
 
 function findNearestStore(lat,lng){
-  for(const s of stores){
+  for(const s of getStores()){
     const d=dist(lat,lng,s.lat,s.lng);
     if(d<(s.r||500)) return s;
   }
@@ -995,24 +1223,7 @@ function showTab(n){
   if(b) b.classList.add('on');
   curTab=n;
   if(n==='scanner'){
-    const pill=document.getElementById('gps-pill');
-    pill.style.display='inline-flex';
-    // If GPS not yet started and consent was given, start it
-    if(!gps && !pill.classList.contains('gps-err')){
-      showGPSLoading();
-      if(navigator.geolocation && !gpsTimer){
-        clearTimeout(gpsTimer);
-        gpsTimer=setTimeout(()=>{
-          if(!gps) setGPSErr(T().gps_no_store);
-        },12000);
-        navigator.geolocation.getCurrentPosition(
-          pos=>{clearTimeout(gpsTimer);onGPSOK(pos)},
-          err=>{clearTimeout(gpsTimer);onGPSFail(err)},
-          {enableHighAccuracy:true,timeout:11000,maximumAge:60000}
-        );
-      }
-    }
-    refreshStoreSel();
+    showStoreBadge();
   }
   if(n==='alertes') renderAlertes();
   if(n==='planning') renderPlanning();
@@ -1031,33 +1242,25 @@ function closeSB(){ document.getElementById('sb').classList.remove('on'); }
 
 /* ═══ STORE SELECTOR ════════════════════════════════════════════════════════ */
 function refreshStoreSel(){
-  const sel=document.getElementById('store-sel');
-  if(!sel) return;
-  const cur=sel.value;
-  sel.innerHTML='<option value="">— Sélectionner —</option>';
-  stores.forEach(s=>{
-    const o=document.createElement('option');
-    o.value=s.id; o.textContent=s.name;
-    if(s.id===cur) o.selected=true;
-    sel.appendChild(o);
-  });
+  // Mode mono-magasin : pas de dropdown à remplir
   fillStoreDL();
 }
 function fillStoreDL(){
+  const opt = storeName ? `<option value="${storeName}">` : '';
   ['store-list-dl','store-list-dl2'].forEach(id=>{
     const dl=document.getElementById(id);
-    if(!dl) return;
-    dl.innerHTML=stores.map(s=>`<option value="${s.name}">`).join('');
+    if(dl) dl.innerHTML=opt;
   });
 }
 function onStoreSel(id){
-  const s=stores.find(x=>x.id===id);
+  const s=getStores().find(x=>x.id===id);
   selStore=s||null;
   const rfm=document.getElementById('rf-mag');
   if(rfm) rfm.value=s?s.name:'';
   if(s){
     document.getElementById('hdr-sub').textContent=s.name;
     const p=document.getElementById('gps-pill');
+  if(!p) return;
     p.classList.remove('gps-err');
     document.getElementById('gps-txt').textContent='🏪 '+s.name;
     document.getElementById('gps-rbtn').style.display='none';
@@ -1066,7 +1269,7 @@ function onStoreSel(id){
 // Store search modal
 function filterSSM(q){
   const list=document.getElementById('ssm-list');
-  const res=stores.filter(s=>!q||s.name.toLowerCase().includes(q.toLowerCase())||(s.address||'').toLowerCase().includes(q.toLowerCase()));
+  const res=getStores().filter(s=>!q||s.name.toLowerCase().includes(q.toLowerCase())||(s.address||'').toLowerCase().includes(q.toLowerCase()));
   if(!res.length){list.innerHTML='<div class="empty">Aucun magasin</div>';return}
   list.innerHTML=res.map(s=>`<div class="ssm-it" onclick="pickStore('${s.id}')">
     <div style="font-size:13px;font-weight:800">${s.name}</div>
@@ -1192,158 +1395,286 @@ function confirmDeleteProd(id){
   });
 }
 
+/* ═══ BACKEND GAS ════════════════════════════════════════════════════════════
+   Toutes les communications vers Google Apps Script passent par sendToGAS.
+   Utilise no-cors → pas de réponse lisible, mais la requête passe bien.
+   Pour lire des réponses (ex: rapport), utiliser action via doGet.
+═══════════════════════════════════════════════════════════════════════════ */
+async function sendToGAS(action, data){
+  if(!gasUrl) return;
+  try{
+    await fetch(gasUrl, {
+      method: 'POST',
+      mode:   'no-cors', // Google Apps Script nécessite no-cors depuis le navigateur
+      headers:{ 'Content-Type': 'application/json' },
+      body:   JSON.stringify({ action, ...data }),
+    });
+  } catch(e){
+    console.warn('[GAS] Envoi échoué:', e);
+  }
+}
+
 function saveAddProduct(){
   const name=document.getElementById('ap-name').value.trim();
   const dlc=document.getElementById('ap-dlc').value;
   if(!name||!dlc){toast(T().fill_all);return}
   const p={
-    id:Date.now(),name,
+    id:Date.now(), name,
     gencod:document.getElementById('ap-gencod').value.trim(),
     type:document.getElementById('ap-type').value.trim(),
     dlc,
-    magasin:document.getElementById('ap-mag').value.trim()||selStore?.name||'',
-    scannedAt:new Date().toISOString(),scannedBy:session?.username||'?'
+    magasin: selStore?.name || storeName || '',
+    scannedAt:new Date().toISOString(), scannedBy:session?.username||'?'
   };
   products.unshift(p);save('fc_products',products);
   closeModal('add-product-modal');renderDashboard();toast(T().saved);
-  ['ap-name','ap-gencod','ap-type','ap-dlc','ap-mag'].forEach(id=>document.getElementById(id).value='');
+  ['ap-name','ap-gencod','ap-type','ap-dlc'].forEach(id=>document.getElementById(id).value='');
+  if(gasUrl) sendToGAS('save_scan',{...p,statut:statusOf(p.dlc)==='e'?'perime':'ok',email_resp:emailResp,email_finance:emailFin});
 }
 
-/* ═══ SCAN ═══════════════════════════════════════════════════════════════════
-   Flux : Photo → FormData POST → N8N Webhook → Gemini (gencod) →
-          Google Sheets catalogue → Respond to Webhook → handleScanResult
-   N8N doit être en mode "Using Respond to Webhook node" (pas "Immediately")
-   La réponse attendue : {found:true, produit:"...", gencod:"...", type_produit:"..."}
-   ou {found:false}
+/* ═══ CATALOGUE LOCAL ════════════════════════════════════════════════════════
+   Stocké en localStorage (fc_catalogue).
+   Structure : [{gencod, nom, famille, marque}, ...]
+   Synchro depuis Admin → URL CSV Google Sheets public.
 ═══════════════════════════════════════════════════════════════════════════ */
-document.getElementById('scan-in').addEventListener('change', async function(e){
-  const file = e.target.files[0];
-  if(!file) return;
-  e.target.value = '';
+let catalogue = JSON.parse(localStorage.getItem('fc_catalogue') || '[]');
 
-  // Reset UI
-  document.getElementById('scan-res').style.display  = 'none';
-  document.getElementById('nf-card').style.display   = 'none';
-  document.getElementById('scan-st').innerHTML =
-    `<span class="spin"></span> ${T().scanning}`;
+function saveCatalogue(){ localStorage.setItem('fc_catalogue', JSON.stringify(catalogue)); }
 
-  // Build FormData — image + contexte GPS/magasin/user
-  const payload = new FormData();
-  payload.append('image', file, file.name || 'scan.jpg');
-  // Pas de champ "action" — la branche scan est la branche par défaut dans N8N
-  if(gps){
-    payload.append('lat', gps.lat);
-    payload.append('lng', gps.lng);
+function lookupGencod(ean){
+  const clean = String(ean).replace(/\s/g,'');
+  return catalogue.find(p => String(p.gencod||'').replace(/\s/g,'') === clean) || null;
+}
+
+function renderCatalogueStats(){
+  const el = document.getElementById('catalogue-stats');
+  if(!el) return;
+  if(!catalogue.length){
+    el.textContent = 'Aucun produit — synchronisez depuis Google Sheets'; el.style.color='var(--r)';
+  } else {
+    const marques=[...new Set(catalogue.map(p=>p.marque||'—'))];
+    el.textContent=`${catalogue.length} produits · ${marques.length} marque(s) : ${marques.join(', ')}`;
+    el.style.color='var(--muted)';
   }
-  if(selStore){
-    payload.append('magasin', selStore.name);
-    payload.append('store_id', selStore.id);
+  const inp=document.getElementById('adm-sheet-url');
+  if(inp) inp.value=localStorage.getItem('fc_sheet_url')||'';
+}
+
+async function syncCatalogue(){
+  const url=document.getElementById('adm-sheet-url').value.trim();
+  if(!url){toast('❌ Entrez l\'URL du Google Sheet');return;}
+  localStorage.setItem('fc_sheet_url',url);
+  const btn=document.getElementById('sync-btn');
+  const st=document.getElementById('sync-status');
+  btn.textContent='⏳ Synchronisation…';btn.disabled=true;st.textContent='';
+  try{
+    const urls=url.split('|').map(u=>u.trim()).filter(Boolean);
+    catalogue=[];let total=0;
+    for(const u of urls){
+      const m=u.match(/[?&]sheet=([^&]+)/);
+      const marque=m?decodeURIComponent(m[1]):'Catalogue';
+      const res=await fetch(u);
+      if(!res.ok) throw new Error(`HTTP ${res.status} pour ${marque}`);
+      const csv=await res.text();
+      const rows=parseCSVSimple(csv);
+      if(rows.length<2) continue;
+      const headers=rows[0].map(h=>h.toLowerCase().replace(/["\s]/g,''));
+      const gi=headers.findIndex(h=>h.includes('gencod')||h.includes('ean')||h.includes('code'));
+      const ni=headers.findIndex(h=>h.includes('libell')||h.includes('nom')||h.includes('produit'));
+      const fi=headers.findIndex(h=>h.includes('famille')||h.includes('type')||h.includes('rayon'));
+      if(gi<0){st.textContent=`❌ ${marque} : colonne "gencod" introuvable`;continue;}
+      for(let i=1;i<rows.length;i++){
+        const row=rows[i];
+        const gc=(row[gi]||'').replace(/["\s']/g,'');
+        if(!gc) continue;
+        catalogue.push({
+          gencod:gc,
+          nom:(ni>=0?row[ni]:'').replace(/^"|"$/g,'').trim(),
+          famille:(fi>=0?row[fi]:'').replace(/^"|"$/g,'').trim(),
+          marque,
+        });
+        total++;
+      }
+    }
+    saveCatalogue();
+    st.textContent=`✅ ${total} produits importés`;st.style.color='var(--gd)';
+    renderCatalogueStats();toast(`✅ Catalogue : ${total} produits`);
+  }catch(e){
+    st.textContent=`❌ ${e.message}`;st.style.color='var(--r)';
+    toast('❌ Erreur synchro');console.error(e);
+  }finally{btn.textContent='🔄 Synchroniser depuis Sheets';btn.disabled=false;}
+}
+
+function clearCatalogue(){
+  showConfirm('Vider le catalogue ?','Tous les produits locaux seront supprimés.',()=>{
+    catalogue=[];saveCatalogue();renderCatalogueStats();toast('🗑 Catalogue vidé');
+  });
+}
+
+function parseCSVSimple(text){
+  const rows=[];
+  for(const line of text.split('\n')){
+    if(!line.trim()) continue;
+    const row=[];let q=false,cell='';
+    for(const c of line){
+      if(c==='"') q=!q;
+      else if(c===','&&!q){row.push(cell.trim());cell='';}
+      else cell+=c;
+    }
+    row.push(cell.trim());
+    rows.push(row);
   }
-  if(session) payload.append('user', session.username);
+  return rows;
+}
 
-  let rawText = '';
-  try {
-    const res = await fetch(webhook, { method:'POST', body: payload });
-    rawText = await res.text();          // toujours lire le texte brut d'abord
+/* ═══ SCAN — ZXing (lecture code-barres 100% navigateur, 0 API, 0 serveur) ══
+   Photo 1 : ZXing lit le gencod EAN → lookup catalogue local.
+   Photo 2 : étiquette produit (si hors catalogue) → Claude Vision optionnel.
+═══════════════════════════════════════════════════════════════════════════ */
+let zxingReader=null;
+let currentEAN=null;
 
-    // Essayer de parser en JSON
-    let data;
-    try { data = JSON.parse(rawText); }
-    catch(_){ data = null; }
-
-    document.getElementById('scan-st').textContent = '';
-
-    if(!data){
-      // N8N a répondu autre chose que du JSON — webhook mal configuré
-      showScanError('N8N a répondu du texte non-JSON. Vérifiez le node "Respond to Webhook".', rawText);
-      return;
+function getZXing(){
+  if(zxingReader) return zxingReader;
+  if(window._zxingFailed) return null;
+  try{
+    if(typeof ZXing !== 'undefined' && ZXing.BrowserMultiFormatReader){
+      zxingReader = new ZXing.BrowserMultiFormatReader();
+      return zxingReader;
     }
+  } catch(e){ console.warn('ZXing init error:',e); }
+  return null;
+}
 
-    // N8N en mode "Immediately" → {"message":"Workflow was started"}
-    if(data.message === 'Workflow was started' || data.message === 'Workflow was started.'){
-      showScanError(
-        'N8N répond immédiatement sans attendre Gemini.\n' +
-        'Ouvrez le node Webhook → Parameters → Respond → sélectionnez "Using Respond to Webhook node".',
-        rawText
-      );
-      return;
+// Photo 1 — code-barres
+document.getElementById('scan-in-ean').addEventListener('change',async function(e){
+  const file=e.target.files[0];if(!file)return;
+  e.target.value='';
+  const st=document.getElementById('scan-st');
+  st.innerHTML=`<span class="spin"></span> Lecture du code-barres…`;
+  currentEAN=null;
+  const reader=getZXing();
+  if(!reader){
+    st.innerHTML=`<div style="color:var(--o);font-weight:800;margin-bottom:6px">⚠️ Lecteur barcode non disponible</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Vérifiez votre connexion internet et rechargez la page, ou utilisez la saisie manuelle.</div>
+      <button onclick="openModal('add-product-modal');fillStoreDL()"
+        style="padding:9px 18px;border-radius:var(--rr);border:none;background:rgba(59,130,246,.85);
+               color:#fff;font-size:12px;font-weight:900;cursor:pointer;font-family:var(--font)">
+        ✏️ Saisie manuelle</button>`;
+    return;
+  }
+  const imgUrl=URL.createObjectURL(file);
+  const img=document.createElement('img');img.src=imgUrl;
+  try{
+    await new Promise(ok=>{img.onload=ok;img.onerror=ok;});
+    const result=await reader.decodeFromImageElement(img);
+    URL.revokeObjectURL(imgUrl);
+    const ean=result.getText().replace(/\s/g,'');
+    currentEAN=ean;
+    st.textContent='';
+    const produit=lookupGencod(ean);
+    if(produit){
+      handleScanResult({found:true,produit:produit.nom,gencod:produit.gencod,type_produit:produit.famille,marque:produit.marque});
+    } else {
+      document.getElementById('scan-ean-found').textContent=`Gencod lu : ${ean} — absent du catalogue`;
+      document.getElementById('scan-step1').style.display='none';
+      document.getElementById('scan-step2').style.display='block';
+      const apGc=document.getElementById('ap-gencod');if(apGc) apGc.value=ean;
     }
-
-    handleScanResult(data);
-
-  } catch(err) {
-    console.error('[Scan] Erreur fetch:', err, '| Raw:', rawText);
-    document.getElementById('scan-st').innerHTML =
-      `<div style="color:var(--r);font-size:12px;font-weight:700;margin-bottom:6px">${T().scan_err}</div>
-       <div style="color:var(--muted);font-size:10px;font-weight:600;margin-bottom:8px">Vérifiez la connexion et l'URL N8N</div>
-       <button onclick="document.getElementById('scan-in').click()"
-         style="padding:8px 16px;border-radius:var(--rr);border:none;background:rgba(224,60,60,.85);
-                color:#fff;font-size:12px;font-weight:900;cursor:pointer;font-family:var(--font)">
-         🔄 Réessayer</button>`;
+  }catch(err){
+    URL.revokeObjectURL(imgUrl);
+    if(err.name==='NotFoundException'){
+      st.innerHTML=`<div style="color:var(--o);font-weight:800">⚠️ Code-barres non détecté</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Cadrez bien le code-barres, bon éclairage, photo nette.</div>
+        <button onclick="document.getElementById('scan-in-ean').click()"
+          style="margin-top:8px;padding:7px 16px;border-radius:var(--rr);border:none;
+                 background:rgba(18,168,118,.82);color:#fff;font-size:12px;font-weight:900;
+                 cursor:pointer;font-family:var(--font)">🔄 Réessayer</button>`;
+    } else {
+      st.innerHTML=`<span style="color:var(--r)">❌ ${err.message}</span>`;
+    }
   }
 });
 
-function handleScanResult(data){
-  /* Normalise les différents formats de réponse N8N :
-     Format A : {found:true, produit:"Yaourt", gencod:"32891...", type_produit:"Laitier"}
-     Format B : {found:true, name:"Yaourt", gencod:"...", type:"Laitier"}
-     Format C : tableau → prendre le premier élément
-     Format D : {found:false} ou {found:false, message:"..."} → produit absent du catalogue
-  */
-  // Si N8N retourne un tableau, prendre le premier item
-  if(Array.isArray(data)) data = data[0] || {};
-
-  // Extraire les champs (supporte plusieurs noms de champs)
-  const prodNom  = data.produit || data.name || data.produit_nom || data.nom || '';
-  const gencod   = data.gencod  || data.ean  || data.barcode     || '';
-  const typeProd = data.type_produit || data.type || data.rayon  || '';
-  const found    = data.found !== false && prodNom.length > 0;
-
-  if(!found){
-    // Log pour debug si besoin
-    console.warn('[handleScanResult] Produit non trouvé. Réponse N8N:', data);
-    document.getElementById('nf-card').style.display = 'block';
-    return;
+// Photo 2 — étiquette produit (hors catalogue)
+document.getElementById('scan-in-prod').addEventListener('change',async function(e){
+  const file=e.target.files[0];if(!file)return;
+  e.target.value='';
+  const st=document.getElementById('scan-st2');
+  st.innerHTML=`<span class="spin"></span> Lecture de l'étiquette…`;
+  try{
+    const base64=await fileToBase64(file);
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:100,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:file.type||'image/jpeg',data:base64}},
+          {type:'text',text:"Lis uniquement le nom du produit sur cet emballage alimentaire. Réponds UNIQUEMENT avec le nom, sans phrase. Ex: 'Yaourt nature bio'"}
+        ]}]})
+    });
+    const data=await res.json();
+    const nom=(data.content?.[0]?.text||'').trim();
+    st.textContent='';
+    if(nom) handleScanResult({found:true,produit:nom,gencod:currentEAN||'',type_produit:'',marque:'Hors catalogue'});
+    else skipPhoto2();
+  }catch(e){
+    st.textContent='';console.warn('Vision:',e);skipPhoto2();
   }
+});
 
-  // Remplir le formulaire
-  document.getElementById('rf-pn').textContent    = prodNom;
-  document.getElementById('rf-gc').value          = gencod;
-  document.getElementById('rf-ty').value          = typeProd;
-  document.getElementById('rf-dlc').value         = '';           // DLC toujours saisie manuelle
-  document.getElementById('rf-mag').value         = selStore?.name || '';
-  document.getElementById('scan-res').style.display = 'block';
+function skipPhoto2(){
+  document.getElementById('scan-step2').style.display='none';
+  document.getElementById('scan-step1').style.display='block';
+  const mag=document.getElementById('ap-mag');
+  if(mag&&selStore) mag.value=selStore.name;
+  fillStoreDL();openModal('add-product-modal');
 }
 
-function showScanError(msg, raw){
-  const isAdmin = session?.role === 'admin';
-  document.getElementById('scan-st').innerHTML =
-    `<div style="background:rgba(224,60,60,.12);border:1px solid rgba(224,60,60,.28);border-radius:12px;padding:12px;text-align:left">
-       <div style="font-size:12px;font-weight:900;color:var(--r);margin-bottom:6px">❌ Problème N8N</div>
-       <div style="font-size:11px;color:var(--muted);font-weight:600;white-space:pre-wrap">${msg}</div>
-       ${isAdmin && raw ? `<details style="margin-top:8px"><summary style="font-size:10px;color:var(--muted);cursor:pointer;font-weight:700">Réponse brute N8N</summary>
-         <div style="font-family:monospace;font-size:10px;color:var(--muted);margin-top:4px;word-break:break-all">${raw.slice(0,400)}</div>
-       </details>` : ''}
-       <button onclick="document.getElementById('scan-in').click()"
-         style="display:block;margin-top:10px;width:100%;padding:9px;border-radius:var(--rr);border:none;
-                background:rgba(224,60,60,.85);color:#fff;font-size:12px;font-weight:900;cursor:pointer;font-family:var(--font)">
-         🔄 Réessayer</button>
-     </div>`;
+async function fileToBase64(file){
+  return new Promise((ok,ko)=>{const r=new FileReader();r.onload=()=>ok(r.result.split(',')[1]);r.onerror=ko;r.readAsDataURL(file);});
+}
+
+function handleScanResult(data){
+  const prodNom=data.produit||data.name||'';
+  const gencod=data.gencod||'';
+  const typeProd=data.type_produit||'';
+  const marque=data.marque||'';
+  if(data.found!==true||!prodNom){
+    const apGc=document.getElementById('ap-gencod');if(apGc&&gencod) apGc.value=gencod;
+    document.getElementById('nf-card').style.display='block';
+    document.getElementById('scan-step1').style.display='none';
+    document.getElementById('scan-step2').style.display='none';
+    return;
+  }
+  document.getElementById('scan-step1').style.display='none';
+  document.getElementById('scan-step2').style.display='none';
+  document.getElementById('rf-pn').textContent=prodNom;
+  document.getElementById('rf-gc').value=gencod;
+  document.getElementById('rf-ty').value=typeProd+(marque?` · ${marque}`:'');
+  document.getElementById('rf-dlc').value='';
+  document.getElementById('rf-mag').value=selStore?.name||'';
+  document.getElementById('scan-res').style.display='block';
+}
+
+function showScanError(msg){
+  document.getElementById('scan-st').innerHTML=`<div style="color:var(--r);font-size:12px;font-weight:800">${msg}</div>`;
 }
 
 function resetScan(){
-  document.getElementById('scan-res').style.display  = 'none';
-  document.getElementById('nf-card').style.display   = 'none';
-  document.getElementById('scan-st').textContent     = '';
+  document.getElementById('scan-res').style.display='none';
+  document.getElementById('nf-card').style.display='none';
+  document.getElementById('scan-step2').style.display='none';
+  document.getElementById('scan-step1').style.display='block';
+  document.getElementById('scan-st').textContent='';
+  currentEAN=null;
 }
 
-// Called from "Saisir manuellement" button on nf-card — pre-fills magasin
 function openManualFromScan(){
   resetScan();
   const mag=document.getElementById('ap-mag');
-  if(mag && selStore) mag.value=selStore.name;
-  fillStoreDL();
-  openModal('add-product-modal');
+  if(mag&&selStore) mag.value=selStore.name;
+  fillStoreDL();openModal('add-product-modal');
 }
 
 /* ═══ STORES MODAL (sidebar ☰ → Gestion des magasins) ═══════════════════════ */
@@ -1355,11 +1686,11 @@ function openStoresModal(){
 
 function renderStoresModal(){
   const el=document.getElementById('stores-modal-list');
-  if(!stores.length){
+  if(!getStores().length){
     el.innerHTML='<div style="font-size:13px;color:var(--muted);padding:6px 0;font-weight:600;text-align:center">Aucun magasin — ajoutez-en un ci-dessous</div>';
     return;
   }
-  el.innerHTML=stores.map(s=>`
+  el.innerHTML=getStores().map(s=>`
     <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid rgba(0,0,0,.05)">
       <div style="font-size:26px;flex-shrink:0;margin-top:3px">🏪</div>
       <div style="flex:1;min-width:0">
@@ -1374,10 +1705,11 @@ function renderStoresModal(){
 }
 
 function confirmDeleteStoreModal(id){
-  const s=stores.find(x=>x.id===id);if(!s)return;
+  const s=getStores().find(x=>x.id===id);if(!s)return;
   showConfirm(`Supprimer "${s.name}" ?`,'Les produits déjà scannés gardent le nom du magasin.',()=>{
-    stores=stores.filter(x=>x.id!==id);
-    save('fc_stores',stores);
+    storeName=''; selStore=null; stores=getStores(); localStorage.setItem('fc_store_name','');
+    // stores is derived from storeName — no direct save needed
+
     if(selStore?.id===id) selStore=null;
     refreshStoreSel(); renderStoresModal(); renderAdmin();
     toast(T().deleted);
@@ -1421,8 +1753,9 @@ function addStoreFromModal(){
   const r=parseInt(document.getElementById('sm-rad').value)||500;
   if(!name){toast('❌ Nom obligatoire');return}
   if(isNaN(lat)||isNaN(lng)){toast('❌ Lat/Lng requis — utilisez 🔍 Trouver ou saisissez manuellement');return}
-  stores.push({id:genId(),name,address:addr,lat,lng,r});
-  save('fc_stores',stores);
+  // Single store: set storeName from form
+    // stores is derived from storeName — no direct save needed
+
   refreshStoreSel();
   ['sm-name','sm-addr','sm-lat','sm-lng'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('sm-rad').value='500';
@@ -1432,12 +1765,38 @@ function addStoreFromModal(){
 }
 
 function saveProduct(){
-  const dlc=document.getElementById('rf-dlc').value;
-  const mag=document.getElementById('rf-mag').value.trim()||selStore?.name||'';
-  if(!dlc){toast(T().fill_all);return}
-  const p={id:Date.now(),name:document.getElementById('rf-pn').textContent,gencod:document.getElementById('rf-gc').value,type:document.getElementById('rf-ty').value,dlc,magasin:mag,scannedAt:new Date().toISOString(),scannedBy:session?.username||'?',lat:gps?.lat,lng:gps?.lng};
-  products.unshift(p);save('fc_products',products);
-  resetScan();toast(T().saved);renderDashboard();
+  const dlc  = document.getElementById('rf-dlc').value;
+  if(!dlc){ toast(T().fill_all); return; }
+
+  const p = {
+    id:         Date.now(),
+    name:       document.getElementById('rf-pn').textContent,
+    gencod:     document.getElementById('rf-gc').value,
+    type:       document.getElementById('rf-ty').value,
+    dlc,
+    magasin:    selStore?.name || storeName || '',
+    scannedAt:  new Date().toISOString(),
+    scannedBy:  session?.username || '?',
+    lat:        gps?.lat || null,
+    lng:        gps?.lng || null,
+  };
+
+  products.unshift(p);
+  save('fc_products', products);
+  resetScan();
+  toast(T().saved);
+  renderDashboard();
+
+  // Envoyer au backend GAS (alerte si périmé + enregistrement)
+  if(gasUrl){
+    const statut = statusOf(p.dlc) === 'e' ? 'perime' : 'ok';
+    sendToGAS('save_scan', {
+      ...p,
+      statut,
+      email_resp:    emailResp,
+      email_finance: emailFin,
+    });
+  }
 }
 
 /* ═══ ALERTES ════════════════════════════════════════════════════════════════ */
@@ -1483,41 +1842,65 @@ function togglePlan(store,idx){
 
 /* ═══ ADMIN ══════════════════════════════════════════════════════════════════ */
 function renderAdmin(){
-  renderStoreAdmin();renderUserAdmin();
+  renderCatalogueStats();
+  renderStoreAdmin();
+  renderUserAdmin();
   document.querySelectorAll('.lsb').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll(`[onclick*="setLang('${lang}')"]`).forEach(b=>b.classList.add('on'));
-  document.getElementById('adm-wh').value=webhook;
-  document.getElementById('adm-email').value=localStorage.getItem('fc_email')||'';
-  document.getElementById('adm-popup').checked=localStorage.getItem('fc_popup')!=='0';
+  const sn=document.getElementById('adm-store-name');  if(sn) sn.value=storeName;
+  const gr=document.getElementById('adm-email-resp');  if(gr) gr.value=emailResp;
+  const gf=document.getElementById('adm-email-finance');if(gf) gf.value=emailFin;
+  const gu=document.getElementById('adm-gas-url');     if(gu) gu.value=gasUrl;
+  const ap=document.getElementById('adm-popup');       if(ap) ap.checked=localStorage.getItem('fc_popup')!=='0';
   document.getElementById('session-info').innerHTML=`<strong>${session?.name}</strong> (${session?.role})<br>🕐 ${session?new Date(session.loginTime).toLocaleString(lang):''}`;
 }
 
 function renderStoreAdmin(){
   const el=document.getElementById('store-admin-list');
-  if(!stores.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px 0">Aucun magasin</div>';return}
-  el.innerHTML=stores.map(s=>`
-    <div class="adm-row">
+  if(!el) return;
+  if(!storeName){
+    el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px 0">Renseignez le nom du magasin dans Configuration.</div>';
+    return;
+  }
+  el.innerHTML=`<div class="adm-row">
       <div class="adm-ico">🏪</div>
       <div class="adm-info">
-        <div class="adm-nm">${s.name}</div>
-        <div class="adm-sb">${s.address||''} · ${s.lat.toFixed(4)},${s.lng.toFixed(4)} · r:${s.r}m</div>
+        <div class="adm-nm">${storeName}</div>
+        <div class="adm-sb">Magasin unique — modifiable dans Configuration</div>
       </div>
-      <button class="adm-del" onclick="confirmDeleteStore('${s.id}')">🗑</button>
-    </div>`).join('');
+    </div>`;
 }
 
 function renderUserAdmin(){
   const el=document.getElementById('user-admin-list');
-  el.innerHTML=users.map((u,i)=>`
-    <div class="adm-row">
-      <div class="adm-ico">${u.role==='admin'?'👑':'👤'}</div>
-      <div class="adm-info">
-        <div class="adm-nm">${u.name} <span style="font-size:11px;color:var(--muted)">@${u.username}</span></div>
-        <span class="${u.role==='admin'?'role-a':'role-g'}">${u.role}</span>
+  if(!el) return;
+  if(!users.length){ el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px 0">Aucun utilisateur</div>'; return; }
+  // Trier : superadmin en premier, puis par level décroissant
+  const sorted = users.map((u,i)=>({...u,_idx:i}))
+    .sort((a,b)=>(getRoleInfo(b.role).level||0)-(getRoleInfo(a.role).level||0));
+  el.innerHTML = sorted.map(u => {
+    const ri = getRoleInfo(u.role);
+    const isMe = u.username===session?.username;
+    return `<div class="adm-row" style="align-items:center;gap:10px">
+      <div style="width:36px;height:36px;border-radius:50%;background:${ri.color}22;border:2px solid ${ri.color}44;
+                  display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${ri.label.split(' ')[0]}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:800;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          ${u.name}
+          ${isMe?'<span style="font-size:10px;background:rgba(18,168,118,.15);color:var(--gd);border-radius:100px;padding:2px 7px;font-weight:900;border:1px solid rgba(18,168,118,.2)">Vous</span>':''}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
+          <span style="font-size:10px;color:var(--muted);font-weight:700">@${u.username}</span>
+          <span style="font-size:10px;background:${ri.color}18;color:${ri.color};border-radius:100px;padding:2px 8px;font-weight:800;border:1px solid ${ri.color}30">${ri.label}</span>
+          ${u.rayon?`<span style="font-size:10px;color:var(--muted);font-weight:600">· ${u.rayon}</span>`:''}
+        </div>
       </div>
-      ${u.username!==session?.username?`
-        <button class="adm-edit" onclick="openEditUser('${u.id||i}')">✏️</button>
-        <button class="adm-del" onclick="confirmDeleteUser(${i})">🗑</button>`:''}</div>`).join('');
+      ${!isMe?`<div style="display:flex;gap:5px;flex-shrink:0">
+        <button class="adm-edit" onclick="openEditUser('${u.id||u._idx}')" title="Modifier">🔑</button>
+        <button class="adm-del" onclick="confirmDeleteUser(${u._idx})" title="Supprimer">🗑</button>
+      </div>`:'<span style="font-size:10px;color:var(--muted);font-weight:700;flex-shrink:0">actif</span>'}
+    </div>`;
+  }).join('');
 }
 
 /* Store CRUD */
@@ -1555,8 +1938,9 @@ function addStore(){
     document.getElementById('as-coord-row').style.display='flex';
     toast('❌ Cliquez 🔍 Trouver ou saisissez lat/lng');return;
   }
-  stores.push({id:genId(),name,address:addr,lat,lng,r});
-  save('fc_stores',stores);refreshStoreSel();
+  // Single store: set storeName from form
+    // stores is derived from storeName — no direct save needed
+refreshStoreSel();
   ['as-name','as-addr','as-lat','as-lng'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('as-rad').value='500';
   document.getElementById('geo-results').innerHTML='';
@@ -1564,26 +1948,30 @@ function addStore(){
   renderAdmin();toast(T().store_added);
 }
 function confirmDeleteStore(id){
-  const s=stores.find(x=>x.id===id);if(!s)return;
+  const s=getStores().find(x=>x.id===id);if(!s)return;
   showConfirm(`Supprimer "${s.name}" ?`,'Ce magasin sera retiré de la liste.',()=>{
-    stores=stores.filter(x=>x.id!==id);
-    save('fc_stores',stores);if(selStore?.id===id)selStore=null;
+    storeName=''; selStore=null; stores=getStores(); localStorage.setItem('fc_store_name','');
+    // stores is derived from storeName — no direct save needed
+if(selStore?.id===id)selStore=null;
     refreshStoreSel();renderAdmin();toast(T().deleted);
   });
 }
 
 /* User CRUD */
 function addUser(){
-  const nm=document.getElementById('au-nm').value.trim();
-  const un=document.getElementById('au-un').value.trim().toLowerCase();
-  const pw=document.getElementById('au-pw').value;
-  const rl=document.getElementById('au-rl').value;
+  const nm   = document.getElementById('au-nm')?.value.trim();
+  const un   = document.getElementById('au-un')?.value.trim().toLowerCase();
+  const pw   = document.getElementById('au-pw')?.value;
+  const rl   = document.getElementById('au-rl')?.value || 'agent';
+  const rayon= document.getElementById('au-rayon')?.value.trim() || '';
   if(!nm||!un||!pw){toast(T().fill_all);return}
-  if(users.find(u=>u.username===un)){toast('Identifiant déjà utilisé');return}
-  users.push({id:genId(),name:nm,username:un,password:pw,role:rl});
+  if(users.find(u=>u.username===un)){toast('❌ Cet identifiant est déjà utilisé');return}
+  const ri = getRoleInfo(rl);
+  users.push({id:genId(), name:nm, username:un, password:pw, role:rl, rayon});
   save('fc_users',users);
-  ['au-nm','au-un','au-pw'].forEach(id=>document.getElementById(id).value='');
-  renderAdmin();toast(T().user_added);
+  ['au-nm','au-un','au-pw','au-rayon'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  renderAdmin();
+  toast(`✅ Accès créé — ${ri.label} : ${nm}`);
 }
 function confirmDeleteUser(i){
   if(users[i].username===session?.username)return;
@@ -1592,20 +1980,93 @@ function confirmDeleteUser(i){
   });
 }
 function openEditUser(idOrIdx){
-  // Simple inline edit via prompt for now — could be expanded
   const u=users.find(x=>x.id===idOrIdx)||users[parseInt(idOrIdx)];
   if(!u)return;
-  const np=prompt(`Nouveau mot de passe pour ${u.name} (laisser vide = inchangé) :`,'');
-  if(np===null)return;
-  if(np.trim()) u.password=np.trim();
-  save('fc_users',users);renderAdmin();toast(T().saved);
+  // Ouvre un modal inline avec les champs modifiables
+  showConfirm(
+    `Modifier "${u.name}"`,
+    'Entrez le nouveau mot de passe dans le champ ci-dessous, puis confirmez.',
+    ()=>{
+      const inp = document.getElementById('edit-user-pw-input');
+      const nm  = document.getElementById('edit-user-nm-input');
+      const newPw = inp ? inp.value.trim() : '';
+      const newNm = nm  ? nm.value.trim()  : '';
+      if(newNm) u.name = newNm;
+      if(newPw) u.password = newPw;
+      if(!newPw && !newNm){ toast('Rien à modifier'); return; }
+      save('fc_users',users);
+      renderAdmin();
+      toast('✅ Accès mis à jour');
+    }
+  );
+  // Ajouter les champs dans le confirm dialog
+  setTimeout(()=>{
+    const p = document.getElementById('cf-p');
+    if(p) p.innerHTML=`
+      <div style="margin-bottom:8px">
+        <div style="font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px">Nom affiché</div>
+        <input id="edit-user-nm-input" class="rf-i" value="${u.name}" placeholder="Nom" style="width:100%;font-size:13px;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px">Nouveau mot de passe</div>
+        <input id="edit-user-pw-input" class="rf-i" type="password" placeholder="Laisser vide = inchangé" style="width:100%;font-size:13px">
+      </div>`;
+  },50);
 }
 function saveConfig(){
-  webhook=document.getElementById('adm-wh').value.trim();
-  localStorage.setItem('fc_webhook',webhook);
-  localStorage.setItem('fc_email',document.getElementById('adm-email').value.trim());
-  localStorage.setItem('fc_popup',document.getElementById('adm-popup').checked?'1':'0');
+  storeName    = document.getElementById('adm-store-name')?.value.trim()    || '';
+  storeEmoji   = document.getElementById('adm-store-emoji')?.value.trim()   || '🏪';
+  storeEnseigne= document.getElementById('adm-store-enseigne')?.value.trim()|| '';
+  storeRegion  = document.getElementById('adm-store-region')?.value.trim()  || '';
+  storeVille   = document.getElementById('adm-store-ville')?.value.trim()   || '';
+  emailResp    = document.getElementById('adm-email-resp')?.value.trim()    || '';
+  emailFin     = document.getElementById('adm-email-finance')?.value.trim() || '';
+  gasUrl       = document.getElementById('adm-gas-url')?.value.trim()       || '';
+  localStorage.setItem('fc_store_name',     storeName);
+  localStorage.setItem('fc_store_emoji',    storeEmoji);
+  localStorage.setItem('fc_store_enseigne', storeEnseigne);
+  localStorage.setItem('fc_store_region',   storeRegion);
+  localStorage.setItem('fc_store_ville',    storeVille);
+  localStorage.setItem('fc_email_resp',     emailResp);
+  localStorage.setItem('fc_email_fin',      emailFin);
+  localStorage.setItem('fc_gas_url',        gasUrl);
+  localStorage.setItem('fc_popup', document.getElementById('adm-popup')?.checked ? '1':'0');
+  stores   = getStores();
+  selStore = storeName ? { name: storeName } : null;
+  // Mettre à jour le branding header + splash
+  document.getElementById('hdr-sub').textContent = [storeEnseigne, storeName].filter(Boolean).join(' · ') || 'FreshControl';
+  updateSplashBranding();
+  showStoreBadge();
   toast(T().saved);
+}
+
+async function testGAS(){
+  const st = document.getElementById('gas-test-status');
+  const url = document.getElementById('adm-gas-url')?.value.trim();
+  if(!url){ toast('❌ Entrez l\'URL GAS d\'abord'); return; }
+  st.textContent = '⏳ Test en cours…'; st.style.color='var(--muted)';
+  try{
+    const res  = await fetch(url+'?action=ping');
+    const data = await res.json();
+    if(data.ok){
+      st.textContent = '✅ Connexion Google Apps Script OK'; st.style.color='var(--gd)';
+    } else {
+      st.textContent = '⚠️ Réponse inattendue : '+JSON.stringify(data); st.style.color='var(--o)';
+    }
+  } catch(e){
+    st.textContent = '❌ Impossible de joindre le serveur GAS'; st.style.color='var(--r)';
+  }
+}
+
+function showStoreBadge(){
+  const badge = document.getElementById('store-badge');
+  const name  = document.getElementById('store-badge-name');
+  if(!badge||!name) return;
+  if(storeName){
+    badge.style.display='block';
+    name.textContent = storeName;
+    document.getElementById('hdr-sub').textContent = storeName;
+  } else {
+    badge.style.display='none';
+  }
 }
 
 /* ═══ STARTUP POPUP ══════════════════════════════════════════════════════════ */
@@ -1660,12 +2121,15 @@ async function sendEmailN8N(){
   const btn=document.getElementById('em-send-btn');
   btn.disabled=true;btn.innerHTML='<span class="spin"></span>';
   try{
-    const res=await fetch(webhook,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'email_reminder',to,subject,body,store:emailStore,lang})});
-    if(!res.ok)throw new Error('HTTP '+res.status);
+    if(!gasUrl) throw new Error('URL GAS non configurée');
+    const res=await fetch(gasUrl,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'email_reminder',to,subject:document.getElementById('em-subj').value,body:document.getElementById('em-body').value,store:emailStore,lang})});
     closeModal('email-modal');toast(T().email_sent);
-  }catch(e){toast(T().email_err)}
-  finally{btn.disabled=false;btn.textContent='🚀 Envoyer via N8N'}
+  }catch(e){
+    toast('📧 Ouverture du client mail…');
+    sendMailto();
+  }
+  finally{btn.disabled=false;btn.textContent='🚀 Envoyer';}
 }
 function sendMailto(){
   const to=encodeURIComponent(document.getElementById('em-to').value.trim());
@@ -1750,6 +2214,7 @@ function toast(msg){
 /* ═══ INIT ═══════════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded',()=>{
   applyLang();
+  updateSplashBranding();
   ['li-u','li-p'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()}));
   // Session : sessionStorage uniquement → login obligatoire à chaque réouverture
   const sd=sessionStorage.getItem('fc_session');
