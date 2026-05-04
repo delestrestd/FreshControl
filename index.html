@@ -346,7 +346,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
   <!-- Branding dynamique : enseigne + FreshControl + magasin -->
   <div id="sp-brand" style="text-align:center;margin-bottom:6px">
     <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:6px">
-      <div id="sp-ico" class="sp-ico">🌿</div>
+      <div id="sp-ico" class="sp-ico">🏪</div>
       <div style="text-align:left">
         <div class="sp-name" id="sp-enseigne-name">FreshControl</div>
         <div id="sp-store-line" style="font-size:13px;font-weight:700;color:rgba(255,255,255,.78);letter-spacing:.3px;margin-top:-2px"></div>
@@ -985,7 +985,7 @@ if(new URLSearchParams(location.search).get('reset')==='1'){
 
 /* ═══ I18N ══════════════════════════════════════════════════════════════════ */
 const I18N={
-  fr:{tag:'Gestion intelligente des périmés',l_user:'Identifiant',l_pass:'Mot de passe',l_btn:'Se connecter',l_err_empty:'Remplissez tous les champs',l_err_wrong:'Identifiant ou mot de passe incorrect',rg_t:'🔒 Données & Confidentialité',rg_p:"FreshControl utilise votre géolocalisation pour identifier le magasin. Votre consentement est demandé à chaque démarrage.",rg_y:'✓ Accepter',rg_n:'Refuser',
+  fr:{tag:'Gestion intelligente des périmés',l_user:'Identifiant',l_pass:'Mot de passe',l_btn:'Se connecter',l_err_empty:'Remplissez tous les champs',l_err_wrong:'Identifiant ou mot de passe incorrect',ph_user:'prenom.nom',ph_pass:'••••••••',rg_t:'🔒 Données & Confidentialité',rg_p:"FreshControl utilise votre géolocalisation pour identifier le magasin. Votre consentement est demandé à chaque démarrage.",rg_y:'✓ Accepter',rg_n:'Refuser',
   lexp:'Périmés',lcrit:'Critiques ≤2j',lwarn:'Attention ≤7j',lok:'OK',lprods:'Produits',all:'Tous',
   sct:'Scanner un produit',scsub:'Photographiez le code-barres EAN',scbtn:'Prendre une photo',scanning:'🔍 Analyse…',scan_ok:'✅ Produit reconnu',scan_err:'❌ Erreur de connexion',
   ldlc:'Date limite (DLC)',rfsave:'💾 Enregistrer',rfcancel:'Annuler',
@@ -999,7 +999,7 @@ const I18N={
   days:['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'],
   saved:'✅ Sauvegardé',deleted:'🗑 Supprimé',user_added:'👤 Utilisateur ajouté',store_added:'🏪 Magasin ajouté',prod_archived:'✅ Produit archivé',no_prods:'Aucun produit',fill_all:'Remplissez tous les champs',email_sent:'✅ E-mail envoyé',email_err:'❌ Erreur envoi',csv_ok:'📥 CSV téléchargé',
   adm_stores:'🏪 Magasins',adm_users:'👥 Utilisateurs',adm_lang:'🌍 Langue',adm_conf:'⚙️ Configuration'},
-  en:{tag:'Smart expiry date management',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err_empty:'Please fill all fields',l_err_wrong:'Wrong username or password',rg_t:'🔒 Privacy & Data',rg_p:'FreshControl uses your geolocation to identify the store. Consent is requested on each startup.',rg_y:'✓ Accept',rg_n:'Decline',
+  en:{tag:'Smart expiry date management',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err_empty:'Please fill all fields',l_err_wrong:'Wrong username or password',ph_user:'firstname.lastname',ph_pass:'••••••••',rg_t:'🔒 Privacy & Data',rg_p:'FreshControl uses your geolocation to identify the store. Consent is requested on each startup.',rg_y:'✓ Accept',rg_n:'Decline',
   lexp:'Expired',lcrit:'Critical ≤2d',lwarn:'Warning ≤7d',lok:'OK',lprods:'Products',all:'All',
   sct:'Scan a product',scsub:'Photograph the EAN barcode',scbtn:'Take a photo',scanning:'🔍 Analyzing…',scan_ok:'✅ Product found',scan_err:'❌ Connection error',
   ldlc:'Expiry date',rfsave:'💾 Save',rfcancel:'Cancel',
@@ -1013,7 +1013,7 @@ const I18N={
   days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
   saved:'✅ Saved',deleted:'🗑 Deleted',user_added:'👤 User added',store_added:'🏪 Store added',prod_archived:'✅ Product archived',no_prods:'No products',fill_all:'Please fill all fields',email_sent:'✅ Email sent',email_err:'❌ Send error',csv_ok:'📥 CSV downloaded',
   adm_stores:'🏪 Stores',adm_users:'👥 Users',adm_lang:'🌍 Language',adm_conf:'⚙️ Config'},
-  es:{tag:'Gestión inteligente de caducidades',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Iniciar sesión',l_err_empty:'Rellene todos los campos',l_err_wrong:'Usuario o contraseña incorrectos',rg_t:'🔒 Privacidad y Datos',rg_p:'FreshControl usa su geolocalización para identificar la tienda. Se solicita consentimiento en cada inicio.',rg_y:'✓ Aceptar',rg_n:'Rechazar',
+  es:{tag:'Gestión inteligente de caducidades',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Iniciar sesión',l_err_empty:'Rellene todos los campos',l_err_wrong:'Usuario o contraseña incorrectos',ph_user:'nombre.apellido',ph_pass:'••••••••',rg_t:'🔒 Privacidad y Datos',rg_p:'FreshControl usa su geolocalización para identificar la tienda. Se solicita consentimiento en cada inicio.',rg_y:'✓ Aceptar',rg_n:'Rechazar',
   lexp:'Caducados',lcrit:'Crítico ≤2d',lwarn:'Atención ≤7d',lok:'OK',lprods:'Productos',all:'Todos',
   sct:'Escanear producto',scsub:'Fotografíe el código EAN',scbtn:'Tomar foto',scanning:'🔍 Analizando…',scan_ok:'✅ Producto encontrado',scan_err:'❌ Error de conexión',
   ldlc:'Fecha caducidad',rfsave:'💾 Guardar',rfcancel:'Cancelar',
@@ -1027,7 +1027,7 @@ const I18N={
   days:['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],
   saved:'✅ Guardado',deleted:'🗑 Eliminado',user_added:'👤 Usuario añadido',store_added:'🏪 Tienda añadida',prod_archived:'✅ Producto archivado',no_prods:'Sin productos',fill_all:'Rellene todos los campos',email_sent:'✅ Correo enviado',email_err:'❌ Error envío',csv_ok:'📥 CSV descargado',
   adm_stores:'🏪 Tiendas',adm_users:'👥 Usuarios',adm_lang:'🌍 Idioma',adm_conf:'⚙️ Config'},
-  zh:{tag:'智能保质期管理系统',l_user:'用户名',l_pass:'密码',l_btn:'登录',l_err_empty:'请填写所有字段',l_err_wrong:'用户名或密码错误',rg_t:'🔒 数据与隐私',rg_p:'FreshControl使用您的地理位置识别门店。每次启动均需同意。',rg_y:'✓ 接受',rg_n:'拒绝',
+  zh:{tag:'智能保质期管理系统',l_user:'用户名',l_pass:'密码',l_btn:'登录',l_err_empty:'请填写所有字段',l_err_wrong:'用户名或密码错误',ph_user:'姓名.姓氏',ph_pass:'••••••••',rg_t:'🔒 数据与隐私',rg_p:'FreshControl使用您的地理位置识别门店。每次启动均需同意。',rg_y:'✓ 接受',rg_n:'拒绝',
   lexp:'已过期',lcrit:'紧急≤2天',lwarn:'注意≤7天',lok:'正常',lprods:'产品',all:'全部',
   sct:'扫描产品',scsub:'拍摄EAN条形码',scbtn:'拍照',scanning:'🔍 分析中…',scan_ok:'✅ 产品已识别',scan_err:'❌ 连接错误',
   ldlc:'有效期',rfsave:'💾 保存',rfcancel:'取消',
@@ -1053,7 +1053,9 @@ function setLang(l){
 function applyLang(){
   const t=T();
   const $=(id,k)=>{const el=document.getElementById(id);if(el)el.textContent=t[k]||k};
+  const $ph=(id,k)=>{const el=document.getElementById(id);if(el && t[k]) el.placeholder=t[k]};
   $('sp-tag','tag');$('l-user','l_user');$('l-pass','l_pass');$('l-btn-t','l_btn');
+  $ph('li-u','ph_user');$ph('li-p','ph_pass');
   $('rg-t','rg_t');$('rg-p','rg_p');$('rg-y','rg_y');$('rg-n','rg_n');
   $('l-exp','lexp');$('l-crit','lcrit');$('l-warn','lwarn');$('l-ok','lok');$('l-prods','lprods');
   $('sc-t','sct');$('sc-sub','scsub');$('sc-btn','scbtn');$('l-dlc','ldlc');
@@ -1109,7 +1111,7 @@ function updateSplashBranding(){
   const ico  = document.getElementById('sp-ico');
   const name = document.getElementById('sp-enseigne-name');
   const line = document.getElementById('sp-store-line');
-  if(ico)  ico.textContent  = storeEmoji || '🌿';
+  if(ico)  ico.textContent  = storeEmoji || '🏪';
   if(name) name.textContent = storeEnseigne ? `FreshControl · ${storeEnseigne}` : 'FreshControl';
   if(line){
     const parts = [storeName, storeVille, storeRegion].filter(Boolean);
