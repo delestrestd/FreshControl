@@ -26,12 +26,13 @@
   --r:#E03C3C;--rd:#B02020;--rl:rgba(224,60,60,.13);
   --o:#F59E0B;--ol:rgba(245,158,11,.13);
   --b:#3B82F6;--bl:rgba(59,130,246,.13);
-  --txt:#0D1F0D;--muted:rgba(13,31,13,.48);--bdr:rgba(13,31,13,.1);
+  --txt:#0D1F0D;--muted:rgba(13,31,13,.62);--mutedx:rgba(13,31,13,.48);--bdr:rgba(13,31,13,.14);
   --spec:inset 0 1.5px 0 rgba(255,255,255,.82);
   --spec-d:inset 0 1.5px 0 rgba(255,255,255,.38);
   --sg:0 6px 22px rgba(18,168,118,.28);--sr:0 6px 22px rgba(224,60,60,.22);
   --ss:0 4px 18px rgba(0,0,0,.09);
-  --rr:100px;--rl2:22px;--rm:16px;
+  --foc:0 0 0 3px rgba(18,168,118,.32);
+  --rr:100px;--rl2:22px;--rm:16px;--ri:14px;
   --font:'Nunito',sans-serif;
   --tab-h:72px;--hdr-h:70px;
 }
@@ -59,20 +60,27 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .sp-lock{display:flex;align-items:center;gap:13px;margin-bottom:8px}
 .sp-ico{width:56px;height:56px;border-radius:18px;background:rgba(255,255,255,.22);backdrop-filter:blur(16px);border:1.5px solid rgba(255,255,255,.45);box-shadow:var(--spec-d);display:flex;align-items:center;justify-content:center;font-size:28px}
 .sp-name{font-size:34px;font-weight:900;color:#fff;letter-spacing:-2px}
-.sp-tag{font-size:12px;color:rgba(255,255,255,.6);font-weight:700;letter-spacing:.3px;margin-bottom:28px}
+.sp-tag{font-size:12px;color:rgba(255,255,255,.78);font-weight:700;letter-spacing:.3px;margin-bottom:28px}
 .lang-row{display:flex;gap:7px;margin-bottom:22px;flex-wrap:wrap;justify-content:center}
-.lang-btn{padding:7px 16px;border-radius:var(--rr);background:rgba(255,255,255,.14);backdrop-filter:blur(10px);border:1.5px solid rgba(255,255,255,.28);color:#fff;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);transition:all .2s;box-shadow:var(--spec-d)}
-.lang-btn.on{background:rgba(255,255,255,.28);border-color:rgba(255,255,255,.72)}
+.lang-btn{padding:8px 16px;min-height:34px;border-radius:var(--rr);background:rgba(255,255,255,.16);backdrop-filter:blur(10px);border:1.5px solid rgba(255,255,255,.32);color:#fff;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);transition:background .18s,border-color .18s;box-shadow:var(--spec-d)}
+.lang-btn:hover{background:rgba(255,255,255,.24)}
+.lang-btn.on{background:rgba(255,255,255,.32);border-color:rgba(255,255,255,.78)}
+/* Sidebar variant: light bg, dark text */
+.sb-body .lang-btn{color:var(--txt);border-color:var(--bdr);background:rgba(255,255,255,.62);box-shadow:var(--spec)}
+.sb-body .lang-btn:hover{background:rgba(255,255,255,.85)}
+.sb-body .lang-btn.on{background:rgba(18,168,118,.85);color:#fff;border-color:rgba(255,255,255,.28)}
 .lc{width:100%;max-width:360px;border-radius:var(--rl2);padding:26px 20px;animation:fadeUp .45s ease .1s both}
 .ll{font-size:11px;font-weight:900;color:rgba(255,255,255,.68);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px}
-.li{width:100%;padding:14px 17px;border-radius:var(--rr);background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.28);color:#fff;font-size:16px;font-family:var(--font);font-weight:700;outline:none;margin-bottom:13px;box-shadow:var(--spec-d);transition:border-color .2s}
-.li:focus{border-color:rgba(255,255,255,.7)}
+.li{width:100%;padding:15px 18px;min-height:50px;border-radius:var(--rr);background:rgba(255,255,255,.22);border:1.5px solid rgba(255,255,255,.32);color:#fff;font-size:16px;font-family:var(--font);font-weight:700;outline:none;margin-bottom:13px;box-shadow:var(--spec-d);transition:border-color .18s,box-shadow .18s,background .18s}
+.li:focus{border-color:rgba(255,255,255,.8);background:rgba(255,255,255,.28);box-shadow:var(--spec-d),0 0 0 3px rgba(255,255,255,.18)}
 .li.err{animation:shake .32s;border-color:rgba(255,130,130,.8)}
-.li::placeholder{color:rgba(255,255,255,.38);font-weight:600}
-.lb{width:100%;padding:16px;border-radius:var(--rr);border:none;background:rgba(255,255,255,.88);color:var(--gd);font-size:16px;font-weight:900;font-family:var(--font);cursor:pointer;box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 6px 20px rgba(0,0,0,.18);transition:transform .15s}
+.li::placeholder{color:rgba(255,255,255,.55);font-weight:600}
+.lb{width:100%;padding:16px;min-height:52px;border-radius:var(--rr);border:none;background:rgba(255,255,255,.92);color:var(--gd);font-size:16px;font-weight:900;font-family:var(--font);cursor:pointer;box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 6px 20px rgba(0,0,0,.18);transition:transform .15s,background .18s}
+.lb:hover{background:#fff}
 .lb:active{transform:scale(.97)}
+.lb:disabled{opacity:.6;cursor:not-allowed;transform:none}
 .lerr{color:rgba(255,180,180,.95);font-size:12px;font-weight:700;text-align:center;margin-top:9px;min-height:16px}
-.lver{color:rgba(255,255,255,.28);font-size:11px;font-weight:700;text-align:center;margin-top:16px}
+.lver{color:rgba(255,255,255,.5);font-size:11px;font-weight:700;text-align:center;margin-top:16px;letter-spacing:.3px}
 
 /* ── RGPD sheet ────────────────────────────────────────────────────── */
 #rgpd{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;backdrop-filter:blur(6px)}
@@ -88,27 +96,31 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 #app{display:none;height:100%;flex-direction:column}
 #app.on{display:flex}
 #hdr{background:rgba(10,107,71,.74);backdrop-filter:blur(26px) saturate(200%);-webkit-backdrop-filter:blur(26px) saturate(200%);border-bottom:1px solid rgba(255,255,255,.18);color:#fff;padding:0 16px;height:var(--hdr-h);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:var(--spec-d),0 3px 20px rgba(0,0,0,.13)}
-#hdr-l{display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.hico{width:38px;height:38px;background:rgba(255,255,255,.2);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:19px;border:1.5px solid rgba(255,255,255,.32);box-shadow:var(--spec-d)}
+#hdr-l{display:flex;align-items:center;gap:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:4px 8px 4px 4px;margin:-4px 0 -4px -4px;border-radius:14px;transition:background .18s}
+#hdr-l:hover{background:rgba(255,255,255,.08)}
+#hdr-l:active{background:rgba(255,255,255,.14)}
+.hico{width:40px;height:40px;background:rgba(255,255,255,.22);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;border:1.5px solid rgba(255,255,255,.34);box-shadow:var(--spec-d);flex-shrink:0}
 #hdr h1{font-size:18px;font-weight:900;letter-spacing:-.5px}
-#hdr small{font-size:10px;opacity:.72;font-weight:700;display:block}
+#hdr small{font-size:11px;opacity:.85;font-weight:700;display:block;margin-top:1px}
 #hdr-r{display:flex;align-items:center;gap:9px}
 .hubadge{background:rgba(224,60,60,.9);color:#fff;font-size:11px;font-weight:900;padding:4px 11px;border-radius:var(--rr);border:1px solid rgba(255,255,255,.22);box-shadow:var(--spec-d)}
-.hmenu{background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.26);color:#fff;width:38px;height:38px;border-radius:12px;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;box-shadow:var(--spec-d)}
+.hmenu{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.32);color:#fff;width:40px;height:40px;border-radius:12px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:var(--spec-d);transition:background .18s}
+.hmenu:hover{background:rgba(255,255,255,.3)}
+.hmenu:active{transform:scale(.94)}
 #main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 13px calc(var(--tab-h)+12px)}
 .tab{display:none}.tab.on{display:block;animation:fadeIn .2s ease}
 #tbar{background:rgba(240,255,248,.62);backdrop-filter:blur(28px) saturate(200%);-webkit-backdrop-filter:blur(28px) saturate(200%);border-top:1px solid rgba(255,255,255,.7);box-shadow:inset 0 1px 0 rgba(255,255,255,.88),0 -3px 28px rgba(0,0,0,.07);height:var(--tab-h);display:flex;flex-shrink:0}
-.tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:transparent;font-size:10px;font-weight:800;color:rgba(13,31,13,.36);cursor:pointer;font-family:var(--font);transition:color .15s;-webkit-tap-highlight-color:transparent;padding-bottom:5px;letter-spacing:.2px}
+.tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;background:transparent;font-size:11px;font-weight:800;color:rgba(13,31,13,.55);cursor:pointer;font-family:var(--font);transition:color .15s;-webkit-tap-highlight-color:transparent;padding-bottom:5px;letter-spacing:.2px;min-height:44px}
 .tb.on{color:var(--g)}.tb-i{font-size:21px;line-height:1;transition:transform .2s}.tb.on .tb-i{transform:scale(1.16)}
 
 /* ── SIDEBAR ───────────────────────────────────────────────────────── */
-#sb{position:fixed;inset:0;z-index:800;display:none}.#sb.on{display:block}
+#sb{position:fixed;inset:0;z-index:800;display:none}
 #sb.on{display:block}
 #sb-bg{position:absolute;inset:0;background:rgba(0,0,0,.3);backdrop-filter:blur(5px)}
 #sb-p{position:absolute;right:0;top:0;bottom:0;width:286px;background:rgba(228,248,238,.84);backdrop-filter:blur(28px) saturate(200%);border-left:1px solid rgba(255,255,255,.62);box-shadow:var(--spec),-14px 0 44px rgba(0,0,0,.16);display:flex;flex-direction:column;animation:slideIn .25s ease;border-radius:var(--rl2) 0 0 var(--rl2);overflow:hidden}
 .sb-hd{background:rgba(10,107,71,.84);backdrop-filter:blur(18px);padding:26px 18px 20px;color:#fff;border-bottom:1px solid rgba(255,255,255,.18)}
 .sb-un{font-size:19px;font-weight:900;letter-spacing:-.4px}
-.sb-rl{font-size:11px;opacity:.72;margin-top:2px;font-weight:700}
+.sb-rl{font-size:11px;opacity:.88;margin-top:3px;font-weight:700}
 .sb-body{flex:1;overflow-y:auto;padding:9px}
 .sb-sec{font-size:10px;font-weight:900;color:var(--muted);letter-spacing:1.3px;text-transform:uppercase;padding:13px 11px 5px}
 .sb-it{display:flex;align-items:center;gap:11px;padding:12px 13px;border-radius:14px;cursor:pointer;font-size:14px;font-weight:700;color:var(--txt);transition:background .13s}
@@ -117,26 +129,40 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .sb-ft{padding:14px}
 .sb-out{width:100%;padding:13px;border-radius:var(--rr);background:rgba(224,60,60,.1);border:1.5px solid rgba(224,60,60,.24);color:var(--r);font-size:14px;font-weight:900;cursor:pointer;font-family:var(--font)}
 
+/* ── DASHBOARD ADD BTN ─────────────────────────────────────────────── */
+.dash-add-btn{padding:7px 14px;min-height:30px;border-radius:var(--rr);background:rgba(18,168,118,.86);color:#fff;border:1px solid rgba(255,255,255,.28);font-size:12px;font-weight:900;cursor:pointer;font-family:var(--font);box-shadow:var(--spec-d);transition:background .18s,transform .12s}
+.dash-add-btn:hover{background:rgba(18,168,118,1)}
+.dash-add-btn:active{transform:scale(.95)}
+
+/* ── STORE BADGE (scanner) ────────────────────────────────────────── */
+.store-badge{display:none;margin-bottom:14px;background:rgba(18,168,118,.86);backdrop-filter:blur(14px);border-radius:var(--rr);padding:11px 18px;border:1px solid rgba(255,255,255,.32);box-shadow:var(--spec-d),var(--sg)}
+.store-badge.on{display:block}
+.store-badge-lbl{font-size:10px;font-weight:900;color:rgba(255,255,255,.85);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.store-badge-name{font-size:14px;font-weight:900;color:#fff;letter-spacing:-.2px}
+
 /* ── STAT CARDS ─────────────────────────────────────────────────────── */
 .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px}
-.sc{border-radius:var(--rl2);padding:18px 15px 16px;cursor:pointer;transition:transform .13s;position:relative;overflow:hidden;backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.32)}
-.sc:active{transform:scale(.95)}
+.sc{border-radius:var(--rl2);padding:18px 15px 16px;cursor:pointer;transition:transform .15s,box-shadow .18s;position:relative;overflow:hidden;backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.32);-webkit-tap-highlight-color:transparent}
+.sc:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,.18)}
+.sc:active{transform:scale(.96)}
 .sc::before{content:'';position:absolute;top:0;left:0;right:0;height:48%;background:linear-gradient(180deg,rgba(255,255,255,.17) 0%,transparent 100%)}
-.sc-n{font-size:36px;font-weight:900;line-height:1;letter-spacing:-2px;color:#fff;position:relative}
-.sc-l{font-size:10px;font-weight:800;color:rgba(255,255,255,.78);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;position:relative}
+.sc-n{font-size:36px;font-weight:900;line-height:1;letter-spacing:-1.6px;color:#fff;position:relative}
+.sc-l{font-size:11px;font-weight:800;color:rgba(255,255,255,.92);margin-top:5px;text-transform:uppercase;letter-spacing:.6px;position:relative}
 .se{background:rgba(176,32,32,.72)}.so{background:rgba(163,99,0,.7)}.sw{background:rgba(29,85,221,.7)}.sk{background:rgba(10,107,71,.74)}
 
 /* ── FILTER CHIPS ────────────────────────────────────────────────────── */
 .frow{display:flex;gap:7px;overflow-x:auto;padding-bottom:3px;scrollbar-width:none;margin-bottom:9px}
 .frow::-webkit-scrollbar{display:none}
-.fc{padding:7px 16px;border-radius:var(--rr);background:rgba(255,255,255,.54);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.66);font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;transition:all .18s;font-family:var(--font);color:var(--muted);box-shadow:var(--spec)}
-.fc.on{background:rgba(18,168,118,.84);color:#fff;border-color:rgba(255,255,255,.28);box-shadow:var(--spec-d),var(--sg)}
+.fc{padding:8px 17px;min-height:34px;border-radius:var(--rr);background:rgba(255,255,255,.62);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.7);font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;transition:all .18s;font-family:var(--font);color:var(--muted);box-shadow:var(--spec)}
+.fc:hover:not(.on){background:rgba(255,255,255,.78);color:var(--txt)}
+.fc.on{background:rgba(18,168,118,.88);color:#fff;border-color:rgba(255,255,255,.32);box-shadow:var(--spec-d),var(--sg)}
 
 /* ── PRODUCT CARD ────────────────────────────────────────────────────── */
 .sh{display:flex;align-items:center;justify-content:space-between;margin:13px 0 9px}
-.sh-t{font-size:11px;font-weight:900;color:rgba(255,255,255,.58);text-transform:uppercase;letter-spacing:.9px}
-.sh-c{font-size:11px;font-weight:700;color:rgba(255,255,255,.48)}
-.pc{background:rgba(255,255,255,.6);backdrop-filter:blur(18px);border-radius:var(--rm);padding:12px 14px;margin-bottom:9px;box-shadow:var(--spec),var(--ss);border:1px solid rgba(255,255,255,.7);display:flex;align-items:flex-start;gap:11px;transition:all .2s}
+.sh-t{font-size:11px;font-weight:900;color:rgba(255,255,255,.78);text-transform:uppercase;letter-spacing:1px}
+.sh-c{font-size:11px;font-weight:700;color:rgba(255,255,255,.65)}
+.pc{background:rgba(255,255,255,.62);backdrop-filter:blur(18px);border-radius:var(--rm);padding:13px 15px;margin-bottom:9px;box-shadow:var(--spec),var(--ss);border:1px solid rgba(255,255,255,.72);display:flex;align-items:flex-start;gap:12px;transition:transform .18s,box-shadow .18s,background .18s}
+.pc:hover{transform:translateY(-1px);box-shadow:var(--spec),0 8px 22px rgba(0,0,0,.13)}
 .pc.s-e{background:rgba(224,60,60,.19);border-color:rgba(224,60,60,.28)}
 .pc.s-o{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.28)}
 .pc.s-w{background:rgba(59,130,246,.14);border-color:rgba(59,130,246,.28)}
@@ -148,23 +174,38 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .pc-rt{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
 .pbadge{font-size:11px;font-weight:900;padding:4px 10px;border-radius:var(--rr);border:1px solid rgba(255,255,255,.28)}
 .be{background:rgba(176,32,32,.85);color:#fff}.bo{background:rgba(163,99,0,.85);color:#fff}.bw{background:rgba(29,85,221,.85);color:#fff}.bk{background:rgba(10,107,71,.85);color:#fff}
-.pact-row{display:flex;gap:5px;margin-top:1px}
-.pact{padding:4px 9px;border-radius:8px;font-size:11px;font-weight:900;cursor:pointer;border:1px solid;font-family:var(--font)}
-.pact-ok{background:rgba(18,168,118,.12);border-color:rgba(18,168,118,.3);color:var(--gd)}
-.pact-ed{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.28);color:#1E40AF}
-.pact-dl{background:rgba(224,60,60,.1);border-color:rgba(224,60,60,.28);color:var(--rd)}
+.pact-row{display:flex;gap:6px;margin-top:2px}
+.pact{min-width:32px;height:32px;padding:0 9px;border-radius:9px;font-size:13px;font-weight:900;cursor:pointer;border:1px solid;font-family:var(--font);display:inline-flex;align-items:center;justify-content:center;transition:background .18s,transform .12s}
+.pact:active{transform:scale(.92)}
+.pact-ok{background:rgba(18,168,118,.14);border-color:rgba(18,168,118,.34);color:var(--gd)}
+.pact-ok:hover{background:rgba(18,168,118,.22)}
+.pact-ed{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.32);color:#1E40AF}
+.pact-ed:hover{background:rgba(59,130,246,.2)}
+.pact-dl{background:rgba(224,60,60,.12);border-color:rgba(224,60,60,.32);color:var(--rd)}
+.pact-dl:hover{background:rgba(224,60,60,.2)}
 
 /* ── SCANNER ─────────────────────────────────────────────────────────── */
 .gps-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(18,168,118,.82);border-radius:var(--rr);padding:8px 14px;font-size:12px;font-weight:800;color:#fff;margin-bottom:14px;border:1px solid rgba(255,255,255,.28);box-shadow:var(--spec-d),var(--sg)}
 .gps-dot{width:7px;height:7px;border-radius:50%;background:#fff;animation:pulse 1.5s ease-in-out infinite}
 .gps-err{background:rgba(176,32,32,.82);box-shadow:var(--spec-d),var(--sr)}.gps-err .gps-dot{animation:none}
 .gps-rbtn{background:none;border:none;color:rgba(255,255,255,.78);font-weight:900;cursor:pointer;font-size:11px;text-decoration:underline;margin-left:3px;font-family:var(--font)}
-.scan-box{border-radius:var(--rl2);padding:30px 20px 26px;text-align:center;border:1px solid rgba(255,255,255,.7);box-shadow:var(--spec),0 14px 40px rgba(0,0,0,.13);margin-bottom:14px;position:relative;overflow:hidden;background:rgba(255,255,255,.52);backdrop-filter:blur(22px)}
+.scan-box{border-radius:var(--rl2);padding:28px 22px 24px;text-align:center;border:1px solid rgba(255,255,255,.72);box-shadow:var(--spec),0 14px 40px rgba(0,0,0,.13);margin-bottom:14px;position:relative;overflow:hidden;background:rgba(255,255,255,.55);backdrop-filter:blur(22px)}
 .scan-box::before{content:'';position:absolute;top:0;left:0;right:0;height:52%;background:linear-gradient(180deg,rgba(255,255,255,.17) 0%,transparent 100%)}
 .scan-box>*{position:relative}
+.scan-step-num{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:rgba(18,168,118,.16);color:var(--gd);font-weight:900;font-size:13px;margin-bottom:10px;border:1.5px solid rgba(18,168,118,.28);letter-spacing:0}
+.scan-step-icon{font-size:38px;margin-bottom:8px;line-height:1}
+.scan-step-title{font-size:16px;font-weight:900;color:var(--gd);letter-spacing:-.2px}
+.scan-step-sub{font-size:13px;color:var(--muted);margin-top:5px;font-weight:600;line-height:1.4;max-width:280px;margin-left:auto;margin-right:auto}
+.scan-step-status{margin-top:10px;font-size:12px;font-weight:700;color:var(--muted);min-height:18px}
+.scan-link-btn{background:rgba(0,0,0,.05);border:1px solid var(--bdr);color:var(--muted);border-radius:var(--rr);padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background .18s,color .18s}
+.scan-link-btn:hover{background:rgba(0,0,0,.09);color:var(--txt)}
+.scan-reset-btn{padding:9px 18px;border-radius:var(--rr);border:1px solid var(--bdr);background:rgba(255,255,255,.6);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background .18s,color .18s}
+.scan-reset-btn:hover{background:rgba(255,255,255,.85);color:var(--txt)}
 #scan-in{display:none}
-.sbtn{display:inline-flex;align-items:center;gap:8px;padding:16px 28px;border-radius:var(--rr);background:rgba(18,168,118,.87);color:#fff;font-size:16px;font-weight:900;cursor:pointer;font-family:var(--font);margin-top:14px;border:1px solid rgba(255,255,255,.28);box-shadow:var(--spec-d),var(--sg);transition:transform .15s}
+.sbtn{display:inline-flex;align-items:center;gap:8px;padding:16px 28px;min-height:52px;border-radius:var(--rr);background:rgba(18,168,118,.92);color:#fff;font-size:16px;font-weight:900;cursor:pointer;font-family:var(--font);margin-top:14px;border:1px solid rgba(255,255,255,.32);box-shadow:var(--spec-d),var(--sg);transition:transform .15s,background .18s}
+.sbtn:hover{background:rgba(18,168,118,1)}
 .sbtn:active{transform:scale(.96)}
+.sbtn:disabled{opacity:.6;cursor:not-allowed;transform:none}
 /* Store selector */
 .store-sel-wrap{margin-bottom:13px}
 .store-sel-lbl{font-size:10px;font-weight:900;color:rgba(255,255,255,.58);text-transform:uppercase;letter-spacing:.9px;margin-bottom:7px}
@@ -178,12 +219,17 @@ select.store-sel option{background:#0A6B47;color:#fff}
 .rf-t{font-size:15px;font-weight:900;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .rf-f{margin-bottom:13px}
 .rf-l{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;margin-bottom:6px}
-.rf-i{width:100%;padding:12px 16px;border-radius:var(--rr);background:rgba(255,255,255,.68);border:1.5px solid var(--bdr);font-size:14px;font-family:var(--font);font-weight:700;outline:none;color:var(--txt);box-shadow:var(--spec);transition:border-color .18s}
-.rf-i:focus{border-color:rgba(18,168,118,.55)}
+.rf-i{width:100%;padding:13px 17px;min-height:46px;border-radius:var(--rr);background:rgba(255,255,255,.72);border:1.5px solid var(--bdr);font-size:14px;font-family:var(--font);font-weight:700;outline:none;color:var(--txt);box-shadow:var(--spec);transition:border-color .18s,box-shadow .18s,background .18s}
+.rf-i:hover:not(:focus):not([readonly]){background:rgba(255,255,255,.82)}
+.rf-i:focus{border-color:rgba(18,168,118,.65);background:rgba(255,255,255,.88);box-shadow:var(--spec),var(--foc)}
+.rf-i[readonly]{cursor:default}
 .rf-row{display:flex;gap:9px}.rf-row .rf-f{flex:1}
-.rfsave{width:100%;padding:15px;border-radius:var(--rr);background:rgba(18,168,118,.87);color:#fff;border:1px solid rgba(255,255,255,.24);font-size:15px;font-weight:900;cursor:pointer;font-family:var(--font);margin-top:3px;box-shadow:var(--spec-d),var(--sg);transition:transform .13s}
+.rfsave{width:100%;padding:15px;min-height:50px;border-radius:var(--rr);background:rgba(18,168,118,.92);color:#fff;border:1px solid rgba(255,255,255,.28);font-size:15px;font-weight:900;cursor:pointer;font-family:var(--font);margin-top:3px;box-shadow:var(--spec-d),var(--sg);transition:transform .13s,background .18s,box-shadow .18s}
+.rfsave:hover{background:rgba(18,168,118,1)}
 .rfsave:active{transform:scale(.97)}
-.rfcancel{width:100%;padding:13px;border-radius:var(--rr);background:rgba(255,255,255,.5);border:1.5px solid var(--bdr);color:var(--muted);font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font);margin-top:8px}
+.rfsave:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.rfcancel{width:100%;padding:13px;min-height:46px;border-radius:var(--rr);background:rgba(255,255,255,.55);border:1.5px solid var(--bdr);color:var(--muted);font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font);margin-top:8px;transition:background .18s,color .18s}
+.rfcancel:hover{background:rgba(255,255,255,.8);color:var(--txt)}
 .nf-card{background:rgba(224,60,60,.18);border:1.5px solid rgba(224,60,60,.34);border-radius:var(--rl2);padding:22px;text-align:center;display:none;margin-bottom:13px;animation:pop .35s ease;box-shadow:var(--spec-d),var(--sr)}
 .nf-retry{margin-top:14px;padding:11px 22px;border-radius:var(--rr);border:1px solid rgba(255,255,255,.24);background:rgba(176,32,32,.85);color:#fff;font-size:13px;font-weight:900;cursor:pointer;font-family:var(--font)}
 
@@ -207,17 +253,38 @@ select.store-sel option{background:#0A6B47;color:#fff}
 .adm-info{flex:1}.adm-nm{font-size:14px;font-weight:800}.adm-sb{font-size:11px;color:var(--muted);font-weight:600;margin-top:2px}
 .role-a{background:rgba(245,158,11,.18);color:#92400e;border-radius:var(--rr);padding:2px 9px;font-size:10px;font-weight:900;display:inline-block;margin-top:2px}
 .role-g{background:rgba(18,168,118,.13);color:var(--gd);border-radius:var(--rr);padding:2px 9px;font-size:10px;font-weight:900;display:inline-block;margin-top:2px}
-.adm-del{border:1px solid rgba(224,60,60,.28);background:rgba(224,60,60,.1);color:var(--r);border-radius:9px;width:32px;height:32px;cursor:pointer;font-size:14px;font-weight:900;flex-shrink:0}
-.adm-edit{border:1px solid rgba(59,130,246,.28);background:rgba(59,130,246,.1);color:#1E40AF;border-radius:9px;width:32px;height:32px;cursor:pointer;font-size:13px;font-weight:900;flex-shrink:0}
+.adm-del{border:1px solid rgba(224,60,60,.32);background:rgba(224,60,60,.12);color:var(--r);border-radius:10px;width:38px;height:38px;cursor:pointer;font-size:15px;font-weight:900;flex-shrink:0;transition:background .18s,transform .12s;display:inline-flex;align-items:center;justify-content:center}
+.adm-del:hover{background:rgba(224,60,60,.2)}
+.adm-del:active{transform:scale(.92)}
+.adm-edit{border:1px solid rgba(59,130,246,.32);background:rgba(59,130,246,.12);color:#1E40AF;border-radius:10px;width:38px;height:38px;cursor:pointer;font-size:14px;font-weight:900;flex-shrink:0;transition:background .18s,transform .12s;display:inline-flex;align-items:center;justify-content:center}
+.adm-edit:hover{background:rgba(59,130,246,.2)}
+.adm-edit:active{transform:scale(.92)}
+/* Brand cards (catalogue marques) */
+.brand-card{display:flex;align-items:center;gap:11px;padding:12px 13px;border-radius:14px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.72);box-shadow:var(--spec);margin-bottom:8px;transition:background .18s}
+.brand-card:hover{background:rgba(255,255,255,.78)}
+.brand-info{flex:1;min-width:0}
+.brand-name{font-size:13px;font-weight:800;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand-meta{font-size:11px;font-weight:600;margin-top:2px;line-height:1.4}
+.brand-actions{display:flex;gap:6px;flex-shrink:0}
+.brand-sync{border:1px solid rgba(18,168,118,.32);background:rgba(18,168,118,.14);color:var(--gd);border-radius:10px;width:38px;height:38px;cursor:pointer;font-size:14px;font-weight:900;flex-shrink:0;transition:background .18s,transform .12s;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font)}
+.brand-sync:hover:not(:disabled){background:rgba(18,168,118,.24)}
+.brand-sync:active{transform:scale(.92)}
+.brand-sync:disabled{opacity:.6;cursor:not-allowed}
 .addform{display:flex;flex-direction:column;gap:9px;margin-top:14px;padding-top:14px;border-top:1px solid var(--bdr)}
 .af-row{display:flex;gap:7px}
-.af-in{flex:1;padding:11px 14px;border-radius:var(--rr);background:rgba(255,255,255,.65);border:1.5px solid var(--bdr);font-size:13px;font-family:var(--font);font-weight:700;outline:none;color:var(--txt);box-shadow:var(--spec)}
-.af-in:focus{border-color:rgba(18,168,118,.5)}
-.af-sel{padding:11px 13px;border-radius:var(--rr);background:rgba(255,255,255,.65);border:1.5px solid var(--bdr);font-size:13px;font-family:var(--font);font-weight:700;outline:none;color:var(--txt)}
-.af-add{padding:11px 16px;border-radius:var(--rr);background:rgba(18,168,118,.84);color:#fff;border:1px solid rgba(255,255,255,.24);font-size:13px;font-weight:900;cursor:pointer;font-family:var(--font);white-space:nowrap;box-shadow:var(--spec-d),var(--sg)}
+.af-in{flex:1;padding:12px 15px;min-height:44px;border-radius:var(--rr);background:rgba(255,255,255,.7);border:1.5px solid var(--bdr);font-size:13px;font-family:var(--font);font-weight:700;outline:none;color:var(--txt);box-shadow:var(--spec);transition:border-color .18s,box-shadow .18s,background .18s}
+.af-in:hover:not(:focus){background:rgba(255,255,255,.8)}
+.af-in:focus{border-color:rgba(18,168,118,.65);background:rgba(255,255,255,.88);box-shadow:var(--spec),var(--foc)}
+.af-sel{padding:12px 32px 12px 15px;min-height:44px;border-radius:var(--rr);background:rgba(255,255,255,.7);border:1.5px solid var(--bdr);font-size:13px;font-family:var(--font);font-weight:700;outline:none;color:var(--txt);box-shadow:var(--spec);-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'><path d='M1 1.5L6 6.5L11 1.5' stroke='%230D1F0D' stroke-opacity='.55' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 13px center;cursor:pointer;transition:border-color .18s,box-shadow .18s,background-color .18s}
+.af-sel:focus{border-color:rgba(18,168,118,.65);box-shadow:var(--spec),var(--foc)}
+.af-add{padding:12px 18px;min-height:44px;border-radius:var(--rr);background:rgba(18,168,118,.88);color:#fff;border:1px solid rgba(255,255,255,.28);font-size:13px;font-weight:900;cursor:pointer;font-family:var(--font);white-space:nowrap;box-shadow:var(--spec-d),var(--sg);transition:background .18s,transform .12s}
+.af-add:hover{background:rgba(18,168,118,1)}
+.af-add:active{transform:scale(.97)}
+.af-add:disabled{opacity:.6;cursor:not-allowed;transform:none}
 .lang-setting-row{display:flex;gap:7px;flex-wrap:wrap}
-.lsb{padding:9px 17px;border-radius:var(--rr);background:rgba(255,255,255,.62);border:1.5px solid var(--bdr);font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);color:var(--muted);transition:all .18s;box-shadow:var(--spec)}
-.lsb.on{background:rgba(18,168,118,.82);color:#fff;border-color:rgba(255,255,255,.24)}
+.lsb{padding:10px 18px;min-height:38px;border-radius:var(--rr);background:rgba(255,255,255,.62);border:1.5px solid var(--bdr);font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);color:var(--muted);transition:background .18s,color .18s,border-color .18s;box-shadow:var(--spec)}
+.lsb:hover:not(.on){background:rgba(255,255,255,.85);color:var(--txt)}
+.lsb.on{background:rgba(18,168,118,.86);color:#fff;border-color:rgba(255,255,255,.28);box-shadow:var(--spec-d),var(--sg)}
 /* geo search results */
 .geo-r{padding:11px 13px;border-radius:12px;margin-bottom:6px;cursor:pointer;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);box-shadow:var(--spec);transition:border-color .15s}
 .geo-r:hover{border-color:rgba(18,168,118,.5)}
@@ -234,7 +301,8 @@ select.store-sel option{background:#0A6B47;color:#fff}
 .mhd{padding:18px 18px 14px;border-bottom:1px solid rgba(0,0,0,.05)}
 .mhd-row{display:flex;align-items:center;justify-content:space-between}
 .mhd-t{font-size:17px;font-weight:900;letter-spacing:-.4px}
-.mcl{padding:8px 13px;border-radius:var(--rr);border:1.5px solid var(--bdr);background:rgba(255,255,255,.6);color:var(--muted);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font)}
+.mcl{min-width:36px;height:36px;padding:0 12px;border-radius:var(--rr);border:1.5px solid var(--bdr);background:rgba(255,255,255,.65);color:var(--muted);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);display:inline-flex;align-items:center;justify-content:center;transition:background .18s,color .18s}
+.mcl:hover{background:rgba(255,255,255,.85);color:var(--txt)}
 .mbody{flex:1;overflow-y:auto;padding:14px}
 /* STARTUP popup */
 .startup-hd{background:rgba(176,32,32,.77);backdrop-filter:blur(14px);padding:20px 18px 16px;color:#fff;border-bottom:1px solid rgba(255,255,255,.18);box-shadow:var(--spec-d)}
@@ -243,8 +311,9 @@ select.store-sel option{background:#0A6B47;color:#fff}
 .startup-prow{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-radius:13px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);margin-bottom:6px}
 .startup-ft{padding:13px 16px;border-top:1px solid rgba(0,0,0,.05);display:flex;gap:9px}
 /* email modal */
-.em-ta{width:100%;padding:12px 15px;border-radius:18px;background:rgba(255,255,255,.7);border:1.5px solid var(--bdr);font-size:12px;font-family:var(--font);font-weight:600;outline:none;color:var(--txt);min-height:130px;resize:vertical;line-height:1.7}
-.em-ta:focus{border-color:rgba(18,168,118,.5)}
+.em-ta{width:100%;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.72);border:1.5px solid var(--bdr);font-size:13px;font-family:var(--font);font-weight:600;outline:none;color:var(--txt);min-height:140px;resize:vertical;line-height:1.65;box-shadow:var(--spec);transition:border-color .18s,box-shadow .18s,background .18s}
+.em-ta:hover:not(:focus){background:rgba(255,255,255,.82)}
+.em-ta:focus{border-color:rgba(18,168,118,.65);background:rgba(255,255,255,.88);box-shadow:var(--spec),var(--foc)}
 /* confirm dialog */
 #confirm-modal{position:fixed;inset:0;z-index:900;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(7px);background:rgba(0,0,0,.38)}
 #confirm-modal.on{display:flex}
@@ -261,9 +330,13 @@ select.store-sel option{background:#0A6B47;color:#fff}
 /* spinner */
 .spin{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .55s linear infinite;vertical-align:middle;margin-right:6px}
 /* empty */
-.empty{text-align:center;padding:38px 18px;color:rgba(255,255,255,.5);font-size:13px;font-weight:700}
+.empty{text-align:center;padding:38px 18px;color:rgba(255,255,255,.7);font-size:13px;font-weight:700}
+.modal-sh .empty,.modal-card .empty,.mbody .empty{color:var(--muted)}
 /* toast */
-.toast{position:fixed;bottom:calc(var(--tab-h) + 13px);left:50%;transform:translateX(-50%);background:rgba(13,31,13,.82);backdrop-filter:blur(18px);color:#fff;padding:12px 22px;border-radius:var(--rr);font-size:12px;font-weight:800;z-index:500;animation:fadeUp .28s;white-space:nowrap;border:1px solid rgba(255,255,255,.18);box-shadow:var(--spec-d)}
+.toast{position:fixed;bottom:calc(var(--tab-h) + 13px);left:50%;transform:translateX(-50%);background:rgba(13,31,13,.86);backdrop-filter:blur(18px);color:#fff;padding:13px 22px;border-radius:var(--rr);font-size:13px;font-weight:800;z-index:500;animation:fadeUp .28s;max-width:calc(100vw - 26px);text-align:center;line-height:1.4;border:1px solid rgba(255,255,255,.2);box-shadow:var(--spec-d),0 8px 28px rgba(0,0,0,.22)}
+/* universal accessibility focus ring (keyboard only) */
+:focus-visible{outline:none}
+button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 0 0 3px rgba(18,168,118,.45)!important;outline:none}
 </style>
 </head>
 <body>
@@ -301,7 +374,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
   <!-- Bouton reset d'urgence — visible en bas de l'écran de connexion -->
   <div style="margin-top:18px;text-align:center">
     <button onclick="emergencyReset()"
-      style="background:none;border:none;color:rgba(255,255,255,.28);font-size:11px;
+      style="background:none;border:none;color:rgba(255,255,255,.5);font-size:11px;
              font-weight:700;cursor:pointer;font-family:var(--font);letter-spacing:.3px;
              text-decoration:underline;padding:6px 12px">
       Réinitialiser les accès
@@ -348,21 +421,13 @@ select.store-sel option{background:#0A6B47;color:#fff}
     </div>
   </div>
 </div>
-    <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:12px 14px;margin-bottom:10px">
-      <div style="font-size:12px;font-weight:900;color:#92400e;margin-bottom:5px">📱 Utilisation d'un appareil personnel (BYOD)</div>
-      <p style="font-size:12px;color:var(--muted);line-height:1.6;font-weight:600">En utilisant FreshControl sur votre téléphone personnel dans le cadre de votre activité professionnelle, vous reconnaissez :<br>
-      • Avoir été informé(e) par votre employeur de cette modalité d'usage<br>
-      • Que les données professionnelles saisies (produits, magasins, alertes) sont stockées localement sur votre appareil dans votre navigateur (localStorage)<br>
-      • Que la suppression de l'application ou la réinitialisation du navigateur entraîne la perte définitive de ces données<br>
-      • Qu'aucune donnée personnelle (contacts, photos personnelles, autres apps) n'est accédée par FreshControl</p>
-    </div>
 
 <!-- ═══ STARTUP POPUP ═════════════════════════════════════════════════ -->
 <div id="startup-modal" class="modal-center">
   <div class="modal-card">
     <div class="startup-hd">
       <div class="mhd-row"><div><h2 id="su-t">⚠️ Alertes produits</h2><p id="su-p">Produits expirés ou critiques</p></div>
-        <button class="mcl" onclick="closeModal('startup-modal')">✕</button></div>
+        <button class="mcl" onclick="closeModal('startup-modal')" aria-label="Fermer">✕</button></div>
     </div>
     <div class="mbody" id="su-body"></div>
     <div class="startup-ft">
@@ -375,9 +440,9 @@ select.store-sel option{background:#0A6B47;color:#fff}
 <!-- ═══ EMAIL MODAL ════════════════════════════════════════════════════ -->
 <div id="email-modal" class="modal-bg">
   <div class="modal-sh">
-    <div class="mhd-row" style="margin-bottom:4px"><div class="mhd-t" id="em-t">📧 Envoyer un rappel</div><button class="mcl" onclick="closeModal('email-modal')">✕</button></div>
+    <div class="mhd-row" style="margin-bottom:4px"><div class="mhd-t" id="em-t">📧 Envoyer un rappel</div><button class="mcl" onclick="closeModal('email-modal')" aria-label="Fermer">✕</button></div>
     <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:14px" id="em-sub">Rappel e-mail des produits urgents</div>
-    <div id="em-store-tag" style="display:none;background:rgba(18,168,118,.14);color:var(--gd);border-radius:var(--rr);padding:4px 12px;font-size:11px;font-weight:900;margin-bottom:13px;border:1px solid rgba(18,168,118,.2);display:inline-block"></div>
+    <div id="em-store-tag" style="display:none;background:rgba(18,168,118,.14);color:var(--gd);border-radius:var(--rr);padding:4px 12px;font-size:11px;font-weight:900;margin-bottom:13px;border:1px solid rgba(18,168,118,.2)"></div>
     <div class="rf-f"><div class="rf-l" id="em-l-to">Destinataire(s)</div><input class="rf-i" id="em-to" type="email" placeholder="responsable@bunga.corp"></div>
     <div class="rf-f"><div class="rf-l" id="em-l-subj">Objet</div><input class="rf-i" id="em-subj"></div>
     <div class="rf-f"><div class="rf-l" id="em-l-body">Corps du message</div><textarea class="em-ta" id="em-body"></textarea></div>
@@ -394,7 +459,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
   <div class="modal-sh">
     <div class="mhd-row" style="margin-bottom:14px">
       <div class="mhd-t">🏪 Gestion des magasins</div>
-      <button class="mcl" onclick="closeModal('stores-modal')">✕</button>
+      <button class="mcl" onclick="closeModal('stores-modal')" aria-label="Fermer">✕</button>
     </div>
 
     <!-- Liste des magasins -->
@@ -439,7 +504,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
 <!-- ═══ STORE SEARCH MODAL ════════════════════════════════════════════ -->
 <div id="ssm" class="modal-bg">
   <div class="modal-sh">
-    <div class="mhd-row" style="margin-bottom:13px"><div class="mhd-t">🔍 Rechercher un magasin</div><button class="mcl" onclick="closeModal('ssm')">✕</button></div>
+    <div class="mhd-row" style="margin-bottom:13px"><div class="mhd-t">🔍 Rechercher un magasin</div><button class="mcl" onclick="closeModal('ssm')" aria-label="Fermer">✕</button></div>
     <input class="rf-i" id="ssm-q" placeholder="Nom ou ville…" oninput="filterSSM(this.value)">
     <div id="ssm-list" style="margin-top:10px;max-height:55vh;overflow-y:auto"></div>
   </div>
@@ -448,7 +513,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
 <!-- ═══ EDIT PRODUCT MODAL ════════════════════════════════════════════ -->
 <div id="ep-modal" class="modal-bg">
   <div class="modal-sh">
-    <div class="mhd-row" style="margin-bottom:14px"><div class="mhd-t" id="ep-t">✏️ Modifier le produit</div><button class="mcl" onclick="closeModal('ep-modal')">✕</button></div>
+    <div class="mhd-row" style="margin-bottom:14px"><div class="mhd-t" id="ep-t">✏️ Modifier le produit</div><button class="mcl" onclick="closeModal('ep-modal')" aria-label="Fermer">✕</button></div>
     <input type="hidden" id="ep-id">
     <div class="rf-f"><div class="rf-l">Nom du produit</div><input class="rf-i" id="ep-name"></div>
     <div class="rf-row">
@@ -466,7 +531,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
 <!-- ═══ ADD PRODUCT MANUALLY ══════════════════════════════════════════ -->
 <div id="add-product-modal" class="modal-bg">
   <div class="modal-sh">
-    <div class="mhd-row" style="margin-bottom:14px"><div class="mhd-t">➕ Ajouter un produit</div><button class="mcl" onclick="closeModal('add-product-modal')">✕</button></div>
+    <div class="mhd-row" style="margin-bottom:14px"><div class="mhd-t">➕ Ajouter un produit</div><button class="mcl" onclick="closeModal('add-product-modal')" aria-label="Fermer">✕</button></div>
     <div class="rf-f"><div class="rf-l">Nom du produit</div><input class="rf-i" id="ap-name" placeholder="Ex: Yaourt nature bio"></div>
     <div class="rf-row">
       <div class="rf-f"><div class="rf-l">Gencod (EAN)</div><input class="rf-i" id="ap-gencod" placeholder="3289196040640"></div>
@@ -485,7 +550,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
 <!-- ═══ ARCHIVE MODAL ════════════════════════════════════════════════ -->
 <div id="archive-modal" class="modal-bg">
   <div class="modal-sh">
-    <div class="mhd-row" style="margin-bottom:14px"><div class="mhd-t">🗂 Historique & Archive</div><button class="mcl" onclick="closeModal('archive-modal')">✕</button></div>
+    <div class="mhd-row" style="margin-bottom:14px"><div class="mhd-t">🗂 Historique & Archive</div><button class="mcl" onclick="closeModal('archive-modal')" aria-label="Fermer">✕</button></div>
     <div id="arch-list"></div>
   </div>
 </div>
@@ -493,7 +558,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
 <!-- ═══ STATS MODAL ═══════════════════════════════════════════════════ -->
 <div id="stats-modal" class="modal-bg">
   <div class="modal-sh">
-    <div class="mhd-row" style="margin-bottom:14px"><div class="mhd-t">📈 Statistiques</div><button class="mcl" onclick="closeModal('stats-modal')">✕</button></div>
+    <div class="mhd-row" style="margin-bottom:14px"><div class="mhd-t">📈 Statistiques</div><button class="mcl" onclick="closeModal('stats-modal')" aria-label="Fermer">✕</button></div>
     <div id="stats-body"></div>
   </div>
 </div>
@@ -519,7 +584,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
     </div>
     <div id="hdr-r">
       <div id="h-badge"></div>
-      <button class="hmenu" onclick="toggleSB()">☰</button>
+      <button class="hmenu" onclick="toggleSB()" aria-label="Menu">☰</button>
     </div>
   </div>
 
@@ -538,7 +603,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
         <span class="sh-t" id="l-prods">Produits</span>
         <div style="display:flex;align-items:center;gap:8px">
           <span class="sh-c" id="pcount"></span>
-          <button onclick="openModal('add-product-modal');fillStoreDL()" style="padding:5px 12px;border-radius:var(--rr);background:rgba(18,168,118,.82);color:#fff;border:1px solid rgba(255,255,255,.24);font-size:11px;font-weight:900;cursor:pointer;font-family:var(--font)">+ Ajouter</button>
+          <button class="dash-add-btn" onclick="openModal('add-product-modal');fillStoreDL()" aria-label="Ajouter un produit">+ Ajouter</button>
         </div>
       </div>
       <div id="plist"></div>
@@ -548,59 +613,47 @@ select.store-sel option{background:#0A6B47;color:#fff}
     <div id="tab-scanner" class="tab">
 
       <!-- Magasin configuré (1 seul) -->
-      <div id="store-badge" style="display:none;margin-bottom:13px;background:rgba(18,168,118,.82);
-           backdrop-filter:blur(12px);border-radius:var(--rr);padding:10px 16px;
-           border:1px solid rgba(255,255,255,.28);box-shadow:var(--spec-d)">
-        <div style="font-size:10px;font-weight:900;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.9px;margin-bottom:2px">🏪 Magasin</div>
-        <div id="store-badge-name" style="font-size:14px;font-weight:900;color:#fff"></div>
+      <div id="store-badge" class="store-badge">
+        <div class="store-badge-lbl">🏪 Magasin</div>
+        <div id="store-badge-name" class="store-badge-name"></div>
       </div>
 
       <!-- ÉTAPE 1 : Scan code-barres (ZXing) -->
       <div class="scan-box" id="scan-step1">
         <input type="file" id="scan-in-ean" accept="image/*" capture="environment">
-        <div style="font-size:46px;margin-bottom:8px">🔖</div>
-        <div style="font-size:15px;font-weight:900;color:var(--gd)">Étape 1 — Code-barres EAN</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;font-weight:600">Photographiez le code-barres du produit</div>
+        <div class="scan-step-num">1</div>
+        <div class="scan-step-icon">🔖</div>
+        <div class="scan-step-title">Code-barres EAN</div>
+        <div class="scan-step-sub">Photographiez le code-barres du produit pour l'identifier dans le catalogue</div>
         <button class="sbtn" onclick="document.getElementById('scan-in-ean').click()">
           📷 Scanner le code-barres
         </button>
-        <div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-          <button onclick="openModal('add-product-modal');fillStoreDL()"
-            style="background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.1);color:var(--muted);
-                   border-radius:var(--rr);padding:7px 14px;font-size:11px;font-weight:700;
-                   cursor:pointer;font-family:var(--font)">
+        <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <button class="scan-link-btn" onclick="openModal('add-product-modal');fillStoreDL()">
             ✏️ Saisie manuelle
           </button>
-          <button id="quick-sync-btn" onclick="quickSync()" title="Rafraîchir le catalogue"
-            style="background:rgba(255,255,255,.22);border:1.5px solid rgba(255,255,255,.32);
-                   border-radius:var(--rr);padding:7px 13px;font-size:13px;cursor:pointer;
-                   font-family:var(--font);color:#fff;backdrop-filter:blur(8px)"
-            title="Rafraîchir le catalogue depuis Sheets">
+          <button id="quick-sync-btn" class="scan-link-btn" onclick="quickSync()" aria-label="Rafraîchir le catalogue" title="Rafraîchir le catalogue depuis Sheets">
             🔄
           </button>
         </div>
-        <div id="scan-st" style="margin-top:10px;font-size:12px;font-weight:700;color:var(--muted);min-height:18px"></div>
+        <div id="scan-st" class="scan-step-status"></div>
       </div>
 
       <!-- ÉTAPE 2 : Photo produit + saisie nom -->
       <div class="scan-box" id="scan-step2" style="display:none">
         <input type="file" id="scan-in-prod" accept="image/*" capture="environment">
-        <div style="font-size:46px;margin-bottom:8px">📦</div>
-        <div style="font-size:15px;font-weight:900;color:var(--gd)">Étape 2 — Photographier l'emballage</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;font-weight:600;line-height:1.6">Photographiez l'étiquette du produit<br>puis saisissez le nom visible</div>
-        <div id="scan-ean-found" style="background:rgba(245,158,11,.15);border-radius:12px;padding:8px 14px;margin:10px 0;font-size:12px;font-weight:800;color:#92400e"></div>
-        <button class="sbtn" onclick="document.getElementById('scan-in-prod').click()" style="background:rgba(59,130,246,.82);box-shadow:0 6px 20px rgba(59,130,246,.28)">
+        <div class="scan-step-num">2</div>
+        <div class="scan-step-icon">📦</div>
+        <div class="scan-step-title">Photographier l'emballage</div>
+        <div class="scan-step-sub">Photographiez l'étiquette du produit puis saisissez le nom visible</div>
+        <div id="scan-ean-found" style="background:rgba(245,158,11,.16);border:1px solid rgba(245,158,11,.28);border-radius:12px;padding:9px 14px;margin:12px 0;font-size:12px;font-weight:800;color:#92400e"></div>
+        <button class="sbtn" onclick="document.getElementById('scan-in-prod').click()" style="background:rgba(59,130,246,.86);box-shadow:0 6px 20px rgba(59,130,246,.3)">
           📷 Photographier l'emballage
         </button>
-        <div style="margin-top:10px">
-          <button onclick="resetScan()"
-            style="padding:8px 16px;border-radius:var(--rr);border:none;
-                   background:rgba(224,60,60,.12);color:var(--r);font-size:12px;font-weight:700;
-                   cursor:pointer;font-family:var(--font)">
-            🔄 Recommencer depuis le début
-          </button>
+        <div style="margin-top:12px">
+          <button class="scan-reset-btn" onclick="resetScan()">🔄 Recommencer depuis le début</button>
         </div>
-        <div id="scan-st2" style="margin-top:8px;font-size:12px;font-weight:700;color:var(--muted);min-height:16px"></div>
+        <div id="scan-st2" class="scan-step-status"></div>
       </div>
 
       <!-- Produit non référencé -->
@@ -646,38 +699,44 @@ select.store-sel option{background:#0A6B47;color:#fff}
     <!-- ADMIN -->
     <div id="tab-admin" class="tab">
 
-      <!-- Catalogue local (Google Sheets → localStorage) -->
+      <!-- Catalogue local — multi-marques -->
       <div class="adm-sec">
-        <div class="adm-t">📋 Catalogue produits</div>
+        <div class="adm-t">📋 Marques du magasin</div>
         <div id="catalogue-stats" style="font-size:12px;font-weight:600;margin-bottom:12px;line-height:1.7">—</div>
 
+        <!-- Liste des marques configurées -->
+        <div id="brand-list" style="margin-bottom:14px"></div>
+
+        <!-- Bloc d'aide -->
         <div style="background:rgba(18,168,118,.08);border:1px solid rgba(18,168,118,.2);border-radius:12px;padding:12px 14px;margin-bottom:13px">
-          <div style="font-size:12px;font-weight:900;color:var(--gd);margin-bottom:5px">💡 Configuration unique</div>
+          <div style="font-size:12px;font-weight:900;color:var(--gd);margin-bottom:5px">💡 Comment ajouter une marque</div>
           <div style="font-size:11px;color:var(--muted);font-weight:600;line-height:1.7">
-            Collez l'URL CSV <strong>une seule fois</strong> — l'app se synchronise automatiquement à chaque démarrage si le catalogue a plus de 24h ou est vide.<br>
-            Format : <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px;font-size:10px">…/gviz/tq?tqx=out:csv&amp;sheet=NomOnglet</code><br>
-            Plusieurs marques : séparez par <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px;font-size:10px"> | </code>
+            1) Dans Google Sheets, créez un onglet par marque (colonnes : <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px;font-size:10px">gencod</code>, <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px;font-size:10px">Libellé produit</code>, <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px;font-size:10px">Famille</code>).<br>
+            2) Publiez en CSV : <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px;font-size:10px">…/gviz/tq?tqx=out:csv&amp;sheet=NomOnglet</code><br>
+            3) Ajoutez ci-dessous (nom + URL). Re-sync individuelle ou globale possible à tout moment.
           </div>
         </div>
 
-        <div class="rf-f">
-          <div class="rf-l">URL(s) CSV Google Sheets</div>
-          <textarea class="rf-i" id="adm-sheet-url" rows="3"
-            style="border-radius:16px;resize:vertical;font-size:11px;line-height:1.7"
-            placeholder="https://docs.google.com/spreadsheets/d/ID/gviz/tq?tqx=out:csv&sheet=Produits"></textarea>
+        <!-- Formulaire ajout -->
+        <div class="addform" style="margin-top:0;padding-top:0;border-top:none">
+          <div class="rf-f"><div class="rf-l">Nom de la marque</div>
+            <input class="af-in" id="cat-name" placeholder="Ex: Lea Nature, Carrefour Bio…"></div>
+          <div class="rf-f"><div class="rf-l">URL CSV Google Sheets</div>
+            <input class="af-in" id="cat-url" placeholder="https://…/gviz/tq?tqx=out:csv&sheet=…" style="font-size:11px"></div>
+          <button class="af-add" onclick="addCatalogue()" style="width:100%;padding:12px">➕ Ajouter cette marque</button>
         </div>
 
-        <div id="sync-status" style="margin:6px 0 10px;font-size:12px;font-weight:700;min-height:16px"></div>
+        <div id="sync-status" style="margin:14px 0 10px;font-size:12px;font-weight:700;min-height:16px"></div>
 
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="af-add" onclick="syncCatalogue()" id="sync-btn" style="flex:2;padding:12px">
-            🔄 Synchroniser maintenant
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <button class="af-add" onclick="syncAllCatalogues()" id="sync-all-btn" style="flex:2;padding:12px">
+            🔄 Tout synchroniser
           </button>
           <button onclick="clearCatalogue()"
             style="flex:1;padding:12px;border-radius:var(--rr);background:rgba(224,60,60,.1);
                    border:1px solid rgba(224,60,60,.28);color:var(--r);font-size:13px;font-weight:800;
                    cursor:pointer;font-family:var(--font)">
-            🗑 Vider
+            🗑 Vider tout
           </button>
         </div>
       </div>
@@ -819,10 +878,10 @@ select.store-sel option{background:#0A6B47;color:#fff}
       <div class="sb-it" onclick="openModal('stats-modal');renderStats();closeSB()"><div class="sb-ic">📈</div>Statistiques</div>
       <div class="sb-sec">Langue</div>
       <div style="display:flex;gap:7px;flex-wrap:wrap;padding:3px 11px">
-        <button class="lang-btn" onclick="setLang('fr');closeSB()" style="color:var(--txt);border-color:var(--bdr);background:rgba(255,255,255,.6)">🇫🇷 FR</button>
-        <button class="lang-btn" onclick="setLang('en');closeSB()" style="color:var(--txt);border-color:var(--bdr);background:rgba(255,255,255,.6)">🇬🇧 EN</button>
-        <button class="lang-btn" onclick="setLang('es');closeSB()" style="color:var(--txt);border-color:var(--bdr);background:rgba(255,255,255,.6)">🇪🇸 ES</button>
-        <button class="lang-btn" onclick="setLang('zh');closeSB()" style="color:var(--txt);border-color:var(--bdr);background:rgba(255,255,255,.6)">🇨🇳 中文</button>
+        <button class="lang-btn" onclick="setLang('fr');closeSB()">🇫🇷 FR</button>
+        <button class="lang-btn" onclick="setLang('en');closeSB()">🇬🇧 EN</button>
+        <button class="lang-btn" onclick="setLang('es');closeSB()">🇪🇸 ES</button>
+        <button class="lang-btn" onclick="setLang('zh');closeSB()">🇨🇳 中文</button>
       </div>
     </div>
     <div class="sb-ft"><button class="sb-out" onclick="doLogout()">🚪 Déconnexion</button></div>
@@ -1386,9 +1445,9 @@ function renderDashboard(){
       <div class="pc-rt">
         <span class="pbadge ${bc}">${bt}</span>
         <div class="pact-row">
-          <button class="pact pact-ok" data-id="${sid}" onclick="archiveProd(this.dataset.id)">✓</button>
-          <button class="pact pact-ed" data-id="${sid}" onclick="openEditProd(this.dataset.id)">✏️</button>
-          <button class="pact pact-dl" data-id="${sid}" onclick="confirmDeleteProd(this.dataset.id)">🗑</button>
+          <button class="pact pact-ok" data-id="${sid}" onclick="archiveProd(this.dataset.id)" aria-label="Archiver" title="Marquer traité">✓</button>
+          <button class="pact pact-ed" data-id="${sid}" onclick="openEditProd(this.dataset.id)" aria-label="Modifier" title="Modifier">✏️</button>
+          <button class="pact pact-dl" data-id="${sid}" onclick="confirmDeleteProd(this.dataset.id)" aria-label="Supprimer" title="Supprimer">🗑</button>
         </div>
       </div>
     </div>`;
@@ -1465,6 +1524,36 @@ async function sendToGAS(action, data){
   }
 }
 
+/* ─── CROWDSOURCING : enrichit le catalogue partagé ─────────────────────────
+   Quand un agent saisit un produit dont le gencod n'est pas dans le catalogue,
+   on pousse {gencod, nom, marque, magasin, user} vers GAS qui doit l'écrire
+   dans un onglet 'crowdsource' du Sheet partagé. À chaque sync globale, ces
+   contributions sont récupérées et fusionnées dans le catalogue local.
+   Côté GAS (Code.gs), il faut handler l'action 'enrich_catalogue' :
+     case 'enrich_catalogue':
+       SpreadsheetApp.openById(SHEET_ID).getSheetByName('crowdsource')
+         .appendRow([new Date(), data.gencod, data.nom, data.famille,
+                     data.marque, data.magasin, data.user, data.lang]);
+       break;
+═══════════════════════════════════════════════════════════════════════════ */
+function pushCrowdsource(p){
+  if(!gasUrl) return;
+  if(!p || !p.gencod || !p.name) return;
+  // Ne pousser que si le gencod n'existe pas dans le catalogue local
+  if(lookupGencod(p.gencod)) return;
+  sendToGAS('enrich_catalogue', {
+    gencod:  String(p.gencod).replace(/\s/g,''),
+    nom:     p.name,
+    famille: p.type || '',
+    marque:  'Crowdsource',
+    magasin: p.magasin || storeName || '',
+    user:    session?.username || '?',
+    lang,
+    ts:      new Date().toISOString(),
+  });
+  console.log('[Crowdsource] Gencod inconnu poussé vers GAS:', p.gencod, p.name);
+}
+
 function saveAddProduct(){
   const name=document.getElementById('ap-name').value.trim();
   const dlc=document.getElementById('ap-dlc').value;
@@ -1480,170 +1569,290 @@ function saveAddProduct(){
   products.unshift(p);save('fc_products',products);
   closeModal('add-product-modal');renderDashboard();toast(T().saved);
   ['ap-name','ap-gencod','ap-type','ap-dlc'].forEach(id=>document.getElementById(id).value='');
-  if(gasUrl) sendToGAS('save_scan',{...p,statut:statusOf(p.dlc)==='e'?'perime':'ok',email_resp:emailResp,email_finance:emailFin});
+  if(gasUrl){
+    sendToGAS('save_scan',{...p,statut:statusOf(p.dlc)==='e'?'perime':'ok',email_resp:emailResp,email_finance:emailFin});
+    pushCrowdsource(p);
+  }
 }
 
-/* ═══ CATALOGUE LOCAL ════════════════════════════════════════════════════════
-   Stocké en localStorage (fc_catalogue).
-   Structure : [{gencod, nom, famille, marque}, ...]
-   Synchro depuis Admin → URL CSV Google Sheets public.
-═══════════════════════════════════════════════════════════════════════════ */
-let catalogue = JSON.parse(localStorage.getItem('fc_catalogue') || '[]');
+/* === CATALOGUE LOCAL - multi-marques ===========================
+   - fc_catalogue     : tableau agrege des produits (lookup rapide via index)
+   - fc_catalogue_ts  : timestamp derniere sync globale
+   - fc_catalogues    : registre des marques [{id,name,url,last_sync,count,error}]
+   - catalogueIdx     : Map gencod->produit en memoire (O(1) lookup)
+   Migration : si fc_catalogues absent et fc_sheet_url present -> split par '|'
+================================================================ */
+let catalogue   = JSON.parse(localStorage.getItem('fc_catalogue')  || '[]');
+let catalogues  = JSON.parse(localStorage.getItem('fc_catalogues') || 'null');
+let catalogueIdx = null;
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   CATALOGUE LOCAL — configuré UNE SEULE FOIS, sync automatique
-   ─────────────────────────────────────────────────────────────────────────
-   • L'URL CSV est sauvegardée définitivement dans localStorage
-   • Sync auto au démarrage si catalogue vide ou > 24h
-   • Sync silencieuse en arrière-plan toutes les 24h
-   • Bouton 🔄 discret dans le scanner pour rafraîchir manuellement
-═══════════════════════════════════════════════════════════════════════════ */
+// Migration douce depuis l'ancien fc_sheet_url (chaine | separee)
+if(catalogues === null){
+  const old = (localStorage.getItem('fc_sheet_url') || '').trim();
+  catalogues = old.split('|').map(u=>u.trim()).filter(Boolean).map(url=>{
+    const m = url.match(/[?&]sheet=([^&]+)/);
+    const name = m ? decodeURIComponent(m[1]).replace(/[_+]/g,' ').trim() : 'Catalogue';
+    return { id: genId(), name, url, last_sync: 0, count: 0, error: null };
+  });
+  saveCataloguesRaw();
+}
+
 function saveCatalogue(){
   localStorage.setItem('fc_catalogue', JSON.stringify(catalogue));
   localStorage.setItem('fc_catalogue_ts', Date.now().toString());
+  rebuildCatalogueIdx();
+}
+function saveCataloguesRaw(){
+  localStorage.setItem('fc_catalogues', JSON.stringify(catalogues));
+}
+function saveCatalogues(){ saveCataloguesRaw(); }
+
+function rebuildCatalogueIdx(){
+  catalogueIdx = new Map();
+  for(const p of catalogue){
+    const k = String(p.gencod||'').replace(/\s/g,'');
+    if(k) catalogueIdx.set(k, p);
+  }
 }
 
 function getCatalogueAge(){
   const ts = parseInt(localStorage.getItem('fc_catalogue_ts') || '0');
-  return ts ? Math.floor((Date.now() - ts) / 60000) : null; // en minutes
+  return ts ? Math.floor((Date.now() - ts) / 60000) : null;
 }
 
 function lookupGencod(ean){
+  if(!catalogueIdx) rebuildCatalogueIdx();
   const clean = String(ean).replace(/\s/g,'');
-  return catalogue.find(p => String(p.gencod||'').replace(/\s/g,'') === clean) || null;
+  return catalogueIdx.get(clean) || null;
 }
 
-/* ── Auto-sync : lancé au démarrage, silencieux ─────────────────────────── */
+/* Auto-sync au demarrage */
 async function autoSyncCatalogue(){
-  const savedUrl = localStorage.getItem('fc_sheet_url') || '';
-  if(!savedUrl) return; // URL jamais configurée → rien à faire
-
-  const ageMin = getCatalogueAge();
+  if(!catalogues.length) return;
+  const ageMin  = getCatalogueAge();
   const isEmpty = catalogue.length === 0;
-  const isOld   = ageMin === null || ageMin > 1440; // > 24h
-
-  if(!isEmpty && !isOld) return; // catalogue frais → pas besoin
-
-  console.log('[Catalogue] Auto-sync:', isEmpty ? 'catalogue vide' : `dernière sync il y a ${ageMin}min`);
-  await runSync(savedUrl, { silent: true });
+  const isOld   = ageMin === null || ageMin > 1440;
+  if(!isEmpty && !isOld){ rebuildCatalogueIdx(); return; }
+  console.log('[Catalogue] Auto-sync', isEmpty ? '(vide)' : `(age ${ageMin}min)`);
+  await syncAllCatalogues({ silent: true });
 }
 
-/* ── Sync manuelle (depuis Admin ou bouton scanner) ─────────────────────── */
-async function syncCatalogue(){
-  const urlInput = document.getElementById('adm-sheet-url');
-  const url = urlInput ? urlInput.value.trim() : localStorage.getItem('fc_sheet_url') || '';
-  if(!url){ toast('❌ Configurez d\'abord l\'URL dans Admin → Catalogue'); return; }
-  localStorage.setItem('fc_sheet_url', url);
-  await runSync(url, { silent: false });
+/* Fetch + parse d'une marque */
+async function fetchCatalogueProducts(cat){
+  const res = await fetch(cat.url, { cache: 'no-store' });
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const csv  = await res.text();
+  const rows = parseCSVSimple(csv);
+  if(rows.length < 2) return [];
+  const headers = rows[0].map(h=>h.toLowerCase().replace(/["\s]/g,''));
+  const gi = headers.findIndex(h=>h.includes('gencod')||h.includes('ean')||h.includes('code'));
+  const ni = headers.findIndex(h=>h.includes('libell')||h.includes('nom')||h.includes('produit'));
+  const fi = headers.findIndex(h=>h.includes('famille')||h.includes('type')||h.includes('rayon'));
+  if(gi<0) throw new Error('Colonne gencod introuvable');
+  const out = [];
+  for(let i=1;i<rows.length;i++){
+    const row = rows[i];
+    const gc  = (row[gi]||'').replace(/["\s']/g,'');
+    if(!gc) continue;
+    out.push({
+      gencod:  gc,
+      nom:     (ni>=0 ? row[ni] : '').replace(/^"|"$/g,'').trim(),
+      famille: (fi>=0 ? row[fi] : '').replace(/^"|"$/g,'').trim(),
+      marque:  cat.name,
+    });
+  }
+  return out;
 }
 
-/* ── Sync rapide depuis le scanner ──────────────────────────────────────── */
+/* Sync globale (toutes les marques en parallele) */
+async function syncAllCatalogues(opts = {}){
+  if(!catalogues.length){
+    if(!opts.silent) toast('❌ Aucune marque configuree - ajoutez-en une');
+    return;
+  }
+  const btn = document.getElementById('sync-all-btn');
+  const st  = document.getElementById('sync-status');
+  if(btn && !opts.silent){ btn.textContent='⏳ Synchronisation...'; btn.disabled=true; }
+  if(st  && !opts.silent){ st.textContent=''; }
+
+  const results = await Promise.allSettled(catalogues.map(c => fetchCatalogueProducts(c)));
+  const merged = [];
+  let totalCount = 0;
+  let errorCount = 0;
+  results.forEach((r, idx) => {
+    const cat = catalogues[idx];
+    if(r.status === 'fulfilled'){
+      cat.count = r.value.length;
+      cat.last_sync = Date.now();
+      cat.error = null;
+      merged.push(...r.value);
+      totalCount += r.value.length;
+    } else {
+      cat.error = (r.reason && r.reason.message) || String(r.reason);
+      errorCount++;
+      console.error(`[Catalogue] ${cat.name} sync failed:`, r.reason);
+    }
+  });
+  catalogue = merged;
+  saveCatalogue();
+  saveCatalogues();
+  renderCatalogueStats();
+  renderBrandList();
+
+  if(!opts.silent){
+    if(errorCount === 0){
+      toast(`✅ ${totalCount} produit${totalCount>1?'s':''} synchronise${totalCount>1?'s':''}`);
+      if(st){ st.textContent = `✅ ${totalCount} produits · ${catalogues.length} marque(s)`; st.style.color='var(--gd)'; }
+    } else {
+      toast(`⚠️ ${errorCount} marque(s) en erreur`);
+      if(st){ st.textContent = `⚠️ ${totalCount} produits - ${errorCount} marque(s) en erreur`; st.style.color='var(--o)'; }
+    }
+  }
+  if(btn && !opts.silent){ btn.textContent='\u{1F504} Tout synchroniser'; btn.disabled=false; }
+}
+
+/* Sync d'une seule marque (incremental) */
+async function syncOneCatalogue(id){
+  const cat = catalogues.find(c => c.id === id);
+  if(!cat) return;
+  const btn = document.getElementById('sync-btn-'+id);
+  if(btn){ btn.textContent='⏳'; btn.disabled=true; }
+  try{
+    const prods = await fetchCatalogueProducts(cat);
+    catalogue = catalogue.filter(p => p.marque !== cat.name).concat(prods);
+    cat.count = prods.length;
+    cat.last_sync = Date.now();
+    cat.error = null;
+    saveCatalogue();
+    saveCatalogues();
+    renderCatalogueStats();
+    renderBrandList();
+    toast(`✅ ${cat.name} : ${prods.length} produit${prods.length>1?'s':''}`);
+  } catch(e){
+    cat.error = e.message || String(e);
+    saveCatalogues();
+    renderBrandList();
+    toast(`❌ ${cat.name} : ${cat.error}`);
+  } finally {
+    if(btn){ btn.textContent='\u{1F504}'; btn.disabled=false; }
+  }
+}
+
+/* Quick sync depuis le scanner */
 async function quickSync(){
-  const url = localStorage.getItem('fc_sheet_url') || '';
-  if(!url){
-    toast('❌ URL non configurée — allez dans Admin → 📋 Catalogue');
+  if(!catalogues.length){
+    toast('❌ Aucune marque - Admin -> \u{1F4CB} Marques');
     return;
   }
   const btn = document.getElementById('quick-sync-btn');
   if(btn){ btn.textContent='⏳'; btn.disabled=true; }
-  await runSync(url, { silent: false });
-  if(btn){ btn.textContent='🔄'; btn.disabled=false; }
+  await syncAllCatalogues({ silent: false });
+  if(btn){ btn.textContent='\u{1F504}'; btn.disabled=false; }
   checkCatalogueWarning();
 }
 
-/* ── Moteur de sync (partagé) ────────────────────────────────────────────── */
-async function runSync(url, { silent = false } = {}){
-  const btn = document.getElementById('sync-btn');
-  const st  = document.getElementById('sync-status');
-  if(btn && !silent){ btn.textContent='⏳ Synchronisation…'; btn.disabled=true; }
-  if(st  && !silent) st.textContent = '';
+/* Sync manuelle (alias compat) */
+async function syncCatalogue(){ await syncAllCatalogues({ silent: false }); }
 
-  try{
-    const urls = url.split('|').map(u=>u.trim()).filter(Boolean);
-    const newCatalogue = [];
-    let total = 0;
-
-    for(const u of urls){
-      const m = u.match(/[?&]sheet=([^&]+)/);
-      const marque = m ? decodeURIComponent(m[1]) : 'Catalogue';
-
-      const res = await fetch(u, { cache: 'no-store' });
-      if(!res.ok) throw new Error(`HTTP ${res.status} (${marque})`);
-      const csv  = await res.text();
-      const rows = parseCSVSimple(csv);
-      if(rows.length < 2) continue;
-
-      const headers = rows[0].map(h=>h.toLowerCase().replace(/["\s]/g,''));
-      const gi = headers.findIndex(h=>h.includes('gencod')||h.includes('ean')||h.includes('code'));
-      const ni = headers.findIndex(h=>h.includes('libell')||h.includes('nom')||h.includes('produit'));
-      const fi = headers.findIndex(h=>h.includes('famille')||h.includes('type')||h.includes('rayon'));
-      if(gi<0) continue;
-
-      for(let i=1;i<rows.length;i++){
-        const row = rows[i];
-        const gc  = (row[gi]||'').replace(/["\s']/g,'');
-        if(!gc) continue;
-        newCatalogue.push({
-          gencod:  gc,
-          nom:     (ni>=0 ? row[ni] : '').replace(/^"|"$/g,'').trim(),
-          famille: (fi>=0 ? row[fi] : '').replace(/^"|"$/g,'').trim(),
-          marque,
-        });
-        total++;
-      }
-    }
-
-    catalogue = newCatalogue;
-    saveCatalogue();
-    renderCatalogueStats();
-
-    if(!silent){
-      const msg = `✅ ${total} produit${total>1?'s':''} synchronisé${total>1?'s':''}`;
-      if(st){ st.textContent=msg; st.style.color='var(--gd)'; }
-      toast(msg);
-    }
-  } catch(e){
-    console.error('[Catalogue] Sync error:', e);
-    if(!silent){
-      if(st){ st.textContent=`❌ ${e.message}`; st.style.color='var(--r)'; }
-      toast('❌ Erreur synchronisation');
-    }
-  } finally {
-    if(btn && !silent){ btn.textContent='🔄 Synchroniser'; btn.disabled=false; }
+/* CRUD marques */
+function addCatalogue(){
+  const nameEl = document.getElementById('cat-name');
+  const urlEl  = document.getElementById('cat-url');
+  const name = (nameEl?.value || '').trim();
+  const url  = (urlEl?.value  || '').trim();
+  if(!name || !url){ toast('❌ Nom et URL obligatoires'); return; }
+  if(catalogues.find(c => c.name.toLowerCase() === name.toLowerCase())){
+    toast('❌ Cette marque existe deja'); return;
   }
+  const newCat = { id: genId(), name, url, last_sync: 0, count: 0, error: null };
+  catalogues.push(newCat);
+  saveCatalogues();
+  if(nameEl) nameEl.value = '';
+  if(urlEl)  urlEl.value  = '';
+  renderBrandList();
+  syncOneCatalogue(newCat.id);
+}
+
+function removeCatalogue(id){
+  const cat = catalogues.find(c => c.id === id);
+  if(!cat) return;
+  showConfirm(`Supprimer la marque "${cat.name}" ?`,'Les produits de cette marque seront retires du catalogue local.', () => {
+    catalogue  = catalogue.filter(p => p.marque !== cat.name);
+    catalogues = catalogues.filter(c => c.id !== id);
+    saveCatalogue();
+    saveCatalogues();
+    renderCatalogueStats();
+    renderBrandList();
+    toast('\u{1F5D1} Marque supprimee');
+  });
 }
 
 function clearCatalogue(){
-  showConfirm('Vider le catalogue ?','Tous les produits locaux seront supprimés.', ()=>{
-    catalogue=[]; localStorage.removeItem('fc_catalogue'); localStorage.removeItem('fc_catalogue_ts');
-    renderCatalogueStats(); toast('🗑 Catalogue vidé');
+  showConfirm('Vider TOUT le catalogue ?','Toutes les marques et leurs produits seront supprimes. La configuration des marques sera conservee.', ()=>{
+    catalogue = [];
+    catalogues.forEach(c => { c.count = 0; c.last_sync = 0; });
+    localStorage.removeItem('fc_catalogue');
+    localStorage.removeItem('fc_catalogue_ts');
+    saveCatalogues();
+    rebuildCatalogueIdx();
+    renderCatalogueStats();
+    renderBrandList();
+    toast('\u{1F5D1} Catalogue vide');
   });
+}
+
+/* Rendering */
+function fmtAge(min){
+  if(min === null || min === undefined) return 'Jamais';
+  if(min < 1)    return "a l'instant";
+  if(min < 60)   return `il y a ${min}min`;
+  if(min < 1440) return `il y a ${Math.floor(min/60)}h`;
+  return `il y a ${Math.floor(min/1440)}j`;
 }
 
 function renderCatalogueStats(){
   const el = document.getElementById('catalogue-stats');
   if(!el) return;
-
-  const ageMin = getCatalogueAge();
-  const savedUrl = localStorage.getItem('fc_sheet_url') || '';
-
-  if(!catalogue.length){
-    const noUrl = !savedUrl;
-    el.innerHTML = noUrl
-      ? '<span style="color:var(--r);font-weight:700">❌ Aucune URL configurée — collez l\'URL ci-dessous (une seule fois)</span>'
-      : '<span style="color:var(--o);font-weight:700">⚠️ Catalogue vide — cliquez Synchroniser</span>';
-  } else {
-    const marques = [...new Set(catalogue.map(p=>p.marque||'—'))];
-    const ageStr  = ageMin !== null
-      ? (ageMin < 60 ? `il y a ${ageMin}min` : ageMin < 1440 ? `il y a ${Math.floor(ageMin/60)}h` : `il y a ${Math.floor(ageMin/1440)}j`)
-      : '';
-    el.innerHTML  = `<span style="color:var(--gd);font-weight:700">✅ ${catalogue.length} produits · ${marques.length} marque(s)</span>
-      <br><span style="font-size:11px;color:var(--muted);font-weight:600">${marques.join(', ')} ${ageStr?'· Sync '+ageStr:''}</span>`;
+  if(!catalogues.length){
+    el.innerHTML = '<span style="color:var(--r);font-weight:700">❌ Aucune marque configuree - ajoutez-en une ci-dessous</span>';
+    return;
   }
-
-  const inp = document.getElementById('adm-sheet-url');
-  if(inp) inp.value = savedUrl;
+  if(!catalogue.length){
+    el.innerHTML = '<span style="color:var(--o);font-weight:700">⚠️ Catalogue vide - cliquez "Tout synchroniser"</span>';
+    return;
+  }
+  const ageStr = fmtAge(getCatalogueAge());
+  el.innerHTML = `<span style="color:var(--gd);font-weight:700">✅ ${catalogue.length} produits · ${catalogues.length} marque(s)</span>
+    <br><span style="font-size:11px;color:var(--muted);font-weight:600">Sync ${ageStr}</span>`;
 }
+
+function renderBrandList(){
+  const el = document.getElementById('brand-list');
+  if(!el) return;
+  if(!catalogues.length){
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:14px 4px;font-weight:600;text-align:center">Aucune marque - ajoutez-en une ci-dessous</div>';
+    return;
+  }
+  el.innerHTML = catalogues.map(c => {
+    const ageMin = c.last_sync ? Math.floor((Date.now() - c.last_sync) / 60000) : null;
+    const meta = c.error
+      ? `<span style="color:var(--r);font-weight:700">⚠️ ${escapeHTML(c.error)}</span>`
+      : `<span style="color:var(--muted)">${c.count} produit${c.count>1?'s':''} · ${fmtAge(ageMin)}</span>`;
+    return `<div class="brand-card">
+      <div class="brand-info">
+        <div class="brand-name">\u{1F4E6} ${escapeHTML(c.name)}</div>
+        <div class="brand-meta">${meta}</div>
+      </div>
+      <div class="brand-actions">
+        <button class="brand-sync" id="sync-btn-${c.id}" data-bid="${c.id}" onclick="syncOneCatalogue(this.dataset.bid)" aria-label="Synchroniser ${escapeHTMLAttr(c.name)}" title="Synchroniser">\u{1F504}</button>
+        <button class="adm-del" data-bid="${c.id}" onclick="removeCatalogue(this.dataset.bid)" aria-label="Supprimer ${escapeHTMLAttr(c.name)}" title="Supprimer">\u{1F5D1}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function escapeHTMLAttr(s){ return escapeHTML(s).replace(/`/g,''); }
 
 function parseCSVSimple(text){
   const rows=[];
@@ -1688,31 +1897,29 @@ function getZXing(){
 function checkCatalogueWarning(){
   const st = document.getElementById('scan-st');
   if(!st) return;
-  const savedUrl = localStorage.getItem('fc_sheet_url') || '';
   if(!catalogue.length){
-    if(!savedUrl){
-      // URL jamais configurée
+    if(!catalogues.length){
+      // Aucune marque configurée
       st.innerHTML = `<div style="background:rgba(224,60,60,.13);border:1px solid rgba(224,60,60,.28);
           border-radius:12px;padding:10px 14px;font-size:12px;font-weight:700;color:var(--rd)">
-        ❌ Catalogue non configuré<br>
-        <span style="font-weight:600;opacity:.85">Allez dans <strong>☰ → Admin → 📋 Catalogue</strong><br>et collez l'URL Google Sheets une seule fois.</span>
+        ❌ Aucune marque configurée<br>
+        <span style="font-weight:600;opacity:.85">Allez dans <strong>☰ → Admin → 📋 Marques</strong> pour ajouter votre première marque.</span>
       </div>`;
     } else {
-      // URL configurée mais catalogue vide (synchro en cours ou échouée)
+      // Marques configurées mais catalogue vide → sync en cours/échouée
       st.innerHTML = `<div style="background:rgba(245,158,11,.13);border:1px solid rgba(245,158,11,.3);
           border-radius:12px;padding:10px 14px;font-size:12px;font-weight:700;color:#92400e">
         ⏳ Catalogue vide — synchronisation en cours…
       </div>`;
-      // Lancer la sync automatiquement
-      quickSync();
+      syncAllCatalogues({ silent: true }).then(checkCatalogueWarning);
     }
   } else {
     const ageMin = getCatalogueAge();
-    if(ageMin !== null && ageMin > 1440){
-      // Vieux de plus de 24h → sync silencieuse
-      runSync(savedUrl, { silent:true }).then(checkCatalogueWarning);
+    if(ageMin !== null && ageMin > 1440 && catalogues.length){
+      // Vieux de plus de 24h → sync silencieuse en arrière-plan
+      syncAllCatalogues({ silent: true }).then(checkCatalogueWarning);
     }
-    st.textContent = ''; // catalogue OK → pas d'avertissement
+    st.textContent = '';
   }
 }
 
@@ -2039,6 +2246,8 @@ function saveProduct(){
       email_resp:    emailResp,
       email_finance: emailFin,
     });
+    // Crowdsource : si ce gencod n'est pas dans le catalogue, on l'y pousse
+    pushCrowdsource(p);
   }
 }
 
@@ -2086,6 +2295,7 @@ function togglePlan(store,idx){
 /* ═══ ADMIN ══════════════════════════════════════════════════════════════════ */
 function renderAdmin(){
   renderCatalogueStats();
+  renderBrandList();
   renderStoreAdmin();
   renderUserAdmin();
   document.querySelectorAll('.lsb').forEach(b=>b.classList.remove('on'));
@@ -2304,11 +2514,11 @@ function showStoreBadge(){
   const name  = document.getElementById('store-badge-name');
   if(!badge||!name) return;
   if(storeName){
-    badge.style.display='block';
+    badge.classList.add('on');
     name.textContent = storeName;
     document.getElementById('hdr-sub').textContent = storeName;
   } else {
-    badge.style.display='none';
+    badge.classList.remove('on');
   }
 }
 
