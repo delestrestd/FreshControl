@@ -384,37 +384,57 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
   </div>
 </div>
 
-<!-- ═══ RGPD ══════════════════════════════════════════════════════════ -->
+<!-- ═══ RGPD ══════════════════════════════════════════════════════════
+     Note projet : ces textes sont rédigés en cohérence avec les
+     traitements réels effectués par l'application (cf. mentions
+     légales). Une relecture par un avocat est requise avant tout
+     déploiement en production. -->
 <div id="rgpd" class="off">
   <div class="rgpd-sh">
-    <div class="rgpd-t">📱 Charte d'usage professionnel — Appareil personnel</div>
+    <div class="rgpd-t">🔒 Charte d'usage et protection des données</div>
 
     <!-- Bloc 1 — BYOD -->
     <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);border-radius:12px;padding:12px 14px;margin-bottom:10px">
-      <div style="font-size:12px;font-weight:900;color:#92400e;margin-bottom:5px">📱 Utilisation de votre appareil personnel (BYOD)</div>
-      <p style="font-size:12px;color:var(--muted);line-height:1.65;font-weight:600">En utilisant FreshControl sur votre téléphone personnel dans le cadre de vos missions, vous reconnaissez :<br>
-      • Avoir été informé(e) par votre responsable de cette modalité d'usage<br>
-      • Utiliser votre appareil de façon volontaire pour réaliser des tâches professionnelles<br>
-      • Que l'application n'accède à <strong>aucune donnée personnelle</strong> (contacts, photos personnelles, messages ou autres apps)<br>
-      • Que seules les données produits saisies dans l'app (nom, DLC, magasin) sont enregistrées localement sur cet appareil</p>
+      <div style="font-size:12px;font-weight:900;color:#92400e;margin-bottom:5px">📱 Usage professionnel sur appareil personnel (BYOD)</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.65;font-weight:600">En utilisant FreshControl sur votre appareil personnel dans le cadre de vos missions, vous reconnaissez :<br>
+      • Avoir été informé(e) par votre employeur de cette modalité d'usage et l'avoir acceptée volontairement ;<br>
+      • Que l'application est une PWA qui n'installe aucun logiciel natif et n'accède pas à vos contacts, photos personnelles, SMS ou autres applications ;<br>
+      • Que vous restez seul(e) propriétaire de votre appareil et responsable de sa configuration générale.</p>
     </div>
 
-    <!-- Bloc 2 — Données stockées -->
+    <!-- Bloc 2 — Données collectées (liste exhaustive) -->
     <div style="background:rgba(18,168,118,.08);border:1px solid rgba(18,168,118,.2);border-radius:12px;padding:12px 14px;margin-bottom:10px">
-      <div style="font-size:12px;font-weight:900;color:var(--gd);margin-bottom:5px">💾 Données & confidentialité</div>
-      <p style="font-size:12px;color:var(--muted);line-height:1.65;font-weight:600">Toutes les données professionnelles saisies sont stockées <strong>uniquement sur cet appareil</strong> (localStorage du navigateur). Aucune donnée n'est transmise à un tiers sans votre action. La désinstallation ou la réinitialisation du navigateur entraîne la suppression définitive de ces données.</p>
+      <div style="font-size:12px;font-weight:900;color:var(--gd);margin-bottom:5px">📋 Données effectivement traitées</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.65;font-weight:600">L'application traite les catégories de données suivantes :<br>
+      • <strong>Géolocalisation</strong> (latitude/longitude) — pour identifier le magasin, après votre consentement explicite à chaque session ;<br>
+      • <strong>Photographies</strong> de codes-barres et d'emballages — décodées localement par votre navigateur, non transmises ;<br>
+      • <strong>Données produits</strong> que vous saisissez : nom, code-barres, DLC, type, magasin, auteur du scan ;<br>
+      • <strong>Compte utilisateur</strong> : nom, identifiant, mot de passe (stocké haché SHA-256 + sel), rôle, rayon ;<br>
+      • <strong>Adresses e-mail</strong> que vous renseignez pour les rappels (optionnel) ;<br>
+      • <strong>Adresse postale</strong> du magasin (optionnel) — géocodée via OpenStreetMap.</p>
     </div>
 
-    <!-- Bloc 3 — Responsabilité -->
+    <!-- Bloc 3 — Stockage & services tiers -->
     <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:12px;padding:12px 14px;margin-bottom:10px">
-      <div style="font-size:12px;font-weight:900;color:#1E40AF;margin-bottom:5px">⚖️ Responsabilité & garantie</div>
-      <p style="font-size:12px;color:var(--muted);line-height:1.65;font-weight:600">FreshControl est une application web (PWA) qui <strong>n'installe aucun logiciel natif</strong> et ne modifie pas la garantie de votre téléphone. En cas de dommage survenu lors d'une mission professionnelle, les conditions de prise en charge relèvent de la politique BYOD de votre employeur. Consultez votre contrat ou votre service RH.</p>
+      <div style="font-size:12px;font-weight:900;color:#1E40AF;margin-bottom:5px">💾 Stockage & destinataires</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.65;font-weight:600"><strong>Stockage principal :</strong> localStorage du navigateur, sur votre appareil. Les données ne quittent pas l'appareil sans action de votre part.<br>
+      <strong>Services tiers chargés à l'ouverture</strong> (sans transfert de données métier) : jsDelivr (CDN du décodeur ZXing), Google Fonts, OpenStreetMap/Nominatim (uniquement lors d'une recherche d'adresse).<br>
+      <strong>Backend optionnel</strong> (si configuré par l'administrateur de votre magasin) : Google Sheets / Google Apps Script pour la synchronisation du catalogue et l'envoi d'alertes e-mail. Dans ce cas, les destinataires sont les services Google et les adresses e-mail que vous saisissez.<br>
+      <strong>Hébergement</strong> : Vercel Inc.</p>
     </div>
 
-    <!-- Bloc 4 — RGPD -->
+    <!-- Bloc 4 — Conservation -->
+    <div style="background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.18);border-radius:12px;padding:12px 14px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:900;color:#5b21b6;margin-bottom:5px">⏳ Durée de conservation</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.65;font-weight:600">Les données sont conservées tant que vous ne les supprimez pas (bouton « Réinitialiser » de l'app, ou nettoyage des données du navigateur). La géolocalisation ponctuelle n'est pas conservée — seul l'appariement au magasin est utilisé pour la session. Les comptes utilisateurs sont conservés tant que l'administrateur ne les supprime pas.</p>
+    </div>
+
+    <!-- Bloc 5 — RGPD -->
     <div style="background:rgba(224,60,60,.07);border:1px solid rgba(224,60,60,.18);border-radius:12px;padding:12px 14px;margin-bottom:16px">
       <div style="font-size:12px;font-weight:900;color:var(--rd);margin-bottom:5px">🇪🇺 Vos droits (RGPD — UE 2016/679)</div>
-      <p style="font-size:12px;color:var(--muted);line-height:1.65;font-weight:600">Vous disposez des droits d'accès, de rectification et d'effacement sur vos données professionnelles. Pour exercer vos droits : <strong>contact@bunga.corp</strong><br>Ce consentement est demandé à chaque démarrage de session.</p>
+      <p style="font-size:12px;color:var(--muted);line-height:1.65;font-weight:600">Vous disposez des droits d'accès, de rectification, d'effacement, de limitation, de portabilité, d'opposition et du droit de retirer votre consentement à tout moment (art. 15 à 22 RGPD). Vous pouvez également introduire une réclamation auprès de la CNIL (<strong>cnil.fr</strong>).<br>
+      Pour exercer vos droits : <strong>[adresse DPO à compléter par l'éditeur]</strong>.<br>
+      <span style="font-size:11px;opacity:.85">Le détail complet des traitements figure dans les <strong>Mentions légales</strong>, accessibles depuis le menu de l'application.</span></p>
     </div>
 
     <div class="rgpd-row">
@@ -562,6 +582,117 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
   <div class="modal-sh">
     <div class="mhd-row" style="margin-bottom:14px"><div class="mhd-t">📈 Statistiques</div><button class="mcl" onclick="closeModal('stats-modal')" aria-label="Fermer">✕</button></div>
     <div id="stats-body"></div>
+  </div>
+</div>
+
+<!-- ═══ MENTIONS LÉGALES / CGU / RGPD ═══════════════════════════════════
+     Textes rédigés en cohérence avec les traitements réels de l'application.
+     À soumettre à un avocat avant toute mise en production : tous les
+     champs entre crochets [ … ] sont des placeholders à compléter. -->
+<div id="legal-modal" class="modal-bg">
+  <div class="modal-sh" style="max-width:720px">
+    <div class="mhd-row" style="margin-bottom:14px"><div class="mhd-t">⚖️ Mentions légales &amp; RGPD</div><button class="mcl" onclick="closeModal('legal-modal')" aria-label="Fermer">✕</button></div>
+    <div style="font-size:12.5px;line-height:1.7;color:var(--txt);font-weight:600">
+
+      <div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:10px 12px;margin-bottom:18px;font-size:11.5px;color:#92400e">
+        ⚠️ <strong>Document de travail.</strong> Les textes ci-dessous sont une base technique alignée sur les traitements réels de l'application. Ils doivent être validés par un conseil juridique avant toute exploitation en production. Les éléments entre crochets <code>[ … ]</code> sont des placeholders à compléter par l'éditeur.
+      </div>
+
+      <h3 style="font-size:15px;font-weight:900;margin:0 0 8px;color:var(--gd)">1. Éditeur de l'application</h3>
+      <p style="margin:0 0 14px;color:var(--muted)">
+        FreshControl (« l'Application ») est édité par <strong>[Raison sociale de l'éditeur]</strong>, [forme juridique] au capital de [montant] €, immatriculée au RCS de [ville] sous le numéro [SIREN], dont le siège social est situé [adresse complète].<br>
+        Numéro de TVA intracommunautaire : <strong>[FRxx XXXXXXXXX]</strong>.<br>
+        Directeur de la publication : <strong>[Nom Prénom]</strong>.<br>
+        Contact : <strong>[email de contact]</strong>.
+      </p>
+
+      <h3 style="font-size:15px;font-weight:900;margin:0 0 8px;color:var(--gd)">2. Hébergement</h3>
+      <p style="margin:0 0 14px;color:var(--muted)">
+        L'Application est hébergée par <strong>Vercel Inc.</strong>, 340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis (<a href="https://vercel.com" target="_blank" rel="noopener noreferrer">vercel.com</a>). Vercel agit en qualité de sous-traitant au sens de l'article 28 du RGPD. Les transferts hors UE sont encadrés par les Clauses Contractuelles Types de la Commission européenne (décision 2021/914).
+      </p>
+
+      <h3 style="font-size:15px;font-weight:900;margin:0 0 8px;color:var(--gd)">3. Conditions Générales d'Utilisation (CGU)</h3>
+
+      <p style="margin:0 0 6px;font-weight:800">3.1. Objet</p>
+      <p style="margin:0 0 12px;color:var(--muted)">L'Application a pour objet d'aider à la gestion des dates limites de consommation (DLC) en magasin : scan de codes-barres, saisie de DLC, suivi multi-magasins, alertes et rappels e-mail.</p>
+
+      <p style="margin:0 0 6px;font-weight:800">3.2. Accès et compte utilisateur</p>
+      <p style="margin:0 0 12px;color:var(--muted)">L'accès à l'Application nécessite un identifiant et un mot de passe fournis par l'administrateur de l'organisation utilisatrice. L'Utilisateur est responsable de la confidentialité de ses identifiants et de toute action effectuée depuis son compte. Tout partage d'identifiants est interdit.</p>
+
+      <p style="margin:0 0 6px;font-weight:800">3.3. Engagements de l'Utilisateur</p>
+      <p style="margin:0 0 12px;color:var(--muted)">L'Utilisateur s'engage à utiliser l'Application conformément à sa destination professionnelle, à ne saisir que des données exactes et licites, à ne pas tenter de contourner les mesures de sécurité, à ne pas effectuer de scraping automatisé ou d'usage anormal, et à respecter les droits des tiers (notamment les droits liés aux marques figurant sur les emballages photographiés).</p>
+
+      <p style="margin:0 0 6px;font-weight:800">3.4. Disponibilité du service</p>
+      <p style="margin:0 0 12px;color:var(--muted)">L'Application est fournie « en l'état » et accessible 24h/24 sous réserve d'opérations de maintenance et de la disponibilité des services tiers (hébergeur, CDN, services Google si configurés). Aucun engagement de niveau de service (SLA) n'est consenti par défaut. L'éditeur se réserve le droit de suspendre temporairement l'accès pour des raisons techniques ou de sécurité.</p>
+
+      <p style="margin:0 0 6px;font-weight:800">3.5. Propriété intellectuelle</p>
+      <p style="margin:0 0 12px;color:var(--muted)">L'ensemble des éléments composant l'Application (code, design, marque, contenus rédactionnels) sont la propriété exclusive de l'éditeur ou de ses concédants. Toute reproduction, représentation ou exploitation non autorisée est interdite. Les données saisies par l'Utilisateur restent sa propriété et sont traitées dans les conditions de la Politique de confidentialité ci-dessous.</p>
+
+      <p style="margin:0 0 6px;font-weight:800">3.6. Limitation de responsabilité</p>
+      <p style="margin:0 0 12px;color:var(--muted)">L'Application est un outil d'aide à la décision. L'éditeur ne saurait être tenu pour responsable des décisions opérationnelles prises par l'Utilisateur ou son employeur sur la base des informations affichées (alertes DLC, retraits de produits, envoi d'e-mails). Dans toute la mesure permise par la loi, la responsabilité de l'éditeur est limitée aux dommages directs et plafonnée à <strong>[montant à définir]</strong> €.</p>
+
+      <p style="margin:0 0 6px;font-weight:800">3.7. Modification des CGU</p>
+      <p style="margin:0 0 14px;color:var(--muted)">L'éditeur se réserve le droit de modifier les présentes CGU. Les utilisateurs sont informés des modifications substantielles via l'écran de consentement à l'ouverture de session. La poursuite de l'utilisation vaut acceptation des CGU mises à jour.</p>
+
+      <h3 style="font-size:15px;font-weight:900;margin:0 0 8px;color:var(--gd)">4. Politique de confidentialité (RGPD)</h3>
+
+      <p style="margin:0 0 6px;font-weight:800">4.1. Responsable de traitement</p>
+      <p style="margin:0 0 12px;color:var(--muted)">Le responsable de traitement est <strong>[Raison sociale de l'éditeur]</strong>. L'employeur de l'Utilisateur agit en qualité de co-responsable lorsque l'usage de l'Application s'inscrit dans une mission professionnelle pour son compte (art. 26 RGPD).</p>
+
+      <p style="margin:0 0 6px;font-weight:800">4.2. Données traitées et finalités</p>
+      <p style="margin:0 0 6px;color:var(--muted)">Les catégories de données traitées et les finalités poursuivies sont les suivantes :</p>
+      <ul style="margin:0 0 12px 18px;color:var(--muted);padding-left:0">
+        <li><strong>Données d'authentification</strong> (nom, identifiant, mot de passe haché, rôle, rayon) — finalité : sécurisation de l'accès. Base : exécution de mesures précontractuelles / contrat (art. 6.1.b RGPD).</li>
+        <li><strong>Géolocalisation ponctuelle</strong> — finalité : associer la session au magasin de rattachement. Base : consentement explicite à chaque session (art. 6.1.a). La position n'est pas conservée.</li>
+        <li><strong>Photographies</strong> de codes-barres et d'emballages — finalité : décodage local du code-barres et identification du produit. Traitées uniquement dans le navigateur de l'Utilisateur, non transmises.</li>
+        <li><strong>Données produits</strong> (code-barres, libellé, DLC, type, magasin, auteur) — finalité : suivi des dates de consommation. Base : intérêt légitime de l'employeur (art. 6.1.f) à prévenir le gaspillage et les non-conformités sanitaires.</li>
+        <li><strong>Adresses postales et e-mail</strong> renseignées dans la configuration — finalité : géocodage du magasin et envoi d'alertes. Base : exécution du contrat / consentement.</li>
+      </ul>
+
+      <p style="margin:0 0 6px;font-weight:800">4.3. Stockage et destinataires</p>
+      <p style="margin:0 0 6px;color:var(--muted)">Par défaut, l'ensemble des données saisies est stocké <strong>localement dans le navigateur</strong> (localStorage / sessionStorage) de l'Utilisateur. Aucune base de données centralisée n'est mise en œuvre par l'Application elle-même.</p>
+      <p style="margin:0 0 6px;color:var(--muted)">Les services tiers chargés à l'ouverture, sans transfert de données métier, sont :</p>
+      <ul style="margin:0 0 6px 18px;color:var(--muted);padding-left:0">
+        <li><strong>jsDelivr</strong> (Cloudflare / Fastly) — chargement de la bibliothèque ZXing pour le décodage local des codes-barres.</li>
+        <li><strong>Google Fonts</strong> — chargement de la police Nunito.</li>
+        <li><strong>Nominatim / OpenStreetMap</strong> (OpenStreetMap Foundation, Royaume-Uni) — géocodage d'adresses postales lors de la configuration d'un magasin.</li>
+      </ul>
+      <p style="margin:0 0 12px;color:var(--muted)">Si l'administrateur configure un backend optionnel : <strong>Google Sheets</strong> et <strong>Google Apps Script</strong> (Google Ireland Limited) reçoivent alors les données de catalogue et, le cas échéant, les sauvegardes de scans et les rappels e-mail. Les transferts vers Google sont encadrés par les Clauses Contractuelles Types.</p>
+
+      <p style="margin:0 0 6px;font-weight:800">4.4. Durées de conservation</p>
+      <ul style="margin:0 0 12px 18px;color:var(--muted);padding-left:0">
+        <li>Données stockées localement : conservées tant que l'Utilisateur ne les supprime pas (bouton « Réinitialiser » de l'Application ou nettoyage des données du navigateur).</li>
+        <li>Géolocalisation : non conservée — utilisée uniquement pour la durée de la session.</li>
+        <li>Comptes utilisateurs : conservés tant que l'administrateur ne les supprime pas.</li>
+        <li>Données envoyées vers Google Sheets / Google Apps Script (si activé) : régies par les durées propres de l'administrateur du compte Google.</li>
+      </ul>
+
+      <p style="margin:0 0 6px;font-weight:800">4.5. Vos droits</p>
+      <p style="margin:0 0 6px;color:var(--muted)">Conformément aux articles 15 à 22 du RGPD, vous disposez des droits suivants :</p>
+      <ul style="margin:0 0 6px 18px;color:var(--muted);padding-left:0">
+        <li>Droit d'accès et de copie de vos données ;</li>
+        <li>Droit de rectification ;</li>
+        <li>Droit à l'effacement (« droit à l'oubli ») ;</li>
+        <li>Droit à la limitation du traitement ;</li>
+        <li>Droit à la portabilité des données dans un format structuré ;</li>
+        <li>Droit d'opposition à un traitement fondé sur l'intérêt légitime ;</li>
+        <li>Droit de retirer votre consentement à tout moment, sans remettre en cause la licéité du traitement antérieur.</li>
+      </ul>
+      <p style="margin:0 0 12px;color:var(--muted)">Pour exercer ces droits ou contacter notre Délégué à la protection des données, écrivez à : <strong>[adresse DPO à compléter]</strong>. Vous pouvez également introduire une réclamation auprès de la <strong>Commission Nationale de l'Informatique et des Libertés (CNIL)</strong> — <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">cnil.fr</a> — 3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07.</p>
+
+      <p style="margin:0 0 6px;font-weight:800">4.6. Sécurité</p>
+      <p style="margin:0 0 14px;color:var(--muted)">Les mots de passe sont stockés sous forme hachée (SHA-256 + sel aléatoire par utilisateur). L'Application est servie exclusivement en HTTPS avec en-têtes de sécurité (CSP, HSTS, X-Frame-Options, Permissions-Policy). L'intégrité des bibliothèques tierces est vérifiée par Sub-Resource Integrity (SRI).</p>
+
+      <h3 style="font-size:15px;font-weight:900;margin:0 0 8px;color:var(--gd)">5. Cookies et stockage local</h3>
+      <p style="margin:0 0 14px;color:var(--muted)">L'Application n'utilise <strong>aucun cookie de traçage publicitaire ni d'analytique</strong>. Elle utilise uniquement les API <code>localStorage</code> et <code>sessionStorage</code> du navigateur, strictement nécessaires à son fonctionnement (persistance des données saisies, session de connexion). Conformément à la doctrine CNIL, ces traitements ne nécessitent pas de consentement préalable distinct lorsqu'ils sont strictement nécessaires à la fourniture du service expressément demandé par l'Utilisateur.</p>
+
+      <h3 style="font-size:15px;font-weight:900;margin:0 0 8px;color:var(--gd)">6. Loi applicable et juridiction compétente</h3>
+      <p style="margin:0 0 14px;color:var(--muted)">Les présentes mentions et conditions sont régies par le droit français. À défaut d'accord amiable, tout litige sera soumis aux juridictions compétentes du ressort du siège social de l'éditeur, sous réserve des dispositions impératives applicables aux consommateurs.</p>
+
+      <h3 style="font-size:15px;font-weight:900;margin:0 0 8px;color:var(--gd)">7. Mise à jour</h3>
+      <p style="margin:0 0 4px;color:var(--muted)">Dernière mise à jour : <span id="legal-update-date"></span>.</p>
+      <p style="margin:0 0 6px;color:var(--muted);font-size:11.5px;font-style:italic">Document soumis à validation juridique avant publication.</p>
+    </div>
   </div>
 </div>
 
@@ -878,6 +1009,8 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       <div class="sb-it" onclick="toolCSV();closeSB()"><div class="sb-ic">📥</div>Exporter CSV</div>
       <div class="sb-it" onclick="openModal('archive-modal');renderArchive();closeSB()"><div class="sb-ic">🗂</div>Historique / Archive</div>
       <div class="sb-it" onclick="openModal('stats-modal');renderStats();closeSB()"><div class="sb-ic">📈</div>Statistiques</div>
+      <div class="sb-sec">Informations</div>
+      <div class="sb-it" onclick="openLegalNotice();closeSB()"><div class="sb-ic">⚖️</div>Mentions légales & RGPD</div>
       <div class="sb-sec">Langue</div>
       <div style="display:flex;gap:7px;flex-wrap:wrap;padding:3px 11px">
         <button class="lang-btn" onclick="setLang('fr');closeSB()">🇫🇷 FR</button>
@@ -987,7 +1120,7 @@ if(new URLSearchParams(location.search).get('reset')==='1'){
 
 /* ═══ I18N ══════════════════════════════════════════════════════════════════ */
 const I18N={
-  fr:{tag:'Gestion intelligente des périmés',l_user:'Identifiant',l_pass:'Mot de passe',l_btn:'Se connecter',l_err_empty:'Remplissez tous les champs',l_err_wrong:'Identifiant ou mot de passe incorrect',ph_user:'prenom.nom',ph_pass:'••••••••',rg_t:'🔒 Données & Confidentialité',rg_p:"FreshControl utilise votre géolocalisation pour identifier le magasin. Votre consentement est demandé à chaque démarrage.",rg_y:'✓ Accepter',rg_n:'Refuser',
+  fr:{tag:'Gestion intelligente des périmés',l_user:'Identifiant',l_pass:'Mot de passe',l_btn:'Se connecter',l_err_empty:'Remplissez tous les champs',l_err_wrong:'Identifiant ou mot de passe incorrect',ph_user:'prenom.nom',ph_pass:'••••••••',rg_t:"🔒 Charte d'usage et protection des données",rg_p:"Le détail des traitements et des durées de conservation figure dans les Mentions légales accessibles depuis le menu.",rg_y:'✓ Accepter',rg_n:'Refuser',
   lexp:'Périmés',lcrit:'Critiques ≤2j',lwarn:'Attention ≤7j',lok:'OK',lprods:'Produits',all:'Tous',
   sct:'Scanner un produit',scsub:'Photographiez le code-barres EAN',scbtn:'Prendre une photo',scanning:'🔍 Analyse…',scan_ok:'✅ Produit reconnu',scan_err:'❌ Erreur de connexion',
   ldlc:'Date limite (DLC)',rfsave:'💾 Enregistrer',rfcancel:'Annuler',
@@ -1001,7 +1134,7 @@ const I18N={
   days:['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'],
   saved:'✅ Sauvegardé',deleted:'🗑 Supprimé',user_added:'👤 Utilisateur ajouté',store_added:'🏪 Magasin ajouté',prod_archived:'✅ Produit archivé',no_prods:'Aucun produit',fill_all:'Remplissez tous les champs',email_sent:'✅ E-mail envoyé',email_err:'❌ Erreur envoi',csv_ok:'📥 CSV téléchargé',
   adm_stores:'🏪 Magasins',adm_users:'👥 Utilisateurs',adm_lang:'🌍 Langue',adm_conf:'⚙️ Configuration'},
-  en:{tag:'Smart expiry date management',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err_empty:'Please fill all fields',l_err_wrong:'Wrong username or password',ph_user:'firstname.lastname',ph_pass:'••••••••',rg_t:'🔒 Privacy & Data',rg_p:'FreshControl uses your geolocation to identify the store. Consent is requested on each startup.',rg_y:'✓ Accept',rg_n:'Decline',
+  en:{tag:'Smart expiry date management',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err_empty:'Please fill all fields',l_err_wrong:'Wrong username or password',ph_user:'firstname.lastname',ph_pass:'••••••••',rg_t:'🔒 Usage charter & data protection',rg_p:'Full processing details and retention periods are available in the Legal Notice from the menu.',rg_y:'✓ Accept',rg_n:'Decline',
   lexp:'Expired',lcrit:'Critical ≤2d',lwarn:'Warning ≤7d',lok:'OK',lprods:'Products',all:'All',
   sct:'Scan a product',scsub:'Photograph the EAN barcode',scbtn:'Take a photo',scanning:'🔍 Analyzing…',scan_ok:'✅ Product found',scan_err:'❌ Connection error',
   ldlc:'Expiry date',rfsave:'💾 Save',rfcancel:'Cancel',
@@ -1015,7 +1148,7 @@ const I18N={
   days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
   saved:'✅ Saved',deleted:'🗑 Deleted',user_added:'👤 User added',store_added:'🏪 Store added',prod_archived:'✅ Product archived',no_prods:'No products',fill_all:'Please fill all fields',email_sent:'✅ Email sent',email_err:'❌ Send error',csv_ok:'📥 CSV downloaded',
   adm_stores:'🏪 Stores',adm_users:'👥 Users',adm_lang:'🌍 Language',adm_conf:'⚙️ Config'},
-  es:{tag:'Gestión inteligente de caducidades',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Iniciar sesión',l_err_empty:'Rellene todos los campos',l_err_wrong:'Usuario o contraseña incorrectos',ph_user:'nombre.apellido',ph_pass:'••••••••',rg_t:'🔒 Privacidad y Datos',rg_p:'FreshControl usa su geolocalización para identificar la tienda. Se solicita consentimiento en cada inicio.',rg_y:'✓ Aceptar',rg_n:'Rechazar',
+  es:{tag:'Gestión inteligente de caducidades',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Iniciar sesión',l_err_empty:'Rellene todos los campos',l_err_wrong:'Usuario o contraseña incorrectos',ph_user:'nombre.apellido',ph_pass:'••••••••',rg_t:'🔒 Carta de uso y protección de datos',rg_p:'El detalle del tratamiento y los plazos de conservación figuran en el Aviso Legal accesible desde el menú.',rg_y:'✓ Aceptar',rg_n:'Rechazar',
   lexp:'Caducados',lcrit:'Crítico ≤2d',lwarn:'Atención ≤7d',lok:'OK',lprods:'Productos',all:'Todos',
   sct:'Escanear producto',scsub:'Fotografíe el código EAN',scbtn:'Tomar foto',scanning:'🔍 Analizando…',scan_ok:'✅ Producto encontrado',scan_err:'❌ Error de conexión',
   ldlc:'Fecha caducidad',rfsave:'💾 Guardar',rfcancel:'Cancelar',
@@ -1029,7 +1162,7 @@ const I18N={
   days:['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],
   saved:'✅ Guardado',deleted:'🗑 Eliminado',user_added:'👤 Usuario añadido',store_added:'🏪 Tienda añadida',prod_archived:'✅ Producto archivado',no_prods:'Sin productos',fill_all:'Rellene todos los campos',email_sent:'✅ Correo enviado',email_err:'❌ Error envío',csv_ok:'📥 CSV descargado',
   adm_stores:'🏪 Tiendas',adm_users:'👥 Usuarios',adm_lang:'🌍 Idioma',adm_conf:'⚙️ Config'},
-  zh:{tag:'智能保质期管理系统',l_user:'用户名',l_pass:'密码',l_btn:'登录',l_err_empty:'请填写所有字段',l_err_wrong:'用户名或密码错误',ph_user:'姓名.姓氏',ph_pass:'••••••••',rg_t:'🔒 数据与隐私',rg_p:'FreshControl使用您的地理位置识别门店。每次启动均需同意。',rg_y:'✓ 接受',rg_n:'拒绝',
+  zh:{tag:'智能保质期管理系统',l_user:'用户名',l_pass:'密码',l_btn:'登录',l_err_empty:'请填写所有字段',l_err_wrong:'用户名或密码错误',ph_user:'姓名.姓氏',ph_pass:'••••••••',rg_t:'🔒 使用规章与数据保护',rg_p:'数据处理详情与保留期限请查阅菜单中的法律声明。',rg_y:'✓ 接受',rg_n:'拒绝',
   lexp:'已过期',lcrit:'紧急≤2天',lwarn:'注意≤7天',lok:'正常',lprods:'产品',all:'全部',
   sct:'扫描产品',scsub:'拍摄EAN条形码',scbtn:'拍照',scanning:'🔍 分析中…',scan_ok:'✅ 产品已识别',scan_err:'❌ 连接错误',
   ldlc:'有效期',rfsave:'💾 保存',rfcancel:'取消',
@@ -2680,6 +2813,17 @@ function toolCSV(){
 /* ═══ MODALS ═════════════════════════════════════════════════════════════════ */
 function openModal(id){document.getElementById(id).classList.add('on')}
 function closeModal(id){document.getElementById(id).classList.remove('on')}
+/* Date de dernière révision rédactionnelle de cette page (ISO).
+   À mettre à jour à chaque modification substantielle du contenu. */
+const LEGAL_NOTICE_LAST_UPDATE = '2026-05-05';
+function openLegalNotice(){
+  const dt = document.getElementById('legal-update-date');
+  if(dt){
+    const d = new Date(LEGAL_NOTICE_LAST_UPDATE);
+    dt.textContent = d.toLocaleDateString(lang||'fr', {year:'numeric',month:'long',day:'numeric'});
+  }
+  openModal('legal-modal');
+}
 let cfCb=null;
 function showConfirm(title,text,cb){
   cfCb=cb;
