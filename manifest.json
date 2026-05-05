@@ -1,14 +1,36 @@
 {
-  "name": "FreshControl",
+  "name": "FreshControl — Gestion des périmés",
   "short_name": "FreshControl",
-  "description": "Gestion des produits périmés en supermarché",
+  "description": "Application PWA de gestion des produits périmés en supermarché — scan code-barres, alertes DLC, planning multi-magasins.",
+  "lang": "fr",
+  "dir": "ltr",
+  "scope": "/",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1D9E75",
-  "theme_color": "#1D9E75",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#0A6B47",
+  "theme_color": "#0A6B47",
   "orientation": "portrait",
+  "categories": ["business", "productivity", "food"],
+  "prefer_related_applications": false,
   "icons": [
-    { "src": "https://fakeimg.pl/192x192/1D9E75/ffffff?text=FC&font_size=72", "sizes": "192x192", "type": "image/png" },
-    { "src": "https://fakeimg.pl/512x512/1D9E75/ffffff?text=FC&font_size=180", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
   ]
 }
