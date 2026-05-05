@@ -1,5 +1,25 @@
 {
   "name": "freshcontrol",
-  "version": "1.0.0",
-  "private": true
+  "version": "1.1.0",
+  "private": true,
+  "description": "PWA de gestion des produits périmés en supermarché — scan EAN local (ZXing), catalogue Google Sheets multi-marques, alertes DLC, planning par magasin.",
+  "homepage": "https://github.com/delestrestd/FreshControl",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/delestrestd/FreshControl.git"
+  },
+  "bugs": {
+    "url": "https://github.com/delestrestd/FreshControl/issues"
+  },
+  "author": "delestrestd",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "npx --yes serve@latest -l 3000 .",
+    "validate:html": "npx --yes html-validate index.html",
+    "validate:json": "node -e \"['manifest.json','vercel.json','package.json'].forEach(f=>{JSON.parse(require('fs').readFileSync(f,'utf-8'));console.log('ok',f);})\"",
+    "validate": "npm run validate:json && npm run validate:html"
+  }
 }
