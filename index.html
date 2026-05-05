@@ -64,7 +64,10 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .sp-name{font-size:34px;font-weight:900;color:#fff;letter-spacing:-2px}
 .sp-tag{font-size:12px;color:rgba(255,255,255,.78);font-weight:700;letter-spacing:.3px;margin-bottom:28px}
 .lang-row{display:flex;gap:7px;margin-bottom:22px;flex-wrap:wrap;justify-content:center}
-.lang-btn{padding:8px 16px;min-height:34px;border-radius:var(--rr);background:rgba(255,255,255,.16);backdrop-filter:blur(10px);border:1.5px solid rgba(255,255,255,.32);color:#fff;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);transition:background .18s,border-color .18s;box-shadow:var(--spec-d)}
+.lang-btn{padding:8px 14px;min-height:34px;border-radius:var(--rr);background:rgba(255,255,255,.16);backdrop-filter:blur(10px);border:1.5px solid rgba(255,255,255,.32);color:#fff;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);transition:background .18s,border-color .18s;box-shadow:var(--spec-d);display:inline-flex;align-items:center;gap:7px;line-height:1}
+/* Drapeau SVG inline (rendu universel — Windows ne dessine pas les emojis-drapeaux) */
+.flag{display:inline-block;width:18px;height:13px;border-radius:2px;border:1px solid rgba(0,0,0,.12);box-shadow:0 1px 0 rgba(0,0,0,.06);flex-shrink:0;vertical-align:middle}
+.lsb .flag{margin-right:8px}
 .lang-btn:hover{background:rgba(255,255,255,.24)}
 .lang-btn.on{background:rgba(255,255,255,.32);border-color:rgba(255,255,255,.78)}
 /* Sidebar variant: light bg, dark text */
@@ -284,7 +287,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
 .af-add:active{transform:scale(.97)}
 .af-add:disabled{opacity:.6;cursor:not-allowed;transform:none}
 .lang-setting-row{display:flex;gap:7px;flex-wrap:wrap}
-.lsb{padding:10px 18px;min-height:38px;border-radius:var(--rr);background:rgba(255,255,255,.62);border:1.5px solid var(--bdr);font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);color:var(--muted);transition:background .18s,color .18s,border-color .18s;box-shadow:var(--spec)}
+.lsb{padding:10px 16px;min-height:38px;border-radius:var(--rr);background:rgba(255,255,255,.62);border:1.5px solid var(--bdr);font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);color:var(--muted);transition:background .18s,color .18s,border-color .18s;box-shadow:var(--spec);display:inline-flex;align-items:center;line-height:1}
 .lsb:hover:not(.on){background:rgba(255,255,255,.85);color:var(--txt)}
 .lsb.on{background:rgba(18,168,118,.86);color:#fff;border-color:rgba(255,255,255,.28);box-shadow:var(--spec-d),var(--sg)}
 /* geo search results */
@@ -297,6 +300,13 @@ select.store-sel option{background:#0A6B47;color:#fff}
 .modal-bg{position:fixed;inset:0;z-index:750;display:none;align-items:flex-end;backdrop-filter:blur(7px);background:rgba(0,0,0,.3)}
 .modal-bg.on{display:flex;animation:fadeIn .22s ease}
 .modal-sh{background:rgba(255,255,255,.82);backdrop-filter:blur(30px) saturate(200%);border-radius:var(--rl2) var(--rl2) 0 0;width:100%;max-width:500px;margin:0 auto;padding:22px 18px 36px;max-height:88vh;overflow-y:auto;border:1px solid rgba(255,255,255,.72);border-bottom:none;box-shadow:var(--spec),0 -10px 44px rgba(0,0,0,.16)}
+/* Variante plein écran pour les longs textes (Mentions légales / RGPD) */
+.modal-bg.full{align-items:stretch;background:rgba(0,0,0,.5)}
+.modal-bg.full .modal-sh{max-width:880px;max-height:100vh;height:100vh;border-radius:0;padding:24px clamp(16px,3vw,42px) 56px;background:rgba(255,255,255,.96)}
+@media (min-width:760px){
+  .modal-bg.full{align-items:flex-start;padding:36px 24px}
+  .modal-bg.full .modal-sh{height:auto;max-height:calc(100vh - 72px);border-radius:var(--rl2)}
+}
 .modal-center{position:fixed;inset:0;z-index:750;display:none;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(7px);background:rgba(0,0,0,.3)}
 .modal-center.on{display:flex;animation:fadeIn .22s ease}
 .modal-card{background:rgba(255,255,255,.85);backdrop-filter:blur(30px) saturate(200%);border-radius:var(--rl2);width:100%;max-width:400px;max-height:80vh;overflow:hidden;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.72);box-shadow:var(--spec),0 20px 60px rgba(0,0,0,.22)}
@@ -348,7 +358,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
   <!-- Branding dynamique : enseigne + FreshControl + magasin -->
   <div id="sp-brand" style="text-align:center;margin-bottom:6px">
     <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:6px">
-      <div id="sp-ico" class="sp-ico">🏪</div>
+      <div id="sp-ico" class="sp-ico">🌿</div>
       <div style="text-align:left">
         <div class="sp-name" id="sp-enseigne-name">FreshControl</div>
         <div id="sp-store-line" style="font-size:13px;font-weight:700;color:rgba(255,255,255,.78);letter-spacing:.3px;margin-top:-2px"></div>
@@ -358,10 +368,10 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
     <div id="sp-powered" style="font-size:10px;color:rgba(255,255,255,.38);font-weight:700;margin-top:4px;letter-spacing:.5px">POWERED BY BUNGA.CORP</div>
   </div>
   <div class="lang-row">
-    <button class="lang-btn on" onclick="setLang('fr')">🇫🇷 FR</button>
-    <button class="lang-btn" onclick="setLang('en')">🇬🇧 EN</button>
-    <button class="lang-btn" onclick="setLang('es')">🇪🇸 ES</button>
-    <button class="lang-btn" onclick="setLang('zh')">🇨🇳 中文</button>
+    <button class="lang-btn on" onclick="setLang('fr')"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#fff"/><rect width="1" height="2" fill="#0055A4"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>FR</button>
+    <button class="lang-btn" onclick="setLang('en')"><svg class="flag" viewBox="0 0 60 30" aria-hidden="true"><rect width="60" height="30" fill="#012169"/><path d="M0,0L60,30M60,0L0,30" stroke="#fff" stroke-width="6"/><path d="M30,0v30M0,15h60" stroke="#fff" stroke-width="10"/><path d="M30,0v30M0,15h60" stroke="#C8102E" stroke-width="6"/></svg>EN</button>
+    <button class="lang-btn" onclick="setLang('es')"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#AA151B"/><rect y=".5" width="3" height="1" fill="#F1BF00"/></svg>ES</button>
+    <button class="lang-btn" onclick="setLang('zh')"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#EE1C25"/><polygon points="7,3 8.5,7 4.5,4.5 9.5,4.5 5.5,7" fill="#FFDE00"/></svg>中文</button>
   </div>
   <div class="lc glass-d">
     <div class="ll" id="l-user">Identifiant</div>
@@ -589,8 +599,8 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
      Textes rédigés en cohérence avec les traitements réels de l'application.
      À soumettre à un avocat avant toute mise en production : tous les
      champs entre crochets [ … ] sont des placeholders à compléter. -->
-<div id="legal-modal" class="modal-bg">
-  <div class="modal-sh" style="max-width:720px">
+<div id="legal-modal" class="modal-bg full">
+  <div class="modal-sh">
     <div class="mhd-row" style="margin-bottom:14px"><div class="mhd-t">⚖️ Mentions légales &amp; RGPD</div><button class="mcl" onclick="closeModal('legal-modal')" aria-label="Fermer">✕</button></div>
     <div style="font-size:12.5px;line-height:1.7;color:var(--txt);font-weight:600">
 
@@ -926,10 +936,10 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       <div class="adm-sec">
         <div class="adm-t">🌍 Langue</div>
         <div class="lang-setting-row" id="lang-setting-row">
-          <button class="lsb" onclick="setLang('fr')">🇫🇷 Français</button>
-          <button class="lsb" onclick="setLang('en')">🇬🇧 English</button>
-          <button class="lsb" onclick="setLang('es')">🇪🇸 Español</button>
-          <button class="lsb" onclick="setLang('zh')">🇨🇳 中文</button>
+          <button class="lsb" onclick="setLang('fr')"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#fff"/><rect width="1" height="2" fill="#0055A4"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>Français</button>
+          <button class="lsb" onclick="setLang('en')"><svg class="flag" viewBox="0 0 60 30" aria-hidden="true"><rect width="60" height="30" fill="#012169"/><path d="M0,0L60,30M60,0L0,30" stroke="#fff" stroke-width="6"/><path d="M30,0v30M0,15h60" stroke="#fff" stroke-width="10"/><path d="M30,0v30M0,15h60" stroke="#C8102E" stroke-width="6"/></svg>English</button>
+          <button class="lsb" onclick="setLang('es')"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#AA151B"/><rect y=".5" width="3" height="1" fill="#F1BF00"/></svg>Español</button>
+          <button class="lsb" onclick="setLang('zh')"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#EE1C25"/><polygon points="7,3 8.5,7 4.5,4.5 9.5,4.5 5.5,7" fill="#FFDE00"/></svg>中文</button>
         </div>
       </div>
 
@@ -940,7 +950,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
         <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">🏪 Identité du magasin</div>
 
         <div class="af-row" style="gap:7px;margin-bottom:7px">
-          <input class="af-in" id="adm-store-emoji" placeholder="🏪" style="width:60px;flex:none;text-align:center;font-size:20px" maxlength="4">
+          <input class="af-in" id="adm-store-emoji" placeholder="🌿" style="width:60px;flex:none;text-align:center;font-size:20px" maxlength="4">
           <input class="rf-i" id="adm-store-name" placeholder="Nom du magasin — ex: Carrefour Aubagne" style="flex:1">
         </div>
         <div class="af-row" style="gap:7px;margin-bottom:7px">
@@ -1013,10 +1023,10 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       <div class="sb-it" onclick="openLegalNotice();closeSB()"><div class="sb-ic">⚖️</div>Mentions légales & RGPD</div>
       <div class="sb-sec">Langue</div>
       <div style="display:flex;gap:7px;flex-wrap:wrap;padding:3px 11px">
-        <button class="lang-btn" onclick="setLang('fr');closeSB()">🇫🇷 FR</button>
-        <button class="lang-btn" onclick="setLang('en');closeSB()">🇬🇧 EN</button>
-        <button class="lang-btn" onclick="setLang('es');closeSB()">🇪🇸 ES</button>
-        <button class="lang-btn" onclick="setLang('zh');closeSB()">🇨🇳 中文</button>
+        <button class="lang-btn" onclick="setLang('fr');closeSB()"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#fff"/><rect width="1" height="2" fill="#0055A4"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>FR</button>
+        <button class="lang-btn" onclick="setLang('en');closeSB()"><svg class="flag" viewBox="0 0 60 30" aria-hidden="true"><rect width="60" height="30" fill="#012169"/><path d="M0,0L60,30M60,0L0,30" stroke="#fff" stroke-width="6"/><path d="M30,0v30M0,15h60" stroke="#fff" stroke-width="10"/><path d="M30,0v30M0,15h60" stroke="#C8102E" stroke-width="6"/></svg>EN</button>
+        <button class="lang-btn" onclick="setLang('es');closeSB()"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#AA151B"/><rect y=".5" width="3" height="1" fill="#F1BF00"/></svg>ES</button>
+        <button class="lang-btn" onclick="setLang('zh');closeSB()"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#EE1C25"/><polygon points="7,3 8.5,7 4.5,4.5 9.5,4.5 5.5,7" fill="#FFDE00"/></svg>中文</button>
       </div>
     </div>
     <div class="sb-ft"><button class="sb-out" onclick="doLogout()">🚪 Déconnexion</button></div>
@@ -1034,8 +1044,17 @@ let planning = JSON.parse(localStorage.getItem('fc_planning') || '{}');
 let session  = null;
 
 // ── Config magasin (branding complet) ─────────────────────────────────────
+// One-shot migration: PR #2 avait basculé l'emoji de splash sur 🏪.
+// On rétablit 🌿 si l'utilisateur n'a pas explicitement choisi autre chose.
+(function migrateLegacyStoreEmoji(){
+  if(localStorage.getItem('fc_emoji_v2_done')) return;
+  if(localStorage.getItem('fc_store_emoji') === '🏪'){
+    localStorage.setItem('fc_store_emoji', '🌿');
+  }
+  localStorage.setItem('fc_emoji_v2_done', '1');
+})();
 let storeName    = localStorage.getItem('fc_store_name')    || '';
-let storeEmoji   = localStorage.getItem('fc_store_emoji')   || '🏪';
+let storeEmoji   = localStorage.getItem('fc_store_emoji')   || '🌿';
 let storeEnseigne= localStorage.getItem('fc_store_enseigne')|| ''; // Ex: Carrefour, Intermarché…
 let storeRegion  = localStorage.getItem('fc_store_region')  || ''; // Ex: PACA, Île-de-France
 let storeVille   = localStorage.getItem('fc_store_ville')   || ''; // Ex: Aubagne
@@ -1251,7 +1270,7 @@ function updateSplashBranding(){
   const ico  = document.getElementById('sp-ico');
   const name = document.getElementById('sp-enseigne-name');
   const line = document.getElementById('sp-store-line');
-  if(ico)  ico.textContent  = storeEmoji || '🏪';
+  if(ico)  ico.textContent  = storeEmoji || '🌿';
   if(name) name.textContent = storeEnseigne ? `FreshControl · ${storeEnseigne}` : 'FreshControl';
   if(line){
     const parts = [storeName, storeVille, storeRegion].filter(Boolean);
