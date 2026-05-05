@@ -305,12 +305,38 @@ select.store-sel option{background:#0A6B47;color:#fff}
 .modal-bg{position:fixed;inset:0;z-index:750;display:none;align-items:flex-end;backdrop-filter:blur(7px);background:rgba(0,0,0,.3)}
 .modal-bg.on{display:flex;animation:fadeIn .22s ease}
 .modal-sh{background:rgba(255,255,255,.82);backdrop-filter:blur(30px) saturate(200%);border-radius:var(--rl2) var(--rl2) 0 0;width:100%;max-width:500px;margin:0 auto;padding:22px 18px 36px;max-height:88vh;overflow-y:auto;border:1px solid rgba(255,255,255,.72);border-bottom:none;box-shadow:var(--spec),0 -10px 44px rgba(0,0,0,.16)}
-/* Variante plein écran pour les longs textes (Mentions légales / RGPD) */
-.modal-bg.full{align-items:stretch;background:rgba(0,0,0,.5)}
-.modal-bg.full .modal-sh{max-width:880px;max-height:100vh;height:100vh;border-radius:0;padding:24px clamp(16px,3vw,42px) 56px;background:rgba(255,255,255,.96)}
+/* ── Variante plein écran pour les longs textes (Mentions légales / RGPD)
+   Mobile : occupe 100% de la hauteur viewport dynamique (gère la barre
+   d'adresse iOS qui apparaît/disparaît) et respecte les safe-areas
+   (notch, home indicator). Header sticky pour que le bouton fermer
+   reste atteignable même au bas du document. */
+.modal-bg.full{align-items:stretch;background:rgba(0,0,0,.5);padding:0;overscroll-behavior:contain}
+.modal-bg.full .modal-sh{
+  width:100%;max-width:none;margin:0;
+  height:100vh;height:100dvh;max-height:none;
+  border-radius:0;border:none;
+  background:rgba(255,255,255,.97);
+  padding:0 clamp(16px,4vw,42px) calc(env(safe-area-inset-bottom,0px) + 36px);
+  display:flex;flex-direction:column
+}
+.modal-bg.full .mhd-row{
+  position:sticky;top:0;z-index:1;margin:0 calc(-1 * clamp(16px,4vw,42px));
+  padding:max(env(safe-area-inset-top,0px), 14px) clamp(16px,4vw,42px) 12px;
+  background:rgba(255,255,255,.96);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(0,0,0,.06)
+}
+.modal-bg.full > .modal-sh > div:not(.mhd-row){flex:1;overflow-y:auto;padding-top:14px;-webkit-overflow-scrolling:touch}
+
 @media (min-width:760px){
   .modal-bg.full{align-items:flex-start;padding:36px 24px}
-  .modal-bg.full .modal-sh{height:auto;max-height:calc(100vh - 72px);border-radius:var(--rl2)}
+  .modal-bg.full .modal-sh{
+    width:100%;max-width:880px;margin:0 auto;
+    height:auto;max-height:calc(100vh - 72px);max-height:calc(100dvh - 72px);
+    border-radius:var(--rl2);
+    padding:0 32px 36px;
+    border:1px solid rgba(255,255,255,.72)
+  }
+  .modal-bg.full .mhd-row{padding:18px 32px 12px;margin:0 -32px;border-radius:var(--rl2) var(--rl2) 0 0}
 }
 .modal-center{position:fixed;inset:0;z-index:750;display:none;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(7px);background:rgba(0,0,0,.3)}
 .modal-center.on{display:flex;animation:fadeIn .22s ease}
@@ -354,6 +380,52 @@ select.store-sel option{background:#0A6B47;color:#fff}
 /* universal accessibility focus ring (keyboard only) */
 :focus-visible{outline:none}
 button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 0 0 3px rgba(18,168,118,.45)!important;outline:none}
+
+/* ═══ DESKTOP / BACK-OFFICE LAYOUT (≥ 960px) ════════════════════════════
+   À partir d'un laptop, on bascule l'application en mode bureau :
+   sidebar permanente à gauche, plus de barre d'onglets en bas, et
+   listes en grille multi-colonne pour exploiter la largeur. Les
+   classes mobiles ne sont pas modifiées — uniquement surcouchées
+   par cette media query. */
+@media (min-width:960px){
+  body::before{background:radial-gradient(ellipse 60% 50% at 12% 6%,#1FD994 0%,transparent 55%),radial-gradient(ellipse 50% 50% at 92% 90%,#064D30 0%,transparent 55%),linear-gradient(155deg,#064D30 0%,#0A6B47 60%,#12A876 100%)}
+
+  /* Sidebar permanente, ancrée à gauche */
+  #sb{display:block!important;position:fixed;left:0;top:0;bottom:0;width:268px;inset:0 auto 0 0;z-index:50}
+  #sb-bg{display:none}
+  #sb-p{position:static;width:100%;height:100%;border-radius:0;box-shadow:0 0 0 1px rgba(255,255,255,.5),12px 0 36px rgba(0,0,0,.06);animation:none;border-left:none;border-right:1px solid rgba(255,255,255,.6)}
+
+  /* Décale toute l'app pour laisser la place à la sidebar */
+  #app.on{padding-left:268px;height:100%}
+  #hdr{padding:0 32px;height:64px}
+  #hdr h1{font-size:20px}
+  #hdr-l{cursor:default}
+  .hmenu{display:none} /* plus de hamburger sur desktop */
+
+  /* Plus de barre d'onglets en bas — la sidebar tient lieu de nav */
+  #tbar{display:none}
+  #main{padding:24px 32px 40px}
+  .toast{bottom:24px}
+
+  /* Liste produits en grille multi-colonne */
+  #plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:11px;align-items:start}
+  .pc{margin-bottom:0}
+
+  /* Cartes admin / formulaires : largeur lisible */
+  .glass,#main > .tab > div,.adm-row{max-width:none}
+
+  /* Modals : centrés au lieu de bottom-sheet */
+  .modal-bg:not(.full){align-items:center;padding:32px}
+  .modal-bg:not(.full) .modal-sh{border-radius:var(--rl2);max-width:640px;max-height:calc(100vh - 64px);max-height:calc(100dvh - 64px);border:1px solid rgba(255,255,255,.72)}
+  .modal-bg.full{padding:40px 32px}
+
+  /* Sidebar : header un peu plus aéré, items confortables */
+  .sb-hd{padding:22px 18px 18px}
+  .sb-it{font-size:13.5px}
+
+  /* Z-index : sidebar sous les modals (qui sont à 750+) */
+  #legal-modal,#stats-modal,#archive-modal,#email-modal,#startup-modal,#confirm-modal,#stores-modal{z-index:850}
+}
 </style>
 </head>
 <body>
@@ -1809,17 +1881,25 @@ async function fetchCatalogueProducts(cat){
   if(!res.ok) throw new Error(`HTTP ${res.status}`);
   const csv  = await res.text();
   const rows = parseCSVSimple(csv);
-  if(rows.length < 2) return [];
+  // Diagnostic : on conserve le nombre brut de lignes lues + sautées,
+  // accessible via cat.diag dans la liste des marques (admin).
+  cat.diag = { rawBytes: csv.length, rawRows: rows.length, skipped: 0, skippedReasons: {} };
+  if(rows.length < 2){ cat.diag.skippedReasons.empty_csv = 1; return []; }
   const headers = rows[0].map(h=>h.toLowerCase().replace(/["\s]/g,''));
   const gi = headers.findIndex(h=>h.includes('gencod')||h.includes('ean')||h.includes('code'));
   const ni = headers.findIndex(h=>h.includes('libell')||h.includes('nom')||h.includes('produit'));
   const fi = headers.findIndex(h=>h.includes('famille')||h.includes('type')||h.includes('rayon'));
-  if(gi<0) throw new Error('Colonne gencod introuvable');
+  cat.diag.headers = headers;
+  cat.diag.matched = { gencod: gi, nom: ni, famille: fi };
+  if(gi<0) throw new Error(`Colonne gencod introuvable. En-tetes detectes : ${headers.join(', ')}`);
   const out = [];
+  const seen = new Set();
   for(let i=1;i<rows.length;i++){
     const row = rows[i];
     const gc  = (row[gi]||'').replace(/["\s']/g,'');
-    if(!gc) continue;
+    if(!gc){ cat.diag.skipped++; cat.diag.skippedReasons.empty_gencod = (cat.diag.skippedReasons.empty_gencod||0)+1; continue; }
+    if(seen.has(gc)){ cat.diag.skipped++; cat.diag.skippedReasons.duplicate_gencod = (cat.diag.skippedReasons.duplicate_gencod||0)+1; continue; }
+    seen.add(gc);
     out.push({
       gencod:  gc,
       nom:     (ni>=0 ? row[ni] : '').replace(/^"|"$/g,'').trim(),
@@ -1827,6 +1907,7 @@ async function fetchCatalogueProducts(cat){
       marque:  cat.name,
     });
   }
+  console.info(`[Catalogue:${cat.name}]`, cat.diag, `→ ${out.length} importes`);
   return out;
 }
 
@@ -2001,20 +2082,58 @@ function renderBrandList(){
   }
   el.innerHTML = catalogues.map(c => {
     const ageMin = c.last_sync ? Math.floor((Date.now() - c.last_sync) / 60000) : null;
-    const meta = c.error
-      ? `<span style="color:var(--r);font-weight:700">⚠️ ${escapeHTML(c.error)}</span>`
-      : `<span style="color:var(--muted)">${c.count} produit${c.count>1?'s':''} · ${fmtAge(ageMin)}</span>`;
+    let metaInner;
+    if(c.error){
+      metaInner = `<span style="color:var(--r);font-weight:700">⚠️ ${escapeHTML(c.error)}</span>`;
+    } else if(c.diag && (c.diag.rawRows - 1 - c.count) > 0){
+      // Sync OK mais des lignes ont été sautées : on signale en orange
+      const skipped = (c.diag.rawRows - 1) - c.count;
+      metaInner = `<span style="color:var(--muted)">${c.count} produit${c.count>1?'s':''} · ${fmtAge(ageMin)}</span>` +
+        `<br><span style="color:var(--o);font-size:10.5px;font-weight:700">⚠️ ${skipped} ligne${skipped>1?'s':''} non importée${skipped>1?'s':''} sur ${c.diag.rawRows-1} (cliquer sur ℹ︎)</span>`;
+    } else {
+      metaInner = `<span style="color:var(--muted)">${c.count} produit${c.count>1?'s':''} · ${fmtAge(ageMin)}</span>`;
+    }
     return `<div class="brand-card">
       <div class="brand-info">
         <div class="brand-name">\u{1F4E6} ${escapeHTML(c.name)}</div>
-        <div class="brand-meta">${meta}</div>
+        <div class="brand-meta">${metaInner}</div>
       </div>
       <div class="brand-actions">
+        <button class="brand-sync" data-bid="${escapeHTMLAttr(c.id)}" onclick="showCatalogueDiag(this.dataset.bid)" aria-label="Diagnostic ${escapeHTMLAttr(c.name)}" title="Voir le diagnostic">ℹ︎</button>
         <button class="brand-sync" id="sync-btn-${c.id}" data-bid="${c.id}" onclick="syncOneCatalogue(this.dataset.bid)" aria-label="Synchroniser ${escapeHTMLAttr(c.name)}" title="Synchroniser">\u{1F504}</button>
         <button class="adm-del" data-bid="${c.id}" onclick="removeCatalogue(this.dataset.bid)" aria-label="Supprimer ${escapeHTMLAttr(c.name)}" title="Supprimer">\u{1F5D1}</button>
       </div>
     </div>`;
   }).join('');
+}
+
+/* Diagnostic d'une marque : ouvre un alert avec le détail du dernier
+   sync pour identifier pourquoi le nombre de produits ne correspond
+   pas (lignes vides, doublons, mauvais en-tête de colonne, etc.). */
+function showCatalogueDiag(id){
+  const cat = catalogues.find(c => c.id === id);
+  if(!cat) return;
+  const lines = [`Marque : ${cat.name}`, `URL : ${cat.url}`];
+  if(cat.last_sync) lines.push(`Dernière synchro : ${new Date(cat.last_sync).toLocaleString(lang||'fr')}`);
+  else lines.push('Jamais synchronisée');
+  lines.push(`Produits importés : ${cat.count||0}`);
+  if(cat.error){ lines.push('', `❌ Erreur : ${cat.error}`); }
+  if(cat.diag){
+    lines.push('', `Lignes lues dans le CSV : ${cat.diag.rawRows}`);
+    lines.push(`Taille du CSV : ${cat.diag.rawBytes} octets`);
+    lines.push(`En-têtes détectés : ${(cat.diag.headers||[]).join(', ') || '—'}`);
+    if(cat.diag.matched){
+      lines.push(`Colonnes mappées : gencod=${cat.diag.matched.gencod}, nom=${cat.diag.matched.nom}, famille=${cat.diag.matched.famille}`);
+    }
+    if(cat.diag.skipped){
+      lines.push(`Lignes sautées : ${cat.diag.skipped}`);
+      const reasons = cat.diag.skippedReasons || {};
+      Object.entries(reasons).forEach(([k,v]) => lines.push(`  • ${k} : ${v}`));
+    }
+  } else {
+    lines.push('', '(Aucun diagnostic — relancer une synchro pour le générer.)');
+  }
+  alert(lines.join('\n'));
 }
 
 function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
