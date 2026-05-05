@@ -9,12 +9,14 @@
 <title>FreshControl</title>
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<!-- ZXing — lecture code-barres locale. Chargé de façon asynchrone, fallback si indisponible -->
+<!-- ZXing — lecture code-barres locale. Chargé de façon asynchrone, SRI verrouillé. -->
 <script>
 (function(){
   var s=document.createElement('script');
   s.src='https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js';
+  s.integrity='sha384-BzBxP10ZE72aitqj5UMmUsbKFliP/DZqA8Wq+BNNhlIJDGoEd1tpkMYXOg9+n6sB';
   s.crossOrigin='anonymous';
+  s.referrerPolicy='no-referrer';
   s.onerror=function(){ window._zxingFailed=true; console.warn('ZXing CDN non disponible — lecture barcode désactivée'); };
   document.head.appendChild(s);
 })();
