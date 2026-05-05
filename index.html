@@ -6,6 +6,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0A6B47">
+<!-- Belt-and-braces : empêche le cache navigateur si jamais le header
+     Cache-Control était filtré en amont (proxies, captive portals…). -->
+<meta http-equiv="Cache-Control" content="no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>FreshControl</title>
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -2870,7 +2875,20 @@ document.addEventListener('DOMContentLoaded',()=>{
   const sd=sessionStorage.getItem('fc_session');
   if(sd){ try{session=JSON.parse(sd);launchApp()}catch(e){sessionStorage.removeItem('fc_session')} }
 });
-if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+/* Service-worker kill-switch.
+   L'application n'embarque pas de SW : elle utilise must-revalidate côté
+   serveur. On désinscrit donc systématiquement tout SW résiduel hérité
+   d'un déploiement antérieur, et on vide la Cache Storage API associée,
+   pour que les mises à jour (HTML, manifest, icônes) soient prises en
+   compte sans intervention manuelle de l'utilisateur. */
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.getRegistrations()
+    .then(rs => rs.forEach(r => r.unregister()))
+    .catch(()=>{});
+}
+if('caches' in window){
+  caches.keys().then(ks => ks.forEach(k => caches.delete(k))).catch(()=>{});
+}
 </script>
 </body>
 </html>
