@@ -1148,7 +1148,7 @@ function launchApp(){
   const gu=document.getElementById('adm-gas-url');       if(gu) gu.value=gasUrl;
   const ap=document.getElementById('adm-popup');         if(ap) ap.checked=localStorage.getItem('fc_popup')!=='0';
   const si=document.getElementById('session-info');
-  if(si) si.innerHTML=`<strong>${session.name}</strong> · ${ri.label}<br>🕐 ${new Date(session.loginTime).toLocaleString(lang)}`;
+  if(si) si.innerHTML=`<strong>${escapeHTML(session.name)}</strong> · ${ri.label}<br>🕐 ${new Date(session.loginTime).toLocaleString(lang)}`;
 
   document.getElementById('hdr-sub').textContent = [storeEnseigne, storeName].filter(Boolean).join(' · ') || 'FreshControl';
 
@@ -1383,9 +1383,9 @@ function filterSSM(q){
   const list=document.getElementById('ssm-list');
   const res=getStores().filter(s=>!q||s.name.toLowerCase().includes(q.toLowerCase())||(s.address||'').toLowerCase().includes(q.toLowerCase()));
   if(!res.length){list.innerHTML='<div class="empty">Aucun magasin</div>';return}
-  list.innerHTML=res.map(s=>`<div class="ssm-it" onclick="pickStore('${s.id}')">
-    <div style="font-size:13px;font-weight:800">${s.name}</div>
-    ${s.address?`<div style="font-size:11px;color:var(--muted);margin-top:2px;font-weight:600">📍 ${s.address}</div>`:''}
+  list.innerHTML=res.map(s=>`<div class="ssm-it" data-sid="${escapeHTMLAttr(s.id)}" onclick="pickStore(this.dataset.sid)">
+    <div style="font-size:13px;font-weight:800">${escapeHTML(s.name)}</div>
+    ${s.address?`<div style="font-size:11px;color:var(--muted);margin-top:2px;font-weight:600">📍 ${escapeHTML(s.address)}</div>`:''}
   </div>`).join('');
 }
 function pickStore(id){
@@ -1436,16 +1436,16 @@ function renderDashboard(){
     const bt={e:t.badge_e,o:t.badge_o,w:t.badge_w,k:t.badge_k}[s].replace('{{d}}',Math.abs(d));
     const bc={e:'be',o:'bo',w:'bw',k:'bk'}[s];
     const ico={e:'💀',o:'⚠️',w:'⏰',k:'✅'}[s];
-    const sid=String(p.id); // toujours string pour les data-attribute
+    const sid=escapeHTMLAttr(String(p.id));
     return`<div class="pc s-${s}" id="pc-${sid}" data-pid="${sid}">
       <div class="pc-ic">${ico}</div>
       <div class="pc-in">
-        <div class="pc-nm">${p.name||'—'}</div>
-        <div class="pc-sb">${p.type||''} · ${p.magasin||''} · DLC: ${fmtDate(p.dlc)}</div>
-        <div class="pc-sb" style="font-size:10px;opacity:.6">par ${p.scannedBy||'?'} · ${p.scannedAt?new Date(p.scannedAt).toLocaleDateString(lang):''}</div>
+        <div class="pc-nm">${escapeHTML(p.name||'—')}</div>
+        <div class="pc-sb">${escapeHTML(p.type||'')} · ${escapeHTML(p.magasin||'')} · DLC: ${fmtDate(p.dlc)}</div>
+        <div class="pc-sb" style="font-size:10px;opacity:.6">par ${escapeHTML(p.scannedBy||'?')} · ${p.scannedAt?new Date(p.scannedAt).toLocaleDateString(lang):''}</div>
       </div>
       <div class="pc-rt">
-        <span class="pbadge ${bc}">${bt}</span>
+        <span class="pbadge ${bc}">${escapeHTML(bt)}</span>
         <div class="pact-row">
           <button class="pact pact-ok" data-id="${sid}" onclick="archiveProd(this.dataset.id)" aria-label="Archiver" title="Marquer traité">✓</button>
           <button class="pact pact-ed" data-id="${sid}" onclick="openEditProd(this.dataset.id)" aria-label="Modifier" title="Modifier">✏️</button>
@@ -1969,7 +1969,7 @@ document.getElementById('scan-in-ean').addEventListener('change', async function
     } else {
       // ❌ Gencod lu mais absent du catalogue → étape 2 : photo produit + saisie nom
       document.getElementById('scan-ean-found').innerHTML =
-        `📦 Gencod <strong>${ean}</strong> lu — absent du catalogue<br>
+        `📦 Gencod <strong>${escapeHTML(ean)}</strong> lu — absent du catalogue<br>
          <span style="font-size:11px;font-weight:600;opacity:.8">Photographiez l'emballage pour saisir le nom</span>`;
       document.getElementById('scan-step1').style.display = 'none';
       document.getElementById('scan-step2').style.display = 'block';
@@ -1999,7 +1999,7 @@ document.getElementById('scan-in-ean').addEventListener('change', async function
             ✏️ Saisir manuellement</button>
         </div>`;
     } else {
-      st.innerHTML = `<span style="color:var(--r);font-size:12px;font-weight:700">❌ Erreur : ${err.message}</span>`;
+      st.innerHTML = `<span style="color:var(--r);font-size:12px;font-weight:700">❌ Erreur : ${escapeHTML(err.message)}</span>`;
     }
   }
 });
@@ -2110,7 +2110,7 @@ function openManualFromScan(){
 }
 
 function showScanError(msg){
-  document.getElementById('scan-st').innerHTML=`<div style="color:var(--r);font-size:12px;font-weight:800">${msg}</div>`;
+  document.getElementById('scan-st').innerHTML=`<div style="color:var(--r);font-size:12px;font-weight:800">${escapeHTML(msg)}</div>`;
 }
 
 function resetScan(){
@@ -2146,11 +2146,11 @@ function renderStoresModal(){
     <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid rgba(0,0,0,.05)">
       <div style="font-size:26px;flex-shrink:0;margin-top:3px">🏪</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:14px;font-weight:800;color:var(--txt)">${s.name}</div>
-        ${s.address?`<div style="font-size:11px;color:var(--muted);margin-top:2px;font-weight:600">📍 ${s.address}</div>`:''}
+        <div style="font-size:14px;font-weight:800;color:var(--txt)">${escapeHTML(s.name)}</div>
+        ${s.address?`<div style="font-size:11px;color:var(--muted);margin-top:2px;font-weight:600">📍 ${escapeHTML(s.address)}</div>`:''}
         <div style="font-size:11px;color:var(--muted);margin-top:1px;font-weight:600">${s.lat.toFixed(4)}, ${s.lng.toFixed(4)} · rayon ${s.r||500}m</div>
       </div>
-      <button data-sid="${s.id}" onclick="confirmDeleteStoreModal(this.dataset.sid)"
+      <button data-sid="${escapeHTMLAttr(s.id)}" onclick="confirmDeleteStoreModal(this.dataset.sid)"
         style="border:1px solid rgba(224,60,60,.28);background:rgba(224,60,60,.1);color:var(--r);
                border-radius:9px;width:32px;height:32px;cursor:pointer;font-size:14px;flex-shrink:0">🗑</button>
     </div>`).join('');
@@ -2179,9 +2179,9 @@ async function geocodeModal(){
     const box=document.getElementById('sm-geo-results');
     if(!data.length){box.innerHTML='<div style="font-size:12px;color:var(--r);padding:6px 0;font-weight:700">❌ Adresse non trouvée</div>';return}
     box.innerHTML=data.map(r=>`
-      <div class="geo-r" data-lat="${r.lat}" data-lon="${r.lon}"
+      <div class="geo-r" data-lat="${parseFloat(r.lat)}" data-lon="${parseFloat(r.lon)}"
            onclick="pickGeoModal(this.dataset.lat,this.dataset.lon)">
-        <div class="geo-r-n">${r.display_name.split(',').slice(0,3).join(', ')}</div>
+        <div class="geo-r-n">${escapeHTML(r.display_name.split(',').slice(0,3).join(', '))}</div>
         <div class="geo-r-a">📍 ${parseFloat(r.lat).toFixed(5)}, ${parseFloat(r.lon).toFixed(5)}</div>
       </div>`).join('');
   }catch(e){toast('❌ Erreur réseau')}
@@ -2263,12 +2263,12 @@ function renderAlertes(){
   el.innerHTML=Object.entries(byStore).map(([store,prods])=>`
     <div class="astore">
       <div class="asto-hd">
-        <span>🏪 ${store} <span class="pbadge be" style="font-size:10px">${prods.length}</span></span>
-        <button onclick="openEmailModal('${store.replace(/'/g,"\\'")}');event.stopPropagation()" style="background:rgba(18,168,118,.12);border:1px solid rgba(18,168,118,.28);color:var(--gd);border-radius:8px;padding:5px 11px;font-size:11px;font-weight:900;cursor:pointer;font-family:var(--font)">📧 Mail</button>
+        <span>🏪 ${escapeHTML(store)} <span class="pbadge be" style="font-size:10px">${prods.length}</span></span>
+        <button data-store="${escapeHTMLAttr(store)}" onclick="openEmailModal(this.dataset.store);event.stopPropagation()" style="background:rgba(18,168,118,.12);border:1px solid rgba(18,168,118,.28);color:var(--gd);border-radius:8px;padding:5px 11px;font-size:11px;font-weight:900;cursor:pointer;font-family:var(--font)">📧 Mail</button>
       </div>
       ${prods.map(p=>{const s=statusOf(p.dlc),d=dDiff(p.dlc);return`<div class="ai">
-        <div><div class="ai-nm">${p.name}</div><div class="ai-dt">DLC: ${fmtDate(p.dlc)}</div></div>
-        <span class="pbadge ${s==='e'?'be':'bo'}">${s==='e'?T().badge_e:'J'+d}</span>
+        <div><div class="ai-nm">${escapeHTML(p.name)}</div><div class="ai-dt">DLC: ${fmtDate(p.dlc)}</div></div>
+        <span class="pbadge ${s==='e'?'be':'bo'}">${s==='e'?escapeHTML(T().badge_e):'J'+d}</span>
       </div>`}).join('')}
     </div>`).join('');
 }
@@ -2282,8 +2282,8 @@ function renderPlanning(){
   el.innerHTML=sNames.map(store=>{
     const plan=planning[store]||[];
     return`<div class="plan-store">
-      <div style="font-size:14px;font-weight:900">🏪 ${store}</div>
-      <div class="dg">${DAYS.map((d,i)=>`<div class="dc${plan.includes(i)?' on':''}" onclick="togglePlan('${store}',${i})">${d}</div>`).join('')}</div>
+      <div style="font-size:14px;font-weight:900">🏪 ${escapeHTML(store)}</div>
+      <div class="dg">${DAYS.map((d,i)=>`<div class="dc${plan.includes(i)?' on':''}" data-store="${escapeHTMLAttr(store)}" data-idx="${i}" onclick="togglePlan(this.dataset.store,Number(this.dataset.idx))">${escapeHTML(d)}</div>`).join('')}</div>
     </div>`;
   }).join('');
 }
@@ -2307,7 +2307,7 @@ function renderAdmin(){
   const gf=document.getElementById('adm-email-finance');if(gf) gf.value=emailFin;
   const gu=document.getElementById('adm-gas-url');     if(gu) gu.value=gasUrl;
   const ap=document.getElementById('adm-popup');       if(ap) ap.checked=localStorage.getItem('fc_popup')!=='0';
-  document.getElementById('session-info').innerHTML=`<strong>${session?.name}</strong> (${session?.role})<br>🕐 ${session?new Date(session.loginTime).toLocaleString(lang):''}`;
+  document.getElementById('session-info').innerHTML=`<strong>${escapeHTML(session?.name||'')}</strong> (${escapeHTML(session?.role||'')})<br>🕐 ${session?new Date(session.loginTime).toLocaleString(lang):''}`;
 }
 
 function renderStoreAdmin(){
@@ -2320,7 +2320,7 @@ function renderStoreAdmin(){
   el.innerHTML=`<div class="adm-row">
       <div class="adm-ico">🏪</div>
       <div class="adm-info">
-        <div class="adm-nm">${storeName}</div>
+        <div class="adm-nm">${escapeHTML(storeName)}</div>
         <div class="adm-sb">Magasin unique — modifiable dans Configuration</div>
       </div>
     </div>`;
@@ -2341,18 +2341,18 @@ function renderUserAdmin(){
                   display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${ri.label.split(' ')[0]}</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:800;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-          ${u.name}
+          ${escapeHTML(u.name)}
           ${isMe?'<span style="font-size:10px;background:rgba(18,168,118,.15);color:var(--gd);border-radius:100px;padding:2px 7px;font-weight:900;border:1px solid rgba(18,168,118,.2)">Vous</span>':''}
         </div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
-          <span style="font-size:10px;color:var(--muted);font-weight:700">@${u.username}</span>
+          <span style="font-size:10px;color:var(--muted);font-weight:700">@${escapeHTML(u.username)}</span>
           <span style="font-size:10px;background:${ri.color}18;color:${ri.color};border-radius:100px;padding:2px 8px;font-weight:800;border:1px solid ${ri.color}30">${ri.label}</span>
-          ${u.rayon?`<span style="font-size:10px;color:var(--muted);font-weight:600">· ${u.rayon}</span>`:''}
+          ${u.rayon?`<span style="font-size:10px;color:var(--muted);font-weight:600">· ${escapeHTML(u.rayon)}</span>`:''}
         </div>
       </div>
       ${!isMe?`<div style="display:flex;gap:5px;flex-shrink:0">
-        <button class="adm-edit" onclick="openEditUser('${u.id||u._idx}')" title="Modifier">🔑</button>
-        <button class="adm-del" onclick="confirmDeleteUser(${u._idx})" title="Supprimer">🗑</button>
+        <button class="adm-edit" data-uid="${escapeHTMLAttr(u.id||u._idx)}" onclick="openEditUser(this.dataset.uid)" title="Modifier">🔑</button>
+        <button class="adm-del" data-uidx="${u._idx}" onclick="confirmDeleteUser(Number(this.dataset.uidx))" title="Supprimer">🗑</button>
       </div>`:'<span style="font-size:10px;color:var(--muted);font-weight:700;flex-shrink:0">actif</span>'}
     </div>`;
   }).join('');
@@ -2369,8 +2369,8 @@ async function geocodeAddr(){
     const data=await res.json();
     const box=document.getElementById('geo-results');
     if(!data.length){box.innerHTML='<div style="font-size:12px;color:var(--r);padding:8px 0;font-weight:700">❌ Adresse non trouvée</div>';return}
-    box.innerHTML=data.map((r,i)=>`<div class="geo-r" onclick="pickGeo(${r.lat},${r.lon},${i})">
-      <div class="geo-r-n">${r.display_name.split(',').slice(0,3).join(', ')}</div>
+    box.innerHTML=data.map((r,i)=>`<div class="geo-r" onclick="pickGeo(${parseFloat(r.lat)},${parseFloat(r.lon)},${i})">
+      <div class="geo-r-n">${escapeHTML(r.display_name.split(',').slice(0,3).join(', '))}</div>
       <div class="geo-r-a">📍 ${parseFloat(r.lat).toFixed(5)}, ${parseFloat(r.lon).toFixed(5)}</div>
     </div>`).join('');
     document.getElementById('as-coord-row').style.display='flex';
@@ -2460,7 +2460,7 @@ function openEditUser(idOrIdx){
     if(p) p.innerHTML=`
       <div style="margin-bottom:8px">
         <div style="font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px">Nom affiché</div>
-        <input id="edit-user-nm-input" class="rf-i" value="${u.name}" placeholder="Nom" style="width:100%;font-size:13px;margin-bottom:8px">
+        <input id="edit-user-nm-input" class="rf-i" value="${escapeHTMLAttr(u.name)}" placeholder="Nom" style="width:100%;font-size:13px;margin-bottom:8px">
         <div style="font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px">Nouveau mot de passe</div>
         <input id="edit-user-pw-input" class="rf-i" type="password" placeholder="Laisser vide = inchangé" style="width:100%;font-size:13px">
       </div>`;
@@ -2533,10 +2533,10 @@ function checkStartup(){
   urgent.forEach(p=>{const k=p.magasin||'—';if(!byStore[k])byStore[k]=[];byStore[k].push(p)});
   document.getElementById('su-body').innerHTML=Object.entries(byStore).map(([store,prods])=>`
     <div style="margin-bottom:14px">
-      <div style="font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">🏪 ${store}</div>
+      <div style="font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">🏪 ${escapeHTML(store)}</div>
       ${prods.map(p=>{const s=statusOf(p.dlc),d=dDiff(p.dlc);return`<div class="startup-prow">
-        <div><div style="font-size:13px;font-weight:800">${p.name}</div><div style="font-size:11px;color:var(--muted);font-weight:600">DLC: ${fmtDate(p.dlc)}</div></div>
-        <span class="pbadge ${s==='e'?'be':'bo'}">${s==='e'?T().badge_e:'J'+d}</span>
+        <div><div style="font-size:13px;font-weight:800">${escapeHTML(p.name)}</div><div style="font-size:11px;color:var(--muted);font-weight:600">DLC: ${fmtDate(p.dlc)}</div></div>
+        <span class="pbadge ${s==='e'?'be':'bo'}">${s==='e'?escapeHTML(T().badge_e):'J'+d}</span>
       </div>`}).join('')}
     </div>`).join('');
   openModal('startup-modal');
@@ -2601,9 +2601,9 @@ function renderArchive(){
     <div style="display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid rgba(0,0,0,.05)">
       <div style="font-size:20px;flex-shrink:0">📦</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:800">${p.name||'—'}</div>
-        <div style="font-size:11px;color:var(--muted);font-weight:600">${p.magasin||'—'} · DLC: ${fmtDate(p.dlc)}</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:2px">🗂 ${new Date(p.archivedAt).toLocaleString(lang)} par <strong>${p.archivedBy}</strong></div>
+        <div style="font-size:13px;font-weight:800">${escapeHTML(p.name||'—')}</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600">${escapeHTML(p.magasin||'—')} · DLC: ${fmtDate(p.dlc)}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">🗂 ${new Date(p.archivedAt).toLocaleString(lang)} par <strong>${escapeHTML(p.archivedBy)}</strong></div>
       </div>
     </div>`).join('');
 }
