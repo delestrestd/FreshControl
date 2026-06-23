@@ -1168,8 +1168,8 @@ function isAdminRole(){ return ['superadmin','directeur'].includes(session?.role
 // Init défauts utilisateurs
 if(!users){
   users=[
-    {id:'u1',name:'Administrateur',username:'admin',   password:'freshcontrol2024',role:'superadmin'},
-    {id:'u2',name:'Agent 1',       username:'agent1',  password:'agent123',        role:'agent'},
+    {id:'u1',name:'Administrateur',username:'admin',   password:'admin',role:'superadmin'},
+    {id:'u2',name:'Agent 1',       username:'agent1',  password:'agent',        role:'agent'},
   ];
   save('fc_users',users);
 }
@@ -1187,17 +1187,17 @@ function emergencyReset(){
     alert('Code incorrect. Contactez votre administrateur Bunga.corp.');
     return;
   }
-  if(!confirm('Réinitialiser tous les accès utilisateurs ?\n\nLes produits, le catalogue et la configuration seront conservés.\n\nCette action remet les identifiants par défaut :\nadmin / freshcontrol2024')) return;
+  if(!confirm('Réinitialiser tous les accès utilisateurs ?\n\nLes produits, le catalogue et la configuration seront conservés.\n\nCette action remet les identifiants par défaut :\nadmin / admin')) return;
   // Reset uniquement les users et la session
   localStorage.removeItem('fc_users');
   sessionStorage.removeItem('fc_session');
   // Recréer les users par défaut
   const defaultUsers = [
-    {id:'u1',name:'Administrateur',username:'admin',password:'freshcontrol2024',role:'superadmin'},
-    {id:'u2',name:'Agent 1',username:'agent1',password:'agent123',role:'agent'},
+    {id:'u1',name:'Administrateur',username:'admin',password:'admin',role:'superadmin'},
+    {id:'u2',name:'Agent 1',username:'agent1',password:'agent',role:'agent'},
   ];
   localStorage.setItem('fc_users', JSON.stringify(defaultUsers));
-  alert('✅ Accès réinitialisés.\n\nConnectez-vous avec :\nIdentifiant : admin\nMot de passe : freshcontrol2024');
+  alert('✅ Accès réinitialisés.\n\nConnectez-vous avec :\nIdentifiant : admin\nMot de passe : admin');
   location.reload();
 }
 
