@@ -220,6 +220,16 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .ord-qty input::-webkit-outer-spin-button,.ord-qty input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .ord-del{width:34px;height:34px;flex-shrink:0;border-radius:9px;border:1px solid rgba(224,60,60,.28);background:rgba(224,60,60,.1);color:var(--r);font-size:14px;cursor:pointer;font-family:var(--font)}
 #scan-in{display:none}
+/* ── Caméra live (viseur + torche) ───────────────────────────────────── */
+.scan-cam-wrap{position:relative;margin:14px 0;border-radius:14px;overflow:hidden;background:#000;box-shadow:var(--ss)}
+.scan-cam-wrap video{display:block;width:100%;max-height:280px;object-fit:cover;background:#000}
+.scan-reticle{position:absolute;inset:0;pointer-events:none}
+.scan-reticle::before{content:'';position:absolute;left:8%;right:8%;top:50%;height:0;border-top:2px solid rgba(224,60,60,.85);box-shadow:0 0 12px rgba(224,60,60,.7);animation:scanline 1.8s ease-in-out infinite}
+.scan-reticle::after{content:'';position:absolute;left:8%;right:8%;top:28%;bottom:28%;border:2px solid rgba(255,255,255,.55);border-radius:12px;box-shadow:0 0 0 2000px rgba(0,0,0,.28)}
+@keyframes scanline{0%,100%{transform:translateY(-46px)}50%{transform:translateY(46px)}}
+.scan-torch{position:absolute;top:10px;right:10px;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(0,0,0,.45);color:#fff;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);z-index:2}
+.scan-torch.on{background:rgba(245,200,40,.92);color:#3a2c00;border-color:rgba(255,255,255,.85)}
+.scan-torch:active{transform:scale(.92)}
 .sbtn{display:inline-flex;align-items:center;gap:8px;padding:16px 28px;min-height:52px;border-radius:var(--rr);background:rgba(18,168,118,.92);color:#fff;font-size:16px;font-weight:900;cursor:pointer;font-family:var(--font);margin-top:14px;border:1px solid rgba(255,255,255,.32);box-shadow:var(--spec-d),var(--sg);transition:transform .15s,background .18s}
 .sbtn:hover{background:rgba(18,168,118,1)}
 .sbtn:active{transform:scale(.96)}
@@ -854,23 +864,29 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
         <div id="store-badge-name" class="store-badge-name"></div>
       </div>
 
-      <!-- ÉTAPE 1 : Scan code-barres (ZXing) -->
+      <!-- ÉTAPE 1 : Scan code-barres (caméra live + repli photo) -->
       <div class="scan-box" id="scan-step1">
-        <input type="file" id="scan-in-ean" accept="image/*" capture="environment">
+        <input type="file" id="scan-in-ean" accept="image/*" capture="environment" style="display:none">
         <div class="scan-step-num">1</div>
         <div class="scan-step-icon">🔖</div>
         <div class="scan-step-title">Code-barres EAN</div>
-        <div class="scan-step-sub">Photographiez le code-barres du produit pour l'identifier dans le catalogue</div>
-        <button class="sbtn" onclick="document.getElementById('scan-in-ean').click()">
-          📷 Scanner le code-barres
-        </button>
+        <div class="scan-step-sub">Visez le code-barres avec la caméra — la lecture est automatique.</div>
+
+        <!-- Caméra live -->
+        <div class="scan-cam-wrap" id="scan-cam-wrap" style="display:none">
+          <video id="scan-video" playsinline muted></video>
+          <div class="scan-reticle"></div>
+          <button class="scan-torch" id="scan-torch" style="display:none" onclick="toggleScanTorch()" aria-label="Torche">🔦</button>
+        </div>
+
+        <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <button class="sbtn" id="scan-cam-btn" onclick="startEanScan()" style="margin-top:0">📷 Démarrer le scan</button>
+          <button class="sbtn" id="scan-cam-stop" onclick="stopEanScan()" style="margin-top:0;display:none;background:rgba(224,60,60,.9);box-shadow:var(--spec-d),var(--sr)">⏹ Arrêter</button>
+        </div>
         <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-          <button class="scan-link-btn" onclick="openModal('add-product-modal');fillStoreDL()">
-            ✏️ Saisie manuelle
-          </button>
-          <button id="quick-sync-btn" class="scan-link-btn" onclick="quickSync()" aria-label="Rafraîchir le catalogue" title="Rafraîchir le catalogue depuis Sheets">
-            🔄
-          </button>
+          <button class="scan-link-btn" onclick="document.getElementById('scan-in-ean').click()">🖼 Scanner via photo</button>
+          <button class="scan-link-btn" onclick="openModal('add-product-modal');fillStoreDL()">✏️ Saisie manuelle</button>
+          <button id="quick-sync-btn" class="scan-link-btn" onclick="quickSync()" aria-label="Rafraîchir le catalogue" title="Rafraîchir le catalogue depuis Sheets">🔄</button>
         </div>
         <div id="scan-st" class="scan-step-status"></div>
       </div>
@@ -929,7 +945,11 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
         <div class="scan-step-icon">🛒</div>
         <div class="scan-step-title">Commande par scan</div>
         <div class="scan-step-sub">Scannez les codes-barres, saisissez la quantité, puis validez pour envoyer la commande par mail. Tout reste enregistré localement.</div>
-        <video id="cmd-video" playsinline muted style="display:none;width:100%;max-height:240px;border-radius:14px;background:#000;margin-top:14px;object-fit:cover"></video>
+        <div class="scan-cam-wrap" id="cmd-cam-wrap" style="display:none">
+          <video id="cmd-video" playsinline muted></video>
+          <div class="scan-reticle"></div>
+          <button class="scan-torch" id="cmd-torch" style="display:none" onclick="toggleCmdTorch()" aria-label="Torche">🔦</button>
+        </div>
         <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
           <button class="sbtn" id="cmd-scan-btn" onclick="startCmdScan()" style="margin-top:0">📷 Démarrer le scan</button>
           <button class="sbtn" id="cmd-stop-btn" onclick="stopCmdScan()" style="margin-top:0;display:none;background:rgba(224,60,60,.9);box-shadow:var(--spec-d),var(--sr)">⏹ Arrêter</button>
@@ -1618,6 +1638,7 @@ function dist(a,b,c,d){
 let curTab='dashboard';
 function showTab(n){
   if(curTab==='commande' && n!=='commande') stopCmdScan(); // libère la caméra
+  if(curTab==='scanner'  && n!=='scanner')  stopEanScan();  // libère la caméra
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
   const t=document.getElementById('tab-'+n), b=document.getElementById('tb-'+n[0]);
@@ -2258,28 +2279,253 @@ function parseCSVSimple(text){
   return rows;
 }
 
-/* ═══ SCAN — ZXing + fallback saisie manuelle ═══════════════════════════════
-   Photo 1 : ZXing lit le gencod EAN → lookup catalogue local.
-             Si trouvé → formulaire DLC pré-rempli.
-             Si non trouvé ou échec → formulaire manuel avec gencod pré-rempli.
-   Photo 2 : preview de l'emballage + saisie du nom produit par l'agent.
-             (L'API Anthropic n'est pas appelable directement depuis le navigateur)
-   Le catalogue doit être synchronisé depuis Admin → 📋 Catalogue.
-═══════════════════════════════════════════════════════════════════════════ */
-let zxingReader=null;
+/* ═══ MOTEUR DE LECTURE CODE-BARRES ═══════════════════════════════════════════
+   Stratégie multi-niveaux pour fiabiliser la lecture sur téléphone :
+     1. BarcodeDetector natif (Android Chrome) — moteur Google, très robuste.
+     2. ZXing en repli (iOS Safari…) avec TRY_HARDER + formats produits restreints.
+   • Caméra live en continu (le code est lu sur des dizaines d'images/s + autofocus)
+     avec torche quand le matériel le permet.
+   • Repli photo : pré-traitement (multi-échelle, niveaux de gris/contraste,
+     recadrage) avant décodage.
+   • Validation de la clé de contrôle EAN/UPC + anti-doublon pour éliminer les
+     faux positifs.
+   Le catalogue est synchronisé depuis Admin → 📋 Marques.
+══════════════════════════════════════════════════════════════════════════════ */
 let currentEAN=null;
 
-function getZXing(){
-  if(zxingReader) return zxingReader;
-  if(window._zxingFailed) return null;
-  try{
-    if(typeof ZXing !== 'undefined' && ZXing.BrowserMultiFormatReader){
-      zxingReader = new ZXing.BrowserMultiFormatReader();
-      return zxingReader;
+const BarcodeEngine = (function(){
+  const NATIVE_FORMATS = ['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf'];
+  let nativeDetector=null, nativeChecked=false;
+  let zxReader=null;
+  let stream=null, videoEl=null, track=null, rafId=null, scanning=false;
+  let onResultCb=null, recent=[], lastAccepted='', lastAcceptedT=0, grabCanvas=null;
+
+  /* ---- ZXing avec hints (formats produits + TRY_HARDER) ---- */
+  function zxHints(){
+    const hints=new Map();
+    try{
+      const F=ZXing.BarcodeFormat;
+      hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS,
+        [F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.CODE_128,F.CODE_39,F.ITF]);
+      hints.set(ZXing.DecodeHintType.TRY_HARDER,true);
+    }catch(e){}
+    return hints;
+  }
+  function getZx(){
+    if(zxReader) return zxReader;
+    if(window._zxingFailed || typeof ZXing==='undefined' || !ZXing.BrowserMultiFormatReader) return null;
+    try{ zxReader=new ZXing.BrowserMultiFormatReader(zxHints()); }
+    catch(e){ try{ zxReader=new ZXing.BrowserMultiFormatReader(); }catch(_){ return null; } }
+    return zxReader;
+  }
+
+  /* ---- BarcodeDetector natif ---- */
+  async function getNative(){
+    if(nativeChecked) return nativeDetector;
+    nativeChecked=true;
+    try{
+      if('BarcodeDetector' in window){
+        const sup=await window.BarcodeDetector.getSupportedFormats();
+        const fmts=NATIVE_FORMATS.filter(f=>sup.includes(f));
+        if(fmts.length) nativeDetector=new window.BarcodeDetector({formats:fmts});
+      }
+    }catch(e){ nativeDetector=null; }
+    return nativeDetector;
+  }
+
+  /* ---- Validation clé de contrôle EAN-13 / UPC-A(12) / EAN-8 ---- */
+  function validChecksum(code){
+    if(!/^\d+$/.test(code)) return true;             // codes alphanum : pas de clé standard
+    const len=code.length;
+    if(len!==13 && len!==12 && len!==8) return true; // longueur atypique → ne pas invalider
+    const d=code.split('').map(Number);
+    const check=d.pop();
+    let sum=0;
+    d.reverse().forEach((n,i)=>{ sum += n*(i%2===0?3:1); });
+    return ((10-(sum%10))%10)===check;
+  }
+  function isProductCode(code){ return /^(\d{8}|\d{12}|\d{13})$/.test(code); }
+  function normalize(raw){ return String(raw||'').replace(/\s/g,'').trim(); }
+
+  /* ---- Détection : natif (rapide) et ZXing (createBinaryBitmap accepte
+          video / canvas / img). Séparés pour ne PAS lancer ZXing à chaque
+          image quand le natif est présent (sinon TRY_HARDER tourne en boucle). */
+  async function tryNative(source){
+    const nd=await getNative();
+    if(!nd) return null;
+    try{
+      const res=await nd.detect(source);
+      if(res && res.length){
+        const cands=res.map(r=>normalize(r.rawValue)).filter(Boolean)
+                       .sort((a,b)=>b.length-a.length);
+        for(const c of cands){ if(validChecksum(c)) return c; }
+        if(cands[0]) return cands[0];
+      }
+    }catch(e){ /* source pas prête sur certains navigateurs */ }
+    return null;
+  }
+  function tryZx(source){
+    const zx=getZx();
+    if(!zx) return null;
+    try{
+      const bb=zx.createBinaryBitmap(source);
+      const r=zx.decodeBitmap(bb);
+      if(r){ const c=normalize(r.getText()); if(c) return c; }
+    }catch(e){ /* NotFoundException */ }
+    return null;
+  }
+  // Repli photo : on tente les deux moteurs (pas critique en perf)
+  async function detectFrom(source){
+    return (await tryNative(source)) || tryZx(source);
+  }
+  // Capture d'une image vidéo, sous-échantillonnée pour alléger ZXing
+  function grabFrame(video){
+    const vw=video.videoWidth, vh=video.videoHeight;
+    if(!vw || !vh) return null;
+    const max=1280, scale=vw>max ? max/vw : 1;
+    const w=Math.round(vw*scale), h=Math.round(vh*scale);
+    if(!grabCanvas) grabCanvas=document.createElement('canvas');
+    grabCanvas.width=w; grabCanvas.height=h;
+    grabCanvas.getContext('2d',{willReadFrequently:true}).drawImage(video,0,0,w,h);
+    return grabCanvas;
+  }
+
+  /* ---- Confirmation : codes produits validés acceptés direct,
+          sinon 2 lectures identiques en < 1,5 s ---- */
+  function confirmHit(code){
+    if(isProductCode(code) && validChecksum(code)) return true;
+    const t=Date.now();
+    recent.push({code,t});
+    recent=recent.filter(r=>t-r.t<1500);
+    return recent.filter(r=>r.code===code).length>=2;
+  }
+
+  /* ---- Pré-traitement image pour le repli photo ---- */
+  function imgW(im){ return im.naturalWidth||im.width; }
+  function imgH(im){ return im.naturalHeight||im.height; }
+  function drawCanvas(img,scale){
+    const w=Math.max(1,Math.round(imgW(img)*scale)), h=Math.max(1,Math.round(imgH(img)*scale));
+    const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+    cv.getContext('2d',{willReadFrequently:true}).drawImage(img,0,0,w,h);
+    return cv;
+  }
+  function grayContrast(src){
+    const cv=document.createElement('canvas'); cv.width=src.width; cv.height=src.height;
+    const ctx=cv.getContext('2d',{willReadFrequently:true});
+    ctx.drawImage(src,0,0);
+    try{
+      const id=ctx.getImageData(0,0,cv.width,cv.height), d=id.data, k=1.45, b=128*(1-k);
+      for(let i=0;i<d.length;i+=4){
+        let g=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+        g=g*k+b; g=g<0?0:g>255?255:g;
+        d[i]=d[i+1]=d[i+2]=g;
+      }
+      ctx.putImageData(id,0,0);
+    }catch(e){}
+    return cv;
+  }
+  function centerCrop(src,frac){
+    const w=Math.round(src.width*frac), h=Math.round(src.height*frac);
+    const x=Math.round((src.width-w)/2), y=Math.round((src.height-h)/2);
+    const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+    cv.getContext('2d').drawImage(src,x,y,w,h,0,0,w,h);
+    return cv;
+  }
+  async function fileToImage(file){
+    try{ if('createImageBitmap' in window) return await createImageBitmap(file); }catch(e){}
+    return await new Promise(res=>{
+      const url=URL.createObjectURL(file), im=new Image();
+      im.onload=()=>{ URL.revokeObjectURL(url); res(im); };
+      im.onerror=()=>{ URL.revokeObjectURL(url); res(null); };
+      im.src=url;
+    });
+  }
+
+  async function decodeImageFile(file){
+    await getNative();
+    const img=await fileToImage(file);
+    if(!img) return null;
+    const w=imgW(img);
+    const variants=[];
+    const base = w>2400 ? drawCanvas(img, 2200/w) : drawCanvas(img,1);
+    variants.push(base);
+    if(w<1000) variants.push(drawCanvas(img,2));        // upscale si petite
+    variants.push(grayContrast(base));                   // niveaux de gris contrastés
+    variants.push(centerCrop(base,0.8));                 // recadrage centre
+    variants.push(grayContrast(centerCrop(base,0.7)));   // recadrage serré + contraste
+    for(const c of variants){
+      const code=await detectFrom(c);
+      if(code) return code;
     }
-  } catch(e){ console.warn('ZXing init error:',e); }
-  return null;
-}
+    return null;
+  }
+
+  /* ---- Caméra live ---- */
+  async function loop(){
+    if(!scanning) return;
+    try{
+      if(videoEl && videoEl.readyState>=2 && videoEl.videoWidth){
+        let code=null;
+        if(nativeDetector){
+          code=await tryNative(videoEl);               // natif : rapide, image pleine
+        }else{
+          const g=grabFrame(videoEl);                  // repli ZXing : image réduite
+          if(g) code=tryZx(g);
+        }
+        if(code && confirmHit(code)){
+          const now=Date.now();
+          if(!(code===lastAccepted && now-lastAcceptedT<2000)){
+            lastAccepted=code; lastAcceptedT=now;
+            if(onResultCb) onResultCb(code);
+          }
+        }
+      }
+    }catch(e){}
+    if(scanning) rafId=setTimeout(loop, nativeDetector?90:170);
+  }
+
+  async function startLiveScan(video,onResult){
+    await getNative();
+    if(!nativeDetector && !getZx()) throw new Error('no-engine');
+    videoEl=video; onResultCb=onResult; recent=[]; lastAccepted=''; lastAcceptedT=0;
+    stream=await navigator.mediaDevices.getUserMedia({
+      audio:false,
+      video:{ facingMode:{ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080} }
+    });
+    video.srcObject=stream;
+    video.setAttribute('playsinline','');
+    try{ await video.play(); }catch(e){}
+    track=stream.getVideoTracks()[0];
+    try{ await track.applyConstraints({advanced:[{focusMode:'continuous'}]}); }catch(e){}
+    scanning=true;
+    loop();
+  }
+  function stopLiveScan(){
+    scanning=false;
+    if(rafId){ clearTimeout(rafId); rafId=null; }
+    if(stream){ stream.getTracks().forEach(t=>{ try{t.stop();}catch(e){} }); stream=null; }
+    if(videoEl){ try{ videoEl.srcObject=null; }catch(e){} videoEl=null; }
+    track=null; onResultCb=null; recent=[];
+  }
+
+  function hasTorch(){
+    try{ return !!(track && track.getCapabilities && track.getCapabilities().torch); }
+    catch(e){ return false; }
+  }
+  async function setTorch(on){
+    if(!hasTorch()) return false;
+    try{ await track.applyConstraints({advanced:[{torch:!!on}]}); return true; }
+    catch(e){ return false; }
+  }
+
+  function isAvailable(){
+    if('BarcodeDetector' in window) return true;
+    if(!window._zxingFailed && typeof ZXing!=='undefined' && ZXing.BrowserMultiFormatReader) return true;
+    return false;
+  }
+
+  return { decodeImageFile, startLiveScan, stopLiveScan, hasTorch, setTorch, isAvailable };
+})();
 
 // Avertissement si catalogue vide au moment d'entrer dans le scanner
 function checkCatalogueWarning(){
@@ -2311,19 +2557,86 @@ function checkCatalogueWarning(){
   }
 }
 
-// ── Photo 1 : code-barres ─────────────────────────────────────────────────
+// ── Étape 1 : caméra live ──────────────────────────────────────────────────
+let scanTorchOn=false;
+
+function startEanScan(){
+  const st=document.getElementById('scan-st');
+  if(!BarcodeEngine.isAvailable()){
+    st.innerHTML=`<div style="color:var(--o);font-weight:800">⚠️ Lecteur indisponible — utilisez « 🖼 Scanner via photo »</div>`;
+    return;
+  }
+  document.getElementById('scan-cam-wrap').style.display='block';
+  document.getElementById('scan-cam-btn').style.display='none';
+  document.getElementById('scan-cam-stop').style.display='inline-flex';
+  st.innerHTML=`<span class="spin"></span> Visez le code-barres…`;
+  currentEAN=null;
+  BarcodeEngine.startLiveScan(
+    document.getElementById('scan-video'),
+    (code)=>{ stopEanScan(); onEanDecoded(code); }
+  ).then(()=>{
+    const tb=document.getElementById('scan-torch');
+    if(tb) tb.style.display = BarcodeEngine.hasTorch() ? 'flex' : 'none';
+  }).catch(err=>{
+    console.warn('Caméra scan:',err);
+    st.innerHTML=`<div style="color:var(--o);font-weight:800;margin-bottom:4px">⚠️ Caméra inaccessible</div>
+      <div style="font-size:11px;color:var(--muted)">Autorisez la caméra, ou utilisez « 🖼 Scanner via photo ».</div>`;
+    stopEanScan();
+  });
+}
+
+function stopEanScan(){
+  BarcodeEngine.stopLiveScan();
+  const wrap=document.getElementById('scan-cam-wrap'); if(wrap) wrap.style.display='none';
+  const b=document.getElementById('scan-cam-btn'), s=document.getElementById('scan-cam-stop');
+  if(b) b.style.display='inline-flex';
+  if(s) s.style.display='none';
+  const tb=document.getElementById('scan-torch'); if(tb){ tb.style.display='none'; tb.classList.remove('on'); }
+  scanTorchOn=false;
+}
+
+function toggleScanTorch(){
+  scanTorchOn=!scanTorchOn;
+  BarcodeEngine.setTorch(scanTorchOn);
+  const tb=document.getElementById('scan-torch'); if(tb) tb.classList.toggle('on',scanTorchOn);
+}
+
+// Aiguillage commun caméra live + photo : gencod lu → lookup catalogue
+function onEanDecoded(ean){
+  ean=String(ean||'').replace(/\s/g,'');
+  const st=document.getElementById('scan-st');
+  if(!ean){ if(st) st.innerHTML=`<div style="color:var(--o);font-weight:800">⚠️ Code non lu — réessayez</div>`; return; }
+  currentEAN=ean;
+  if(st) st.textContent='';
+
+  const produit = lookupGencod(ean);
+  if(produit){
+    // ✅ Trouvé dans le catalogue
+    handleScanResult({found:true, produit:produit.nom, gencod:produit.gencod, type_produit:produit.famille, marque:produit.marque});
+  } else {
+    // ❌ Gencod lu mais absent du catalogue → étape 2 : photo produit + saisie nom
+    document.getElementById('scan-ean-found').innerHTML =
+      `📦 Gencod <strong>${escapeHTML(ean)}</strong> lu — absent du catalogue<br>
+       <span style="font-size:11px;font-weight:600;opacity:.8">Photographiez l'emballage pour saisir le nom</span>`;
+    document.getElementById('scan-step1').style.display = 'none';
+    document.getElementById('scan-step2').style.display = 'block';
+    const apGc = document.getElementById('ap-gencod');
+    if(apGc) apGc.value = ean;
+  }
+}
+
+// ── Étape 1 (repli) : décodage depuis une photo ────────────────────────────
 document.getElementById('scan-in-ean').addEventListener('change', async function(e){
   const file = e.target.files[0];
   if(!file) return;
   e.target.value = '';
+  stopEanScan();
 
   const st = document.getElementById('scan-st');
   st.innerHTML = `<span class="spin"></span> Lecture du code-barres…`;
   currentEAN = null;
 
-  const reader = getZXing();
-  if(!reader){
-    // ZXing non disponible → aller direct à saisie manuelle
+  if(!BarcodeEngine.isAvailable()){
     st.innerHTML = `<div style="color:var(--o);font-weight:800;margin-bottom:6px">⚠️ Lecteur barcode non chargé</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Rechargez la page ou utilisez la saisie manuelle.</div>
       <button onclick="openManualFromScan()"
@@ -2333,60 +2646,36 @@ document.getElementById('scan-in-ean').addEventListener('change', async function
     return;
   }
 
-  // Créer une image temporaire pour ZXing
-  const imgUrl = URL.createObjectURL(file);
-  const img = document.createElement('img');
-  img.src = imgUrl;
+  let code=null;
+  try{ code = await BarcodeEngine.decodeImageFile(file); }
+  catch(err){ console.warn('decodeImageFile:',err); }
 
-  try{
-    await new Promise((ok,err)=>{img.onload=ok; img.onerror=err; setTimeout(ok, 8000);});
-    const result = await reader.decodeFromImageElement(img);
-    URL.revokeObjectURL(imgUrl);
-
-    const ean = result.getText().replace(/\s/g,'');
-    currentEAN = ean;
-    st.textContent = '';
-
-    // Chercher dans le catalogue local
-    const produit = lookupGencod(ean);
-    if(produit){
-      // ✅ Trouvé dans le catalogue
-      handleScanResult({found:true, produit:produit.nom, gencod:produit.gencod, type_produit:produit.famille, marque:produit.marque});
-    } else {
-      // ❌ Gencod lu mais absent du catalogue → étape 2 : photo produit + saisie nom
-      document.getElementById('scan-ean-found').innerHTML =
-        `📦 Gencod <strong>${escapeHTML(ean)}</strong> lu — absent du catalogue<br>
-         <span style="font-size:11px;font-weight:600;opacity:.8">Photographiez l'emballage pour saisir le nom</span>`;
-      document.getElementById('scan-step1').style.display = 'none';
-      document.getElementById('scan-step2').style.display = 'block';
-      // Pré-remplir le gencod dans le formulaire
-      const apGc = document.getElementById('ap-gencod');
-      if(apGc) apGc.value = ean;
-    }
-  } catch(err){
-    URL.revokeObjectURL(imgUrl);
-    if(err.name === 'NotFoundException'){
-      st.innerHTML = `
-        <div style="color:var(--o);font-weight:800;margin-bottom:4px">⚠️ Code-barres non détecté</div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6">
-          • Cadrez uniquement le code-barres<br>
-          • Bon éclairage, fond clair<br>
-          • Photo nette, pas de reflet<br>
-          • Distance : 15 à 30 cm
-        </div>
-        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-          <button onclick="document.getElementById('scan-in-ean').click()"
-            style="padding:9px 16px;border-radius:var(--rr);border:none;background:rgba(18,168,118,.82);
-                   color:#fff;font-size:12px;font-weight:900;cursor:pointer;font-family:var(--font)">
-            🔄 Réessayer</button>
-          <button onclick="openManualFromScan()"
-            style="padding:9px 16px;border-radius:var(--rr);border:1.5px solid var(--bdr);background:rgba(255,255,255,.5);
-                   color:var(--txt);font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font)">
-            ✏️ Saisir manuellement</button>
-        </div>`;
-    } else {
-      st.innerHTML = `<span style="color:var(--r);font-size:12px;font-weight:700">❌ Erreur : ${escapeHTML(err.message)}</span>`;
-    }
+  if(code){
+    st.textContent='';
+    onEanDecoded(code);
+  } else {
+    st.innerHTML = `
+      <div style="color:var(--o);font-weight:800;margin-bottom:4px">⚠️ Code-barres non détecté</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6">
+        • Préférez « 📷 Démarrer le scan » (lecture en continu, plus fiable)<br>
+        • Cadrez uniquement le code-barres<br>
+        • Bon éclairage, photo nette, pas de reflet<br>
+        • Distance : 15 à 30 cm
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button onclick="startEanScan()"
+          style="padding:9px 16px;border-radius:var(--rr);border:none;background:rgba(18,168,118,.82);
+                 color:#fff;font-size:12px;font-weight:900;cursor:pointer;font-family:var(--font)">
+          📷 Scanner en direct</button>
+        <button onclick="document.getElementById('scan-in-ean').click()"
+          style="padding:9px 16px;border-radius:var(--rr);border:1.5px solid var(--bdr);background:rgba(255,255,255,.5);
+                 color:var(--txt);font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font)">
+          🖼 Nouvelle photo</button>
+        <button onclick="openManualFromScan()"
+          style="padding:9px 16px;border-radius:var(--rr);border:1.5px solid var(--bdr);background:rgba(255,255,255,.5);
+                 color:var(--txt);font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font)">
+          ✏️ Manuel</button>
+      </div>`;
   }
 });
 
@@ -2500,6 +2789,7 @@ function showScanError(msg){
 }
 
 function resetScan(){
+  stopEanScan();
   document.getElementById('scan-res').style.display='none';
   document.getElementById('nf-card').style.display='none';
   document.getElementById('scan-step2').style.display='none';
@@ -2515,89 +2805,75 @@ function resetScan(){
    commande n'est poussée vers un serveur : tout reste sur l'appareil. */
 let orders       = JSON.parse(localStorage.getItem('fc_orders') || '[]');
 let currentOrder = [];
-let cmdReader    = null;
 let cmdScanning  = false;
 let cmdPending   = null;   // produit détecté, en attente de quantité
-let cmdLastCode  = '';     // anti-doublon de lecture caméra
-let cmdLastTime  = 0;
+// L'anti-doublon de lecture caméra est désormais géré par BarcodeEngine.
 
 function renderCommande(){
   showStoreBadge();
   renderOrderLines();
 }
 
-function getCmdReader(){
-  if(cmdReader) return cmdReader;
-  if(window._zxingFailed) return null;
-  try{
-    if(typeof ZXing !== 'undefined' && ZXing.BrowserMultiFormatReader){
-      cmdReader = new ZXing.BrowserMultiFormatReader();
-      return cmdReader;
-    }
-  }catch(e){ console.warn('ZXing init (commande):', e); }
-  return null;
-}
+let cmdTorchOn=false;
 
 async function startCmdScan(){
   const st = document.getElementById('cmd-st');
-  const reader = getCmdReader();
-  if(!reader){
-    if(st) st.innerHTML = '<div style="color:var(--o);font-weight:800">⚠️ Lecteur indisponible — utilisez « Scanner via photo »</div>';
+  if(!BarcodeEngine.isAvailable()){
+    if(st) st.innerHTML = '<div style="color:var(--o);font-weight:800">⚠️ Lecteur indisponible — utilisez « 🖼 Scanner via photo »</div>';
     return;
   }
+  const wrap = document.getElementById('cmd-cam-wrap');
   const video = document.getElementById('cmd-video');
   document.getElementById('cmd-scan-btn').style.display = 'none';
   document.getElementById('cmd-stop-btn').style.display = 'inline-flex';
-  video.style.display = 'block';
+  if(wrap) wrap.style.display = 'block';
   if(st) st.textContent = 'Visez un code-barres…';
   cmdScanning = true;
   try{
-    await reader.decodeFromVideoDevice(null, video, (result) => {
-      if(!cmdScanning || cmdPending) return;
-      if(result){
-        const code = result.getText().replace(/\s/g,'');
-        const now  = Date.now();
-        if(code === cmdLastCode && (now - cmdLastTime) < 1800) return; // anti-doublon
-        cmdLastCode = code; cmdLastTime = now;
-        onCmdDecode(code);
-      }
+    await BarcodeEngine.startLiveScan(video, (code) => {
+      if(!cmdScanning || cmdPending) return;   // une saisie quantité est en cours
+      onCmdDecode(code);
     });
+    const tb=document.getElementById('cmd-torch');
+    if(tb) tb.style.display = BarcodeEngine.hasTorch() ? 'flex' : 'none';
   }catch(e){
     console.warn('Caméra commande:', e);
-    if(st) st.innerHTML = '<div style="color:var(--o);font-weight:800">⚠️ Caméra inaccessible — utilisez « Scanner via photo »</div>';
+    if(st) st.innerHTML = '<div style="color:var(--o);font-weight:800">⚠️ Caméra inaccessible — utilisez « 🖼 Scanner via photo »</div>';
     stopCmdScan();
   }
 }
 
 function stopCmdScan(){
   cmdScanning = false;
-  if(cmdReader){ try{ cmdReader.reset(); }catch(e){} }
-  const video = document.getElementById('cmd-video');
-  if(video) video.style.display = 'none';
+  BarcodeEngine.stopLiveScan();
+  const wrap = document.getElementById('cmd-cam-wrap');
+  if(wrap) wrap.style.display = 'none';
   const b1 = document.getElementById('cmd-scan-btn'), b2 = document.getElementById('cmd-stop-btn');
   if(b1) b1.style.display = 'inline-flex';
   if(b2) b2.style.display = 'none';
+  const tb=document.getElementById('cmd-torch'); if(tb){ tb.style.display='none'; tb.classList.remove('on'); }
+  cmdTorchOn=false;
 }
 
-// Scan via photo (fallback caméra refusée / non disponible)
+function toggleCmdTorch(){
+  cmdTorchOn=!cmdTorchOn;
+  BarcodeEngine.setTorch(cmdTorchOn);
+  const tb=document.getElementById('cmd-torch'); if(tb) tb.classList.toggle('on',cmdTorchOn);
+}
+
+// Scan via photo (repli caméra refusée / non disponible) — même pré-traitement robuste
 document.getElementById('cmd-photo-in').addEventListener('change', async function(e){
   const file = e.target.files[0];
   if(!file) return;
   e.target.value = '';
   const st = document.getElementById('cmd-st');
-  const reader = getCmdReader();
-  if(!reader){ if(st) st.textContent = '⚠️ Lecteur indisponible'; return; }
-  const imgUrl = URL.createObjectURL(file);
-  const img = document.createElement('img'); img.src = imgUrl;
-  try{
-    await new Promise((ok,ko)=>{ img.onload=ok; img.onerror=ko; setTimeout(ok,8000); });
-    const result = await reader.decodeFromImageElement(img);
-    URL.revokeObjectURL(imgUrl);
-    onCmdDecode(result.getText().replace(/\s/g,''));
-  }catch(err){
-    URL.revokeObjectURL(imgUrl);
-    if(st) st.innerHTML = '<div style="color:var(--o);font-weight:800">⚠️ Code-barres non détecté — réessayez</div>';
-  }
+  if(!BarcodeEngine.isAvailable()){ if(st) st.textContent = '⚠️ Lecteur indisponible'; return; }
+  if(st) st.innerHTML = '<span class="spin"></span> Lecture…';
+  let code=null;
+  try{ code = await BarcodeEngine.decodeImageFile(file); }
+  catch(err){ console.warn('decodeImageFile (commande):',err); }
+  if(code){ if(st) st.textContent=''; onCmdDecode(code); }
+  else if(st) st.innerHTML = '<div style="color:var(--o);font-weight:800">⚠️ Code-barres non détecté — réessayez ou utilisez « 📷 Démarrer le scan »</div>';
 });
 
 function cmdManualEntry(){ onCmdDecode(''); }
