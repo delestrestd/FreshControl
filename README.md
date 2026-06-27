@@ -5,7 +5,7 @@ PWA de gestion des produits périmés en supermarché.
 - Scanner de code-barres EAN **100 % local** (ZXing dans le navigateur — pas d'API).
 - Catalogue **multi-marques** synchronisé depuis Google Sheets.
 - Alertes DLC, planning de tournées par magasin, rappels e-mail.
-- Multi-utilisateurs : super admin, directeur, responsable, agent, lecture seule.
+- Mono-utilisateur : un seul compte administrateur (outil de terrain personnel).
 - Multilingue (FR / EN / ES / ZH).
 
 ## Démarrage rapide
@@ -81,18 +81,17 @@ https://…/gviz/tq?tqx=out:csv&sheet=Marque_A|https://…/gviz/tq?tqx=out:csv&s
 - Content-Security-Policy stricte, X-Frame-Options DENY, HSTS preload.
 - Permissions-Policy : caméra et géolocalisation autorisées sur le même origin uniquement, micro / paiement / USB bloqués.
 
-### Identifiants par défaut
+### Identifiant par défaut (application mono-utilisateur)
 
-À l'installation :
+À l'installation, un **unique compte** est créé :
 
 ```
-admin   / freshcontrol2024   (super-admin)
-agent1  / agent123           (agent)
+admin / freshcontrol2024
 ```
 
-Au **premier login** de chacun de ces comptes, l'application **impose le choix d'un nouveau mot de passe** (8 caractères minimum) — les valeurs ci-dessus ne servent qu'au tout premier accès.
+**Changez ce mot de passe** depuis Admin → 🔑 Mon compte. L'identifiant `admin` est pré-rempli à l'écran de connexion.
 
-Si l'accès est perdu, une réinitialisation est disponible depuis l'écran de connexion : code `RESET` + 4 premières lettres du nom du magasin (ou `RESET2024` si aucun magasin n'est configuré). La réinitialisation **ne restaure plus d'identifiants connus** — elle demande de définir un nouveau mot de passe administrateur, haché immédiatement.
+Si l'accès est perdu, une réinitialisation est disponible depuis l'écran de connexion : code `RESET` + 4 premières lettres du nom du magasin (ou `RESET2024` si aucun magasin n'est configuré). La réinitialisation **ne restaure aucun identifiant connu** — elle demande de définir un nouveau mot de passe administrateur, haché immédiatement.
 
 ### Endpoint `api/scan.js` (analyse d'image — optionnel)
 

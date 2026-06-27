@@ -460,7 +460,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
   </div>
   <div class="lc glass-d">
     <div class="ll" id="l-user">Identifiant</div>
-    <input class="li" id="li-u" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="prenom.nom">
+    <input class="li" id="li-u" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="prenom.nom" value="admin">
     <div class="ll" id="l-pass">Mot de passe</div>
     <input class="li" id="li-p" type="password" autocomplete="current-password" placeholder="••••••••">
     <button class="lb" id="l-btn" onclick="doLogin()"><span id="l-btn-t">Se connecter</span></button>
@@ -1043,32 +1043,10 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
         </div>
       </div>
 
-      <!-- Gestion des accès utilisateurs -->
+      <!-- Mon compte (application mono-utilisateur) -->
       <div class="adm-sec">
-        <div class="adm-t">🔑 Gestion des accès</div>
-        <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:12px;line-height:1.7;background:rgba(0,0,0,.04);padding:8px 12px;border-radius:10px">
-          Hiérarchie : ⚡ Super Admin → 👔 Directeur → 📋 Responsable rayon → 👤 Agent → 👁 Lecture seule
-        </div>
+        <div class="adm-t">🔑 Mon compte</div>
         <div id="user-admin-list"></div>
-        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bdr)">
-          <div style="font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">➕ Ajouter un accès</div>
-          <div class="af-row" style="flex-wrap:wrap;gap:7px">
-            <input class="af-in" id="au-nm" placeholder="Prénom Nom" style="flex:1;min-width:120px">
-            <input class="af-in" id="au-un" placeholder="identifiant" autocapitalize="none" style="flex:1;min-width:100px">
-          </div>
-          <div class="af-row" style="margin-top:7px;flex-wrap:wrap;gap:7px">
-            <input class="af-in" id="au-pw" type="password" placeholder="Mot de passe" style="flex:2;min-width:120px">
-            <select class="af-sel" id="au-rl" style="flex:1;min-width:130px">
-              <option value="agent">👤 Agent</option>
-              <option value="responsable">📋 Responsable rayon</option>
-              <option value="directeur">👔 Directeur</option>
-              <option value="lecture">👁 Lecture seule</option>
-              <option value="superadmin">⚡ Super Admin</option>
-            </select>
-          </div>
-          <input class="af-in" id="au-rayon" placeholder="Rayon / Service (optionnel — ex: Frais, Boulangerie)" style="width:100%;margin-top:7px">
-          <button class="af-add" onclick="addUser()" style="width:100%;padding:12px;margin-top:8px">➕ Créer l'accès</button>
-        </div>
       </div>
 
       <!-- Langue -->
@@ -1264,11 +1242,10 @@ function getRoleInfo(role){ return ROLES[role] || ROLES.agent; }
 function canAccess(tab){ return getRoleInfo(session?.role)?.tabs?.includes(tab) ?? false; }
 function isAdminRole(){ return ['superadmin','directeur'].includes(session?.role); }
 
-// Init défauts utilisateurs
+// Init défaut — application mono-utilisateur : un seul compte administrateur.
 if(!users){
   users=[
-    {id:'u1',name:'Administrateur',username:'admin',   password:'freshcontrol2024',role:'superadmin',mustChange:true},
-    {id:'u2',name:'Agent 1',       username:'agent1',  password:'agent123',        role:'agent',     mustChange:true},
+    {id:'u1',name:'Administrateur',username:'admin',password:'freshcontrol2024',role:'superadmin'},
   ];
   save('fc_users',users);
 }
@@ -1423,20 +1400,8 @@ async function doLogin(){
     ['li-u','li-p'].forEach(id=>{const el=document.getElementById(id);el.classList.add('err');setTimeout(()=>el.classList.remove('err'),380)});
     return;
   }
-  // Premier accès (compte par défaut) : changement de mot de passe obligatoire.
-  if(candidate.mustChange){
-    let np='';
-    for(;;){
-      np = prompt('Premier accès — choisissez un nouveau mot de passe (8 caractères minimum) :') || '';
-      if(np===''){ err.textContent='Changement de mot de passe requis pour continuer.'; return; }
-      if(np.length<8){ alert('8 caractères minimum.'); continue; }
-      break;
-    }
-    candidate.password = await hashPassword(np);
-    delete candidate.mustChange;
-    save('fc_users', users);
-  } else if(needsRehash(candidate.password)){
-    // Migration silencieuse des hachages legacy (clair / sha256) vers PBKDF2.
+  // Migration silencieuse des hachages legacy (clair / sha256) vers PBKDF2.
+  if(needsRehash(candidate.password)){
     candidate.password = await hashPassword(p);
     save('fc_users', users);
   }
@@ -1459,7 +1424,7 @@ function doLogout(){
   closeSB();
   document.getElementById('app').classList.remove('on');
   document.getElementById('splash').classList.remove('off');
-  document.getElementById('li-u').value='';
+  document.getElementById('li-u').value='admin'; // mono-utilisateur : identifiant pré-rempli
   showTab('dashboard');
 }
 
@@ -3071,33 +3036,23 @@ function renderStoreAdmin(){
 function renderUserAdmin(){
   const el=document.getElementById('user-admin-list');
   if(!el) return;
-  if(!users.length){ el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px 0">Aucun utilisateur</div>'; return; }
-  // Trier : superadmin en premier, puis par level décroissant
-  const sorted = users.map((u,i)=>({...u,_idx:i}))
-    .sort((a,b)=>(getRoleInfo(b.role).level||0)-(getRoleInfo(a.role).level||0));
-  el.innerHTML = sorted.map(u => {
-    const ri = getRoleInfo(u.role);
-    const isMe = u.username===session?.username;
-    return `<div class="adm-row" style="align-items:center;gap:10px">
-      <div style="width:36px;height:36px;border-radius:50%;background:${ri.color}22;border:2px solid ${ri.color}44;
-                  display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${ri.label.split(' ')[0]}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:800;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-          ${escapeHTML(u.name)}
-          ${isMe?'<span style="font-size:10px;background:rgba(18,168,118,.15);color:var(--gd);border-radius:100px;padding:2px 7px;font-weight:900;border:1px solid rgba(18,168,118,.2)">Vous</span>':''}
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
-          <span style="font-size:10px;color:var(--muted);font-weight:700">@${escapeHTML(u.username)}</span>
-          <span style="font-size:10px;background:${ri.color}18;color:${ri.color};border-radius:100px;padding:2px 8px;font-weight:800;border:1px solid ${ri.color}30">${ri.label}</span>
-          ${u.rayon?`<span style="font-size:10px;color:var(--muted);font-weight:600">· ${escapeHTML(u.rayon)}</span>`:''}
-        </div>
-      </div>
-      ${!isMe?`<div style="display:flex;gap:5px;flex-shrink:0">
-        <button class="adm-edit" data-uid="${escapeHTMLAttr(u.id||u._idx)}" onclick="openEditUser(this.dataset.uid)" title="Modifier">🔑</button>
-        <button class="adm-del" data-uidx="${u._idx}" onclick="confirmDeleteUser(Number(this.dataset.uidx))" title="Supprimer">🗑</button>
-      </div>`:'<span style="font-size:10px;color:var(--muted);font-weight:700;flex-shrink:0">actif</span>'}
-    </div>`;
-  }).join('');
+  // Mono-utilisateur : on affiche le compte courant avec un bouton pour
+  // modifier le nom et le mot de passe (cf. openEditUser).
+  const me = users.find(u=>u.username===session?.username) || users[0];
+  if(!me){ el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px 0">Aucun compte</div>'; return; }
+  el.innerHTML = `<div class="adm-row" style="align-items:center;gap:10px">
+    <div style="width:36px;height:36px;border-radius:50%;background:rgba(18,168,118,.14);border:2px solid rgba(18,168,118,.3);
+                display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">👤</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:13px;font-weight:800">${escapeHTML(me.name)}</div>
+      <div style="font-size:10px;color:var(--muted);font-weight:700;margin-top:2px">@${escapeHTML(me.username)}</div>
+    </div>
+    <button data-uid="${escapeHTMLAttr(me.id||'u1')}" onclick="openEditUser(this.dataset.uid)"
+      style="flex-shrink:0;border:1px solid var(--bdr);background:rgba(255,255,255,.7);color:var(--txt);border-radius:10px;padding:8px 13px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font)">🔑 Modifier</button>
+  </div>
+  <div style="font-size:11px;color:var(--muted);font-weight:600;margin-top:10px;line-height:1.6;background:rgba(0,0,0,.04);padding:8px 12px;border-radius:10px">
+    Application mono-utilisateur. Changez votre nom ou votre mot de passe via « 🔑 Modifier ».
+  </div>`;
 }
 
 /* Store CRUD */
@@ -3138,29 +3093,7 @@ function confirmDeleteStore(id){
   });
 }
 
-/* User CRUD */
-async function addUser(){
-  const nm   = document.getElementById('au-nm')?.value.trim();
-  const un   = document.getElementById('au-un')?.value.trim().toLowerCase();
-  const pw   = document.getElementById('au-pw')?.value;
-  const rl   = document.getElementById('au-rl')?.value || 'agent';
-  const rayon= document.getElementById('au-rayon')?.value.trim() || '';
-  if(!nm||!un||!pw){toast(T().fill_all);return}
-  if(users.find(u=>u.username===un)){toast('❌ Cet identifiant est déjà utilisé');return}
-  const ri = getRoleInfo(rl);
-  const hashed = await hashPassword(pw);
-  users.push({id:genId(), name:nm, username:un, password:hashed, role:rl, rayon});
-  save('fc_users',users);
-  ['au-nm','au-un','au-pw','au-rayon'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  renderAdmin();
-  toast(`✅ Accès créé — ${ri.label} : ${nm}`);
-}
-function confirmDeleteUser(i){
-  if(users[i].username===session?.username)return;
-  showConfirm(`Supprimer "${users[i].name}" ?`,'Cet utilisateur ne pourra plus se connecter.',()=>{
-    users.splice(i,1);save('fc_users',users);renderAdmin();toast(T().deleted);
-  });
-}
+/* Compte unique — modification du nom / mot de passe */
 function openEditUser(idOrIdx){
   const u=users.find(x=>x.id===idOrIdx)||users[parseInt(idOrIdx)];
   if(!u)return;
