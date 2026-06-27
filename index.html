@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0A6B47">
@@ -211,6 +211,14 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .scan-link-btn:hover{background:rgba(0,0,0,.09);color:var(--txt)}
 .scan-reset-btn{padding:9px 18px;border-radius:var(--rr);border:1px solid var(--bdr);background:rgba(255,255,255,.6);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background .18s,color .18s}
 .scan-reset-btn:hover{background:rgba(255,255,255,.85);color:var(--txt)}
+/* ── Commande (lignes éditables) ─────────────────────────────────────── */
+.ord-line{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.64);border:1px solid rgba(255,255,255,.7);border-radius:14px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--spec)}
+.ord-qty{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.ord-qty button{width:30px;height:30px;border-radius:9px;border:1px solid var(--bdr);background:rgba(255,255,255,.85);color:var(--txt);font-size:17px;font-weight:900;cursor:pointer;font-family:var(--font);line-height:1;display:flex;align-items:center;justify-content:center}
+.ord-qty button:active{transform:scale(.92)}
+.ord-qty input{width:48px;text-align:center;padding:6px 2px;border-radius:9px;border:1.5px solid var(--bdr);font-size:14px;font-weight:800;font-family:var(--font);background:rgba(255,255,255,.92);color:var(--txt);outline:none;-moz-appearance:textfield}
+.ord-qty input::-webkit-outer-spin-button,.ord-qty input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.ord-del{width:34px;height:34px;flex-shrink:0;border-radius:9px;border:1px solid rgba(224,60,60,.28);background:rgba(224,60,60,.1);color:var(--r);font-size:14px;cursor:pointer;font-family:var(--font)}
 #scan-in{display:none}
 .sbtn{display:inline-flex;align-items:center;gap:8px;padding:16px 28px;min-height:52px;border-radius:var(--rr);background:rgba(18,168,118,.92);color:#fff;font-size:16px;font-weight:900;cursor:pointer;font-family:var(--font);margin-top:14px;border:1px solid rgba(255,255,255,.32);box-shadow:var(--spec-d),var(--sg);transition:transform .15s,background .18s}
 .sbtn:hover{background:rgba(18,168,118,1)}
@@ -672,6 +680,14 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
   </div>
 </div>
 
+<!-- ═══ COMMANDES MODAL ═══════════════════════════════════════════════ -->
+<div id="orders-modal" class="modal-bg">
+  <div class="modal-sh">
+    <div class="mhd-row" style="margin-bottom:14px"><div class="mhd-t">🗂 Historique des commandes</div><button class="mcl" onclick="closeModal('orders-modal')" aria-label="Fermer">✕</button></div>
+    <div id="orders-list"></div>
+  </div>
+</div>
+
 <!-- ═══ MENTIONS LÉGALES / CGU / RGPD ═══════════════════════════════════
      Textes rédigés en cohérence avec les traitements réels de l'application.
      À soumettre à un avocat avant toute mise en production : tous les
@@ -905,6 +921,52 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       </div>
     </div>
 
+    <!-- COMMANDE -->
+    <div id="tab-commande" class="tab">
+
+      <!-- Scan (caméra live + fallback photo) -->
+      <div class="scan-box" id="cmd-scan-box">
+        <div class="scan-step-icon">🛒</div>
+        <div class="scan-step-title">Commande par scan</div>
+        <div class="scan-step-sub">Scannez les codes-barres, saisissez la quantité, puis validez pour envoyer la commande par mail. Tout reste enregistré localement.</div>
+        <video id="cmd-video" playsinline muted style="display:none;width:100%;max-height:240px;border-radius:14px;background:#000;margin-top:14px;object-fit:cover"></video>
+        <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <button class="sbtn" id="cmd-scan-btn" onclick="startCmdScan()" style="margin-top:0">📷 Démarrer le scan</button>
+          <button class="sbtn" id="cmd-stop-btn" onclick="stopCmdScan()" style="margin-top:0;display:none;background:rgba(224,60,60,.9);box-shadow:var(--spec-d),var(--sr)">⏹ Arrêter</button>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <input type="file" id="cmd-photo-in" accept="image/*" capture="environment" style="display:none">
+          <button class="scan-link-btn" onclick="document.getElementById('cmd-photo-in').click()">🖼 Scanner via photo</button>
+          <button class="scan-link-btn" onclick="cmdManualEntry()">✏️ Saisie manuelle</button>
+        </div>
+        <div id="cmd-st" class="scan-step-status"></div>
+      </div>
+
+      <!-- Saisie quantité (après détection) -->
+      <div class="scan-box" id="cmd-qty-box" style="display:none;text-align:left">
+        <div class="rf-t">📦 <span id="cmd-qty-name"></span></div>
+        <div class="rf-row">
+          <div class="rf-f"><div class="rf-l">Gencod</div><input class="rf-i" id="cmd-qty-gc" readonly style="background:rgba(0,0,0,.04);color:var(--muted)"></div>
+          <div class="rf-f"><div class="rf-l">Famille / Marque</div><input class="rf-i" id="cmd-qty-fam" readonly style="background:rgba(0,0,0,.04);color:var(--muted)"></div>
+        </div>
+        <div id="cmd-qty-namewrap" style="display:none"><div class="rf-f"><div class="rf-l">Nom du produit (hors catalogue)</div><input class="rf-i" id="cmd-qty-manualname" placeholder="Nom du produit"></div></div>
+        <div class="rf-f"><div class="rf-l">Quantité</div><input class="rf-i" id="cmd-qty-input" type="number" min="1" step="1" value="1" inputmode="numeric"></div>
+        <button class="rfsave" onclick="addOrderLine()">➕ Ajouter à la commande</button>
+        <button class="rfcancel" onclick="cancelCmdQty()">Annuler</button>
+      </div>
+
+      <!-- Liste de la commande en cours -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 2px 10px">
+        <div style="font-size:14px;font-weight:900;color:#fff">🧾 Commande en cours <span id="cmd-count" style="opacity:.85;font-weight:700"></span></div>
+        <button class="scan-link-btn" onclick="openModal('orders-modal');renderOrdersHistory()" style="background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.32)">🗂 Historique</button>
+      </div>
+      <div id="order-lines"></div>
+      <div id="cmd-footer" style="display:none;margin-top:12px">
+        <button class="af-add" style="width:100%;padding:14px" onclick="validateOrder()">✅ Valider et envoyer par mail</button>
+        <button class="scan-reset-btn" style="width:100%;margin-top:8px" onclick="clearOrder()">🗑 Vider la commande</button>
+      </div>
+    </div>
+
     <!-- ALERTES -->
     <div id="tab-alertes" class="tab">
       <button class="af-add" style="width:100%;margin-bottom:13px;padding:13px" onclick="openEmailModal(null)" id="l-send-all">📧 Envoyer le récap global</button>
@@ -1072,6 +1134,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
   <div id="tbar">
     <button class="tb on" id="tb-d" onclick="showTab('dashboard')"><span class="tb-i">📊</span><span id="tl-d">Tableau</span></button>
     <button class="tb" id="tb-s" onclick="showTab('scanner')"><span class="tb-i">📷</span><span id="tl-s">Scanner</span></button>
+    <button class="tb" id="tb-c" onclick="showTab('commande')"><span class="tb-i">🛒</span><span id="tl-c">Commande</span></button>
     <button class="tb" id="tb-a" onclick="showTab('alertes')"><span class="tb-i">🔔</span><span id="tl-a">Alertes</span></button>
     <button class="tb" id="tb-p" onclick="showTab('planning')"><span class="tb-i">📅</span><span id="tl-p">Planning</span></button>
     <button class="tb" id="tb-adm" onclick="showTab('admin')" style="display:none"><span class="tb-i">⚙️</span><span>Admin</span></button>
@@ -1087,6 +1150,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       <div class="sb-sec">Navigation</div>
       <div class="sb-it" onclick="showTab('dashboard');closeSB()"><div class="sb-ic">📊</div>Tableau de bord</div>
       <div class="sb-it" onclick="showTab('scanner');closeSB()"><div class="sb-ic">📷</div>Scanner</div>
+      <div class="sb-it" onclick="showTab('commande');closeSB()"><div class="sb-ic">🛒</div>Commande</div>
       <div class="sb-it" onclick="showTab('alertes');closeSB()"><div class="sb-ic">🔔</div>Alertes</div>
       <div class="sb-it" onclick="showTab('planning');closeSB()"><div class="sb-ic">📅</div>Planning</div>
       <div class="sb-it" id="sb-adm" onclick="showTab('admin');closeSB()" style="display:none"><div class="sb-ic">⚙️</div>Administration</div>
@@ -1142,10 +1206,45 @@ let emailResp = localStorage.getItem('fc_email_resp')  || '';
 let emailFin  = localStorage.getItem('fc_email_fin')   || '';
 
 // stores = tableau réactif dérivé du magasin unique configuré
-function getStores(){ return storeName ? [{ id:'s0', name:storeName, address:storeVille, lat:0, lng:0, r:500 }] : []; }
+function getStores(){
+  if(!storeName) return [];
+  const lat = parseFloat(localStorage.getItem('fc_store_lat'));
+  const lng = parseFloat(localStorage.getItem('fc_store_lng'));
+  const r   = parseInt(localStorage.getItem('fc_store_rad'),10) || 500;
+  return [{ id:'s0', name:storeName, address:storeVille,
+            lat: Number.isFinite(lat)?lat:0, lng: Number.isFinite(lng)?lng:0, r }];
+}
 let stores   = getStores();
 let selStore = storeName ? { name: storeName } : null;
-const webhook = ''; // legacy
+
+/* Persiste le magasin unique (nom + ville + coordonnées GPS optionnelles)
+   et rafraîchit le branding. Centralise ce que faisaient — sans rien écrire —
+   addStore() / addStoreFromModal(). */
+function persistStore({ name, ville, lat, lng, rad } = {}){
+  if(name  !== undefined) storeName  = name  || '';
+  if(ville !== undefined) storeVille = ville || '';
+  localStorage.setItem('fc_store_name',  storeName);
+  localStorage.setItem('fc_store_ville', storeVille);
+  if(Number.isFinite(lat)) localStorage.setItem('fc_store_lat', String(lat));
+  if(Number.isFinite(lng)) localStorage.setItem('fc_store_lng', String(lng));
+  if(Number.isFinite(rad)) localStorage.setItem('fc_store_rad', String(rad));
+  stores   = getStores();
+  selStore = storeName ? { name: storeName } : null;
+  const hs = document.getElementById('hdr-sub');
+  if(hs) hs.textContent = [storeEnseigne, storeName].filter(Boolean).join(' · ') || 'FreshControl';
+  updateSplashBranding();
+  showStoreBadge();
+}
+function clearStore(){
+  storeName = ''; storeVille = '';
+  ['fc_store_name','fc_store_ville','fc_store_lat','fc_store_lng','fc_store_rad']
+    .forEach(k => localStorage.removeItem(k));
+  stores = getStores(); selStore = null;
+  const hs = document.getElementById('hdr-sub');
+  if(hs) hs.textContent = [storeEnseigne].filter(Boolean).join(' · ') || 'FreshControl';
+  updateSplashBranding();
+  showStoreBadge();
+}
 
 /* ── HIÉRARCHIE GRANDE DISTRIBUTION ──────────────────────────────────────
    superadmin      → Bunga.corp — accès total toutes enseignes
@@ -1155,10 +1254,10 @@ const webhook = ''; // legacy
    lecture         → Direction régionale / finances — lecture seule + rapports
 ─────────────────────────────────────────────────────────────────────────── */
 const ROLES = {
-  superadmin:  { label:'⚡ Super Admin',    color:'#7c3aed', badge:'SA', level:5, tabs:['dashboard','scanner','alertes','planning','admin'] },
-  directeur:   { label:'👔 Directeur',      color:'#064D30', badge:'DR', level:4, tabs:['dashboard','scanner','alertes','planning','admin'] },
-  responsable: { label:'📋 Responsable',    color:'#0A6B47', badge:'RR', level:3, tabs:['dashboard','scanner','alertes','planning'] },
-  agent:       { label:'👤 Agent',          color:'#1E40AF', badge:'AG', level:2, tabs:['scanner','dashboard'] },
+  superadmin:  { label:'⚡ Super Admin',    color:'#7c3aed', badge:'SA', level:5, tabs:['dashboard','scanner','commande','alertes','planning','admin'] },
+  directeur:   { label:'👔 Directeur',      color:'#064D30', badge:'DR', level:4, tabs:['dashboard','scanner','commande','alertes','planning','admin'] },
+  responsable: { label:'📋 Responsable',    color:'#0A6B47', badge:'RR', level:3, tabs:['dashboard','scanner','commande','alertes','planning'] },
+  agent:       { label:'👤 Agent',          color:'#1E40AF', badge:'AG', level:2, tabs:['scanner','commande','dashboard'] },
   lecture:     { label:'👁 Lecture seule',  color:'#92400E', badge:'LT', level:1, tabs:['dashboard','alertes'] },
 };
 function getRoleInfo(role){ return ROLES[role] || ROLES.agent; }
@@ -1168,14 +1267,14 @@ function isAdminRole(){ return ['superadmin','directeur'].includes(session?.role
 // Init défauts utilisateurs
 if(!users){
   users=[
-    {id:'u1',name:'Administrateur',username:'admin',   password:'admin',role:'superadmin'},
-    {id:'u2',name:'Agent 1',       username:'agent1',  password:'agent',        role:'agent'},
+    {id:'u1',name:'Administrateur',username:'admin',   password:'freshcontrol2024',role:'superadmin',mustChange:true},
+    {id:'u2',name:'Agent 1',       username:'agent1',  password:'agent123',        role:'agent',     mustChange:true},
   ];
   save('fc_users',users);
 }
 
 /* Emergency reset — accessible depuis l'écran de connexion */
-function emergencyReset(){
+async function emergencyReset(){
   const pin = prompt('Code de réinitialisation (fourni par Bunga.corp) :');
   if(pin === null) return; // annulé
   // PIN = "RESET" + les 4 premiers caractères du nom du magasin en majuscules
@@ -1187,17 +1286,23 @@ function emergencyReset(){
     alert('Code incorrect. Contactez votre administrateur Bunga.corp.');
     return;
   }
-  if(!confirm('Réinitialiser tous les accès utilisateurs ?\n\nLes produits, le catalogue et la configuration seront conservés.\n\nCette action remet les identifiants par défaut :\nadmin / admin')) return;
-  // Reset uniquement les users et la session
-  localStorage.removeItem('fc_users');
-  sessionStorage.removeItem('fc_session');
-  // Recréer les users par défaut
+  if(!confirm('Réinitialiser l\'accès administrateur ?\n\nLes produits, le catalogue et la configuration sont conservés.\nVous allez choisir un nouveau mot de passe administrateur.')) return;
+  // On ne restaure AUCUN identifiant connu : l'opérateur définit un nouveau
+  // mot de passe, qui est haché immédiatement (pas de "admin/freshcontrol2024").
+  let pw = '';
+  for(;;){
+    pw = prompt('Nouveau mot de passe administrateur (8 caractères minimum) :') || '';
+    if(pw === '') return; // annulé
+    if(pw.length < 8){ alert('8 caractères minimum.'); continue; }
+    break;
+  }
+  const hashed = await hashPassword(pw);
   const defaultUsers = [
-    {id:'u1',name:'Administrateur',username:'admin',password:'admin',role:'superadmin'},
-    {id:'u2',name:'Agent 1',username:'agent1',password:'agent',role:'agent'},
+    {id:'u1',name:'Administrateur',username:'admin',password:hashed,role:'superadmin'},
   ];
   localStorage.setItem('fc_users', JSON.stringify(defaultUsers));
-  alert('✅ Accès réinitialisés.\n\nConnectez-vous avec :\nIdentifiant : admin\nMot de passe : admin');
+  sessionStorage.removeItem('fc_session');
+  alert('✅ Accès réinitialisé.\n\nIdentifiant : admin\nMot de passe : celui que vous venez de définir.');
   location.reload();
 }
 
@@ -1208,7 +1313,9 @@ function genId(){ return Date.now().toString(36)+'_'+Math.random().toString(36).
 if(new URLSearchParams(location.search).get('reset')==='1'){
   ['fc_users','fc_products','fc_archive','fc_planning','fc_lang',
    'fc_gas_url','fc_store_name','fc_store_emoji','fc_store_enseigne','fc_store_region','fc_store_ville',
-   'fc_email_resp','fc_email_fin','fc_catalogue'].forEach(k=>localStorage.removeItem(k));
+   'fc_store_lat','fc_store_lng','fc_store_rad',
+   'fc_email_resp','fc_email_fin','fc_catalogue','fc_catalogue_ts','fc_catalogues',
+   'fc_orders','fc_popup','fc_email'].forEach(k=>localStorage.removeItem(k));
   sessionStorage.clear();
   history.replaceState(null,'',location.pathname);
   location.reload();
@@ -1222,7 +1329,7 @@ const I18N={
   ldlc:'Date limite (DLC)',rfsave:'💾 Enregistrer',rfcancel:'Annuler',
   nft:'Produit non référencé',nfsub:"Ce gencod n'est pas dans le catalogue Bunga.corp.",nfbtn:'Nouveau scan',
   gps_load:'Localisation…',gps_denied:'GPS refusé — sélection manuelle',gps_err:'Erreur GPS',gps_retry:'Réessayer',gps_no_store:'Hors zone magasin — sélection manuelle',
-  tl_d:'Tableau',tl_s:'Scanner',tl_a:'Alertes',tl_p:'Planning',
+  tl_d:'Tableau',tl_s:'Scanner',tl_c:'Commande',tl_a:'Alertes',tl_p:'Planning',
   badge_e:'Périmé',badge_o:'J-{{d}}',badge_w:'J-{{d}}',badge_k:'J+{{d}}',
   send_all:'📧 Envoyer le récap global',su_t:'⚠️ Alertes produits',su_p:'Produits expirés ou critiques détectés',
   em_t:'📧 Envoyer un rappel',em_sub:'Rappel e-mail des produits urgents',em_to:'Destinataire(s)',em_subj:'Objet',em_body:'Corps du message',em_cancel:'Annuler',su_mail:'📧 Envoyer par mail',su_cl:'Fermer',
@@ -1236,7 +1343,7 @@ const I18N={
   ldlc:'Expiry date',rfsave:'💾 Save',rfcancel:'Cancel',
   nft:'Product not found',nfsub:"This barcode isn't in the Bunga.corp catalogue.",nfbtn:'New scan',
   gps_load:'Locating…',gps_denied:'GPS denied — manual selection',gps_err:'GPS error',gps_retry:'Retry',gps_no_store:'Outside store zone — manual selection',
-  tl_d:'Dashboard',tl_s:'Scanner',tl_a:'Alerts',tl_p:'Planning',
+  tl_d:'Dashboard',tl_s:'Scanner',tl_c:'Order',tl_a:'Alerts',tl_p:'Planning',
   badge_e:'Expired',badge_o:'D-{{d}}',badge_w:'D-{{d}}',badge_k:'D+{{d}}',
   send_all:'📧 Send global recap',su_t:'⚠️ Product alerts',su_p:'Expired or critical products detected',
   em_t:'📧 Send reminder',em_sub:'Email reminder for urgent products',em_to:'Recipient(s)',em_subj:'Subject',em_body:'Message',em_cancel:'Cancel',su_mail:'📧 Send by email',su_cl:'Close',
@@ -1250,7 +1357,7 @@ const I18N={
   ldlc:'Fecha caducidad',rfsave:'💾 Guardar',rfcancel:'Cancelar',
   nft:'Producto no encontrado',nfsub:"Este código no está en el catálogo Bunga.corp.",nfbtn:'Nuevo escaneo',
   gps_load:'Localizando…',gps_denied:'GPS denegado — selección manual',gps_err:'Error GPS',gps_retry:'Reintentar',gps_no_store:'Fuera de zona — selección manual',
-  tl_d:'Panel',tl_s:'Escáner',tl_a:'Alertas',tl_p:'Planif.',
+  tl_d:'Panel',tl_s:'Escáner',tl_c:'Pedido',tl_a:'Alertas',tl_p:'Planif.',
   badge_e:'Caducado',badge_o:'D-{{d}}',badge_w:'D-{{d}}',badge_k:'D+{{d}}',
   send_all:'📧 Enviar resumen global',su_t:'⚠️ Alertas productos',su_p:'Productos caducados o críticos',
   em_t:'📧 Enviar recordatorio',em_sub:'Recordatorio de productos urgentes',em_to:'Destinatario',em_subj:'Asunto',em_body:'Mensaje',em_cancel:'Cancelar',su_mail:'📧 Enviar por correo',su_cl:'Cerrar',
@@ -1264,7 +1371,7 @@ const I18N={
   ldlc:'有效期',rfsave:'💾 保存',rfcancel:'取消',
   nft:'产品未找到',nfsub:"此条形码不在Bunga.corp目录中。",nfbtn:'重新扫描',
   gps_load:'定位中…',gps_denied:'GPS被拒绝 — 手动选择',gps_err:'GPS错误',gps_retry:'重试',gps_no_store:'不在门店范围内 — 手动选择',
-  tl_d:'仪表盘',tl_s:'扫描',tl_a:'警报',tl_p:'计划',
+  tl_d:'仪表盘',tl_s:'扫描',tl_c:'订单',tl_a:'警报',tl_p:'计划',
   badge_e:'已过期',badge_o:'还剩{{d}}天',badge_w:'还剩{{d}}天',badge_k:'+{{d}}天',
   send_all:'📧 发送全局摘要',su_t:'⚠️ 产品警报',su_p:'检测到过期或紧急产品',
   em_t:'📧 发送提醒',em_sub:'紧急产品邮件提醒',em_to:'收件人',em_subj:'主题',em_body:'邮件内容',em_cancel:'取消',su_mail:'📧 发送邮件',su_cl:'关闭',
@@ -1291,7 +1398,7 @@ function applyLang(){
   $('l-exp','lexp');$('l-crit','lcrit');$('l-warn','lwarn');$('l-ok','lok');$('l-prods','lprods');
   $('sc-t','sct');$('sc-sub','scsub');$('sc-btn','scbtn');$('l-dlc','ldlc');
   $('rf-save','rfsave');$('rf-cancel','rfcancel');$('nf-t','nft');$('nf-sub','nfsub');$('nf-btn','nfbtn');
-  $('tl-d','tl_d');$('tl-s','tl_s');$('tl-a','tl_a');$('tl-p','tl_p');
+  $('tl-d','tl_d');$('tl-s','tl_s');$('tl-c','tl_c');$('tl-a','tl_a');$('tl-p','tl_p');
   $('l-send-all','send_all');$('su-t','su_t');$('su-p','su_p');$('su-mail','su_mail');$('su-cl','su_cl');
   $('em-t','em_t');$('em-sub','em_sub');$('em-cancel','em_cancel');
   // lang buttons
@@ -1316,7 +1423,20 @@ async function doLogin(){
     ['li-u','li-p'].forEach(id=>{const el=document.getElementById(id);el.classList.add('err');setTimeout(()=>el.classList.remove('err'),380)});
     return;
   }
-  if(isLegacyPassword(candidate.password)){
+  // Premier accès (compte par défaut) : changement de mot de passe obligatoire.
+  if(candidate.mustChange){
+    let np='';
+    for(;;){
+      np = prompt('Premier accès — choisissez un nouveau mot de passe (8 caractères minimum) :') || '';
+      if(np===''){ err.textContent='Changement de mot de passe requis pour continuer.'; return; }
+      if(np.length<8){ alert('8 caractères minimum.'); continue; }
+      break;
+    }
+    candidate.password = await hashPassword(np);
+    delete candidate.mustChange;
+    save('fc_users', users);
+  } else if(needsRehash(candidate.password)){
+    // Migration silencieuse des hachages legacy (clair / sha256) vers PBKDF2.
     candidate.password = await hashPassword(p);
     save('fc_users', users);
   }
@@ -1330,6 +1450,7 @@ async function doLogin(){
 function doLogout(){
   session=null;
   sessionStorage.removeItem('fc_session');
+  stopCmdScan(); currentOrder=[]; // libère caméra + commande non validée
   // Clear GPS watch so it restarts fresh on next login
   if(gpsWid!==null){navigator.geolocation.clearWatch(gpsWid);gpsWid=null}
   clearTimeout(gpsTimer);
@@ -1475,17 +1596,6 @@ function triggerGPS(){
   }, 21000);
 }
 
-// Appel auto discret (sans forcer, juste essayer)
-function initGPS(){
-  if(navigator.geolocation && !gps){
-    navigator.geolocation.getCurrentPosition(
-      pos => { if(!gps) onGPSOK(pos, true); },
-      ()  => { /* silencieux — l'utilisateur utilisera le bouton */ },
-      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
-    );
-  }
-}
-
 function showGPSLoading(){
   const p=document.getElementById('gps-pill');
   if(!p) return;
@@ -1563,6 +1673,7 @@ function dist(a,b,c,d){
 /* ═══ TAB NAV ════════════════════════════════════════════════════════════════ */
 let curTab='dashboard';
 function showTab(n){
+  if(curTab==='commande' && n!=='commande') stopCmdScan(); // libère la caméra
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
   const t=document.getElementById('tab-'+n), b=document.getElementById('tb-'+n[0]);
@@ -1573,12 +1684,14 @@ function showTab(n){
     showStoreBadge();
     checkCatalogueWarning();
   }
+  if(n==='commande') renderCommande();
   if(n==='alertes') renderAlertes();
   if(n==='planning') renderPlanning();
   if(n==='admin') renderAdmin();
 }
 function renderCurrentTab(){
   if(curTab==='dashboard') renderDashboard();
+  else if(curTab==='commande') renderCommande();
   else if(curTab==='alertes') renderAlertes();
   else if(curTab==='planning') renderPlanning();
   else if(curTab==='admin') renderAdmin();
@@ -1797,7 +1910,7 @@ function saveAddProduct(){
   const dlc=document.getElementById('ap-dlc').value;
   if(!name||!dlc){toast(T().fill_all);return}
   const p={
-    id:Date.now(), name,
+    id:genId(), name,
     gencod:document.getElementById('ap-gencod').value.trim(),
     type:document.getElementById('ap-type').value.trim(),
     dlc,
@@ -2144,38 +2257,60 @@ function escapeHTMLAttr(s){ return escapeHTML(s).replace(/`/g,''); }
    Toute valeur ne commençant pas par "sha256:" est traitée comme un mot de
    passe en clair (legacy) — comparaison directe au login puis migration. */
 function _toHex(buf){ return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
-async function hashPassword(plain, saltHex){
-  if(!saltHex){
-    const salt = new Uint8Array(16); crypto.getRandomValues(salt);
-    saltHex = _toHex(salt.buffer);
-  }
-  const enc = new TextEncoder().encode(saltHex + ':' + String(plain));
-  const buf = await crypto.subtle.digest('SHA-256', enc);
+function _fromHex(hex){ return Uint8Array.from((hex.match(/../g)||[]).map(h=>parseInt(h,16))); }
+const PBKDF2_ITERS = 200000;
+/* Format stocké : "pbkdf2:<iters>:<saltHex>:<hashHex>" (clé dérivée 256 bits).
+   PBKDF2 (key-stretching) remplace le SHA-256 simple : bien plus coûteux à
+   brute-forcer hors-ligne. */
+async function hashPassword(plain, saltHex, iters){
+  iters = iters || PBKDF2_ITERS;
+  let salt;
+  if(saltHex){ salt = _fromHex(saltHex); }
+  else { salt = new Uint8Array(16); crypto.getRandomValues(salt); saltHex = _toHex(salt.buffer); }
+  const keyMat = await crypto.subtle.importKey('raw', new TextEncoder().encode(String(plain)), 'PBKDF2', false, ['deriveBits']);
+  const bits   = await crypto.subtle.deriveBits({ name:'PBKDF2', salt, iterations:iters, hash:'SHA-256' }, keyMat, 256);
+  return `pbkdf2:${iters}:${saltHex}:${_toHex(bits)}`;
+}
+/* Recalcule un hash legacy SHA-256 ("sha256:<salt>:<hash>") pour le vérifier
+   au login avant migration vers PBKDF2. */
+async function _sha256Legacy(plain, saltHex){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(saltHex + ':' + String(plain)));
   return 'sha256:' + saltHex + ':' + _toHex(buf);
 }
 async function verifyPassword(plain, stored){
   if(typeof stored !== 'string') return false;
-  if(!stored.startsWith('sha256:')) return String(plain) === stored; // legacy
-  const parts = stored.split(':');
-  if(parts.length !== 3) return false;
-  const recomputed = await hashPassword(plain, parts[1]);
-  return recomputed === stored;
-}
-function isLegacyPassword(stored){ return typeof stored==='string' && !stored.startsWith('sha256:'); }
-
-function parseCSVSimple(text){
-  const rows=[];
-  for(const line of text.split('\n')){
-    if(!line.trim()) continue;
-    const row=[];let q=false,cell='';
-    for(const c of line){
-      if(c==='"') q=!q;
-      else if(c===','&&!q){row.push(cell.trim());cell='';}
-      else cell+=c;
-    }
-    row.push(cell.trim());
-    rows.push(row);
+  if(stored.startsWith('pbkdf2:')){
+    const p = stored.split(':');
+    if(p.length !== 4) return false;
+    return (await hashPassword(plain, p[2], parseInt(p[1],10))) === stored;
   }
+  if(stored.startsWith('sha256:')){
+    const p = stored.split(':');
+    if(p.length !== 3) return false;
+    return (await _sha256Legacy(plain, p[1])) === stored;
+  }
+  return String(plain) === stored; // mot de passe en clair (legacy)
+}
+/* true tant que le hash n'est pas au format courant (clair ou sha256 → à ré-hasher). */
+function needsRehash(stored){ return typeof stored !== 'string' || !stored.startsWith('pbkdf2:'); }
+
+/* Parseur CSV conforme RFC 4180 (suffisant) : gère les guillemets échappés ""
+   et les retours-ligne à l'intérieur d'une cellule entre guillemets. */
+function parseCSVSimple(text){
+  const rows=[]; let row=[], cell='', q=false;
+  text = String(text).replace(/\r\n?/g,'\n');
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){
+      if(c==='"'){ if(text[i+1]==='"'){ cell+='"'; i++; } else q=false; }
+      else cell+=c;
+    } else if(c==='"'){ q=true; }
+    else if(c===','){ row.push(cell.trim()); cell=''; }
+    else if(c==='\n'){ row.push(cell.trim()); if(row.some(x=>x!=='')) rows.push(row); row=[]; cell=''; }
+    else cell+=c;
+  }
+  row.push(cell.trim());
+  if(row.some(x=>x!=='')) rows.push(row);
   return rows;
 }
 
@@ -2429,11 +2564,315 @@ function resetScan(){
   currentEAN=null;
 }
 
-function openManualFromScan(){
-  resetScan();
-  const mag=document.getElementById('ap-mag');
-  if(mag&&selStore) mag.value=selStore.name;
-  fillStoreDL();openModal('add-product-modal');
+/* ═══ COMMANDE — réappro par scan, 100 % locale ═════════════════════════════
+   Workflow : scan EAN (caméra live ou photo) → lookup dans le catalogue local
+   → saisie quantité → ligne ajoutée à la commande (éditable / supprimable).
+   Validation → enregistrement local (fc_orders) + e-mail pré-rempli. Aucune
+   commande n'est poussée vers un serveur : tout reste sur l'appareil. */
+let orders       = JSON.parse(localStorage.getItem('fc_orders') || '[]');
+let currentOrder = [];
+let cmdReader    = null;
+let cmdScanning  = false;
+let cmdPending   = null;   // produit détecté, en attente de quantité
+let cmdLastCode  = '';     // anti-doublon de lecture caméra
+let cmdLastTime  = 0;
+
+function renderCommande(){
+  showStoreBadge();
+  renderOrderLines();
+}
+
+function getCmdReader(){
+  if(cmdReader) return cmdReader;
+  if(window._zxingFailed) return null;
+  try{
+    if(typeof ZXing !== 'undefined' && ZXing.BrowserMultiFormatReader){
+      cmdReader = new ZXing.BrowserMultiFormatReader();
+      return cmdReader;
+    }
+  }catch(e){ console.warn('ZXing init (commande):', e); }
+  return null;
+}
+
+async function startCmdScan(){
+  const st = document.getElementById('cmd-st');
+  const reader = getCmdReader();
+  if(!reader){
+    if(st) st.innerHTML = '<div style="color:var(--o);font-weight:800">⚠️ Lecteur indisponible — utilisez « Scanner via photo »</div>';
+    return;
+  }
+  const video = document.getElementById('cmd-video');
+  document.getElementById('cmd-scan-btn').style.display = 'none';
+  document.getElementById('cmd-stop-btn').style.display = 'inline-flex';
+  video.style.display = 'block';
+  if(st) st.textContent = 'Visez un code-barres…';
+  cmdScanning = true;
+  try{
+    await reader.decodeFromVideoDevice(null, video, (result) => {
+      if(!cmdScanning || cmdPending) return;
+      if(result){
+        const code = result.getText().replace(/\s/g,'');
+        const now  = Date.now();
+        if(code === cmdLastCode && (now - cmdLastTime) < 1800) return; // anti-doublon
+        cmdLastCode = code; cmdLastTime = now;
+        onCmdDecode(code);
+      }
+    });
+  }catch(e){
+    console.warn('Caméra commande:', e);
+    if(st) st.innerHTML = '<div style="color:var(--o);font-weight:800">⚠️ Caméra inaccessible — utilisez « Scanner via photo »</div>';
+    stopCmdScan();
+  }
+}
+
+function stopCmdScan(){
+  cmdScanning = false;
+  if(cmdReader){ try{ cmdReader.reset(); }catch(e){} }
+  const video = document.getElementById('cmd-video');
+  if(video) video.style.display = 'none';
+  const b1 = document.getElementById('cmd-scan-btn'), b2 = document.getElementById('cmd-stop-btn');
+  if(b1) b1.style.display = 'inline-flex';
+  if(b2) b2.style.display = 'none';
+}
+
+// Scan via photo (fallback caméra refusée / non disponible)
+document.getElementById('cmd-photo-in').addEventListener('change', async function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  e.target.value = '';
+  const st = document.getElementById('cmd-st');
+  const reader = getCmdReader();
+  if(!reader){ if(st) st.textContent = '⚠️ Lecteur indisponible'; return; }
+  const imgUrl = URL.createObjectURL(file);
+  const img = document.createElement('img'); img.src = imgUrl;
+  try{
+    await new Promise((ok,ko)=>{ img.onload=ok; img.onerror=ko; setTimeout(ok,8000); });
+    const result = await reader.decodeFromImageElement(img);
+    URL.revokeObjectURL(imgUrl);
+    onCmdDecode(result.getText().replace(/\s/g,''));
+  }catch(err){
+    URL.revokeObjectURL(imgUrl);
+    if(st) st.innerHTML = '<div style="color:var(--o);font-weight:800">⚠️ Code-barres non détecté — réessayez</div>';
+  }
+});
+
+function cmdManualEntry(){ onCmdDecode(''); }
+
+function onCmdDecode(ean){
+  const prod = ean ? lookupGencod(ean) : null;
+  cmdPending = {
+    gencod:  ean || '',
+    name:    prod ? (prod.nom || '') : '',
+    famille: prod ? [prod.famille, prod.marque].filter(Boolean).join(' · ') : '',
+    known:   !!prod,
+  };
+  document.getElementById('cmd-qty-gc').value  = cmdPending.gencod || '—';
+  document.getElementById('cmd-qty-fam').value = cmdPending.famille || '';
+  const nameEl     = document.getElementById('cmd-qty-name');
+  const manualWrap = document.getElementById('cmd-qty-namewrap');
+  const manualInp  = document.getElementById('cmd-qty-manualname');
+  if(cmdPending.known){
+    nameEl.textContent = cmdPending.name || 'Produit';
+    manualWrap.style.display = 'none';
+    manualInp.value = '';
+  } else {
+    nameEl.textContent = ean ? 'Produit hors catalogue' : 'Saisie manuelle';
+    manualWrap.style.display = 'block';
+    manualInp.value = '';
+  }
+  document.getElementById('cmd-qty-input').value = '1';
+  document.getElementById('cmd-qty-box').style.display = 'block';
+  if(document.getElementById('cmd-st')) document.getElementById('cmd-st').textContent = '';
+  setTimeout(()=>{
+    const f = cmdPending && cmdPending.known ? document.getElementById('cmd-qty-input') : manualInp;
+    if(f){ f.focus(); if(f.select) f.select(); }
+  }, 120);
+}
+
+function addOrderLine(){
+  if(!cmdPending) return;
+  const qty = parseInt(document.getElementById('cmd-qty-input').value, 10);
+  if(!qty || qty < 1){ toast('Quantité invalide'); return; }
+  let name = cmdPending.name;
+  if(!cmdPending.known){
+    name = document.getElementById('cmd-qty-manualname').value.trim();
+    if(!name){ toast('Saisissez le nom du produit'); return; }
+  }
+  // Regroupe si le même gencod est déjà dans la commande
+  const existing = cmdPending.gencod ? currentOrder.find(l => l.gencod === cmdPending.gencod) : null;
+  if(existing) existing.qty += qty;
+  else currentOrder.push({ gencod: cmdPending.gencod, name, famille: cmdPending.famille, qty });
+  cmdPending = null;
+  document.getElementById('cmd-qty-box').style.display = 'none';
+  renderOrderLines();
+  toast('➕ Ajouté');
+}
+
+function cancelCmdQty(){
+  cmdPending = null;
+  document.getElementById('cmd-qty-box').style.display = 'none';
+}
+
+function changeOrderQty(idx, delta){
+  const l = currentOrder[idx]; if(!l) return;
+  l.qty = Math.max(1, l.qty + delta);
+  renderOrderLines();
+}
+function setOrderQty(idx, val){
+  const l = currentOrder[idx]; if(!l) return;
+  const q = parseInt(val, 10);
+  l.qty = (!q || q < 1) ? 1 : q;
+  renderOrderLines();
+}
+function removeOrderLine(idx){
+  currentOrder.splice(idx, 1);
+  renderOrderLines();
+}
+
+function renderOrderLines(){
+  const el     = document.getElementById('order-lines');
+  const footer = document.getElementById('cmd-footer');
+  const count  = document.getElementById('cmd-count');
+  if(!el) return;
+  if(!currentOrder.length){
+    el.innerHTML = '<div class="empty">Aucun article — scannez un produit pour commencer</div>';
+    if(footer) footer.style.display = 'none';
+    if(count)  count.textContent = '';
+    return;
+  }
+  const totalQty = currentOrder.reduce((s,l)=>s+l.qty, 0);
+  if(count) count.textContent = `(${currentOrder.length} réf. · ${totalQty} u.)`;
+  el.innerHTML = currentOrder.map((l,i)=>`
+    <div class="ord-line">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(l.name||'—')}</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(l.gencod||'sans gencod')}${l.famille?' · '+escapeHTML(l.famille):''}</div>
+      </div>
+      <div class="ord-qty">
+        <button onclick="changeOrderQty(${i},-1)" aria-label="Diminuer">−</button>
+        <input type="number" min="1" value="${l.qty}" onchange="setOrderQty(${i},this.value)" inputmode="numeric" aria-label="Quantité">
+        <button onclick="changeOrderQty(${i},1)" aria-label="Augmenter">+</button>
+      </div>
+      <button class="ord-del" onclick="removeOrderLine(${i})" aria-label="Supprimer la ligne">🗑</button>
+    </div>`).join('');
+  if(footer) footer.style.display = 'block';
+}
+
+function buildOrderText(lines, meta){
+  const out = [
+    `Commande — ${meta.date}`,
+    meta.store ? `Magasin : ${meta.store}` : '',
+    meta.by ? `Préparée par : ${meta.by}` : '',
+    '', 'Produits :', '',
+  ].filter((x,idx)=> x!=='' || idx>2);
+  lines.forEach(l => out.push(`- ${l.name}  (${l.gencod||'sans gencod'})  ×${l.qty}`));
+  const totalQty = lines.reduce((s,l)=>s+l.qty, 0);
+  out.push('', `Total : ${lines.length} référence(s) · ${totalQty} unité(s)`, '', '— FreshControl');
+  return out.join('\n');
+}
+
+function openOrderEmail(subject, body){
+  document.getElementById('em-to').value   = localStorage.getItem('fc_email') || emailResp || '';
+  document.getElementById('em-subj').value = subject;
+  document.getElementById('em-body').value = body;
+  const stag = document.getElementById('em-store-tag');
+  if(stag){ stag.style.display = 'inline-block'; stag.textContent = '🛒 Commande'; }
+  emailStore = null;
+  openModal('email-modal');
+}
+
+function validateOrder(){
+  if(!currentOrder.length){ toast('Commande vide'); return; }
+  stopCmdScan();
+  const record = {
+    id:    genId(),
+    date:  new Date().toISOString(),
+    store: storeName || '',
+    by:    session?.username || '?',
+    lines: currentOrder.map(l => ({ ...l })),
+  };
+  orders.unshift(record);
+  localStorage.setItem('fc_orders', JSON.stringify(orders));
+  const dateStr = new Date(record.date).toLocaleDateString(lang);
+  openOrderEmail(
+    `[FreshControl] Commande${record.store ? ' — '+record.store : ''} — ${dateStr}`,
+    buildOrderText(record.lines, { date: dateStr, store: record.store, by: record.by })
+  );
+  currentOrder = [];
+  renderOrderLines();
+  toast('✅ Commande enregistrée');
+}
+
+function clearOrder(){
+  if(!currentOrder.length) return;
+  showConfirm('Vider la commande en cours ?','Les articles non validés seront perdus.', ()=>{
+    currentOrder = [];
+    renderOrderLines();
+    toast('🗑 Commande vidée');
+  });
+}
+
+function exportOrderCSV(lines){
+  const cols = ['gencod','name','famille','qty'];
+  const rows = [cols.join(';'), ...lines.map(l => cols.map(c => `"${String(l[c]??'').replace(/"/g,'""')}"`).join(';'))];
+  const blob = new Blob(['﻿'+rows.join('\n')], { type:'text/csv;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `Commande_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  toast(T().csv_ok);
+}
+
+/* Historique des commandes (modale) */
+function findOrder(id){ return orders.find(o => o.id === id); }
+function renderOrdersHistory(){
+  const el = document.getElementById('orders-list');
+  if(!el) return;
+  if(!orders.length){ el.innerHTML = '<div class="empty">Aucune commande enregistrée</div>'; return; }
+  el.innerHTML = orders.slice(0,100).map(o => {
+    const totalQty = o.lines.reduce((s,l)=>s+l.qty, 0);
+    return `<div style="padding:11px 0;border-bottom:1px solid rgba(0,0,0,.06)">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div style="font-size:13px;font-weight:800">🛒 ${escapeHTML(new Date(o.date).toLocaleString(lang))}</div>
+        <span class="pbadge bk" style="font-size:10px">${o.lines.length} réf · ${totalQty} u</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);font-weight:600;margin:2px 0 6px">${escapeHTML(o.store||'—')} · ${escapeHTML(o.by||'?')}</div>
+      <div style="font-size:11.5px;color:var(--txt);font-weight:600;line-height:1.6">
+        ${o.lines.map(l=>`${escapeHTML(l.name||'—')} <strong>×${l.qty}</strong>`).join('<br>')}
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="reorderFrom(this.dataset.oid)">↻ Recharger</button>
+        <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="emailOrder(this.dataset.oid)">📧 Renvoyer</button>
+        <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="exportOrderId(this.dataset.oid)">📥 CSV</button>
+        <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="deleteOrder(this.dataset.oid)" style="color:var(--r)">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function reorderFrom(id){
+  const o = findOrder(id); if(!o) return;
+  currentOrder = o.lines.map(l => ({ ...l }));
+  closeModal('orders-modal');
+  showTab('commande');
+  toast('↻ Commande rechargée');
+}
+function emailOrder(id){
+  const o = findOrder(id); if(!o) return;
+  const dateStr = new Date(o.date).toLocaleDateString(lang);
+  openOrderEmail(
+    `[FreshControl] Commande${o.store ? ' — '+o.store : ''} — ${dateStr}`,
+    buildOrderText(o.lines, { date: dateStr, store: o.store, by: o.by })
+  );
+  closeModal('orders-modal');
+}
+function exportOrderId(id){ const o = findOrder(id); if(o) exportOrderCSV(o.lines); }
+function deleteOrder(id){
+  showConfirm('Supprimer cette commande ?','Suppression définitive de l\'historique.', ()=>{
+    orders = orders.filter(o => o.id !== id);
+    localStorage.setItem('fc_orders', JSON.stringify(orders));
+    renderOrdersHistory();
+    toast(T().deleted);
+  });
 }
 
 /* ═══ STORES MODAL (sidebar ☰ → Gestion des magasins) ═══════════════════════ */
@@ -2466,35 +2905,33 @@ function renderStoresModal(){
 function confirmDeleteStoreModal(id){
   const s=getStores().find(x=>x.id===id);if(!s)return;
   showConfirm(`Supprimer "${s.name}" ?`,'Les produits déjà scannés gardent le nom du magasin.',()=>{
-    storeName=''; selStore=null; stores=getStores(); localStorage.setItem('fc_store_name','');
-    // stores is derived from storeName — no direct save needed
-
-    if(selStore?.id===id) selStore=null;
+    clearStore();
     refreshStoreSel(); renderStoresModal(); renderAdmin();
     toast(T().deleted);
   });
 }
 
-async function geocodeModal(){
-  const addr=document.getElementById('sm-addr').value.trim();
-  if(!addr){toast(T().fill_all);return}
-  const btn=document.getElementById('sm-geo-btn');
-  btn.textContent='⏳';btn.disabled=true;
+/* Géocodage Nominatim — factorisé pour les deux formulaires d'adresse magasin
+   (modale « Gestion des magasins » et Admin → ajout de magasin). */
+async function geocodeInto(addrId, btnId, boxId, pickFn, onResults){
+  const addr = document.getElementById(addrId).value.trim();
+  if(!addr){ toast(T().fill_all); return; }
+  const btn = document.getElementById(btnId);
+  btn.textContent='⏳'; btn.disabled=true;
   try{
-    const res=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addr)}&format=json&limit=5&accept-language=${lang}`);
-    const data=await res.json();
-    const box=document.getElementById('sm-geo-results');
-    if(!data.length){box.innerHTML='<div style="font-size:12px;color:var(--r);padding:6px 0;font-weight:700">❌ Adresse non trouvée</div>';return}
-    box.innerHTML=data.map(r=>`
-      <div class="geo-r" data-lat="${parseFloat(r.lat)}" data-lon="${parseFloat(r.lon)}"
-           onclick="pickGeoModal(this.dataset.lat,this.dataset.lon)">
-        <div class="geo-r-n">${escapeHTML(r.display_name.split(',').slice(0,3).join(', '))}</div>
-        <div class="geo-r-a">📍 ${parseFloat(r.lat).toFixed(5)}, ${parseFloat(r.lon).toFixed(5)}</div>
-      </div>`).join('');
-  }catch(e){toast('❌ Erreur réseau')}
-  finally{btn.textContent='🔍 Trouver';btn.disabled=false}
+    const res  = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addr)}&format=json&limit=5&accept-language=${lang}`);
+    const data = await res.json();
+    const box  = document.getElementById(boxId);
+    if(!data.length){ box.innerHTML='<div style="font-size:12px;color:var(--r);padding:8px 0;font-weight:700">❌ Adresse non trouvée</div>'; return; }
+    box.innerHTML = data.map(r=>`<div class="geo-r" data-lat="${parseFloat(r.lat)}" data-lon="${parseFloat(r.lon)}" onclick="${pickFn}(this.dataset.lat,this.dataset.lon)">
+      <div class="geo-r-n">${escapeHTML(r.display_name.split(',').slice(0,3).join(', '))}</div>
+      <div class="geo-r-a">📍 ${parseFloat(r.lat).toFixed(5)}, ${parseFloat(r.lon).toFixed(5)}</div>
+    </div>`).join('');
+    if(onResults) onResults();
+  }catch(e){ toast('❌ Erreur réseau'); }
+  finally{ btn.textContent='🔍 Trouver'; btn.disabled=false; }
 }
-
+function geocodeModal(){ return geocodeInto('sm-addr','sm-geo-btn','sm-geo-results','pickGeoModal'); }
 function pickGeoModal(lat,lon){
   document.getElementById('sm-lat').value=parseFloat(lat).toFixed(5);
   document.getElementById('sm-lng').value=parseFloat(lon).toFixed(5);
@@ -2512,9 +2949,7 @@ function addStoreFromModal(){
   const r=parseInt(document.getElementById('sm-rad').value)||500;
   if(!name){toast('❌ Nom obligatoire');return}
   if(isNaN(lat)||isNaN(lng)){toast('❌ Lat/Lng requis — utilisez 🔍 Trouver ou saisissez manuellement');return}
-  // Single store: set storeName from form
-    // stores is derived from storeName — no direct save needed
-
+  persistStore({ name, ville:addr, lat, lng, rad:r });
   refreshStoreSel();
   ['sm-name','sm-addr','sm-lat','sm-lng'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('sm-rad').value='500';
@@ -2528,7 +2963,7 @@ function saveProduct(){
   if(!dlc){ toast(T().fill_all); return; }
 
   const p = {
-    id:         Date.now(),
+    id:         genId(),
     name:       document.getElementById('rf-pn').textContent,
     gencod:     document.getElementById('rf-gc').value,
     type:       document.getElementById('rf-ty').value,
@@ -2666,28 +3101,15 @@ function renderUserAdmin(){
 }
 
 /* Store CRUD */
-async function geocodeAddr(){
-  const addr=document.getElementById('as-addr').value.trim();
-  if(!addr){toast(T().fill_all);return}
-  const btn=document.getElementById('geo-btn');
-  btn.textContent='⏳';btn.disabled=true;
-  try{
-    const res=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addr)}&format=json&limit=5&accept-language=${lang}`);
-    const data=await res.json();
-    const box=document.getElementById('geo-results');
-    if(!data.length){box.innerHTML='<div style="font-size:12px;color:var(--r);padding:8px 0;font-weight:700">❌ Adresse non trouvée</div>';return}
-    box.innerHTML=data.map((r,i)=>`<div class="geo-r" onclick="pickGeo(${parseFloat(r.lat)},${parseFloat(r.lon)},${i})">
-      <div class="geo-r-n">${escapeHTML(r.display_name.split(',').slice(0,3).join(', '))}</div>
-      <div class="geo-r-a">📍 ${parseFloat(r.lat).toFixed(5)}, ${parseFloat(r.lon).toFixed(5)}</div>
-    </div>`).join('');
-    document.getElementById('as-coord-row').style.display='flex';
-  }catch(e){toast('❌ Erreur réseau')}
-  finally{btn.textContent='🔍 Trouver';btn.disabled=false}
+function geocodeAddr(){
+  return geocodeInto('as-addr','geo-btn','geo-results','pickGeo', ()=>{
+    const row=document.getElementById('as-coord-row'); if(row) row.style.display='flex';
+  });
 }
 function pickGeo(lat,lon){
   document.getElementById('as-lat').value=parseFloat(lat).toFixed(5);
   document.getElementById('as-lng').value=parseFloat(lon).toFixed(5);
-  document.getElementById('as-coord-row').style.display='flex';
+  const row=document.getElementById('as-coord-row'); if(row) row.style.display='flex';
 }
 function addStore(){
   const name=document.getElementById('as-name').value.trim();
@@ -2700,9 +3122,8 @@ function addStore(){
     document.getElementById('as-coord-row').style.display='flex';
     toast('❌ Cliquez 🔍 Trouver ou saisissez lat/lng');return;
   }
-  // Single store: set storeName from form
-    // stores is derived from storeName — no direct save needed
-refreshStoreSel();
+  persistStore({ name, ville:addr, lat, lng, rad:r });
+  refreshStoreSel();
   ['as-name','as-addr','as-lat','as-lng'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('as-rad').value='500';
   document.getElementById('geo-results').innerHTML='';
@@ -2712,9 +3133,7 @@ refreshStoreSel();
 function confirmDeleteStore(id){
   const s=getStores().find(x=>x.id===id);if(!s)return;
   showConfirm(`Supprimer "${s.name}" ?`,'Ce magasin sera retiré de la liste.',()=>{
-    storeName=''; selStore=null; stores=getStores(); localStorage.setItem('fc_store_name','');
-    // stores is derived from storeName — no direct save needed
-if(selStore?.id===id)selStore=null;
+    clearStore();
     refreshStoreSel();renderAdmin();toast(T().deleted);
   });
 }
@@ -2776,7 +3195,7 @@ function openEditUser(idOrIdx){
 }
 function saveConfig(){
   storeName    = document.getElementById('adm-store-name')?.value.trim()    || '';
-  storeEmoji   = document.getElementById('adm-store-emoji')?.value.trim()   || '🏪';
+  storeEmoji   = document.getElementById('adm-store-emoji')?.value.trim()   || '🌿';
   storeEnseigne= document.getElementById('adm-store-enseigne')?.value.trim()|| '';
   storeRegion  = document.getElementById('adm-store-region')?.value.trim()  || '';
   storeVille   = document.getElementById('adm-store-ville')?.value.trim()   || '';
@@ -2927,7 +3346,7 @@ function renderStats(){
     <div style="display:flex;gap:8px;margin-bottom:14px">${card(total,'En cours',`var(--txt)`)}${card(archTotal,'Traités','var(--gd)')}</div>
     <div style="font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;margin-bottom:9px">Par magasin</div>
     ${Object.entries(byStore).map(([s,c])=>`<div style="background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);border-radius:13px;padding:12px;margin-bottom:8px;box-shadow:var(--spec)">
-      <div style="font-size:13px;font-weight:800;margin-bottom:7px">🏪 ${s}</div>
+      <div style="font-size:13px;font-weight:800;margin-bottom:7px">🏪 ${escapeHTML(s)}</div>
       <div style="display:flex;gap:5px;flex-wrap:wrap">
         ${c.e?`<span class="pbadge be" style="font-size:10px">💀 ${c.e}</span>`:''}
         ${c.o?`<span class="pbadge bo" style="font-size:10px">⚠️ ${c.o}</span>`:''}
@@ -2936,7 +3355,7 @@ function renderStats(){
       </div></div>`).join('')}
     ${Object.keys(agCnt).length?`<div style="font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;margin:13px 0 9px">Traitements / Agent</div>
       ${Object.entries(agCnt).sort((a,b)=>b[1]-a[1]).map(([a,n])=>`<div style="display:flex;justify-content:space-between;padding:10px 13px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);border-radius:12px;margin-bottom:7px;box-shadow:var(--spec)">
-        <span style="font-size:12px;font-weight:800">👤 ${a}</span>
+        <span style="font-size:12px;font-weight:800">👤 ${escapeHTML(a)}</span>
         <span style="font-size:12px;font-weight:900;color:var(--gd)">${n} traité${n>1?'s':''}</span>
       </div>`).join('')}`:''}`;
 }

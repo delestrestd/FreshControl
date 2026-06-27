@@ -1,6 +1,6 @@
 {
   "name": "freshcontrol",
-  "version": "1.1.0",
+  "version": "3.0.0",
   "private": true,
   "description": "PWA de gestion des produits périmés en supermarché — scan EAN local (ZXing), catalogue Google Sheets multi-marques, alertes DLC, planning par magasin.",
   "homepage": "https://github.com/delestrestd/FreshControl",

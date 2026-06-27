@@ -1,20 +1,35 @@
+// Endpoint serverless OPTIONNEL (analyse d'image via Claude Vision).
+// SÉCURITÉ : désactivé par défaut. Il ne s'active que si la variable
+// d'environnement SCAN_TOKEN est définie, et chaque requête doit alors
+// présenter ce même secret dans l'en-tête `x-fc-token`. Sans cela,
+// l'endpoint refuse tout appel — évite l'abus de la clé Anthropic
+// (proxy ouvert facturé). N'expose jamais la clé API.
 const handler = async function (req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const ORIGIN = process.env.SCAN_ALLOWED_ORIGIN || '';
+  res.setHeader('Access-Control-Allow-Origin', ORIGIN || 'null');
+  res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-fc-token');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
+  const expected = process.env.SCAN_TOKEN;
+
   if (req.method === 'GET') {
-    const keyOk = !!process.env.ANTHROPIC_API_KEY;
+    // Diagnostic minimal : ne révèle ni la clé, ni son préfixe.
     return res.status(200).json({
       status: 'ok',
-      key_present: keyOk,
-      key_prefix: keyOk ? process.env.ANTHROPIC_API_KEY.slice(0, 10) + '...' : 'MANQUANTE',
+      enabled: !!expected,
+      key_present: !!process.env.ANTHROPIC_API_KEY,
     });
   }
 
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  // Garde d'accès : endpoint désactivé tant que SCAN_TOKEN n'est pas configuré.
+  if (!expected) return res.status(503).json({ error: 'Endpoint désactivé (SCAN_TOKEN non configuré)' });
+  const provided = req.headers['x-fc-token'];
+  if (provided !== expected) return res.status(401).json({ error: 'Non autorisé' });
 
   const { image, mimeType } = req.body || {};
   if (!image) return res.status(400).json({ error: 'Image manquante' });

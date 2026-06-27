@@ -74,7 +74,8 @@ https://…/gviz/tq?tqx=out:csv&sheet=Marque_A|https://…/gviz/tq?tqx=out:csv&s
 
 ## Sécurité
 
-- Mots de passe hashés (SHA-256 + sel par utilisateur), migration douce des comptes existants au login.
+- Mots de passe hachés **PBKDF2-SHA-256 (200 000 itérations) + sel par utilisateur** ; migration automatique au login des anciens formats (clair / SHA-256 simple).
+- ⚠️ **Limite d'architecture** : toute l'authentification et les rôles sont côté client (`localStorage`). Ce n'est **pas** une frontière de sécurité opposable à un utilisateur ayant accès au navigateur/devtools — c'est un garde-fou d'usage, pas un contrôle d'accès serveur.
 - Échappement HTML systématique sur toutes les valeurs interpolées dans les rendus.
 - Sub-Resource Integrity (SRI) verrouille la version de la CDN ZXing.
 - Content-Security-Policy stricte, X-Frame-Options DENY, HSTS preload.
@@ -89,7 +90,13 @@ admin   / freshcontrol2024   (super-admin)
 agent1  / agent123           (agent)
 ```
 
-**Changer ces mots de passe immédiatement** depuis Admin → Utilisateurs. Si l'accès est perdu, un PIN de réinitialisation est disponible depuis l'écran de connexion (`RESET` + 4 premières lettres du nom du magasin, ou `RESET2024` si aucun magasin n'est configuré).
+Au **premier login** de chacun de ces comptes, l'application **impose le choix d'un nouveau mot de passe** (8 caractères minimum) — les valeurs ci-dessus ne servent qu'au tout premier accès.
+
+Si l'accès est perdu, une réinitialisation est disponible depuis l'écran de connexion : code `RESET` + 4 premières lettres du nom du magasin (ou `RESET2024` si aucun magasin n'est configuré). La réinitialisation **ne restaure plus d'identifiants connus** — elle demande de définir un nouveau mot de passe administrateur, haché immédiatement.
+
+### Endpoint `api/scan.js` (analyse d'image — optionnel)
+
+Désactivé par défaut. Il ne s'active que si la variable d'environnement `SCAN_TOKEN` est définie côté Vercel ; chaque requête doit alors présenter ce secret dans l'en-tête `x-fc-token`. Tant que `SCAN_TOKEN` n'est pas configuré, l'endpoint refuse tout appel (évite l'abus de la clé Anthropic). Optionnellement, `SCAN_ALLOWED_ORIGIN` restreint l'origine CORS.
 
 ## Licence
 
