@@ -86,12 +86,12 @@ https://…/gviz/tq?tqx=out:csv&sheet=Marque_A|https://…/gviz/tq?tqx=out:csv&s
 À l'installation, un **unique compte** est créé :
 
 ```
-admin / freshcontrol2024
+admin / admin
 ```
 
-**Changez ce mot de passe** depuis Admin → 🔑 Mon compte. L'identifiant `admin` est pré-rempli à l'écran de connexion.
+L'identifiant `admin` est pré-rempli à l'écran de connexion. Vous pouvez changer le mot de passe depuis Admin → 🔑 Mon compte (il est alors haché en PBKDF2 au login).
 
-Si l'accès est perdu, une réinitialisation est disponible depuis l'écran de connexion : code `RESET` + 4 premières lettres du nom du magasin (ou `RESET2024` si aucun magasin n'est configuré). La réinitialisation **ne restaure aucun identifiant connu** — elle demande de définir un nouveau mot de passe administrateur, haché immédiatement.
+Si l'accès est perdu, le bouton « Réinitialiser les accès » de l'écran de connexion **restaure simplement `admin / admin`** (les produits, le catalogue et la configuration sont conservés).
 
 ### Endpoint `api/scan.js` (analyse d'image — optionnel)
 

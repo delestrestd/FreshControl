@@ -1245,41 +1245,20 @@ function isAdminRole(){ return ['superadmin','directeur'].includes(session?.role
 // Init défaut — application mono-utilisateur : un seul compte administrateur.
 if(!users){
   users=[
-    {id:'u1',name:'Administrateur',username:'admin',password:'freshcontrol2024',role:'superadmin'},
+    {id:'u1',name:'Administrateur',username:'admin',password:'admin',role:'superadmin'},
   ];
   save('fc_users',users);
 }
 
-/* Emergency reset — accessible depuis l'écran de connexion */
-async function emergencyReset(){
-  const pin = prompt('Code de réinitialisation (fourni par Bunga.corp) :');
-  if(pin === null) return; // annulé
-  // PIN = "RESET" + les 4 premiers caractères du nom du magasin en majuscules
-  // Ex: magasin "Carrefour Aubagne" → PIN = "RESETCARR"
-  // Si aucun magasin configuré → PIN = "RESET2024"
-  const stored = localStorage.getItem('fc_store_name') || '';
-  const expected = 'RESET' + (stored ? stored.replace(/\s/g,'').toUpperCase().slice(0,4) : '2024');
-  if(pin.trim().toUpperCase() !== expected){
-    alert('Code incorrect. Contactez votre administrateur Bunga.corp.');
-    return;
-  }
-  if(!confirm('Réinitialiser l\'accès administrateur ?\n\nLes produits, le catalogue et la configuration sont conservés.\nVous allez choisir un nouveau mot de passe administrateur.')) return;
-  // On ne restaure AUCUN identifiant connu : l'opérateur définit un nouveau
-  // mot de passe, qui est haché immédiatement (pas de "admin/freshcontrol2024").
-  let pw = '';
-  for(;;){
-    pw = prompt('Nouveau mot de passe administrateur (8 caractères minimum) :') || '';
-    if(pw === '') return; // annulé
-    if(pw.length < 8){ alert('8 caractères minimum.'); continue; }
-    break;
-  }
-  const hashed = await hashPassword(pw);
-  const defaultUsers = [
-    {id:'u1',name:'Administrateur',username:'admin',password:hashed,role:'superadmin'},
-  ];
-  localStorage.setItem('fc_users', JSON.stringify(defaultUsers));
+/* Emergency reset — accessible depuis l'écran de connexion.
+   Usage solo : restaure simplement l'accès admin / admin. */
+function emergencyReset(){
+  if(!confirm('Réinitialiser l\'accès ?\n\nLes produits, le catalogue et la configuration sont conservés.\nL\'identifiant redevient admin / admin.')) return;
+  localStorage.setItem('fc_users', JSON.stringify([
+    {id:'u1',name:'Administrateur',username:'admin',password:'admin',role:'superadmin'},
+  ]));
   sessionStorage.removeItem('fc_session');
-  alert('✅ Accès réinitialisé.\n\nIdentifiant : admin\nMot de passe : celui que vous venez de définir.');
+  alert('✅ Accès réinitialisé.\n\nIdentifiant : admin\nMot de passe : admin');
   location.reload();
 }
 
