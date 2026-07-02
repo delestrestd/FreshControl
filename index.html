@@ -1009,9 +1009,19 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
         <!-- Liste des marques configurées -->
         <div id="brand-list" style="margin-bottom:14px"></div>
 
-        <!-- Bloc d'aide -->
+        <!-- Import par fichier (local-first) -->
+        <div style="background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.22);border-radius:12px;padding:12px 14px;margin-bottom:13px">
+          <div style="font-size:12px;font-weight:900;color:var(--b);margin-bottom:5px">📁 Importer un fichier (recommandé)</div>
+          <div style="font-size:11px;color:var(--muted);font-weight:600;line-height:1.7;margin-bottom:10px">
+            Chargez directement un fichier <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px;font-size:10px">.xlsx</code> ou <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px;font-size:10px">.csv</code> (colonnes : <b>Code-barres / Gencod</b>, <b>Nom du produit</b>, <b>Type</b>). Tout reste sur cet appareil, aucun envoi serveur. Nommez la marque ci-dessous (sinon le nom du fichier est utilisé).
+          </div>
+          <input type="file" id="cat-file-in" accept=".xlsx,.csv" style="display:none" onchange="onCatalogueFileChange(event)">
+          <button class="af-add" onclick="document.getElementById('cat-file-in').click()" style="width:100%;padding:12px;background:var(--b)">📁 Importer un fichier .xlsx / .csv</button>
+        </div>
+
+        <!-- Bloc d'aide : source URL Google Sheets -->
         <div style="background:rgba(18,168,118,.08);border:1px solid rgba(18,168,118,.2);border-radius:12px;padding:12px 14px;margin-bottom:13px">
-          <div style="font-size:12px;font-weight:900;color:var(--gd);margin-bottom:5px">💡 Comment ajouter une marque</div>
+          <div style="font-size:12px;font-weight:900;color:var(--gd);margin-bottom:5px">🔗 …ou depuis Google Sheets (URL synchronisée)</div>
           <div style="font-size:11px;color:var(--muted);font-weight:600;line-height:1.7">
             1) Dans Google Sheets, créez un onglet par marque (colonnes : <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px;font-size:10px">gencod</code>, <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px;font-size:10px">Libellé produit</code>, <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px;font-size:10px">Famille</code>).<br>
             2) Publiez en CSV : <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px;font-size:10px">…/gviz/tq?tqx=out:csv&amp;sheet=NomOnglet</code><br>
@@ -1023,9 +1033,9 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
         <div class="addform" style="margin-top:0;padding-top:0;border-top:none">
           <div class="rf-f"><div class="rf-l">Nom de la marque</div>
             <input class="af-in" id="cat-name" placeholder="Ex: Lea Nature, Carrefour Bio…"></div>
-          <div class="rf-f"><div class="rf-l">URL CSV Google Sheets</div>
+          <div class="rf-f"><div class="rf-l">URL CSV Google Sheets (optionnel si import fichier)</div>
             <input class="af-in" id="cat-url" placeholder="https://…/gviz/tq?tqx=out:csv&sheet=…" style="font-size:11px"></div>
-          <button class="af-add" onclick="addCatalogue()" style="width:100%;padding:12px">➕ Ajouter cette marque</button>
+          <button class="af-add" onclick="addCatalogue()" style="width:100%;padding:12px">➕ Ajouter cette marque (URL)</button>
         </div>
 
         <div id="sync-status" style="margin:14px 0 10px;font-size:12px;font-weight:700;min-height:16px"></div>
@@ -1953,40 +1963,86 @@ async function autoSyncCatalogue(){
   await syncAllCatalogues({ silent: true });
 }
 
-/* Fetch + parse d'une marque */
+/* Fetch + parse d'une marque (source URL CSV Google Sheets) */
 async function fetchCatalogueProducts(cat){
   const res = await fetch(cat.url, { cache: 'no-store' });
   if(!res.ok) throw new Error(`HTTP ${res.status}`);
   const csv  = await res.text();
   const rows = parseCSVSimple(csv);
-  // Diagnostic : on conserve le nombre brut de lignes lues + sautées,
-  // accessible via cat.diag dans la liste des marques (admin).
-  cat.diag = { rawBytes: csv.length, rawRows: rows.length, skipped: 0, skippedReasons: {} };
-  if(rows.length < 2){ cat.diag.skippedReasons.empty_csv = 1; return []; }
-  const headers = rows[0].map(h=>h.toLowerCase().replace(/["\s]/g,''));
-  const gi = headers.findIndex(h=>h.includes('gencod')||h.includes('ean')||h.includes('code'));
-  const ni = headers.findIndex(h=>h.includes('libell')||h.includes('nom')||h.includes('produit'));
-  const fi = headers.findIndex(h=>h.includes('famille')||h.includes('type')||h.includes('rayon'));
-  cat.diag.headers = headers;
-  cat.diag.matched = { gencod: gi, nom: ni, famille: fi };
-  if(gi<0) throw new Error(`Colonne gencod introuvable. En-tetes detectes : ${headers.join(', ')}`);
-  const out = [];
-  const seen = new Set();
-  for(let i=1;i<rows.length;i++){
-    const row = rows[i];
-    const gc  = (row[gi]||'').replace(/["\s']/g,'');
-    if(!gc){ cat.diag.skipped++; cat.diag.skippedReasons.empty_gencod = (cat.diag.skippedReasons.empty_gencod||0)+1; continue; }
-    if(seen.has(gc)){ cat.diag.skipped++; cat.diag.skippedReasons.duplicate_gencod = (cat.diag.skippedReasons.duplicate_gencod||0)+1; continue; }
-    seen.add(gc);
-    out.push({
-      gencod:  gc,
-      nom:     (ni>=0 ? row[ni] : '').replace(/^"|"$/g,'').trim(),
-      famille: (fi>=0 ? row[fi] : '').replace(/^"|"$/g,'').trim(),
-      marque:  cat.name,
-    });
-  }
+  const { products, diag } = mapRowsToCatalogue(rows);
+  diag.rawBytes = csv.length; // diagnostic accessible via cat.diag (admin)
+  cat.diag = diag;
+  const out = products.map(p => ({ ...p, marque: cat.name }));
   console.info(`[Catalogue:${cat.name}]`, cat.diag, `→ ${out.length} importes`);
   return out;
+}
+
+/* ─── IMPORT PAR FICHIER (.xlsx / .csv) — local-first ─────────────────────────
+   Le client fournit ses tarifs en fichier ; on les importe localement dans le
+   catalogue comme une « marque » de source `file` (sans URL). Ces marques ne
+   sont jamais re-synchronisées depuis un serveur : leurs produits sont préservés
+   à chaque sync (voir syncAllCatalogues) et remplacés uniquement par un ré-import. */
+function deriveBrandName(fileName){
+  return String(fileName || 'Catalogue')
+    .replace(/\.(xlsx|xls|csv)$/i, '')
+    .replace(/[_]+/g, ' ')
+    .trim() || 'Catalogue';
+}
+
+async function parseCatalogueFile(file){
+  const name = (file.name || '').toLowerCase();
+  let rows;
+  if(name.endsWith('.csv')){
+    rows = parseCSVSimple(await file.text());
+  } else if(name.endsWith('.xlsx')){
+    rows = await XlsxLite.readRows(await file.arrayBuffer());
+  } else if(name.endsWith('.xls')){
+    throw new Error('Format .xls (ancien Excel) non supporté — enregistrez en .xlsx ou .csv.');
+  } else {
+    throw new Error('Format non reconnu — utilisez un fichier .xlsx ou .csv.');
+  }
+  const { products, diag } = mapRowsToCatalogue(rows);
+  diag.rawBytes = file.size;
+  return { products, diag };
+}
+
+async function onCatalogueFileChange(e){
+  const file = e.target.files && e.target.files[0];
+  e.target.value = ''; // permet de ré-importer le même fichier
+  if(!file) return;
+  const nameEl = document.getElementById('cat-name');
+  const suggested = (nameEl && nameEl.value.trim()) || deriveBrandName(file.name);
+  const st = document.getElementById('sync-status');
+  if(st){ st.textContent = '⏳ Lecture du fichier…'; st.style.color = 'var(--muted)'; }
+  try{
+    const { products, diag } = await parseCatalogueFile(file);
+    if(!products.length) throw new Error('Aucun produit valide trouvé dans le fichier.');
+    let cat = catalogues.find(c => c.name.toLowerCase() === suggested.toLowerCase());
+    if(cat){
+      cat.source = 'file'; cat.url = '';
+    } else {
+      cat = { id: genId(), name: suggested, url: '', source: 'file', last_sync: 0, count: 0, error: null };
+      catalogues.push(cat);
+    }
+    const tagged = products.map(p => ({ ...p, marque: cat.name }));
+    catalogue = catalogue.filter(p => p.marque !== cat.name).concat(tagged);
+    cat.count = tagged.length;
+    cat.last_sync = Date.now();
+    cat.error = null;
+    cat.diag = diag;
+    saveCatalogue();
+    saveCatalogues();
+    renderCatalogueStats();
+    renderBrandList();
+    checkCatalogueWarning();
+    if(nameEl) nameEl.value = '';
+    toast(`✅ ${cat.name} : ${tagged.length} produit${tagged.length > 1 ? 's' : ''} importé${tagged.length > 1 ? 's' : ''}`);
+    if(st){ st.textContent = `✅ ${cat.name} · ${tagged.length} produits importés`; st.style.color = 'var(--gd)'; }
+  }catch(err){
+    console.error('[Import fichier]', err);
+    toast(`❌ Import : ${err.message || err}`);
+    if(st){ st.textContent = `❌ ${err.message || err}`; st.style.color = 'var(--r)'; }
+  }
 }
 
 /* Sync globale (toutes les marques en parallele) */
@@ -2000,12 +2056,17 @@ async function syncAllCatalogues(opts = {}){
   if(btn && !opts.silent){ btn.textContent='⏳ Synchronisation...'; btn.disabled=true; }
   if(st  && !opts.silent){ st.textContent=''; }
 
-  const results = await Promise.allSettled(catalogues.map(c => fetchCatalogueProducts(c)));
-  const merged = [];
-  let totalCount = 0;
+  // Les marques importées par fichier n'ont pas d'URL : on préserve leurs
+  // produits déjà en mémoire et on ne re-synchronise que les marques URL.
+  const fileCats  = catalogues.filter(c => c.source === 'file');
+  const urlCats   = catalogues.filter(c => c.source !== 'file');
+  const fileNames = new Set(fileCats.map(c => c.name));
+  const merged = catalogue.filter(p => fileNames.has(p.marque));
+  let totalCount = merged.length;
   let errorCount = 0;
+  const results = await Promise.allSettled(urlCats.map(c => fetchCatalogueProducts(c)));
   results.forEach((r, idx) => {
-    const cat = catalogues[idx];
+    const cat = urlCats[idx];
     if(r.status === 'fulfilled'){
       cat.count = r.value.length;
       cat.last_sync = Date.now();
@@ -2040,6 +2101,7 @@ async function syncAllCatalogues(opts = {}){
 async function syncOneCatalogue(id){
   const cat = catalogues.find(c => c.id === id);
   if(!cat) return;
+  if(cat.source === 'file'){ toast('📁 Marque importée par fichier — utilisez « Importer un fichier » pour la mettre à jour.'); return; }
   const btn = document.getElementById('sync-btn-'+id);
   if(btn){ btn.textContent='⏳'; btn.disabled=true; }
   try{
@@ -2159,26 +2221,31 @@ function renderBrandList(){
     return;
   }
   el.innerHTML = catalogues.map(c => {
+    const isFile = c.source === 'file';
     const ageMin = c.last_sync ? Math.floor((Date.now() - c.last_sync) / 60000) : null;
+    const ageLabel = isFile ? (c.last_sync ? `importé ${fmtAge(ageMin)}` : 'jamais importé') : fmtAge(ageMin);
     let metaInner;
     if(c.error){
       metaInner = `<span style="color:var(--r);font-weight:700">⚠️ ${escapeHTML(c.error)}</span>`;
     } else if(c.diag && (c.diag.rawRows - 1 - c.count) > 0){
-      // Sync OK mais des lignes ont été sautées : on signale en orange
+      // Import/sync OK mais des lignes ont été sautées : on signale en orange
       const skipped = (c.diag.rawRows - 1) - c.count;
-      metaInner = `<span style="color:var(--muted)">${c.count} produit${c.count>1?'s':''} · ${fmtAge(ageMin)}</span>` +
+      metaInner = `<span style="color:var(--muted)">${c.count} produit${c.count>1?'s':''} · ${ageLabel}</span>` +
         `<br><span style="color:var(--o);font-size:10.5px;font-weight:700">⚠️ ${skipped} ligne${skipped>1?'s':''} non importée${skipped>1?'s':''} sur ${c.diag.rawRows-1} (cliquer sur ℹ︎)</span>`;
     } else {
-      metaInner = `<span style="color:var(--muted)">${c.count} produit${c.count>1?'s':''} · ${fmtAge(ageMin)}</span>`;
+      metaInner = `<span style="color:var(--muted)">${c.count} produit${c.count>1?'s':''} · ${ageLabel}</span>`;
     }
+    // Marque fichier → pas de bouton sync (rien à re-fetch) ; icône 📁 distinctive.
+    const syncBtn = isFile ? '' :
+      `<button class="brand-sync" id="sync-btn-${c.id}" data-bid="${c.id}" onclick="syncOneCatalogue(this.dataset.bid)" aria-label="Synchroniser ${escapeHTMLAttr(c.name)}" title="Synchroniser">\u{1F504}</button>`;
     return `<div class="brand-card">
       <div class="brand-info">
-        <div class="brand-name">\u{1F4E6} ${escapeHTML(c.name)}</div>
+        <div class="brand-name">${isFile ? '\u{1F4C1}' : '\u{1F4E6}'} ${escapeHTML(c.name)}</div>
         <div class="brand-meta">${metaInner}</div>
       </div>
       <div class="brand-actions">
         <button class="brand-sync" data-bid="${escapeHTMLAttr(c.id)}" onclick="showCatalogueDiag(this.dataset.bid)" aria-label="Diagnostic ${escapeHTMLAttr(c.name)}" title="Voir le diagnostic">ℹ︎</button>
-        <button class="brand-sync" id="sync-btn-${c.id}" data-bid="${c.id}" onclick="syncOneCatalogue(this.dataset.bid)" aria-label="Synchroniser ${escapeHTMLAttr(c.name)}" title="Synchroniser">\u{1F504}</button>
+        ${syncBtn}
         <button class="adm-del" data-bid="${c.id}" onclick="removeCatalogue(this.dataset.bid)" aria-label="Supprimer ${escapeHTMLAttr(c.name)}" title="Supprimer">\u{1F5D1}</button>
       </div>
     </div>`;
@@ -2191,14 +2258,15 @@ function renderBrandList(){
 function showCatalogueDiag(id){
   const cat = catalogues.find(c => c.id === id);
   if(!cat) return;
-  const lines = [`Marque : ${cat.name}`, `URL : ${cat.url}`];
-  if(cat.last_sync) lines.push(`Dernière synchro : ${new Date(cat.last_sync).toLocaleString(lang||'fr')}`);
-  else lines.push('Jamais synchronisée');
+  const isFile = cat.source === 'file';
+  const lines = [`Marque : ${cat.name}`, isFile ? 'Source : fichier importé (.xlsx / .csv)' : `URL : ${cat.url}`];
+  if(cat.last_sync) lines.push(`${isFile ? 'Dernier import' : 'Dernière synchro'} : ${new Date(cat.last_sync).toLocaleString(lang||'fr')}`);
+  else lines.push(isFile ? 'Jamais importée' : 'Jamais synchronisée');
   lines.push(`Produits importés : ${cat.count||0}`);
   if(cat.error){ lines.push('', `❌ Erreur : ${cat.error}`); }
   if(cat.diag){
-    lines.push('', `Lignes lues dans le CSV : ${cat.diag.rawRows}`);
-    lines.push(`Taille du CSV : ${cat.diag.rawBytes} octets`);
+    lines.push('', `Lignes lues dans le fichier : ${cat.diag.rawRows}`);
+    if(cat.diag.rawBytes != null) lines.push(`Taille de la source : ${cat.diag.rawBytes} octets`);
     lines.push(`En-têtes détectés : ${(cat.diag.headers||[]).join(', ') || '—'}`);
     if(cat.diag.matched){
       lines.push(`Colonnes mappées : gencod=${cat.diag.matched.gencod}, nom=${cat.diag.matched.nom}, famille=${cat.diag.matched.famille}`);
@@ -2277,6 +2345,177 @@ function parseCSVSimple(text){
   row.push(cell.trim());
   if(row.some(x=>x!=='')) rows.push(row);
   return rows;
+}
+
+/* ═══ LECTEUR XLSX NATIF (zéro dépendance) ═══════════════════════════════════
+   Un .xlsx est une archive ZIP de fichiers XML. On lit le répertoire central
+   du ZIP, on décompresse chaque entrée utile via DecompressionStream('deflate-raw')
+   — dispo sur tous les navigateurs modernes (Chrome 80+, Safari 16.4+, Firefox) —
+   puis on parse la 1ʳᵉ feuille. Gère les chaînes partagées (sharedStrings),
+   les inlineStr et les cellules numériques. Tout se fait localement, hors-ligne,
+   sans CDN : cohérent avec la direction local-first du produit. */
+const XlsxLite = (function(){
+  const dv = (u8) => new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+
+  async function inflateRaw(bytes){
+    if(!('DecompressionStream' in window)) throw new Error('DecompressionStream non supporté par ce navigateur');
+    const ds = new DecompressionStream('deflate-raw');
+    const stream = new Response(bytes).body.pipeThrough(ds);
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  }
+
+  /* Parse le répertoire central du ZIP → Map(nom → Uint8Array décompressé) */
+  async function unzip(arrayBuffer){
+    const u8 = new Uint8Array(arrayBuffer);
+    const view = dv(u8);
+    // Localiser l'End Of Central Directory (signature 0x06054b50), en remontant depuis la fin.
+    let eocd = -1;
+    for(let i = u8.length - 22; i >= 0 && i >= u8.length - 22 - 65536; i--){
+      if(view.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
+    }
+    if(eocd < 0) throw new Error('Archive .xlsx illisible (EOCD absent)');
+    const cdCount  = view.getUint16(eocd + 10, true);
+    let   ptr      = view.getUint32(eocd + 16, true); // offset du répertoire central
+    const dec = new TextDecoder('utf-8');
+    const out = new Map();
+    for(let e = 0; e < cdCount; e++){
+      if(view.getUint32(ptr, true) !== 0x02014b50) throw new Error('Entrée ZIP corrompue');
+      const method   = view.getUint16(ptr + 10, true);
+      const compSize = view.getUint32(ptr + 20, true);
+      const fnLen    = view.getUint16(ptr + 28, true);
+      const extraLen = view.getUint16(ptr + 30, true);
+      const commLen  = view.getUint16(ptr + 32, true);
+      const localOff = view.getUint32(ptr + 42, true);
+      const name     = dec.decode(u8.subarray(ptr + 46, ptr + 46 + fnLen));
+      ptr += 46 + fnLen + extraLen + commLen;
+      // On ne décompresse que les XML dont on a besoin.
+      if(!/^xl\/(worksheets\/sheet\d+\.xml|sharedStrings\.xml|workbook\.xml)$/.test(name)) continue;
+      // En-tête local : recalcule la position réelle des données.
+      if(view.getUint32(localOff, true) !== 0x04034b50) throw new Error('En-tête local ZIP invalide');
+      const lFnLen    = view.getUint16(localOff + 26, true);
+      const lExtraLen = view.getUint16(localOff + 28, true);
+      const dataStart = localOff + 30 + lFnLen + lExtraLen;
+      const raw = u8.subarray(dataStart, dataStart + compSize);
+      out.set(name, method === 0 ? raw : await inflateRaw(raw));
+    }
+    return out;
+  }
+
+  const ENT = { amp:'&', lt:'<', gt:'>', quot:'"', apos:"'" };
+  function decodeXml(s){
+    return String(s).replace(/&(#x?[0-9a-fA-F]+|\w+);/g, (m, e) => {
+      if(e[0] === '#'){
+        const code = e[1] === 'x' || e[1] === 'X' ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10);
+        return isNaN(code) ? m : String.fromCodePoint(code);
+      }
+      return ENT[e] !== undefined ? ENT[e] : m;
+    });
+  }
+
+  /* sharedStrings.xml → tableau de chaînes (concatène le texte enrichi). */
+  function parseSharedStrings(xml){
+    const out = [];
+    const si = xml.match(/<si\b[^>]*>([\s\S]*?)<\/si>/g) || [];
+    for(const block of si){
+      let text = '';
+      const ts = block.match(/<t\b[^>]*>([\s\S]*?)<\/t>/g) || [];
+      for(const t of ts){ text += t.replace(/^<t\b[^>]*>/, '').replace(/<\/t>$/, ''); }
+      out.push(decodeXml(text));
+    }
+    return out;
+  }
+
+  const COL_RE = /^([A-Z]+)/;
+  function colIndex(ref){
+    const m = COL_RE.exec(ref || '');
+    if(!m) return 0;
+    let n = 0;
+    for(const ch of m[1]) n = n * 26 + (ch.charCodeAt(0) - 64);
+    return n - 1;
+  }
+
+  /* Feuille XML → tableau de lignes (chaque ligne = tableau de cellules texte). */
+  function parseSheet(xml, shared){
+    const rows = [];
+    const rowBlocks = xml.match(/<row\b[^>]*>[\s\S]*?<\/row>|<row\b[^>]*\/>/g) || [];
+    for(const rb of rowBlocks){
+      const cells = [];
+      let max = -1;
+      const cellRe = /<c\b([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g;
+      let cm;
+      while((cm = cellRe.exec(rb))){
+        const attrs = cm[1] || '';
+        const inner = cm[2] || '';
+        const refM  = /\br="([A-Z]+\d+)"/.exec(attrs);
+        const idx   = refM ? colIndex(refM[1]) : (max + 1);
+        const tM    = /\bt="([^"]+)"/.exec(attrs);
+        const type  = tM ? tM[1] : 'n';
+        let val = '';
+        if(type === 'inlineStr'){
+          const ts = inner.match(/<t\b[^>]*>([\s\S]*?)<\/t>/g) || [];
+          val = decodeXml(ts.map(t => t.replace(/^<t\b[^>]*>/, '').replace(/<\/t>$/, '')).join(''));
+        } else {
+          const vM = /<v\b[^>]*>([\s\S]*?)<\/v>/.exec(inner);
+          const raw = vM ? decodeXml(vM[1]) : '';
+          if(type === 's'){ const i = parseInt(raw, 10); val = shared[i] != null ? shared[i] : ''; }
+          else val = raw;
+        }
+        cells[idx] = val;
+        if(idx > max) max = idx;
+      }
+      for(let i = 0; i <= max; i++) if(cells[i] == null) cells[i] = '';
+      rows.push(cells);
+    }
+    return rows;
+  }
+
+  async function readRows(arrayBuffer){
+    const files = await unzip(arrayBuffer);
+    const dec = new TextDecoder('utf-8');
+    const shared = files.has('xl/sharedStrings.xml')
+      ? parseSharedStrings(dec.decode(files.get('xl/sharedStrings.xml'))) : [];
+    // 1ʳᵉ feuille : sheet1.xml si présente, sinon la plus petite numérotée.
+    let sheetKey = null;
+    for(const k of files.keys()){
+      if(/^xl\/worksheets\/sheet\d+\.xml$/.test(k)){
+        if(!sheetKey || k < sheetKey) sheetKey = k;
+      }
+    }
+    if(!sheetKey) throw new Error('Aucune feuille de calcul trouvée dans le .xlsx');
+    return parseSheet(dec.decode(files.get(sheetKey)), shared);
+  }
+
+  return { readRows };
+})();
+
+/* Mapping commun (CSV + XLSX) : lignes brutes → produits catalogue.
+   Détection d'en-têtes tolérante (gencod/ean/code, nom/libellé/produit,
+   type/famille/rayon) + anti-doublon + diagnostic. Retourne {products, diag}. */
+function mapRowsToCatalogue(rows){
+  const diag = { rawRows: rows.length, skipped: 0, skippedReasons: {} };
+  if(rows.length < 2){ diag.skippedReasons.empty = 1; return { products: [], diag }; }
+  const headers = rows[0].map(h => String(h || '').toLowerCase().replace(/["\s]/g, ''));
+  const gi = headers.findIndex(h => h.includes('gencod') || h.includes('ean') || h.includes('code'));
+  const ni = headers.findIndex(h => h.includes('libell') || h.includes('nom') || h.includes('produit'));
+  const fi = headers.findIndex(h => h.includes('famille') || h.includes('type') || h.includes('rayon'));
+  diag.headers = headers;
+  diag.matched = { gencod: gi, nom: ni, famille: fi };
+  if(gi < 0) throw new Error(`Colonne gencod introuvable. En-têtes détectés : ${headers.join(', ')}`);
+  const out = [];
+  const seen = new Set();
+  for(let i = 1; i < rows.length; i++){
+    const row = rows[i] || [];
+    const gc  = String(row[gi] == null ? '' : row[gi]).replace(/["\s']/g, '');
+    if(!gc){ diag.skipped++; diag.skippedReasons.empty_gencod = (diag.skippedReasons.empty_gencod || 0) + 1; continue; }
+    if(seen.has(gc)){ diag.skipped++; diag.skippedReasons.duplicate_gencod = (diag.skippedReasons.duplicate_gencod || 0) + 1; continue; }
+    seen.add(gc);
+    out.push({
+      gencod:  gc,
+      nom:     String(ni >= 0 ? (row[ni] || '') : '').replace(/^"|"$/g, '').trim(),
+      famille: String(fi >= 0 ? (row[fi] || '') : '').replace(/^"|"$/g, '').trim(),
+    });
+  }
+  return { products: out, diag };
 }
 
 /* ═══ MOTEUR DE LECTURE CODE-BARRES ═══════════════════════════════════════════
