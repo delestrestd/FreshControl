@@ -1,0 +1,11 @@
+# Données métier client importées localement — ne JAMAIS déployer
+# (téléchargeables publiquement sinon). L'import se fait côté navigateur.
+*.xlsx
+*.xls
+*.csv
+
+# Artefacts locaux
+*.bak
+*.tmp
+files/
+scratch/
