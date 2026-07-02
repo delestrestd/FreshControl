@@ -998,6 +998,13 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       <div id="planning-list"></div>
     </div>
 
+    <!-- CATALOGUE (consultation) -->
+    <div id="tab-catalogue" class="tab">
+      <input class="af-in" id="cat-view-search" placeholder="🔍 Rechercher (nom, gencod, type, marque)…" oninput="filterCatalogueView()" style="width:100%;margin-bottom:12px">
+      <div id="cat-view-stats" style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:12px">—</div>
+      <div id="cat-view-list"></div>
+    </div>
+
     <!-- ADMIN -->
     <div id="tab-admin" class="tab">
 
@@ -1005,6 +1012,8 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       <div class="adm-sec">
         <div class="adm-t">📋 Marques du magasin</div>
         <div id="catalogue-stats" style="font-size:12px;font-weight:600;margin-bottom:12px;line-height:1.7">—</div>
+
+        <button onclick="showTab('catalogue')" style="width:100%;margin-bottom:14px;padding:11px;border-radius:var(--rr);background:rgba(18,168,118,.1);border:1px solid rgba(18,168,118,.28);color:var(--gd);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font)">📚 Voir tout le catalogue</button>
 
         <!-- Liste des marques configurées -->
         <div id="brand-list" style="margin-bottom:14px"></div>
@@ -1145,6 +1154,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
     <button class="tb" id="tb-c" onclick="showTab('commande')"><span class="tb-i">🛒</span><span id="tl-c">Commande</span></button>
     <button class="tb" id="tb-a" onclick="showTab('alertes')"><span class="tb-i">🔔</span><span id="tl-a">Alertes</span></button>
     <button class="tb" id="tb-p" onclick="showTab('planning')"><span class="tb-i">📅</span><span id="tl-p">Planning</span></button>
+    <button class="tb" id="tb-cat" onclick="showTab('catalogue')"><span class="tb-i">📚</span><span id="tl-cat">Catalogue</span></button>
     <button class="tb" id="tb-adm" onclick="showTab('admin')" style="display:none"><span class="tb-i">⚙️</span><span>Admin</span></button>
   </div>
 </div>
@@ -1161,6 +1171,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       <div class="sb-it" onclick="showTab('commande');closeSB()"><div class="sb-ic">🛒</div>Commande</div>
       <div class="sb-it" onclick="showTab('alertes');closeSB()"><div class="sb-ic">🔔</div>Alertes</div>
       <div class="sb-it" onclick="showTab('planning');closeSB()"><div class="sb-ic">📅</div>Planning</div>
+      <div class="sb-it" onclick="showTab('catalogue');closeSB()"><div class="sb-ic">📚</div>Catalogue</div>
       <div class="sb-it" id="sb-adm" onclick="showTab('admin');closeSB()" style="display:none"><div class="sb-ic">⚙️</div>Administration</div>
       <div class="sb-sec">Outils</div>
       <div class="sb-it" onclick="openStoresModal();closeSB()"><div class="sb-ic">🏪</div>Gestion des magasins</div>
@@ -1651,7 +1662,10 @@ function showTab(n){
   if(curTab==='scanner'  && n!=='scanner')  stopEanScan();  // libère la caméra
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
-  const t=document.getElementById('tab-'+n), b=document.getElementById('tb-'+n[0]);
+  // Le bouton de la barre suit le 1er caractère du nom, sauf onglets à nom
+  // ambigu (admin/catalogue commencent par 'a'/'c' déjà pris).
+  const tbMap = { admin:'tb-adm', catalogue:'tb-cat' };
+  const t=document.getElementById('tab-'+n), b=document.getElementById(tbMap[n]||('tb-'+n[0]));
   if(t) t.classList.add('on');
   if(b) b.classList.add('on');
   curTab=n;
@@ -1662,6 +1676,7 @@ function showTab(n){
   if(n==='commande') renderCommande();
   if(n==='alertes') renderAlertes();
   if(n==='planning') renderPlanning();
+  if(n==='catalogue') renderCatalogueView();
   if(n==='admin') renderAdmin();
 }
 function renderCurrentTab(){
@@ -1669,6 +1684,7 @@ function renderCurrentTab(){
   else if(curTab==='commande') renderCommande();
   else if(curTab==='alertes') renderAlertes();
   else if(curTab==='planning') renderPlanning();
+  else if(curTab==='catalogue') renderCatalogueView();
   else if(curTab==='admin') renderAdmin();
 }
 
@@ -2211,6 +2227,52 @@ function renderCatalogueStats(){
   const ageStr = fmtAge(getCatalogueAge());
   el.innerHTML = `<span style="color:var(--gd);font-weight:700">✅ ${catalogue.length} produits · ${catalogues.length} marque(s)</span>
     <br><span style="font-size:11px;color:var(--muted);font-weight:600">Sync ${ageStr}</span>`;
+}
+
+/* ─── Onglet CATALOGUE (consultation en lecture seule) ────────────────────────
+   Affiche tout le catalogue agrégé (toutes marques confondues) avec une
+   recherche instantanée sur nom / gencod / type / marque. */
+function renderCatalogueView(){ filterCatalogueView(); }
+
+function filterCatalogueView(){
+  const listEl = document.getElementById('cat-view-list');
+  const statEl = document.getElementById('cat-view-stats');
+  if(!listEl) return;
+  if(!catalogue.length){
+    if(statEl) statEl.textContent = '';
+    listEl.innerHTML = '<div style="text-align:center;color:var(--muted);font-weight:600;padding:34px 12px;line-height:1.8">📚 Catalogue vide.<br>Importez un fichier dans <b>Admin → 📋 Marques</b>.</div>';
+    return;
+  }
+  const q = (document.getElementById('cat-view-search')?.value || '').trim().toLowerCase();
+  let rows = catalogue;
+  if(q){
+    rows = catalogue.filter(p =>
+      (p.nom||'').toLowerCase().includes(q) ||
+      (p.gencod||'').toLowerCase().includes(q) ||
+      (p.famille||'').toLowerCase().includes(q) ||
+      (p.marque||'').toLowerCase().includes(q));
+  }
+  const brandCount = new Set(catalogue.map(p=>p.marque)).size;
+  if(statEl){
+    statEl.textContent = q
+      ? `${rows.length} résultat${rows.length>1?'s':''} sur ${catalogue.length} produits`
+      : `${catalogue.length} produits · ${brandCount} marque${brandCount>1?'s':''}`;
+  }
+  if(!rows.length){
+    listEl.innerHTML = '<div style="text-align:center;color:var(--muted);font-weight:600;padding:24px 12px">Aucun produit ne correspond.</div>';
+    return;
+  }
+  const CAP = 500;
+  const shown = rows.slice(0, CAP);
+  listEl.innerHTML = shown.map(p => `
+    <div style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:rgba(255,255,255,.55);border:1px solid rgba(13,31,13,.08);border-radius:12px;margin-bottom:7px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:800;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(p.nom||'(sans nom)')}</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;margin-top:2px">${p.famille?('🏷 '+escapeHTML(p.famille)+' · '):''}📦 ${escapeHTML(p.marque||'')}</div>
+      </div>
+      <div style="font-size:11px;font-weight:800;color:var(--gd);font-variant-numeric:tabular-nums;white-space:nowrap">${escapeHTML(p.gencod||'')}</div>
+    </div>`).join('') +
+    (rows.length > CAP ? `<div style="text-align:center;color:var(--muted);font-weight:600;padding:14px;font-size:12px">… et ${rows.length-CAP} de plus — affinez la recherche pour voir le reste.</div>` : '');
 }
 
 function renderBrandList(){
