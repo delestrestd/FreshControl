@@ -34,3 +34,8 @@ files.zip
 *.bak
 *.tmp
 scratch/
+
+# Catalogues clients (données métier importées localement, jamais versionnées)
+*.xlsx
+*.xls
+*.csv
