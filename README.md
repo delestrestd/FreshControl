@@ -2,8 +2,10 @@
 
 PWA de gestion des produits périmés en supermarché.
 
-- Scanner de code-barres EAN **100 % local** (ZXing dans le navigateur — pas d'API).
-- Catalogue **multi-marques** synchronisé depuis Google Sheets.
+- Scanner de code-barres EAN **robuste et 100 % local** : `BarcodeDetector` natif (Android Chrome) avec repli **ZXing** (iOS/Safari), caméra **live en continu**, torche + autofocus, repli photo — aucune image n'est envoyée à un serveur.
+- **Module Commande** : réappro par **scan continu** — chaque produit reconnu s'ajoute tout seul, quantités exprimées en **colis**, e-mail + historique local (voir plus bas).
+- Catalogue **multi-marques** synchronisé depuis Google Sheets **ou importé localement** (`.xlsx` / `.csv`, sans dépendance CDN ni envoi serveur).
+- Onglet **Catalogue** : consultation en lecture seule du catalogue agrégé (recherche instantanée nom / gencod / type / marque).
 - Alertes DLC, planning de tournées par magasin, rappels e-mail.
 - Mono-utilisateur : un seul compte administrateur (outil de terrain personnel).
 - Multilingue (FR / EN / ES / ZH).
@@ -71,6 +73,28 @@ Plusieurs onglets / marques peuvent être combinés via `|` :
 ```
 https://…/gviz/tq?tqx=out:csv&sheet=Marque_A|https://…/gviz/tq?tqx=out:csv&sheet=Marque_B
 ```
+
+### Import d'un catalogue par fichier (local-first)
+
+Depuis Admin → 📋 Marques → **« Importer un fichier »**, on charge un tarif au format `.xlsx` ou `.csv` directement dans le navigateur (lecteur XLSX natif, zéro dépendance externe, aucun envoi serveur). Les colonnes reconnues sont les mêmes que pour Google Sheets (`Code-barres / Gencod`, `Nom du produit`, `Type` — synonymes tolérés). Une marque importée par fichier porte l'icône 📁 : ses produits sont **préservés à chaque synchro** et ne sont remplacés que par un ré-import.
+
+> Les fichiers `.xlsx / .xls / .csv` du dépôt sont exclus du versionnement (`.gitignore`) **et** du déploiement (`.vercelignore`) : ce sont des données métier client, jamais publiées.
+
+## Module Commande (réappro par scan)
+
+Onglet 🛒 **Commande** — 100 % local, aucune commande n'est poussée vers un serveur (enregistrement `localStorage` + e-mail pré-rempli).
+
+**Fonctionnement du scan (depuis la v3.1) :**
+
+1. Un appui unique sur **« 📷 Démarrer le scan »** allume la caméra, qui tourne ensuite **en continu**.
+2. Dès qu'un code-barres est **reconnu dans le catalogue**, la ligne s'ajoute **automatiquement** à la commande (1 colis) — aucune photo à déclencher, aucune boîte à valider. Un flash vert + un toast confirment l'ajout.
+3. Re-scanner le même produit **incrémente** son nombre de colis (anti-doublon de 2 s pour éviter les comptages accidentels).
+4. La quantité de chaque ligne est un **nombre de colis** librement ajustable (`− / +` ou saisie directe). *Le fichier tarif ne contenant pas le conditionnement (unités par colis), aucune conversion en unités n'est faite.*
+5. Un code **hors catalogue** (ou la saisie manuelle) ouvre une boîte pour renseigner le nom du produit avant l'ajout.
+
+La commande se valide par e-mail ; un **historique local** permet de recharger, renvoyer ou exporter (CSV, colonne `colis`) les commandes passées.
+
+> La caméra ne démarre pas d'elle-même à l'ouverture de l'onglet : le clic initial sur « Démarrer le scan » reste nécessaire (choix délibéré pour ne pas monopoliser la caméra).
 
 ## Sécurité
 
