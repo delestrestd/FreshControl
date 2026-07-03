@@ -219,6 +219,9 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .ord-qty input{width:48px;text-align:center;padding:6px 2px;border-radius:9px;border:1.5px solid var(--bdr);font-size:14px;font-weight:800;font-family:var(--font);background:rgba(255,255,255,.92);color:var(--txt);outline:none;-moz-appearance:textfield}
 .ord-qty input::-webkit-outer-spin-button,.ord-qty input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .ord-del{width:34px;height:34px;flex-shrink:0;border-radius:9px;border:1px solid rgba(224,60,60,.28);background:rgba(224,60,60,.1);color:var(--r);font-size:14px;cursor:pointer;font-family:var(--font)}
+.ord-colis{font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);text-align:center;margin-top:2px}
+.ord-line.flash{animation:flashLine 1.1s ease}
+@keyframes flashLine{0%{background:rgba(45,190,110,.55);box-shadow:0 0 0 2px rgba(45,190,110,.6)}100%{background:rgba(255,255,255,.64);box-shadow:var(--spec)}}
 #scan-in{display:none}
 /* ── Caméra live (viseur + torche) ───────────────────────────────────── */
 .scan-cam-wrap{position:relative;margin:14px 0;border-radius:14px;overflow:hidden;background:#000;box-shadow:var(--ss)}
@@ -944,7 +947,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       <div class="scan-box" id="cmd-scan-box">
         <div class="scan-step-icon">🛒</div>
         <div class="scan-step-title">Commande par scan</div>
-        <div class="scan-step-sub">Scannez les codes-barres, saisissez la quantité, puis validez pour envoyer la commande par mail. Tout reste enregistré localement.</div>
+        <div class="scan-step-sub">Visez les codes-barres : chaque produit reconnu s'ajoute tout seul à la commande (1 colis, re-scannez pour +1). Ajustez le nombre de colis sur chaque ligne, puis validez pour envoyer par mail. Tout reste enregistré localement.</div>
         <div class="scan-cam-wrap" id="cmd-cam-wrap" style="display:none">
           <video id="cmd-video" playsinline muted></video>
           <div class="scan-reticle"></div>
@@ -970,7 +973,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
           <div class="rf-f"><div class="rf-l">Famille / Marque</div><input class="rf-i" id="cmd-qty-fam" readonly style="background:rgba(0,0,0,.04);color:var(--muted)"></div>
         </div>
         <div id="cmd-qty-namewrap" style="display:none"><div class="rf-f"><div class="rf-l">Nom du produit (hors catalogue)</div><input class="rf-i" id="cmd-qty-manualname" placeholder="Nom du produit"></div></div>
-        <div class="rf-f"><div class="rf-l">Quantité</div><input class="rf-i" id="cmd-qty-input" type="number" min="1" step="1" value="1" inputmode="numeric"></div>
+        <div class="rf-f"><div class="rf-l">Nombre de colis</div><input class="rf-i" id="cmd-qty-input" type="number" min="1" step="1" value="1" inputmode="numeric"></div>
         <button class="rfsave" onclick="addOrderLine()">➕ Ajouter à la commande</button>
         <button class="rfcancel" onclick="cancelCmdQty()">Annuler</button>
       </div>
@@ -3100,14 +3103,17 @@ function resetScan(){
 }
 
 /* ═══ COMMANDE — réappro par scan, 100 % locale ═════════════════════════════
-   Workflow : scan EAN (caméra live ou photo) → lookup dans le catalogue local
-   → saisie quantité → ligne ajoutée à la commande (éditable / supprimable).
+   Workflow : caméra live en continu → chaque code reconnu dans le catalogue
+   s'ajoute tout seul à la commande (1 colis, +1 si re-scanné) sans interrompre
+   le scan ; le nombre de colis s'ajuste ensuite sur chaque ligne. Un code hors
+   catalogue (ou la saisie manuelle) ouvre une boîte pour renseigner le nom.
    Validation → enregistrement local (fc_orders) + e-mail pré-rempli. Aucune
    commande n'est poussée vers un serveur : tout reste sur l'appareil. */
 let orders       = JSON.parse(localStorage.getItem('fc_orders') || '[]');
 let currentOrder = [];
 let cmdScanning  = false;
-let cmdPending   = null;   // produit détecté, en attente de quantité
+let cmdPending   = null;   // produit hors catalogue / saisie manuelle, en attente de nom
+let lastAddedKey = null;   // clé de la dernière ligne ajoutée (pour le flash visuel)
 // L'anti-doublon de lecture caméra est désormais géré par BarcodeEngine.
 
 function renderCommande(){
@@ -3181,52 +3187,51 @@ function cmdManualEntry(){ onCmdDecode(''); }
 
 function onCmdDecode(ean){
   const prod = ean ? lookupGencod(ean) : null;
-  cmdPending = {
-    gencod:  ean || '',
-    name:    prod ? (prod.nom || '') : '',
-    famille: prod ? [prod.famille, prod.marque].filter(Boolean).join(' · ') : '',
-    known:   !!prod,
-  };
-  document.getElementById('cmd-qty-gc').value  = cmdPending.gencod || '—';
-  document.getElementById('cmd-qty-fam').value = cmdPending.famille || '';
-  const nameEl     = document.getElementById('cmd-qty-name');
-  const manualWrap = document.getElementById('cmd-qty-namewrap');
-  const manualInp  = document.getElementById('cmd-qty-manualname');
-  if(cmdPending.known){
-    nameEl.textContent = cmdPending.name || 'Produit';
-    manualWrap.style.display = 'none';
-    manualInp.value = '';
-  } else {
-    nameEl.textContent = ean ? 'Produit hors catalogue' : 'Saisie manuelle';
-    manualWrap.style.display = 'block';
-    manualInp.value = '';
+  // Produit reconnu dans le catalogue → ajout direct, la caméra continue de tourner.
+  if(prod){
+    addOrderProduct({
+      gencod:  ean,
+      name:    prod.nom || 'Produit',
+      famille: [prod.famille, prod.marque].filter(Boolean).join(' · '),
+    });
+    return;
   }
+  // Code inconnu (hors catalogue) ou saisie manuelle → on demande le nom via la boîte.
+  cmdPending = { gencod: ean || '', famille: '' };
+  document.getElementById('cmd-qty-gc').value  = cmdPending.gencod || '—';
+  document.getElementById('cmd-qty-fam').value = '';
+  const manualInp = document.getElementById('cmd-qty-manualname');
+  document.getElementById('cmd-qty-name').textContent = ean ? 'Produit hors catalogue' : 'Saisie manuelle';
+  document.getElementById('cmd-qty-namewrap').style.display = 'block';
+  manualInp.value = '';
   document.getElementById('cmd-qty-input').value = '1';
   document.getElementById('cmd-qty-box').style.display = 'block';
   if(document.getElementById('cmd-st')) document.getElementById('cmd-st').textContent = '';
-  setTimeout(()=>{
-    const f = cmdPending && cmdPending.known ? document.getElementById('cmd-qty-input') : manualInp;
-    if(f){ f.focus(); if(f.select) f.select(); }
-  }, 120);
+  setTimeout(()=>{ manualInp.focus(); if(manualInp.select) manualInp.select(); }, 120);
+}
+
+/* Ajout direct d'un produit à la commande (scan d'un produit reconnu).
+   +1 colis si le même gencod est déjà présent ; sinon nouvelle ligne à 1 colis. */
+function addOrderProduct(p, qty){
+  const add = (!qty || qty < 1) ? 1 : qty;
+  const existing = p.gencod ? currentOrder.find(l => l.gencod === p.gencod) : null;
+  let line;
+  if(existing){ existing.qty += add; line = existing; }
+  else { line = { gencod: p.gencod || '', name: p.name || '—', famille: p.famille || '', qty: add }; currentOrder.push(line); }
+  lastAddedKey = line.gencod || line.name;
+  renderOrderLines();
+  toast(`➕ ${line.name} · ${line.qty} colis`);
 }
 
 function addOrderLine(){
   if(!cmdPending) return;
   const qty = parseInt(document.getElementById('cmd-qty-input').value, 10);
-  if(!qty || qty < 1){ toast('Quantité invalide'); return; }
-  let name = cmdPending.name;
-  if(!cmdPending.known){
-    name = document.getElementById('cmd-qty-manualname').value.trim();
-    if(!name){ toast('Saisissez le nom du produit'); return; }
-  }
-  // Regroupe si le même gencod est déjà dans la commande
-  const existing = cmdPending.gencod ? currentOrder.find(l => l.gencod === cmdPending.gencod) : null;
-  if(existing) existing.qty += qty;
-  else currentOrder.push({ gencod: cmdPending.gencod, name, famille: cmdPending.famille, qty });
+  if(!qty || qty < 1){ toast('Nombre de colis invalide'); return; }
+  const name = document.getElementById('cmd-qty-manualname').value.trim();
+  if(!name){ toast('Saisissez le nom du produit'); return; }
+  addOrderProduct({ gencod: cmdPending.gencod, name, famille: cmdPending.famille }, qty);
   cmdPending = null;
   document.getElementById('cmd-qty-box').style.display = 'none';
-  renderOrderLines();
-  toast('➕ Ajouté');
 }
 
 function cancelCmdQty(){
@@ -3262,21 +3267,28 @@ function renderOrderLines(){
     return;
   }
   const totalQty = currentOrder.reduce((s,l)=>s+l.qty, 0);
-  if(count) count.textContent = `(${currentOrder.length} réf. · ${totalQty} u.)`;
-  el.innerHTML = currentOrder.map((l,i)=>`
-    <div class="ord-line">
+  if(count) count.textContent = `(${currentOrder.length} réf. · ${totalQty} colis)`;
+  el.innerHTML = currentOrder.map((l,i)=>{
+    const flash = (l.gencod||l.name) === lastAddedKey ? ' flash' : '';
+    return `
+    <div class="ord-line${flash}">
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(l.name||'—')}</div>
         <div style="font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(l.gencod||'sans gencod')}${l.famille?' · '+escapeHTML(l.famille):''}</div>
       </div>
-      <div class="ord-qty">
-        <button onclick="changeOrderQty(${i},-1)" aria-label="Diminuer">−</button>
-        <input type="number" min="1" value="${l.qty}" onchange="setOrderQty(${i},this.value)" inputmode="numeric" aria-label="Quantité">
-        <button onclick="changeOrderQty(${i},1)" aria-label="Augmenter">+</button>
+      <div style="flex-shrink:0">
+        <div class="ord-qty">
+          <button onclick="changeOrderQty(${i},-1)" aria-label="Un colis de moins">−</button>
+          <input type="number" min="1" value="${l.qty}" onchange="setOrderQty(${i},this.value)" inputmode="numeric" aria-label="Nombre de colis">
+          <button onclick="changeOrderQty(${i},1)" aria-label="Un colis de plus">+</button>
+        </div>
+        <div class="ord-colis">colis</div>
       </div>
       <button class="ord-del" onclick="removeOrderLine(${i})" aria-label="Supprimer la ligne">🗑</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   if(footer) footer.style.display = 'block';
+  lastAddedKey = null;   // le flash ne joue qu'une fois
 }
 
 function buildOrderText(lines, meta){
@@ -3286,9 +3298,9 @@ function buildOrderText(lines, meta){
     meta.by ? `Préparée par : ${meta.by}` : '',
     '', 'Produits :', '',
   ].filter((x,idx)=> x!=='' || idx>2);
-  lines.forEach(l => out.push(`- ${l.name}  (${l.gencod||'sans gencod'})  ×${l.qty}`));
+  lines.forEach(l => out.push(`- ${l.name}  (${l.gencod||'sans gencod'})  ×${l.qty} colis`));
   const totalQty = lines.reduce((s,l)=>s+l.qty, 0);
-  out.push('', `Total : ${lines.length} référence(s) · ${totalQty} unité(s)`, '', '— FreshControl');
+  out.push('', `Total : ${lines.length} référence(s) · ${totalQty} colis`, '', '— FreshControl');
   return out.join('\n');
 }
 
@@ -3335,7 +3347,8 @@ function clearOrder(){
 
 function exportOrderCSV(lines){
   const cols = ['gencod','name','famille','qty'];
-  const rows = [cols.join(';'), ...lines.map(l => cols.map(c => `"${String(l[c]??'').replace(/"/g,'""')}"`).join(';'))];
+  const head = ['gencod','name','famille','colis'];
+  const rows = [head.join(';'), ...lines.map(l => cols.map(c => `"${String(l[c]??'').replace(/"/g,'""')}"`).join(';'))];
   const blob = new Blob(['﻿'+rows.join('\n')], { type:'text/csv;charset=utf-8' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
@@ -3355,7 +3368,7 @@ function renderOrdersHistory(){
     return `<div style="padding:11px 0;border-bottom:1px solid rgba(0,0,0,.06)">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
         <div style="font-size:13px;font-weight:800">🛒 ${escapeHTML(new Date(o.date).toLocaleString(lang))}</div>
-        <span class="pbadge bk" style="font-size:10px">${o.lines.length} réf · ${totalQty} u</span>
+        <span class="pbadge bk" style="font-size:10px">${o.lines.length} réf · ${totalQty} colis</span>
       </div>
       <div style="font-size:11px;color:var(--muted);font-weight:600;margin:2px 0 6px">${escapeHTML(o.store||'—')} · ${escapeHTML(o.by||'?')}</div>
       <div style="font-size:11.5px;color:var(--txt);font-weight:600;line-height:1.6">
