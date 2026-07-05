@@ -43,7 +43,10 @@
   --font:'Nunito',sans-serif;
   --tab-h:72px;--hdr-h:70px;
 }
-html,body{height:100%;font-family:var(--font);color:var(--txt);overflow:hidden;-webkit-text-size-adjust:100%}
+html,body{height:100%;font-family:var(--font);color:var(--txt);overflow:hidden;overscroll-behavior:none;-webkit-text-size-adjust:100%}
+/* Verrou anti « la page part dans tous les sens » sur iOS : body fixe (pas de
+   pan/rebond du viewport), seuls les conteneurs internes défilent. */
+body{position:fixed;inset:0;width:100%;height:100%;touch-action:manipulation}
 /* green bg */
 body::before{content:'';position:fixed;inset:0;z-index:-2;
   background:radial-gradient(ellipse 80% 60% at 20% 10%,#1FD994 0%,transparent 52%),
@@ -132,7 +135,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .sb-hd{background:rgba(10,107,71,.84);backdrop-filter:blur(18px);padding:26px 18px 20px;color:#fff;border-bottom:1px solid rgba(255,255,255,.18)}
 .sb-un{font-size:19px;font-weight:900;letter-spacing:-.4px}
 .sb-rl{font-size:11px;opacity:.88;margin-top:3px;font-weight:700}
-.sb-body{flex:1;overflow-y:auto;padding:9px}
+.sb-body{flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:9px}
 .sb-sec{font-size:10px;font-weight:900;color:var(--muted);letter-spacing:1.3px;text-transform:uppercase;padding:13px 11px 5px}
 .sb-it{display:flex;align-items:center;gap:11px;padding:12px 13px;border-radius:14px;cursor:pointer;font-size:14px;font-weight:700;color:var(--txt);transition:background .13s}
 .sb-it:hover,.sb-it.on{background:rgba(18,168,118,.12);color:var(--gd)}
@@ -368,7 +371,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
 .mhd-t{font-size:17px;font-weight:900;letter-spacing:-.4px}
 .mcl{min-width:36px;height:36px;padding:0 12px;border-radius:var(--rr);border:1.5px solid var(--bdr);background:rgba(255,255,255,.65);color:var(--muted);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);display:inline-flex;align-items:center;justify-content:center;transition:background .18s,color .18s}
 .mcl:hover{background:rgba(255,255,255,.85);color:var(--txt)}
-.mbody{flex:1;overflow-y:auto;padding:14px}
+.mbody{flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:14px}
 /* STARTUP popup */
 .startup-hd{background:rgba(176,32,32,.77);backdrop-filter:blur(14px);padding:20px 18px 16px;color:#fff;border-bottom:1px solid rgba(255,255,255,.18);box-shadow:var(--spec-d)}
 .startup-hd h2{font-size:18px;font-weight:900;margin-bottom:3px}
@@ -480,7 +483,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
     <button class="lb" id="l-btn" onclick="doLogin()"><span id="l-btn-t">Se connecter</span></button>
     <div class="lerr" id="l-err"></div>
   </div>
-  <div class="lver">FreshControl v3.4 · <span class="brand-logo" style="width:40px;height:18px;margin-left:4px"></span></div>
+  <div class="lver">FreshControl v3.5 · <span class="brand-logo" style="width:40px;height:18px;margin-left:4px"></span></div>
 
   <!-- Bouton reset d'urgence — visible en bas de l'écran de connexion -->
   <div style="margin-top:18px;text-align:center">
@@ -2659,6 +2662,7 @@ const BarcodeEngine = (function(){
     if(window._zxingFailed || typeof ZXing==='undefined' || !ZXing.BrowserMultiFormatReader) return null;
     try{ zxReader=new ZXing.BrowserMultiFormatReader(zxHints()); }
     catch(e){ try{ zxReader=new ZXing.BrowserMultiFormatReader(); }catch(_){ return null; } }
+    try{ zxReader.timeBetweenScansMillis=120; }catch(_){}   // cadence du décodage continu (défaut 500 ms)
     return zxReader;
   }
 
@@ -2711,7 +2715,18 @@ const BarcodeEngine = (function(){
     const zx=getZx();
     if(!zx) return null;
     try{
-      const bb=zx.createBinaryBitmap(source);
+      // Source de luminance construite DIRECTEMENT depuis notre canvas.
+      // Évite zx.createBinaryBitmap() qui met en cache un canvas interne
+      // dimensionné à la 1ʳᵉ image puis redessine SANS redimensionner :
+      // avec des tailles différentes (plein cadre / recadrage / photo) les
+      // images suivantes sont rognées → code-barres hors cadre → jamais lu.
+      let bb;
+      if(source instanceof HTMLCanvasElement && ZXing.HTMLCanvasElementLuminanceSource){
+        const lum=new ZXing.HTMLCanvasElementLuminanceSource(source);
+        bb=new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(lum));
+      }else{
+        bb=zx.createBinaryBitmap(source);
+      }
       const r=zx.decodeBitmap(bb);
       if(r){ const c=normalize(r.getText()); if(c) return c; }
     }catch(e){ /* NotFoundException */ }
@@ -2839,24 +2854,56 @@ const BarcodeEngine = (function(){
 
   async function startLiveScan(video,onResult){
     await getNative();
-    if(!nativeDetector && !getZx()) throw new Error('no-engine');
+    const zx = nativeDetector ? null : getZx();
+    if(!nativeDetector && !zx) throw new Error('no-engine');
     videoEl=video; onResultCb=onResult; recent=[]; lastAccepted=''; lastAcceptedT=0;
     _frames=0; _lastRaw='';
-    stream=await navigator.mediaDevices.getUserMedia({
+    const constraints={
       audio:false,
       video:{ facingMode:{ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080} }
-    });
+    };
+    // On ouvre NOUS-MÊMES le flux caméra : torche + autofocus réglés tout de
+    // suite, et startLiveScan résout immédiatement (bouton torche + diag).
+    stream=await navigator.mediaDevices.getUserMedia(constraints);
     video.srcObject=stream;
-    video.setAttribute('playsinline','');
+    video.setAttribute('playsinline',''); try{ video.muted=true; }catch(e){}
     try{ await video.play(); }catch(e){}
-    track=stream.getVideoTracks()[0];
-    try{ await track.applyConstraints({advanced:[{focusMode:'continuous'}]}); }catch(e){}
+    track=stream.getVideoTracks()[0]||null;
+    try{ if(track) await track.applyConstraints({advanced:[{focusMode:'continuous'}]}); }catch(e){}
     scanning=true;
-    loop();
+
+    if(nativeDetector){
+      loop();                                   // Android : BarcodeDetector natif (boucle maison)
+      return;
+    }
+
+    // iOS / navigateurs sans BarcodeDetector : décodeur vidéo CONTINU officiel
+    // de ZXing. Il redessine un canvas de capture correctement dimensionné à
+    // CHAQUE image (contrairement à notre ancienne boucle) → décode enfin.
+    const handle=(result)=>{
+      if(!scanning) return;
+      _frames++;                                // diagnostic : compte les tentatives
+      if(!result) return;
+      const code=normalize(result.getText ? result.getText() : result);
+      if(!code) return;
+      _lastRaw=code;
+      if(confirmHit(code)){
+        const now=Date.now();
+        if(!(code===lastAccepted && now-lastAcceptedT<2000)){
+          lastAccepted=code; lastAcceptedT=now;
+          if(onResultCb) onResultCb(code);
+        }
+      }
+    };
+    // Non-awaité : le décodage tourne en continu via le callback. On lui passe
+    // NOTRE flux déjà ouvert (ZXing le ré-attache proprement).
+    try{ zx.decodeFromStream(stream, video, handle); }
+    catch(e){ try{ loop(); }catch(_){} }        // repli : ancienne boucle maison (tryZx corrigé)
   }
   function stopLiveScan(){
     scanning=false;
     if(rafId){ clearTimeout(rafId); rafId=null; }
+    try{ if(zxReader) zxReader.reset(); }catch(e){}   // stoppe le décodage continu ZXing + libère sa caméra
     if(stream){ stream.getTracks().forEach(t=>{ try{t.stop();}catch(e){} }); stream=null; }
     if(videoEl){ try{ videoEl.srcObject=null; }catch(e){} videoEl=null; }
     track=null; onResultCb=null; recent=[];
