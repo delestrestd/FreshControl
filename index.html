@@ -483,7 +483,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
     <button class="lb" id="l-btn" onclick="doLogin()"><span id="l-btn-t">Se connecter</span></button>
     <div class="lerr" id="l-err"></div>
   </div>
-  <div class="lver">FreshControl v3.5 · <span class="brand-logo" style="width:40px;height:18px;margin-left:4px"></span></div>
+  <div class="lver">FreshControl v3.6 · <span class="brand-logo" style="width:40px;height:18px;margin-left:4px"></span></div>
 
   <!-- Bouton reset d'urgence — visible en bas de l'écran de connexion -->
   <div style="margin-top:18px;text-align:center">
@@ -2754,8 +2754,18 @@ const BarcodeEngine = (function(){
   function zxScanFrame(video){
     const g=grabFrame(video);
     if(!g) return null;
-    const cc=centerCrop(g,0.6);   // zoom viseur : barres plus grandes ET image plus petite = plus rapide
-    return tryZx(cc) || tryZx(grayContrast(cc)) || tryZx(g);
+    // Pipeline éprouvé (identique à l'import photo, qui décode bien) appliqué à
+    // la frame live : plein cadre, recadrages « zoom viseur » de plus en plus
+    // serrés, renforcement de contraste + upscale. Rattrape autofocus mou,
+    // code-barres petit/éloigné ou peu contrasté (fréquent sur iOS).
+    const cc=centerCrop(g,0.66), cc2=centerCrop(g,0.45);
+    return tryZx(g)
+        || tryZx(cc)
+        || tryZx(grayContrast(cc))
+        || tryZx(cc2)
+        || tryZx(grayContrast(cc2))
+        || tryZx(drawCanvas(cc2,2))
+        || tryZx(grayContrast(g));
   }
 
   /* ---- Confirmation : codes produits validés acceptés direct,
@@ -2854,16 +2864,13 @@ const BarcodeEngine = (function(){
 
   async function startLiveScan(video,onResult){
     await getNative();
-    const zx = nativeDetector ? null : getZx();
-    if(!nativeDetector && !zx) throw new Error('no-engine');
+    if(!nativeDetector && !getZx()) throw new Error('no-engine');
     videoEl=video; onResultCb=onResult; recent=[]; lastAccepted=''; lastAcceptedT=0;
     _frames=0; _lastRaw='';
     const constraints={
       audio:false,
       video:{ facingMode:{ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080} }
     };
-    // On ouvre NOUS-MÊMES le flux caméra : torche + autofocus réglés tout de
-    // suite, et startLiveScan résout immédiatement (bouton torche + diag).
     stream=await navigator.mediaDevices.getUserMedia(constraints);
     video.srcObject=stream;
     video.setAttribute('playsinline',''); try{ video.muted=true; }catch(e){}
@@ -2871,34 +2878,10 @@ const BarcodeEngine = (function(){
     track=stream.getVideoTracks()[0]||null;
     try{ if(track) await track.applyConstraints({advanced:[{focusMode:'continuous'}]}); }catch(e){}
     scanning=true;
-
-    if(nativeDetector){
-      loop();                                   // Android : BarcodeDetector natif (boucle maison)
-      return;
-    }
-
-    // iOS / navigateurs sans BarcodeDetector : décodeur vidéo CONTINU officiel
-    // de ZXing. Il redessine un canvas de capture correctement dimensionné à
-    // CHAQUE image (contrairement à notre ancienne boucle) → décode enfin.
-    const handle=(result)=>{
-      if(!scanning) return;
-      _frames++;                                // diagnostic : compte les tentatives
-      if(!result) return;
-      const code=normalize(result.getText ? result.getText() : result);
-      if(!code) return;
-      _lastRaw=code;
-      if(confirmHit(code)){
-        const now=Date.now();
-        if(!(code===lastAccepted && now-lastAcceptedT<2000)){
-          lastAccepted=code; lastAcceptedT=now;
-          if(onResultCb) onResultCb(code);
-        }
-      }
-    };
-    // Non-awaité : le décodage tourne en continu via le callback. On lui passe
-    // NOTRE flux déjà ouvert (ZXing le ré-attache proprement).
-    try{ zx.decodeFromStream(stream, video, handle); }
-    catch(e){ try{ loop(); }catch(_){} }        // repli : ancienne boucle maison (tryZx corrigé)
+    // Une seule boucle : loop() choisit le moteur (natif Android via tryNative,
+    // iOS via zxScanFrame multi-variantes). Le pipeline multi-variantes est
+    // celui qui décode déjà les photos → on l'applique aux images live.
+    loop();
   }
   function stopLiveScan(){
     scanning=false;
@@ -2927,6 +2910,7 @@ const BarcodeEngine = (function(){
   function getDiag(){
     return {
       engine: nativeDetector ? 'natif' : 'ZXing',
+      zxing: (typeof ZXing!=='undefined' && !!ZXing.BrowserMultiFormatReader && !window._zxingFailed),
       res: (videoEl && videoEl.videoWidth) ? (videoEl.videoWidth+'×'+videoEl.videoHeight) : '—',
       frames: _frames,
       lastRaw: _lastRaw
@@ -2969,16 +2953,34 @@ function checkCatalogueWarning(){
 /* Diagnostic live discret sous le viseur (moteur · résolution · essais · dernière
    lecture brute). Permet de comprendre un scan qui ne lit pas sur un vrai
    téléphone sans avoir accès à la console. */
-let _scanDiagTimer=null;
+let _scanDiagTimer=null, _diagPrevFrames=-1, _diagStall=0;
 function startScanDiag(stId){
   stopScanDiag();
+  _diagPrevFrames=-1; _diagStall=0;
   _scanDiagTimer=setInterval(()=>{
     const st=document.getElementById(stId); if(!st) return;
     const d=BarcodeEngine.getDiag();
     let el=document.getElementById('scan-diag-line');
     if(!el){ el=document.createElement('div'); el.id='scan-diag-line';
-      el.style.cssText='font-size:10px;color:var(--muted);font-weight:700;margin-top:5px;line-height:1.5'; st.appendChild(el); }
-    el.textContent='⚙ moteur '+d.engine+' · '+d.res+' · '+d.frames+' essais'+(d.lastRaw?(' · lu: '+d.lastRaw):' · aucune lecture');
+      el.style.cssText='margin-top:9px;padding:9px 11px;border-radius:11px;background:rgba(13,31,13,.78);color:#fff;font-size:11px;font-weight:800;line-height:1.65;text-align:left;font-variant-numeric:tabular-nums;box-shadow:var(--ss)';
+      st.appendChild(el); }
+    // Détection « images figées » : le compteur d'essais n'augmente plus
+    const moving = d.frames>_diagPrevFrames;
+    if(!moving && d.frames>0) _diagStall++; else _diagStall=0;
+    _diagPrevFrames=d.frames;
+    // Verdict automatique
+    let verdict, col='#8be3c0';
+    if(!d.zxing){ verdict='❌ Moteur de lecture NON chargé — 1er lancement à faire avec du réseau (Wi-Fi/4G), puis rouvre.'; col='#ff8080'; }
+    else if(d.res==='—'){ verdict='⏳ Ouverture de la caméra…'; col='#ffd08a'; }
+    else if(_diagStall>=3){ verdict='⚠️ La caméra ne fournit pas d’images (figées). Ferme et relance le scan.'; col='#ffd08a'; }
+    else if(d.lastRaw){ verdict='✅ Code détecté ('+d.lastRaw+').'; col='#8be3c0'; }
+    else { verdict='🔍 Images OK, code pas encore lu → rapproche à ~8-12 cm, code BIEN À PLAT, plus de lumière. Sinon utilise « 🖼 Scanner via photo » (fiable).'; col='#ffd08a'; }
+    el.innerHTML =
+      '<div>⚙ Moteur : '+d.engine+' '+(d.zxing?'✓':'✗')+'</div>'+
+      '<div>📷 Caméra : '+d.res+'</div>'+
+      '<div>🔁 Tentatives : '+d.frames+'</div>'+
+      '<div>🔎 Dernière lecture : '+(d.lastRaw||'aucune')+'</div>'+
+      '<div style="margin-top:5px;color:'+col+'">'+verdict+'</div>';
   }, 400);
 }
 function stopScanDiag(){ if(_scanDiagTimer){ clearInterval(_scanDiagTimer); _scanDiagTimer=null; } const e=document.getElementById('scan-diag-line'); if(e) e.remove(); }
