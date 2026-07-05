@@ -479,7 +479,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
     <button class="lb" id="l-btn" onclick="doLogin()"><span id="l-btn-t">Se connecter</span></button>
     <div class="lerr" id="l-err"></div>
   </div>
-  <div class="lver">FreshControl v3.1 · Bunga.corp</div>
+  <div class="lver">FreshControl v3.2 · Bunga.corp</div>
 
   <!-- Bouton reset d'urgence — visible en bas de l'écran de connexion -->
   <div style="margin-top:18px;text-align:center">
@@ -2640,6 +2640,7 @@ const BarcodeEngine = (function(){
   let zxReader=null;
   let stream=null, videoEl=null, track=null, rafId=null, scanning=false;
   let onResultCb=null, recent=[], lastAccepted='', lastAcceptedT=0, grabCanvas=null;
+  let _frames=0, _lastRaw='';   // diagnostic scan live
 
   /* ---- ZXing avec hints (formats produits + TRY_HARDER) ---- */
   function zxHints(){
@@ -2719,16 +2720,26 @@ const BarcodeEngine = (function(){
   async function detectFrom(source){
     return (await tryNative(source)) || tryZx(source);
   }
-  // Capture d'une image vidéo, sous-échantillonnée pour alléger ZXing
+  // Capture d'une image vidéo (résolution quasi pleine pour garder les barres nettes)
   function grabFrame(video){
     const vw=video.videoWidth, vh=video.videoHeight;
     if(!vw || !vh) return null;
-    const max=1280, scale=vw>max ? max/vw : 1;
+    const max=1920, scale=vw>max ? max/vw : 1;
     const w=Math.round(vw*scale), h=Math.round(vh*scale);
     if(!grabCanvas) grabCanvas=document.createElement('canvas');
     grabCanvas.width=w; grabCanvas.height=h;
     grabCanvas.getContext('2d',{willReadFrequently:true}).drawImage(video,0,0,w,h);
     return grabCanvas;
+  }
+  /* Décodage ZXing d'une frame live : mêmes variantes que le repli photo
+     (le chemin photo décode bien) — plein cadre, puis recadrage centre
+     (= « zoom » sur le viseur, barres plus grandes), puis gris/contraste.
+     Rattrape autofocus mou / code-barres petit ou peu contrasté sur iOS. */
+  function zxScanFrame(video){
+    const g=grabFrame(video);
+    if(!g) return null;
+    const cc=centerCrop(g,0.6);   // zoom viseur : barres plus grandes ET image plus petite = plus rapide
+    return tryZx(cc) || tryZx(grayContrast(cc)) || tryZx(g);
   }
 
   /* ---- Confirmation : codes produits validés acceptés direct,
@@ -2810,9 +2821,9 @@ const BarcodeEngine = (function(){
         if(nativeDetector){
           code=await tryNative(videoEl);               // natif : rapide, image pleine
         }else{
-          const g=grabFrame(videoEl);                  // repli ZXing : image réduite
-          if(g) code=tryZx(g);
+          code=zxScanFrame(videoEl);                   // repli ZXing : multi-variantes (crop/contraste)
         }
+        _frames++; if(code) _lastRaw=code;             // diagnostic
         if(code && confirmHit(code)){
           const now=Date.now();
           if(!(code===lastAccepted && now-lastAcceptedT<2000)){
@@ -2829,6 +2840,7 @@ const BarcodeEngine = (function(){
     await getNative();
     if(!nativeDetector && !getZx()) throw new Error('no-engine');
     videoEl=video; onResultCb=onResult; recent=[]; lastAccepted=''; lastAcceptedT=0;
+    _frames=0; _lastRaw='';
     stream=await navigator.mediaDevices.getUserMedia({
       audio:false,
       video:{ facingMode:{ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080} }
@@ -2864,8 +2876,16 @@ const BarcodeEngine = (function(){
     if(!window._zxingFailed && typeof ZXing!=='undefined' && ZXing.BrowserMultiFormatReader) return true;
     return false;
   }
+  function getDiag(){
+    return {
+      engine: nativeDetector ? 'natif' : 'ZXing',
+      res: (videoEl && videoEl.videoWidth) ? (videoEl.videoWidth+'×'+videoEl.videoHeight) : '—',
+      frames: _frames,
+      lastRaw: _lastRaw
+    };
+  }
 
-  return { decodeImageFile, startLiveScan, stopLiveScan, hasTorch, setTorch, isAvailable };
+  return { decodeImageFile, startLiveScan, stopLiveScan, hasTorch, setTorch, isAvailable, getDiag };
 })();
 
 // Avertissement si catalogue vide au moment d'entrer dans le scanner
@@ -2898,6 +2918,23 @@ function checkCatalogueWarning(){
   }
 }
 
+/* Diagnostic live discret sous le viseur (moteur · résolution · essais · dernière
+   lecture brute). Permet de comprendre un scan qui ne lit pas sur un vrai
+   téléphone sans avoir accès à la console. */
+let _scanDiagTimer=null;
+function startScanDiag(stId){
+  stopScanDiag();
+  _scanDiagTimer=setInterval(()=>{
+    const st=document.getElementById(stId); if(!st) return;
+    const d=BarcodeEngine.getDiag();
+    let el=document.getElementById('scan-diag-line');
+    if(!el){ el=document.createElement('div'); el.id='scan-diag-line';
+      el.style.cssText='font-size:10px;color:var(--muted);font-weight:700;margin-top:5px;line-height:1.5'; st.appendChild(el); }
+    el.textContent='⚙ moteur '+d.engine+' · '+d.res+' · '+d.frames+' essais'+(d.lastRaw?(' · lu: '+d.lastRaw):' · aucune lecture');
+  }, 400);
+}
+function stopScanDiag(){ if(_scanDiagTimer){ clearInterval(_scanDiagTimer); _scanDiagTimer=null; } const e=document.getElementById('scan-diag-line'); if(e) e.remove(); }
+
 // ── Étape 1 : caméra live ──────────────────────────────────────────────────
 let scanTorchOn=false;
 
@@ -2918,6 +2955,7 @@ function startEanScan(){
   ).then(()=>{
     const tb=document.getElementById('scan-torch');
     if(tb) tb.style.display = BarcodeEngine.hasTorch() ? 'flex' : 'none';
+    startScanDiag('scan-st');
   }).catch(err=>{
     console.warn('Caméra scan:',err);
     st.innerHTML=`<div style="color:var(--o);font-weight:800;margin-bottom:4px">⚠️ Caméra inaccessible</div>
@@ -2927,6 +2965,7 @@ function startEanScan(){
 }
 
 function stopEanScan(){
+  stopScanDiag();
   BarcodeEngine.stopLiveScan();
   const wrap=document.getElementById('scan-cam-wrap'); if(wrap) wrap.style.display='none';
   const b=document.getElementById('scan-cam-btn'), s=document.getElementById('scan-cam-stop');
@@ -3180,6 +3219,7 @@ async function startCmdScan(){
     });
     const tb=document.getElementById('cmd-torch');
     if(tb) tb.style.display = BarcodeEngine.hasTorch() ? 'flex' : 'none';
+    startScanDiag('cmd-st');
   }catch(e){
     console.warn('Caméra commande:', e);
     if(st) st.innerHTML = '<div style="color:var(--o);font-weight:800">⚠️ Caméra inaccessible — utilisez « 🖼 Scanner via photo »</div>';
@@ -3189,6 +3229,7 @@ async function startCmdScan(){
 
 function stopCmdScan(){
   cmdScanning = false;
+  stopScanDiag();
   BarcodeEngine.stopLiveScan();
   const wrap = document.getElementById('cmd-cam-wrap');
   if(wrap) wrap.style.display = 'none';
