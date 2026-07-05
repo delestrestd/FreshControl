@@ -3,6 +3,8 @@
 *.xlsx
 *.xls
 *.csv
+*.pdf
+FreshControl_Catalogues/
 
 # Artefacts locaux
 *.bak
