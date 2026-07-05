@@ -240,6 +240,16 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .scan-torch{position:absolute;top:10px;right:10px;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(0,0,0,.45);color:#fff;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);z-index:2}
 .scan-torch.on{background:rgba(245,200,40,.92);color:#3a2c00;border-color:rgba(255,255,255,.85)}
 .scan-torch:active{transform:scale(.92)}
+/* Commande — pendant le scan : on supprime tout le « cadre autour » (icône,
+   titre, description, gros padding) et on COLLE le bloc en haut ; la caméra
+   garde sa taille, et la liste des articles défile dessous. */
+#cmd-scan-box.scanning{position:sticky;top:0;z-index:30;padding:10px 14px 12px;background:rgba(9,77,48,.97);backdrop-filter:blur(10px);box-shadow:0 8px 22px rgba(0,0,0,.32)}
+#cmd-scan-box.scanning::before{display:none}
+#cmd-scan-box.scanning .scan-step-icon,#cmd-scan-box.scanning .scan-step-title,#cmd-scan-box.scanning .scan-step-sub{display:none}
+#cmd-scan-box.scanning .scan-cam-wrap{margin:0 0 8px}
+#cmd-scan-box.scanning .scan-link-btn{color:#fff;border-color:rgba(255,255,255,.42)}
+#cmd-scan-box.scanning #cmd-st{color:#fff;margin-top:4px}
+#cmd-scan-box.scanning #scan-diag-line{font-size:10px;padding:6px 9px;line-height:1.45}
 .sbtn{display:inline-flex;align-items:center;gap:8px;padding:16px 28px;min-height:52px;border-radius:var(--rr);background:rgba(18,168,118,.92);color:#fff;font-size:16px;font-weight:900;cursor:pointer;font-family:var(--font);margin-top:14px;border:1px solid rgba(255,255,255,.32);box-shadow:var(--spec-d),var(--sg);transition:transform .15s,background .18s}
 .sbtn:hover{background:rgba(18,168,118,1)}
 .sbtn:active{transform:scale(.96)}
@@ -486,7 +496,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
     <button class="lb" id="l-btn" onclick="doLogin()"><span id="l-btn-t">Se connecter</span></button>
     <div class="lerr" id="l-err"></div>
   </div>
-  <div class="lver">FreshControl v3.8 · <span class="brand-logo" style="width:40px;height:18px;margin-left:4px"></span></div>
+  <div class="lver">FreshControl v3.9 · <span class="brand-logo" style="width:40px;height:18px;margin-left:4px"></span></div>
 
   <!-- Bouton reset d'urgence — visible en bas de l'écran de connexion -->
   <div style="margin-top:18px;text-align:center">
@@ -2981,11 +2991,8 @@ function startScanDiag(stId){
     else if(d.lastRaw){ verdict='✅ Code détecté ('+d.lastRaw+').'; col='#8be3c0'; }
     else { verdict='🔍 Images OK, code pas encore lu → rapproche à ~8-12 cm, code BIEN À PLAT, plus de lumière. Sinon utilise « 🖼 Scanner via photo » (fiable).'; col='#ffd08a'; }
     el.innerHTML =
-      '<div>⚙ Moteur : '+d.engine+' '+(d.zxing?'✓':'✗')+'</div>'+
-      '<div>📷 Caméra : '+d.res+'</div>'+
-      '<div>🔁 Tentatives : '+d.frames+'</div>'+
-      '<div>🔎 Dernière lecture : '+(d.lastRaw||'aucune')+'</div>'+
-      '<div style="margin-top:5px;color:'+col+'">'+verdict+'</div>';
+      '<div>⚙ '+d.engine+(d.zxing?' ✓':' ✗')+'  ·  📷 '+d.res+'  ·  🔁 '+d.frames+'  ·  🔎 '+(d.lastRaw||'—')+'</div>'+
+      '<div style="margin-top:3px;color:'+col+'">'+verdict+'</div>';
   }, 400);
 }
 function stopScanDiag(){ if(_scanDiagTimer){ clearInterval(_scanDiagTimer); _scanDiagTimer=null; } const e=document.getElementById('scan-diag-line'); if(e) e.remove(); }
@@ -3261,6 +3268,7 @@ async function startCmdScan(){
   document.getElementById('cmd-scan-btn').style.display = 'none';
   document.getElementById('cmd-stop-btn').style.display = 'inline-flex';
   if(wrap) wrap.style.display = 'block';
+  const box=document.getElementById('cmd-scan-box'); if(box) box.classList.add('scanning');
   if(st) st.textContent = 'Visez un code-barres…';
   cmdScanning = true;
   try{
@@ -3284,6 +3292,7 @@ function stopCmdScan(){
   BarcodeEngine.stopLiveScan();
   const wrap = document.getElementById('cmd-cam-wrap');
   if(wrap) wrap.style.display = 'none';
+  const box=document.getElementById('cmd-scan-box'); if(box) box.classList.remove('scanning');
   const b1 = document.getElementById('cmd-scan-btn'), b2 = document.getElementById('cmd-stop-btn');
   if(b1) b1.style.display = 'inline-flex';
   if(b2) b2.style.display = 'none';
