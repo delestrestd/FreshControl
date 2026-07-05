@@ -217,6 +217,9 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .scan-reset-btn:hover{background:rgba(255,255,255,.85);color:var(--txt)}
 /* ── Commande (lignes éditables) ─────────────────────────────────────── */
 .ord-line{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.64);border:1px solid rgba(255,255,255,.7);border-radius:14px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--spec)}
+.ord-name-in{width:100%;border:none;background:transparent;font-family:var(--font);font-size:13px;font-weight:800;color:var(--txt);padding:2px 0;border-bottom:1px dashed transparent;overflow:hidden;text-overflow:ellipsis}
+.ord-name-in:focus{outline:none;border-bottom-color:var(--bdr)}
+.ord-name-in::placeholder{color:var(--mutedx);font-weight:600}
 .ord-qty{display:flex;align-items:center;gap:4px;flex-shrink:0}
 .ord-qty button{width:30px;height:30px;border-radius:9px;border:1px solid var(--bdr);background:rgba(255,255,255,.85);color:var(--txt);font-size:17px;font-weight:900;cursor:pointer;font-family:var(--font);line-height:1;display:flex;align-items:center;justify-content:center}
 .ord-qty button:active{transform:scale(.92)}
@@ -483,7 +486,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
     <button class="lb" id="l-btn" onclick="doLogin()"><span id="l-btn-t">Se connecter</span></button>
     <div class="lerr" id="l-err"></div>
   </div>
-  <div class="lver">FreshControl v3.6 · <span class="brand-logo" style="width:40px;height:18px;margin-left:4px"></span></div>
+  <div class="lver">FreshControl v3.7 · <span class="brand-logo" style="width:40px;height:18px;margin-left:4px"></span></div>
 
   <!-- Bouton reset d'urgence — visible en bas de l'écran de connexion -->
   <div style="margin-top:18px;text-align:center">
@@ -933,7 +936,8 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
 
       <!-- Formulaire résultat scan -->
       <div id="scan-res">
-        <div class="rf-t">✅ <span id="rf-pn"></span></div>
+        <div class="rf-t">✅ Produit scanné</div>
+        <div class="rf-f"><div class="rf-l">Nom du produit</div><input class="rf-i" id="rf-pn" placeholder="Nom (optionnel — modifiable)"></div>
         <div class="rf-row">
           <div class="rf-f"><div class="rf-l">Gencod</div><input class="rf-i" id="rf-gc" readonly style="background:rgba(0,0,0,.04);color:var(--muted)"></div>
           <div class="rf-f"><div class="rf-l">Type / Marque</div><input class="rf-i" id="rf-ty" readonly style="background:rgba(0,0,0,.04);color:var(--muted)"></div>
@@ -3040,19 +3044,16 @@ function onEanDecoded(ean){
   if(st) st.textContent='';
 
   const produit = lookupGencod(ean);
-  if(produit){
-    // ✅ Trouvé dans le catalogue
-    handleScanResult({found:true, produit:produit.nom, gencod:produit.gencod, type_produit:produit.famille, marque:produit.marque});
-  } else {
-    // ❌ Gencod lu mais absent du catalogue → étape 2 : photo produit + saisie nom
-    document.getElementById('scan-ean-found').innerHTML =
-      `📦 Gencod <strong>${escapeHTML(ean)}</strong> lu — absent du catalogue<br>
-       <span style="font-size:11px;font-weight:600;opacity:.8">Photographiez l'emballage pour saisir le nom</span>`;
-    document.getElementById('scan-step1').style.display = 'none';
-    document.getElementById('scan-step2').style.display = 'block';
-    const apGc = document.getElementById('ap-gencod');
-    if(apGc) apGc.value = ean;
-  }
+  // Catalogue DÉCOUPLÉ : on va TOUJOURS à la saisie de date. Le nom est
+  // pré-rempli si le produit est au catalogue (bonus), sinon laissé vide et
+  // modifiable — jamais bloqué par « absent du catalogue ».
+  handleScanResult({
+    found: true,
+    produit: produit ? produit.nom : '',
+    gencod: ean,
+    type_produit: produit ? produit.famille : '',
+    marque: produit ? produit.marque : ''
+  });
 }
 
 // ── Étape 1 (repli) : décodage depuis une photo ────────────────────────────
@@ -3185,7 +3186,7 @@ function handleScanResult(data){
   const typeProd = data.type_produit || '';
   const marque   = data.marque  || '';
 
-  if(data.found!==true || !prodNom){
+  if(data.found!==true){
     const apGc = document.getElementById('ap-gencod');
     if(apGc && gencod) apGc.value = gencod;
     document.getElementById('nf-card').style.display = 'block';
@@ -3196,11 +3197,10 @@ function handleScanResult(data){
 
   document.getElementById('scan-step1').style.display = 'none';
   document.getElementById('scan-step2').style.display = 'none';
-  document.getElementById('rf-pn').textContent = prodNom;
+  document.getElementById('rf-pn').value = prodNom;
   document.getElementById('rf-gc').value        = gencod;
   document.getElementById('rf-ty').value        = typeProd + (marque ? ` · ${marque}` : '');
   document.getElementById('rf-dlc').value       = '';
-  document.getElementById('rf-mag').value       = selStore?.name || storeName || '';
   document.getElementById('scan-res').style.display = 'block';
   // Focus sur la date DLC
   setTimeout(()=>{ const dlc=document.getElementById('rf-dlc'); if(dlc) dlc.focus(); }, 150);
@@ -3324,8 +3324,14 @@ function onCmdDecode(ean){
     });
     return;
   }
-  // Code inconnu (hors catalogue) ou saisie manuelle → on demande le nom via la boîte.
-  cmdPending = { gencod: ean || '', famille: '' };
+  // Code SCANNÉ mais hors catalogue → ajout DIRECT (vitesse) : nom vide et
+  // modifiable sur la ligne, suppression si erreur. Pas de boîte de confirmation.
+  if(ean){
+    addOrderProduct({ gencod: ean, name: '', famille: 'Hors catalogue' });
+    return;
+  }
+  // Saisie manuelle (bouton, aucun gencod) → boîte nom + quantité.
+  cmdPending = { gencod: '', famille: '' };
   document.getElementById('cmd-qty-gc').value  = cmdPending.gencod || '—';
   document.getElementById('cmd-qty-fam').value = '';
   const manualInp = document.getElementById('cmd-qty-manualname');
@@ -3345,10 +3351,10 @@ function addOrderProduct(p, qty){
   const existing = p.gencod ? currentOrder.find(l => l.gencod === p.gencod) : null;
   let line;
   if(existing){ existing.qty += add; line = existing; }
-  else { line = { gencod: p.gencod || '', name: p.name || '—', famille: p.famille || '', qty: add }; currentOrder.push(line); }
+  else { line = { gencod: p.gencod || '', name: p.name || '', famille: p.famille || '', qty: add }; currentOrder.push(line); }
   lastAddedKey = line.gencod || line.name;
   renderOrderLines();
-  toast(`➕ ${line.name} · ${line.qty} colis`);
+  toast(`➕ ${line.name || line.gencod || 'Article'} · ${line.qty} colis`);
 }
 
 function addOrderLine(){
@@ -3371,6 +3377,10 @@ function changeOrderQty(idx, delta){
   const l = currentOrder[idx]; if(!l) return;
   l.qty = Math.max(1, l.qty + delta);
   renderOrderLines();
+}
+function setOrderName(idx, val){
+  const l = currentOrder[idx]; if(!l) return;
+  l.name = String(val || '').trim();
 }
 function setOrderQty(idx, val){
   const l = currentOrder[idx]; if(!l) return;
@@ -3401,7 +3411,7 @@ function renderOrderLines(){
     return `
     <div class="ord-line${flash}">
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(l.name||'—')}</div>
+        <input class="ord-name-in" value="${escapeHTML(l.name||'')}" placeholder="Nom (optionnel)" onchange="setOrderName(${i},this.value)" aria-label="Nom du produit">
         <div style="font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(l.gencod||'sans gencod')}${l.famille?' · '+escapeHTML(l.famille):''}</div>
       </div>
       <div style="flex-shrink:0">
@@ -3426,7 +3436,7 @@ function buildOrderText(lines, meta){
     meta.by ? `Préparée par : ${meta.by}` : '',
     '', 'Produits :', '',
   ].filter((x,idx)=> x!=='' || idx>2);
-  lines.forEach(l => out.push(`- ${l.name}  (${l.gencod||'sans gencod'})  ×${l.qty} colis`));
+  lines.forEach(l => out.push(`- ${l.name || l.gencod || 'sans nom'}  (${l.gencod||'sans gencod'})  ×${l.qty} colis`));
   const totalQty = lines.reduce((s,l)=>s+l.qty, 0);
   out.push('', `Total : ${lines.length} référence(s) · ${totalQty} colis`, '', '— FreshControl');
   return out.join('\n');
@@ -3626,7 +3636,7 @@ function saveProduct(){
 
   const p = {
     id:         genId(),
-    name:       document.getElementById('rf-pn').textContent,
+    name:       document.getElementById('rf-pn').value.trim() || document.getElementById('rf-gc').value,
     gencod:     document.getElementById('rf-gc').value,
     type:       document.getElementById('rf-ty').value,
     dlc,
