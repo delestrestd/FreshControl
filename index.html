@@ -153,6 +153,18 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .store-badge.on{display:block}
 .store-badge-lbl{font-size:10px;font-weight:900;color:rgba(255,255,255,.85);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
 .store-badge-name{font-size:14px;font-weight:900;color:#fff;letter-spacing:-.2px}
+/* ── BARRE MAGASIN (détection GPS auto) ───────────────────────────────── */
+.sbar{display:flex;align-items:center;gap:10px;background:rgba(18,168,118,.9);backdrop-filter:blur(14px);border-radius:var(--rr);padding:10px 12px 10px 14px;border:1px solid rgba(255,255,255,.34);box-shadow:var(--spec-d),var(--sg);margin-bottom:13px;min-height:48px}
+.sbar.warn{background:rgba(163,99,0,.9)}
+.sbar.err{background:rgba(176,32,32,.86)}
+.sbar.idle{background:rgba(70,92,82,.72)}
+.sbar-ico{font-size:18px;flex-shrink:0;line-height:1}
+.sbar-main{flex:1;min-width:0;cursor:pointer;display:flex;flex-direction:column;gap:1px;-webkit-tap-highlight-color:transparent}
+.sbar-nm{font-size:14px;font-weight:900;color:#fff;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sbar-sub{font-size:9.5px;font-weight:800;color:rgba(255,255,255,.82);text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sbar-act{flex-shrink:0;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.38);color:#fff;font-size:12px;font-weight:900;padding:9px 13px;min-height:38px;border-radius:var(--rr);cursor:pointer;font-family:var(--font);white-space:nowrap;display:inline-flex;align-items:center;gap:5px;-webkit-tap-highlight-color:transparent;transition:transform .12s,background .18s}
+.sbar-act:active{transform:scale(.94)}
+.sbar.locating .sbar-ico{animation:pulse 1.2s ease-in-out infinite}
 
 /* ── STAT CARDS ─────────────────────────────────────────────────────── */
 .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px}
@@ -496,7 +508,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
     <button class="lb" id="l-btn" onclick="doLogin()"><span id="l-btn-t">Se connecter</span></button>
     <div class="lerr" id="l-err"></div>
   </div>
-  <div class="lver">FreshControl v3.9 · <span class="brand-logo" style="width:40px;height:18px;margin-left:4px"></span></div>
+  <div class="lver">FreshControl v3.10 · <span class="brand-logo" style="width:40px;height:18px;margin-left:4px"></span></div>
 
   <!-- Bouton reset d'urgence — visible en bas de l'écran de connexion -->
   <div style="margin-top:18px;text-align:center">
@@ -630,6 +642,10 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
         </button>
       </div>
     </div>
+    <button onclick="useMyPositionInModal()"
+      style="width:100%;margin-bottom:10px;padding:12px;border-radius:var(--rr);border:1px solid rgba(18,168,118,.3);background:rgba(18,168,118,.12);color:var(--gd);font-size:13px;font-weight:900;cursor:pointer;font-family:var(--font)">
+      📍 Utiliser ma position actuelle
+    </button>
     <div id="sm-geo-results" style="margin-bottom:10px"></div>
     <div class="rf-row" id="sm-coord-row">
       <div class="rf-f">
@@ -879,11 +895,8 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
     <!-- SCANNER -->
     <div id="tab-scanner" class="tab">
 
-      <!-- Magasin configuré (1 seul) -->
-      <div id="store-badge" class="store-badge">
-        <div class="store-badge-lbl">🏪 Magasin</div>
-        <div id="store-badge-name" class="store-badge-name"></div>
-      </div>
+      <!-- Magasin détecté automatiquement par GPS -->
+      <div class="sbar idle" data-storebar></div>
 
       <!-- ÉTAPE 1 : Scan code-barres (caméra live + repli photo) -->
       <div class="scan-box" id="scan-step1">
@@ -961,6 +974,9 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
 
     <!-- COMMANDE -->
     <div id="tab-commande" class="tab">
+
+      <!-- Magasin détecté automatiquement par GPS -->
+      <div class="sbar idle" data-storebar></div>
 
       <!-- Scan (caméra live + fallback photo) -->
       <div class="scan-box" id="cmd-scan-box">
@@ -1094,6 +1110,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
             <div class="rf-l">Adresse</div>
             <div class="af-row"><input class="af-in" id="as-addr" placeholder="Rue, Ville" style="flex:1"><button class="af-add" onclick="geocodeAddr()" id="geo-btn">🔍 Trouver</button></div>
           </div>
+          <button class="af-add" onclick="useMyPositionAdmin()" style="width:100%;padding:11px;background:rgba(18,168,118,.12);color:var(--gd);border:1px solid rgba(18,168,118,.3)">📍 Utiliser ma position actuelle</button>
           <div id="geo-results"></div>
           <div class="af-row" id="as-coord-row" style="display:none">
             <input class="af-in" id="as-lat" type="number" step="0.0001" placeholder="Latitude">
@@ -1125,17 +1142,14 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       <div class="adm-sec">
         <div class="adm-t">⚙️ Configuration magasin & système</div>
 
-        <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">🏪 Identité du magasin</div>
+        <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">🏪 Identité (enseigne)</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:10px;line-height:1.55">Le <b>magasin où vous scannez</b> est détecté automatiquement par GPS parmi vos magasins (section 🏪 Magasins ci-dessus). Ici, seulement l'enseigne globale pour le branding.</div>
 
         <div class="af-row" style="gap:7px;margin-bottom:7px">
           <input class="af-in" id="adm-store-emoji" placeholder="🌿" style="width:60px;flex:none;text-align:center;font-size:20px" maxlength="4">
-          <input class="rf-i" id="adm-store-name" placeholder="Nom du magasin — ex: Carrefour Aubagne" style="flex:1">
+          <input class="rf-i" id="adm-store-enseigne" placeholder="Enseigne — ex: Carrefour, Intermarché" style="flex:1">
         </div>
-        <div class="af-row" style="gap:7px;margin-bottom:7px">
-          <input class="rf-i" id="adm-store-enseigne" placeholder="Enseigne — ex: Carrefour, Monoprix, Intermarché" style="flex:1">
-          <input class="rf-i" id="adm-store-region" placeholder="Région — ex: PACA" style="flex:1">
-        </div>
-        <div class="rf-f"><div class="rf-l">Ville</div><input class="rf-i" id="adm-store-ville" placeholder="Ex: Aubagne"></div>
+        <div class="rf-f"><div class="rf-l">Région</div><input class="rf-i" id="adm-store-region" placeholder="Ex: PACA"></div>
 
         <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:14px 0 8px">📧 E-mails alertes & rapports</div>
         <div class="rf-f"><div class="rf-l">Responsable magasin</div><input class="rf-i" id="adm-email-resp" type="email" placeholder="responsable@enseigne.fr"></div>
@@ -1246,45 +1260,66 @@ let gasUrl    = localStorage.getItem('fc_gas_url')     || '';
 let emailResp = localStorage.getItem('fc_email_resp')  || '';
 let emailFin  = localStorage.getItem('fc_email_fin')   || '';
 
-// stores = tableau réactif dérivé du magasin unique configuré
-function getStores(){
-  if(!storeName) return [];
-  const lat = parseFloat(localStorage.getItem('fc_store_lat'));
-  const lng = parseFloat(localStorage.getItem('fc_store_lng'));
-  const r   = parseInt(localStorage.getItem('fc_store_rad'),10) || 500;
-  return [{ id:'s0', name:storeName, address:storeVille,
-            lat: Number.isFinite(lat)?lat:0, lng: Number.isFinite(lng)?lng:0, r }];
+// ── MAGASINS : liste multi-magasin + magasin actif (détecté par GPS) ─────────
+function loadStores(){
+  try{ const a=JSON.parse(localStorage.getItem('fc_stores')||'[]'); return Array.isArray(a)?a:[]; }
+  catch(e){ return []; }
 }
-let stores   = getStores();
-let selStore = storeName ? { name: storeName } : null;
+function saveStores(list){ localStorage.setItem('fc_stores', JSON.stringify(list)); }
+// Migration douce de l'ancien mono-magasin (fc_store_*) vers la liste fc_stores
+(function migrateStores(){
+  if(localStorage.getItem('fc_stores')) return;         // déjà migré
+  const nm = (localStorage.getItem('fc_store_name')||'').trim();
+  if(!nm){ saveStores([]); return; }
+  const lat=parseFloat(localStorage.getItem('fc_store_lat'));
+  const lng=parseFloat(localStorage.getItem('fc_store_lng'));
+  const r  =parseInt(localStorage.getItem('fc_store_rad'),10)||500;
+  const st={ id:'s'+Date.now(), name:nm, ville:localStorage.getItem('fc_store_ville')||'',
+             lat:Number.isFinite(lat)?lat:null, lng:Number.isFinite(lng)?lng:null, r };
+  saveStores([st]);
+  localStorage.setItem('fc_active_store', st.id);
+})();
+function getStores(){ return loadStores(); }
 
-/* Persiste le magasin unique (nom + ville + coordonnées GPS optionnelles)
-   et rafraîchit le branding. Centralise ce que faisaient — sans rien écrire —
-   addStore() / addStoreFromModal(). */
-function persistStore({ name, ville, lat, lng, rad } = {}){
-  if(name  !== undefined) storeName  = name  || '';
-  if(ville !== undefined) storeVille = ville || '';
-  localStorage.setItem('fc_store_name',  storeName);
-  localStorage.setItem('fc_store_ville', storeVille);
-  if(Number.isFinite(lat)) localStorage.setItem('fc_store_lat', String(lat));
-  if(Number.isFinite(lng)) localStorage.setItem('fc_store_lng', String(lng));
-  if(Number.isFinite(rad)) localStorage.setItem('fc_store_rad', String(rad));
-  stores   = getStores();
-  selStore = storeName ? { name: storeName } : null;
-  const hs = document.getElementById('hdr-sub');
+let stores = getStores();
+// Magasin actif : restauré via fc_active_store, sinon l'unique magasin s'il n'y en a qu'un
+let selStore = (function(){
+  const id = localStorage.getItem('fc_active_store');
+  let s = id ? getStores().find(x=>x.id===id) : null;
+  if(!s){ const l=getStores(); if(l.length===1) s=l[0]; }
+  return s || null;
+})();
+storeName  = selStore?.name  || '';
+storeVille = selStore?.ville || '';
+
+/* Définit le magasin actif (choisi par GPS ou manuellement) et rafraîchit tout
+   l'affichage. storeName/storeVille restent un miroir (compat. code existant). */
+function setActiveStore(s, opts){
+  opts = opts || {};
+  selStore  = s || null;
+  storeName = s ? (s.name  || '') : '';
+  storeVille= s ? (s.ville || '') : '';
+  if(s) localStorage.setItem('fc_active_store', s.id);
+  else  localStorage.removeItem('fc_active_store');
+  const hs=document.getElementById('hdr-sub');
   if(hs) hs.textContent = [storeEnseigne, storeName].filter(Boolean).join(' · ') || 'FreshControl';
+  const rfm=document.getElementById('rf-mag'); if(rfm) rfm.value = storeName;
   updateSplashBranding();
-  showStoreBadge();
+  renderStoreBars();
+  if(opts.toastIt && s) toast('📍 '+s.name);
 }
-function clearStore(){
-  storeName = ''; storeVille = '';
-  ['fc_store_name','fc_store_ville','fc_store_lat','fc_store_lng','fc_store_rad']
-    .forEach(k => localStorage.removeItem(k));
-  stores = getStores(); selStore = null;
-  const hs = document.getElementById('hdr-sub');
-  if(hs) hs.textContent = [storeEnseigne].filter(Boolean).join(' · ') || 'FreshControl';
-  updateSplashBranding();
-  showStoreBadge();
+function createStore(o){
+  o=o||{};
+  const list=getStores();
+  const st={ id:'s'+Date.now(), name:(o.name||'').trim(), ville:o.ville||'',
+             lat:Number.isFinite(o.lat)?o.lat:null, lng:Number.isFinite(o.lng)?o.lng:null,
+             r:parseInt(o.r,10)||500 };
+  list.push(st); saveStores(list); stores=list;
+  return st;
+}
+function removeStore(id){
+  const list=getStores().filter(s=>s.id!==id); saveStores(list); stores=list;
+  if(selStore && selStore.id===id) setActiveStore(list.length===1 ? list[0] : null);
 }
 
 /* ── HIÉRARCHIE GRANDE DISTRIBUTION ──────────────────────────────────────
@@ -1423,9 +1458,7 @@ function applyLang(){
   // lang buttons
   document.querySelectorAll('.lang-btn,.lsb').forEach(b=>{b.classList.remove('on')});
   document.querySelectorAll(`[onclick*="setLang('${lang}')"]`).forEach(b=>b.classList.add('on'));
-  // gps
-  const gp=document.getElementById('gps-txt');
-  if(gp&&gp.textContent===I18N[lang==='fr'?'en':'fr']?.gps_load) gp.textContent=t.gps_load;
+  renderStoreBars();
 }
 
 /* ═══ AUTH ══════════════════════════════════════════════════════════════════ */
@@ -1458,11 +1491,7 @@ function doLogout(){
   session=null;
   sessionStorage.removeItem('fc_session');
   stopCmdScan(); currentOrder=[]; // libère caméra + commande non validée
-  // Clear GPS watch so it restarts fresh on next login
-  if(gpsWid!==null){navigator.geolocation.clearWatch(gpsWid);gpsWid=null}
-  clearTimeout(gpsTimer);
-  gps=null; selStore=storeName?{name:storeName}:null;
-  // GPS pill removed from scanner
+  stopGPS(); gps=null; gpsState='idle'; // le GPS redémarre au prochain login
   closeSB();
   document.getElementById('app').classList.remove('on');
   document.getElementById('splash').classList.remove('off');
@@ -1501,11 +1530,10 @@ function launchApp(){
   if(tbAdm) tbAdm.style.display = isAdminRole() ? 'flex' : 'none';
   if(sbAdm) sbAdm.style.display = isAdminRole() ? 'flex' : 'none';
 
-  // Charger config admin
-  const sn=document.getElementById('adm-store-name');    if(sn) sn.value=storeName;
+  // Charger config admin (identité globale : enseigne/emoji/région ; les magasins
+  // sont une liste gérée à part et détectée par GPS)
   const se=document.getElementById('adm-store-emoji');   if(se) se.value=storeEmoji;
   const sei=document.getElementById('adm-store-enseigne');if(sei) sei.value=storeEnseigne;
-  const sv=document.getElementById('adm-store-ville');   if(sv) sv.value=storeVille;
   const sr=document.getElementById('adm-store-region');  if(sr) sr.value=storeRegion;
   const gr=document.getElementById('adm-email-resp');    if(gr) gr.value=emailResp;
   const gf=document.getElementById('adm-email-finance'); if(gf) gf.value=emailFin;
@@ -1531,6 +1559,9 @@ function launchApp(){
 function rgpdYes(){
   document.getElementById('rgpd').classList.add('off');
   document.getElementById('hdr-sub').textContent = [storeEnseigne, storeName].filter(Boolean).join(' · ') || 'FreshControl';
+  // Consentement donné (geste utilisateur) → démarrer la détection GPS du magasin
+  startGPS();
+  renderStoreBars();
   // Sync automatique si catalogue vide ou ancien (silencieuse)
   autoSyncCatalogue();
   checkStartup();
@@ -1548,128 +1579,58 @@ function rgpdNo(){
   sessionStorage.removeItem('fc_session');
 }
 
-/* ═══ GPS — robuste iOS/Android ═════════════════════════════════════════════
-   Stratégie : bouton "Localiser" déclenche le GPS sur geste utilisateur.
-   watchPosition seul (plus fiable que getCurrentPosition sur iOS).
-   Timeout 20s. Pas d'auto-démarrage silencieux.
+/* ═══ GPS — détection AUTOMATIQUE du magasin (iOS/Android) ════════════════════
+   watchPosition en continu (le plus fiable sur iOS). À chaque position on
+   cherche le magasin enregistré dans le rayon duquel on se trouve et on
+   l'active tout seul → aucun choix manuel. Démarre après le consentement RGPD.
 ═══════════════════════════════════════════════════════════════════════════ */
-let gps=null, gpsWid=null, gpsTimer=null;
+let gps=null, gpsWid=null, gpsLastFix=null;
+let gpsState='idle';   // idle | locating | ok | nomatch | denied | unavailable
 
-function triggerGPS(){
-  if(!navigator.geolocation){
-    setGPSErr('GPS non disponible');
-    return;
-  }
-  // Annuler éventuellement le watch précédent
-  if(gpsWid!==null){ navigator.geolocation.clearWatch(gpsWid); gpsWid=null; }
-  clearTimeout(gpsTimer);
-
-  showGPSLoading();
-  document.getElementById('gps-trigger-btn').textContent = '⏳';
-  document.getElementById('gps-trigger-btn').disabled    = true;
-
-  // watchPosition est plus fiable que getCurrentPosition sur iOS Safari
-  let firstFix = true;
+function startGPS(manual){
+  if(!navigator.geolocation){ gpsState='unavailable'; renderStoreBars(); return; }
+  if(gpsWid!==null){ if(manual) renderStoreBars(); return; }   // déjà en cours
+  gpsState='locating'; renderStoreBars();
   gpsWid = navigator.geolocation.watchPosition(
-    pos => {
-      clearTimeout(gpsTimer);
-      document.getElementById('gps-trigger-btn').textContent = '📍 Localiser';
-      document.getElementById('gps-trigger-btn').disabled    = false;
-      onGPSOK(pos, firstFix);
-      firstFix = false;
-    },
+    pos => applyGpsFix(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy),
     err => {
-      if(!firstFix) return; // ignorer erreurs après premier fix
-      clearTimeout(gpsTimer);
-      document.getElementById('gps-trigger-btn').textContent = '📍 Localiser';
-      document.getElementById('gps-trigger-btn').disabled    = false;
-      onGPSFail(err);
+      if(err.code===1)  gpsState='denied';
+      else if(!gps)     gpsState='unavailable';
+      renderStoreBars();
+      if(manual && err.code===1 && /iphone|ipad|ipod/i.test(navigator.userAgent)){
+        setTimeout(()=>toast('iOS : Réglages → Confidentialité → Localisation → activez pour Safari'),500);
+      }
     },
-    {
-      enableHighAccuracy: false, // false = plus rapide et plus fiable sur iOS !
-      timeout:            20000,
-      maximumAge:         0,     // toujours une position fraîche
-    }
+    { enableHighAccuracy:false, timeout:20000, maximumAge:15000 }
   );
-
-  // Timeout de sécurité 20s
-  gpsTimer = setTimeout(()=>{
-    if(!gps){
-      if(gpsWid!==null){ navigator.geolocation.clearWatch(gpsWid); gpsWid=null; }
-      document.getElementById('gps-trigger-btn').textContent = '📍 Localiser';
-      document.getElementById('gps-trigger-btn').disabled    = false;
-      setGPSErr('GPS : délai dépassé — choisissez manuellement');
-    }
-  }, 21000);
 }
+function stopGPS(){ if(gpsWid!==null){ navigator.geolocation.clearWatch(gpsWid); gpsWid=null; } }
+function relocateGPS(){ stopGPS(); gps=null; gpsState='locating'; renderStoreBars(); startGPS(true); }
 
-function showGPSLoading(){
-  const p=document.getElementById('gps-pill');
-  if(!p) return;
-  if(p){ p.style.display='inline-flex'; p.classList.remove('gps-err'); }
-  const gt=document.getElementById('gps-txt');
-  if(gt) gt.textContent='📡 Localisation…';
-  const dot=document.getElementById('gps-dot');
-  if(dot) dot.style.animation='pulse 1.2s ease-in-out infinite';
-}
-
-function onGPSOK(pos, updateStore=true){
-  gps={lat:pos.coords.latitude, lng:pos.coords.longitude, acc:Math.round(pos.coords.accuracy||0)};
-  const found = findNearestStore(gps.lat, gps.lng);
-  const pill  = document.getElementById('gps-pill');
-  if(!pill) return;
-  if(pill){ pill.style.display='inline-flex'; pill.classList.remove('gps-err'); }
-  const dot = document.getElementById('gps-dot');
-  if(dot) dot.style.animation='';
-
-  if(found && updateStore){
-    document.getElementById('gps-txt').textContent = '📍 '+found.name;
-    document.getElementById('hdr-sub').textContent = found.name;
-    selStore = found;
-    const sel = document.getElementById('store-sel');
-    if(sel && sel.value !== found.id){ sel.value = found.id; }
-    const rfm = document.getElementById('rf-mag');
-    if(rfm && !rfm.value) rfm.value = found.name;
-  } else if(!found){
-    const acc  = gps.acc ? ` ±${gps.acc}m` : '';
-    document.getElementById('gps-txt').textContent = `📍 ${gps.lat.toFixed(4)}, ${gps.lng.toFixed(4)}${acc}`;
-    document.getElementById('hdr-sub').textContent = T().gps_no_store;
-    if(updateStore){
-      // Clignoter le sélecteur
-      const sel = document.getElementById('store-sel');
-      if(sel){ sel.style.outline='2px solid rgba(245,158,11,.8)';
-               setTimeout(()=>sel.style.outline='',3000); }
-    }
+/* Une position arrive → activer automatiquement le magasin où l'on se trouve. */
+function applyGpsFix(lat,lng,acc){
+  gps={lat,lng,acc:Math.round(acc||0)};
+  gpsLastFix={lat,lng};
+  const found=findNearestStore(lat,lng);
+  if(found){
+    gpsState='ok';
+    if(!selStore || selStore.id!==found.id) setActiveStore(found,{toastIt:true});
+    else renderStoreBars();
+  }else{
+    gpsState='nomatch';       // on est ailleurs qu'un magasin connu
+    renderStoreBars();
   }
 }
 
-function onGPSFail(err){
-  const msg = err.code===1
-    ? T().gps_denied
-    : (err.code===2 ? 'GPS indisponible' : 'Délai GPS dépassé');
-  setGPSErr(msg);
-  if(err.code===1 && /iphone|ipad|ipod/i.test(navigator.userAgent)){
-    setTimeout(()=>toast('iOS : Réglages → Safari → Localisation → Autoriser'),700);
-  }
-}
-
-function setGPSErr(msg){
-  const p=document.getElementById('gps-pill');
-  if(!p) return;
-  if(p){ p.style.display='inline-flex'; p.classList.add('gps-err'); }
-  const gt=document.getElementById('gps-txt');
-  if(gt) gt.textContent = msg;
-  document.getElementById('hdr-sub').textContent = T().gps_no_store;
-}
-
-function retryGPS(){ triggerGPS(); }
-
+/* Magasin enregistré le plus proche DONT on est dans le rayon (sinon null). */
 function findNearestStore(lat,lng){
+  let best=null, bestD=Infinity;
   for(const s of getStores()){
+    if(!Number.isFinite(s.lat)||!Number.isFinite(s.lng)) continue;
     const d=dist(lat,lng,s.lat,s.lng);
-    if(d<(s.r||500)) return s;
+    if(d<=(s.r||500) && d<bestD){ best=s; bestD=d; }
   }
-  return null;
+  return best;
 }
 function dist(a,b,c,d){
   const R=6371000,dA=(c-a)*Math.PI/180,dB=(d-b)*Math.PI/180;
@@ -1691,8 +1652,11 @@ function showTab(n){
   if(t) t.classList.add('on');
   if(b) b.classList.add('on');
   curTab=n;
+  if(n==='scanner'||n==='commande'){
+    if(gpsWid===null && gpsState!=='denied') startGPS(); // relance la détection si besoin
+    renderStoreBars();
+  }
   if(n==='scanner'){
-    showStoreBadge();
     checkCatalogueWarning();
   }
   if(n==='commande') renderCommande();
@@ -1714,46 +1678,85 @@ function renderCurrentTab(){
 function toggleSB(){ document.getElementById('sb').classList.toggle('on'); }
 function closeSB(){ document.getElementById('sb').classList.remove('on'); }
 
-/* ═══ STORE SELECTOR ════════════════════════════════════════════════════════ */
-function refreshStoreSel(){
-  // Mode mono-magasin : pas de dropdown à remplir
-  fillStoreDL();
-}
+/* ═══ MAGASIN — barre + sélecteur ════════════════════════════════════════════ */
+function refreshStoreSel(){ fillStoreDL(); }
 function fillStoreDL(){
-  const opt = storeName ? `<option value="${storeName}">` : '';
+  const opts = getStores().map(s=>`<option value="${escapeHTMLAttr(s.name)}">`).join('');
   ['store-list-dl','store-list-dl2'].forEach(id=>{
     const dl=document.getElementById(id);
-    if(dl) dl.innerHTML=opt;
+    if(dl) dl.innerHTML=opts;
   });
 }
-function onStoreSel(id){
-  const s=getStores().find(x=>x.id===id);
-  selStore=s||null;
-  const rfm=document.getElementById('rf-mag');
-  if(rfm) rfm.value=s?s.name:'';
-  if(s){
-    document.getElementById('hdr-sub').textContent=s.name;
-    const p=document.getElementById('gps-pill');
-  if(!p) return;
-    p.classList.remove('gps-err');
-    document.getElementById('gps-txt').textContent='🏪 '+s.name;
-    document.getElementById('gps-rbtn').style.display='none';
-  }
+
+/* État affiché par la barre magasin, dérivé du GPS + du magasin actif. */
+function storeBarState(){
+  const n = getStores().length;
+  if(gpsState==='locating') return {cls:'locating',ico:'📡',nm:'Localisation…',sub:'Recherche du magasin GPS',act:null};
+  if(selStore && gpsState==='ok')     return {cls:'',    ico:'📍',nm:selStore.name,sub:'Détecté automatiquement',act:{lbl:'↻',fn:'relocateGPS()'}};
+  if(gpsState==='nomatch')            return {cls:'warn',ico:'📍',nm:'Nouveau lieu',    sub:'Hors de vos magasins',act:{lbl:'➕ Enregistrer ici',fn:'registerStoreHere()'}};
+  if(selStore)                        return {cls:'',    ico:'🏪',nm:selStore.name,sub:'Magasin sélectionné',    act:{lbl:'📍 Localiser',fn:'relocateGPS()'}};
+  if(gpsState==='denied')             return {cls:'err', ico:'📍',nm:'GPS refusé',      sub:'Autorisez la localisation',act:{lbl:'Choisir',fn:'openStoresManager()'}};
+  if(gpsState==='unavailable')        return {cls:'idle',ico:'🏪',nm:n?'Choisir un magasin':'Aucun magasin',sub:'GPS indisponible',act:{lbl:n?'Choisir':'➕ Ajouter',fn:'openStoresManager()'}};
+  return {cls:'idle',ico:'🏪',nm:n?'Choisir un magasin':'Aucun magasin',sub:'Touchez pour localiser',act:{lbl:'📍 Localiser',fn:'relocateGPS()'}};
 }
-// Store search modal
+function renderStoreBars(){
+  const st=storeBarState();
+  document.querySelectorAll('[data-storebar]').forEach(bar=>{
+    bar.className='sbar'+(st.cls?' '+st.cls:'');
+    bar.innerHTML=
+      `<span class="sbar-ico">${st.ico}</span>`+
+      `<div class="sbar-main" onclick="openStoresManager()">`+
+        `<div class="sbar-nm">${escapeHTML(st.nm)}</div>`+
+        `<div class="sbar-sub">${escapeHTML(st.sub)}</div>`+
+      `</div>`+
+      (st.act?`<button class="sbar-act" onclick="event.stopPropagation();${st.act.fn}">${st.act.lbl}</button>`:'');
+  });
+}
+function openStoresManager(){ openModal('stores-modal'); renderStoresModal(); }
+
+/* « Enregistrer ce magasin ici » : pré-remplit la position GPS actuelle dans le
+   formulaire d'ajout, il ne reste qu'à saisir le nom. */
+function registerStoreHere(){
+  openStoresManager();
+  if(gpsLastFix){
+    const la=document.getElementById('sm-lat'), lo=document.getElementById('sm-lng');
+    if(la) la.value=gpsLastFix.lat.toFixed(5);
+    if(lo) lo.value=gpsLastFix.lng.toFixed(5);
+    toast('📍 Position pré-remplie — nommez ce magasin');
+  }
+  setTimeout(()=>document.getElementById('sm-name')?.focus(),150);
+}
+/* Remplit lat/lng d'un formulaire avec la position actuelle (bouton « Ma position »). */
+function fillMyPosition(latId,lngId,rowId){
+  const set=(la,lo)=>{ const a=document.getElementById(latId),b=document.getElementById(lngId);
+    if(a)a.value=la.toFixed(5); if(b)b.value=lo.toFixed(5);
+    if(rowId){const r=document.getElementById(rowId); if(r) r.style.display='flex';}
+    toast('📍 Position actuelle'); };
+  if(gpsLastFix){ set(gpsLastFix.lat,gpsLastFix.lng); return; }
+  if(!navigator.geolocation){ toast('GPS indisponible'); return; }
+  toast('📡 Localisation…');
+  navigator.geolocation.getCurrentPosition(
+    p=>{ gpsLastFix={lat:p.coords.latitude,lng:p.coords.longitude}; set(p.coords.latitude,p.coords.longitude); },
+    e=>toast('❌ GPS : '+(e.code===1?'refusé':'indisponible')),
+    {enableHighAccuracy:false,timeout:15000,maximumAge:10000}
+  );
+}
+function useMyPositionInModal(){ fillMyPosition('sm-lat','sm-lng'); }
+function useMyPositionAdmin(){ fillMyPosition('as-lat','as-lng','as-coord-row'); }
+// Sélection depuis la modale de recherche (ssm)
 function filterSSM(q){
   const list=document.getElementById('ssm-list');
-  const res=getStores().filter(s=>!q||s.name.toLowerCase().includes(q.toLowerCase())||(s.address||'').toLowerCase().includes(q.toLowerCase()));
+  const res=getStores().filter(s=>!q||s.name.toLowerCase().includes(q.toLowerCase())||(s.ville||'').toLowerCase().includes(q.toLowerCase()));
   if(!res.length){list.innerHTML='<div class="empty">Aucun magasin</div>';return}
   list.innerHTML=res.map(s=>`<div class="ssm-it" data-sid="${escapeHTMLAttr(s.id)}" onclick="pickStore(this.dataset.sid)">
     <div style="font-size:13px;font-weight:800">${escapeHTML(s.name)}</div>
-    ${s.address?`<div style="font-size:11px;color:var(--muted);margin-top:2px;font-weight:600">📍 ${escapeHTML(s.address)}</div>`:''}
+    ${s.ville?`<div style="font-size:11px;color:var(--muted);margin-top:2px;font-weight:600">📍 ${escapeHTML(s.ville)}</div>`:''}
   </div>`).join('');
 }
 function pickStore(id){
   closeModal('ssm');
-  const sel=document.getElementById('store-sel');
-  if(sel){sel.value=id;onStoreSel(id);}
+  const s=getStores().find(x=>x.id===id);
+  if(s) setActiveStore(s,{toastIt:true});
 }
 
 /* ═══ DASHBOARD ══════════════════════════════════════════════════════════════ */
@@ -3672,29 +3675,41 @@ function openStoresModal(){
 
 function renderStoresModal(){
   const el=document.getElementById('stores-modal-list');
-  if(!getStores().length){
-    el.innerHTML='<div style="font-size:13px;color:var(--muted);padding:6px 0;font-weight:600;text-align:center">Aucun magasin — ajoutez-en un ci-dessous</div>';
+  const list=getStores();
+  if(!list.length){
+    el.innerHTML='<div style="font-size:13px;color:var(--muted);padding:6px 0;font-weight:600;text-align:center">Aucun magasin — ajoutez-en un ci-dessous.<br>Le GPS détectera ensuite où vous êtes automatiquement.</div>';
     return;
   }
-  el.innerHTML=getStores().map(s=>`
-    <div style="display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid rgba(0,0,0,.05)">
-      <div style="font-size:26px;flex-shrink:0;margin-top:3px">🏪</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:14px;font-weight:800;color:var(--txt)">${escapeHTML(s.name)}</div>
-        ${s.address?`<div style="font-size:11px;color:var(--muted);margin-top:2px;font-weight:600">📍 ${escapeHTML(s.address)}</div>`:''}
-        <div style="font-size:11px;color:var(--muted);margin-top:1px;font-weight:600">${s.lat.toFixed(4)}, ${s.lng.toFixed(4)} · rayon ${s.r||500}m</div>
+  el.innerHTML=list.map(s=>{
+    const active=selStore&&selStore.id===s.id;
+    const coord=Number.isFinite(s.lat)&&Number.isFinite(s.lng);
+    return `<div style="display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid rgba(0,0,0,.05)">
+      <div data-sid="${escapeHTMLAttr(s.id)}" onclick="selectStoreFromModal(this.dataset.sid)" style="flex:1;min-width:0;cursor:pointer;display:flex;align-items:flex-start;gap:10px">
+        <div style="font-size:24px;flex-shrink:0;margin-top:2px">${active?'📍':'🏪'}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:800;color:var(--txt)">${escapeHTML(s.name)}${active?' <span style="color:var(--gd);font-size:10px;font-weight:900;letter-spacing:.5px">· ACTIF</span>':''}</div>
+          ${s.ville?`<div style="font-size:11px;color:var(--muted);margin-top:2px;font-weight:600">📍 ${escapeHTML(s.ville)}</div>`:''}
+          <div style="font-size:11px;color:var(--muted);margin-top:1px;font-weight:600">${coord?`${s.lat.toFixed(4)}, ${s.lng.toFixed(4)} · rayon ${s.r||500}m`:'⚠ sans position GPS — non détectable'}</div>
+        </div>
       </div>
       <button data-sid="${escapeHTMLAttr(s.id)}" onclick="confirmDeleteStoreModal(this.dataset.sid)"
         style="border:1px solid rgba(224,60,60,.28);background:rgba(224,60,60,.1);color:var(--r);
                border-radius:9px;width:32px;height:32px;cursor:pointer;font-size:14px;flex-shrink:0">🗑</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+}
+function selectStoreFromModal(id){
+  const s=getStores().find(x=>x.id===id); if(!s) return;
+  setActiveStore(s,{toastIt:true});
+  renderStoresModal();
+  closeModal('stores-modal');
 }
 
 function confirmDeleteStoreModal(id){
   const s=getStores().find(x=>x.id===id);if(!s)return;
   showConfirm(`Supprimer "${s.name}" ?`,'Les produits déjà scannés gardent le nom du magasin.',()=>{
-    clearStore();
-    refreshStoreSel(); renderStoresModal(); renderAdmin();
+    removeStore(id);
+    renderStoresModal(); renderStoreBars(); renderAdmin();
     toast(T().deleted);
   });
 }
@@ -3736,13 +3751,14 @@ function addStoreFromModal(){
   const lng=parseFloat(document.getElementById('sm-lng').value);
   const r=parseInt(document.getElementById('sm-rad').value)||500;
   if(!name){toast('❌ Nom obligatoire');return}
-  if(isNaN(lat)||isNaN(lng)){toast('❌ Lat/Lng requis — utilisez 🔍 Trouver ou saisissez manuellement');return}
-  persistStore({ name, ville:addr, lat, lng, rad:r });
+  if(isNaN(lat)||isNaN(lng)){toast('❌ Position requise — 🔍 Trouver, 📍 Ma position, ou saisie manuelle');return}
+  const st=createStore({ name, ville:addr, lat, lng, r });
+  setActiveStore(st,{toastIt:false});          // le nouveau magasin devient actif
   refreshStoreSel();
   ['sm-name','sm-addr','sm-lat','sm-lng'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('sm-rad').value='500';
   document.getElementById('sm-geo-results').innerHTML='';
-  renderStoresModal(); renderAdmin();
+  renderStoresModal(); renderStoreBars(); renderAdmin();
   toast(T().store_added);
 }
 
@@ -3832,7 +3848,6 @@ function renderAdmin(){
   renderUserAdmin();
   document.querySelectorAll('.lsb').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll(`[onclick*="setLang('${lang}')"]`).forEach(b=>b.classList.add('on'));
-  const sn=document.getElementById('adm-store-name');  if(sn) sn.value=storeName;
   const gr=document.getElementById('adm-email-resp');  if(gr) gr.value=emailResp;
   const gf=document.getElementById('adm-email-finance');if(gf) gf.value=emailFin;
   const gu=document.getElementById('adm-gas-url');     if(gu) gu.value=gasUrl;
@@ -3843,17 +3858,22 @@ function renderAdmin(){
 function renderStoreAdmin(){
   const el=document.getElementById('store-admin-list');
   if(!el) return;
-  if(!storeName){
-    el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px 0">Renseignez le nom du magasin dans Configuration.</div>';
+  const list=getStores();
+  const btn=`<button onclick="openStoresManager()" style="margin-top:9px;width:100%;padding:12px;border-radius:var(--rr);background:rgba(18,168,118,.14);border:1px solid rgba(18,168,118,.3);color:var(--gd);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font)">🏪 Gérer mes magasins</button>`;
+  if(!list.length){
+    el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px 0;line-height:1.6">Aucun magasin enregistré. Ajoutez vos magasins : le GPS détectera automatiquement celui où vous êtes.</div>'+btn;
     return;
   }
-  el.innerHTML=`<div class="adm-row">
-      <div class="adm-ico">🏪</div>
+  el.innerHTML=list.map(s=>{
+    const active=selStore&&selStore.id===s.id;
+    return `<div class="adm-row">
+      <div class="adm-ico">${active?'📍':'🏪'}</div>
       <div class="adm-info">
-        <div class="adm-nm">${escapeHTML(storeName)}</div>
-        <div class="adm-sb">Magasin unique — modifiable dans Configuration</div>
+        <div class="adm-nm">${escapeHTML(s.name)}${active?' <span style="color:var(--gd);font-size:10px;font-weight:900">· ACTIF</span>':''}</div>
+        <div class="adm-sb">${s.ville?escapeHTML(s.ville)+' · ':''}${Number.isFinite(s.lat)?'GPS ✓':'⚠ sans GPS'}</div>
       </div>
     </div>`;
+  }).join('')+btn;
 }
 
 function renderUserAdmin(){
@@ -3900,19 +3920,20 @@ function addStore(){
     document.getElementById('as-coord-row').style.display='flex';
     toast('❌ Cliquez 🔍 Trouver ou saisissez lat/lng');return;
   }
-  persistStore({ name, ville:addr, lat, lng, rad:r });
+  const st=createStore({ name, ville:addr, lat, lng, r });
+  setActiveStore(st,{toastIt:false});
   refreshStoreSel();
   ['as-name','as-addr','as-lat','as-lng'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('as-rad').value='500';
   document.getElementById('geo-results').innerHTML='';
   document.getElementById('as-coord-row').style.display='none';
-  renderAdmin();toast(T().store_added);
+  renderStoreBars();renderAdmin();toast(T().store_added);
 }
 function confirmDeleteStore(id){
   const s=getStores().find(x=>x.id===id);if(!s)return;
   showConfirm(`Supprimer "${s.name}" ?`,'Ce magasin sera retiré de la liste.',()=>{
-    clearStore();
-    refreshStoreSel();renderAdmin();toast(T().deleted);
+    removeStore(id);
+    renderStoreBars();renderAdmin();toast(T().deleted);
   });
 }
 
@@ -3950,29 +3971,26 @@ function openEditUser(idOrIdx){
   },50);
 }
 function saveConfig(){
-  storeName    = document.getElementById('adm-store-name')?.value.trim()    || '';
+  // Le nom/ville du magasin ne sont plus ici : les magasins sont une liste gérée
+  // dans « Gérer mes magasins » et le magasin actif est détecté par GPS.
+  // Ici on ne configure que l'identité globale (enseigne/emoji/région) + backend.
   storeEmoji   = document.getElementById('adm-store-emoji')?.value.trim()   || '🌿';
   storeEnseigne= document.getElementById('adm-store-enseigne')?.value.trim()|| '';
   storeRegion  = document.getElementById('adm-store-region')?.value.trim()  || '';
-  storeVille   = document.getElementById('adm-store-ville')?.value.trim()   || '';
   emailResp    = document.getElementById('adm-email-resp')?.value.trim()    || '';
   emailFin     = document.getElementById('adm-email-finance')?.value.trim() || '';
   gasUrl       = document.getElementById('adm-gas-url')?.value.trim()       || '';
-  localStorage.setItem('fc_store_name',     storeName);
   localStorage.setItem('fc_store_emoji',    storeEmoji);
   localStorage.setItem('fc_store_enseigne', storeEnseigne);
   localStorage.setItem('fc_store_region',   storeRegion);
-  localStorage.setItem('fc_store_ville',    storeVille);
   localStorage.setItem('fc_email_resp',     emailResp);
   localStorage.setItem('fc_email_fin',      emailFin);
   localStorage.setItem('fc_gas_url',        gasUrl);
   localStorage.setItem('fc_popup', document.getElementById('adm-popup')?.checked ? '1':'0');
-  stores   = getStores();
-  selStore = storeName ? { name: storeName } : null;
   // Mettre à jour le branding header + splash
   document.getElementById('hdr-sub').textContent = [storeEnseigne, storeName].filter(Boolean).join(' · ') || 'FreshControl';
   updateSplashBranding();
-  showStoreBadge();
+  renderStoreBars();
   toast(T().saved);
 }
 
@@ -3994,18 +4012,8 @@ async function testGAS(){
   }
 }
 
-function showStoreBadge(){
-  const badge = document.getElementById('store-badge');
-  const name  = document.getElementById('store-badge-name');
-  if(!badge||!name) return;
-  if(storeName){
-    badge.classList.add('on');
-    name.textContent = storeName;
-    document.getElementById('hdr-sub').textContent = storeName;
-  } else {
-    badge.classList.remove('on');
-  }
-}
+// Conservé pour compatibilité : la barre magasin remplace l'ancien badge.
+function showStoreBadge(){ renderStoreBars(); }
 
 /* ═══ STARTUP POPUP ══════════════════════════════════════════════════════════ */
 function checkStartup(){
