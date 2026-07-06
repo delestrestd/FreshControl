@@ -99,7 +99,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 /* ── RGPD sheet ────────────────────────────────────────────────────── */
 #rgpd{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;backdrop-filter:blur(6px)}
 #rgpd.off{display:none}
-.rgpd-sh{background:rgba(255,255,255,.85);backdrop-filter:blur(28px) saturate(180%);border-radius:var(--rl2) var(--rl2) 0 0;padding:24px 20px 36px;max-height:72vh;overflow-y:auto;width:100%;border-top:1px solid rgba(255,255,255,.7);box-shadow:var(--spec),0 -8px 36px rgba(0,0,0,.14)}
+.rgpd-sh{background:rgba(255,255,255,.85);backdrop-filter:blur(28px) saturate(180%);border-radius:var(--rl2) var(--rl2) 0 0;padding:24px 20px 36px;max-height:72vh;max-height:72dvh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;width:100%;border-top:1px solid rgba(255,255,255,.7);box-shadow:var(--spec),0 -8px 36px rgba(0,0,0,.14)}
 .rgpd-t{font-size:17px;font-weight:900;margin-bottom:9px}
 .rgpd-p{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:20px;font-weight:600}
 .rgpd-row{display:flex;gap:9px}
@@ -121,7 +121,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .hmenu{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.32);color:#fff;width:40px;height:40px;border-radius:12px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:var(--spec-d);transition:background .18s}
 .hmenu:hover{background:rgba(255,255,255,.3)}
 .hmenu:active{transform:scale(.94)}
-#main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 13px calc(var(--tab-h)+12px)}
+#main{flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:14px 13px calc(var(--tab-h) + 12px)}
 .tab{display:none}.tab.on{display:block;animation:fadeIn .2s ease}
 #tbar{background:rgba(240,255,248,.62);backdrop-filter:blur(28px) saturate(200%);-webkit-backdrop-filter:blur(28px) saturate(200%);border-top:1px solid rgba(255,255,255,.7);box-shadow:inset 0 1px 0 rgba(255,255,255,.88),0 -3px 28px rgba(0,0,0,.07);height:var(--tab-h);display:flex;flex-shrink:0}
 .tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;background:transparent;font-size:11px;font-weight:800;color:rgba(13,31,13,.55);cursor:pointer;font-family:var(--font);transition:color .15s;-webkit-tap-highlight-color:transparent;padding-bottom:5px;letter-spacing:.2px;min-height:44px}
@@ -342,7 +342,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
 /* ── MODALS ──────────────────────────────────────────────────────────── */
 .modal-bg{position:fixed;inset:0;z-index:750;display:none;align-items:flex-end;backdrop-filter:blur(7px);background:rgba(0,0,0,.3)}
 .modal-bg.on{display:flex;animation:fadeIn .22s ease}
-.modal-sh{background:rgba(255,255,255,.82);backdrop-filter:blur(30px) saturate(200%);border-radius:var(--rl2) var(--rl2) 0 0;width:100%;max-width:500px;margin:0 auto;padding:22px 18px 36px;max-height:88vh;overflow-y:auto;border:1px solid rgba(255,255,255,.72);border-bottom:none;box-shadow:var(--spec),0 -10px 44px rgba(0,0,0,.16)}
+.modal-sh{background:rgba(255,255,255,.82);backdrop-filter:blur(30px) saturate(200%);border-radius:var(--rl2) var(--rl2) 0 0;width:100%;max-width:500px;margin:0 auto;padding:22px 18px 36px;max-height:88vh;max-height:88dvh;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border:1px solid rgba(255,255,255,.72);border-bottom:none;box-shadow:var(--spec),0 -10px 44px rgba(0,0,0,.16)}
 /* ── Variante plein écran pour les longs textes (Mentions légales / RGPD)
    Mobile : occupe 100% de la hauteur viewport dynamique (gère la barre
    d'adresse iOS qui apparaît/disparaît) et respecte les safe-areas
@@ -363,7 +363,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
   background:rgba(255,255,255,.96);backdrop-filter:blur(12px);
   border-bottom:1px solid rgba(0,0,0,.06)
 }
-.modal-bg.full > .modal-sh > div:not(.mhd-row){flex:1;overflow-y:auto;padding-top:14px;-webkit-overflow-scrolling:touch}
+.modal-bg.full > .modal-sh > div:not(.mhd-row){flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding-top:14px;-webkit-overflow-scrolling:touch}
 
 @media (min-width:760px){
   .modal-bg.full{align-items:flex-start;padding:36px 24px}
@@ -378,7 +378,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
 }
 .modal-center{position:fixed;inset:0;z-index:750;display:none;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(7px);background:rgba(0,0,0,.3)}
 .modal-center.on{display:flex;animation:fadeIn .22s ease}
-.modal-card{background:rgba(255,255,255,.85);backdrop-filter:blur(30px) saturate(200%);border-radius:var(--rl2);width:100%;max-width:400px;max-height:80vh;overflow:hidden;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.72);box-shadow:var(--spec),0 20px 60px rgba(0,0,0,.22)}
+.modal-card{background:rgba(255,255,255,.85);backdrop-filter:blur(30px) saturate(200%);border-radius:var(--rl2);width:100%;max-width:400px;max-height:80vh;max-height:80dvh;overflow:hidden;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.72);box-shadow:var(--spec),0 20px 60px rgba(0,0,0,.22)}
 .mhd{padding:18px 18px 14px;border-bottom:1px solid rgba(0,0,0,.05)}
 .mhd-row{display:flex;align-items:center;justify-content:space-between}
 .mhd-t{font-size:17px;font-weight:900;letter-spacing:-.4px}
@@ -654,7 +654,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
   <div class="modal-sh">
     <div class="mhd-row" style="margin-bottom:13px"><div class="mhd-t">🔍 Rechercher un magasin</div><button class="mcl" onclick="closeModal('ssm')" aria-label="Fermer">✕</button></div>
     <input class="rf-i" id="ssm-q" placeholder="Nom ou ville…" oninput="filterSSM(this.value)">
-    <div id="ssm-list" style="margin-top:10px;max-height:55vh;overflow-y:auto"></div>
+    <div id="ssm-list" style="margin-top:10px"></div>
   </div>
 </div>
 
@@ -4128,6 +4128,29 @@ function toolCSV(){
   const a=document.createElement('a');a.href=url;a.download=`FreshControl_${new Date().toISOString().slice(0,10)}.csv`;a.click();
   URL.revokeObjectURL(url);toast(T().csv_ok);
 }
+
+/* ═══ VERROU DE DÉFILEMENT iOS ═══════════════════════════════════════════════
+   Le body est déjà position:fixed, mais iOS Safari continue de « rebondir » le
+   viewport (rubber-band) quand un geste ne trouve rien à faire défiler. On bloque
+   donc tout touchmove qui NE part PAS d'un conteneur réellement défilable
+   (vertical OU horizontal). Les vrais scrollers (#main, .modal-sh, .mbody,
+   .sb-body, .frow…) restent libres. No-op tant qu'on est sur le splash/login. */
+(function installScrollLock(){
+  const scrollable = el => {
+    for(let n=el; n && n!==document.body && n.nodeType===1; n=n.parentElement){
+      const s=getComputedStyle(n);
+      if(n.scrollHeight>n.clientHeight+1 && /(auto|scroll)/.test(s.overflowY)) return true;
+      if(n.scrollWidth >n.clientWidth +1 && /(auto|scroll)/.test(s.overflowX)) return true;
+    }
+    return false;
+  };
+  document.addEventListener('touchmove', e => {
+    const app=document.getElementById('app');
+    if(!app || !app.classList.contains('on')) return; // splash/login : laisser faire
+    if(e.touches && e.touches.length>1) return;        // pincement : laisser faire
+    if(!scrollable(e.target)) e.preventDefault();      // rien à défiler → pas de rebond
+  }, {passive:false});
+})();
 
 /* ═══ MODALS ═════════════════════════════════════════════════════════════════ */
 function openModal(id){document.getElementById(id).classList.add('on')}
