@@ -222,6 +222,8 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .pact-ed:hover{background:rgba(59,130,246,.2)}
 .pact-dl{background:rgba(224,60,60,.12);border-color:rgba(224,60,60,.32);color:var(--rd)}
 .pact-dl:hover{background:rgba(224,60,60,.2)}
+.pact-abs{background:rgba(217,119,6,.12);border-color:rgba(217,119,6,.34);color:#B45309}
+.pact-abs:hover{background:rgba(217,119,6,.2)}
 
 /* ── SCANNER ─────────────────────────────────────────────────────────── */
 .gps-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(18,168,118,.82);border-radius:var(--rr);padding:8px 14px;font-size:12px;font-weight:800;color:#fff;margin-bottom:14px;border:1px solid rgba(255,255,255,.28);box-shadow:var(--spec-d),var(--sg)}
@@ -296,6 +298,12 @@ select.store-sel option{background:#0A6B47;color:#fff}
 .rf-i:hover:not(:focus):not([readonly]){background:rgba(255,255,255,.82)}
 .rf-i:focus{border-color:rgba(18,168,118,.65);background:rgba(255,255,255,.88);box-shadow:var(--spec),var(--foc)}
 .rf-i[readonly]{cursor:default}
+/* iOS Safari : input[type=date] s'attribue une largeur intrinseque native qui
+   ignore width:100% et fait deborder l'encart a droite. On neutralise l'apparence
+   native et on autorise le retrecissement pour qu'il respecte la largeur du conteneur. */
+.rf-i[type="date"]{-webkit-appearance:none;appearance:none;min-width:0;max-width:100%;overflow:hidden}
+.rf-i[type="date"]::-webkit-date-and-time-value{text-align:left;margin:0;padding:0}
+.rf-i[type="date"]::-webkit-calendar-picker-indicator{margin-left:auto;flex-shrink:0}
 .rf-row{display:flex;flex-wrap:wrap;gap:9px}.rf-row .rf-f{flex:1 1 120px;min-width:0}
 .rfsave{width:100%;padding:15px;min-height:50px;border-radius:var(--rr);background:rgba(18,168,118,.92);color:#fff;border:1px solid rgba(255,255,255,.28);font-size:15px;font-weight:900;cursor:pointer;font-family:var(--font);margin-top:3px;box-shadow:var(--spec-d),var(--sg);transition:transform .13s,background .18s,box-shadow .18s}
 .rfsave:hover{background:rgba(18,168,118,1)}
@@ -681,6 +689,28 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       </div>
     </div>
     <button class="rfsave" onclick="addStoreFromModal()" style="font-size:14px;padding:13px">➕ Ajouter ce magasin</button>
+  </div>
+</div>
+
+<!-- ═══ DOSSIERS MAGASINS ═══════════════════════════════════════════════ -->
+<div id="folders-modal" class="modal-bg">
+  <div class="modal-sh">
+    <div class="mhd-row" style="margin-bottom:14px">
+      <div class="mhd-t" id="folders-title">🗂 Dossiers magasins</div>
+      <button class="mcl" onclick="closeModal('folders-modal')" aria-label="Fermer">✕</button>
+    </div>
+    <div id="folders-body"></div>
+  </div>
+</div>
+
+<!-- ═══ ÉTAT DES STOCKS (départ vs réel) ════════════════════════════════ -->
+<div id="stockstate-modal" class="modal-bg">
+  <div class="modal-sh">
+    <div class="mhd-row" style="margin-bottom:14px">
+      <div class="mhd-t">📊 État des stocks</div>
+      <button class="mcl" onclick="closeModal('stockstate-modal')" aria-label="Fermer">✕</button>
+    </div>
+    <div id="stockstate-body"></div>
   </div>
 </div>
 
@@ -1115,6 +1145,9 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
         <div id="stk-st" class="scan-step-status"></div>
       </div>
 
+      <!-- Stock de départ (baseline) + accès à l'état réel -->
+      <div id="stk-base" style="margin:2px 2px 12px"></div>
+
       <!-- Liste du relevé de stock en cours -->
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 2px 10px">
         <div style="font-size:14px;font-weight:900;color:#fff">📦 Stock en cours <span id="stk-count" style="opacity:.85;font-weight:700"></span></div>
@@ -1286,15 +1319,13 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
     </div>
   </div>
 
+  <!-- Menu du bas : uniquement les 4 usages terrain quotidiens (aéré).
+       Tableau / Planning / Catalogue / Administration restent dans le menu ☰. -->
   <div id="tbar">
-    <button class="tb on" id="tb-d" onclick="showTab('dashboard')"><span class="tb-i">📊</span><span id="tl-d">Tableau</span></button>
-    <button class="tb" id="tb-s" onclick="showTab('scanner')"><span class="tb-i">📷</span><span id="tl-s">Scanner</span></button>
+    <button class="tb" id="tb-s" onclick="showTab('scanner')"><span class="tb-i">🌿</span><span id="tl-s">Fresh</span></button>
     <button class="tb" id="tb-c" onclick="showTab('commande')"><span class="tb-i">🛒</span><span id="tl-c">Commande</span></button>
     <button class="tb" id="tb-stk" onclick="showTab('stocks')"><span class="tb-i">📦</span><span id="tl-stk">Stocks</span></button>
     <button class="tb" id="tb-a" onclick="showTab('alertes')"><span class="tb-i">🔔</span><span id="tl-a">Alertes</span></button>
-    <button class="tb" id="tb-p" onclick="showTab('planning')"><span class="tb-i">📅</span><span id="tl-p">Planning</span></button>
-    <button class="tb" id="tb-cat" onclick="showTab('catalogue')"><span class="tb-i">📚</span><span id="tl-cat">Catalogue</span></button>
-    <button class="tb" id="tb-adm" onclick="showTab('admin')" style="display:none"><span class="tb-i">⚙️</span><span>Admin</span></button>
   </div>
 </div>
 
@@ -1306,7 +1337,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
     <div class="sb-body">
       <div class="sb-sec">Navigation</div>
       <div class="sb-it" onclick="showTab('dashboard');closeSB()"><div class="sb-ic">📊</div>Tableau de bord</div>
-      <div class="sb-it" onclick="showTab('scanner');closeSB()"><div class="sb-ic">📷</div>Scanner</div>
+      <div class="sb-it" onclick="showTab('scanner');closeSB()"><div class="sb-ic">🌿</div>Fresh</div>
       <div class="sb-it" onclick="showTab('commande');closeSB()"><div class="sb-ic">🛒</div>Commande</div>
       <div class="sb-it" onclick="showTab('stocks');closeSB()"><div class="sb-ic">📦</div>Stocks</div>
       <div class="sb-it" onclick="showTab('alertes');closeSB()"><div class="sb-ic">🔔</div>Alertes</div>
@@ -1315,6 +1346,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       <div class="sb-it" id="sb-adm" onclick="showTab('admin');closeSB()" style="display:none"><div class="sb-ic">⚙️</div>Administration</div>
       <div class="sb-sec">Outils</div>
       <div class="sb-it" onclick="openStoresModal();closeSB()"><div class="sb-ic">🏪</div>Gestion des magasins</div>
+      <div class="sb-it" onclick="openFolders();closeSB()"><div class="sb-ic">🗂</div>Dossiers magasins</div>
       <div class="sb-it" onclick="openEmailModal(null);closeSB()"><div class="sb-ic">📧</div>Récap alertes par magasin</div>
       <div class="sb-it" onclick="toolCSV();closeSB()"><div class="sb-ic">📥</div>Exporter CSV</div>
       <div class="sb-it" onclick="openModal('archive-modal');renderArchive();closeSB()"><div class="sb-ic">🗂</div>Historique / Archive</div>
@@ -1487,7 +1519,7 @@ const I18N={
   ldlc:'Date limite (DLC)',rfsave:'💾 Enregistrer',rfcancel:'Annuler',
   nft:'Produit non référencé',nfsub:"Ce gencod n'est pas dans le catalogue.",nfbtn:'Nouveau scan',
   gps_load:'Localisation…',gps_denied:'GPS refusé — sélection manuelle',gps_err:'Erreur GPS',gps_retry:'Réessayer',gps_no_store:'Hors zone magasin — sélection manuelle',
-  tl_d:'Tableau',tl_s:'Scanner',tl_c:'Commande',tl_stk:'Stocks',tl_a:'Alertes',tl_p:'Planning',
+  tl_d:'Tableau',tl_s:'Fresh',tl_c:'Commande',tl_stk:'Stocks',tl_a:'Alertes',tl_p:'Planning',
   badge_e:'Périmé',badge_o:'J-{{d}}',badge_w:'J-{{d}}',badge_k:'J-{{d}}',
   send_all:'📧 Envoyer le récap global',su_t:'⚠️ Alertes produits',su_p:'Produits expirés ou critiques détectés',
   em_t:'📧 Envoyer un rappel',em_sub:'Rappel e-mail des produits urgents',em_to:'Destinataire(s)',em_subj:'Objet',em_body:'Corps du message',em_cancel:'Annuler',su_mail:'📧 Envoyer par mail',su_cl:'Fermer',
@@ -1501,7 +1533,7 @@ const I18N={
   ldlc:'Expiry date',rfsave:'💾 Save',rfcancel:'Cancel',
   nft:'Product not found',nfsub:"This barcode isn't in the catalogue.",nfbtn:'New scan',
   gps_load:'Locating…',gps_denied:'GPS denied — manual selection',gps_err:'GPS error',gps_retry:'Retry',gps_no_store:'Outside store zone — manual selection',
-  tl_d:'Dashboard',tl_s:'Scanner',tl_c:'Order',tl_stk:'Stock',tl_a:'Alerts',tl_p:'Planning',
+  tl_d:'Dashboard',tl_s:'Fresh',tl_c:'Order',tl_stk:'Stock',tl_a:'Alerts',tl_p:'Planning',
   badge_e:'Expired',badge_o:'D-{{d}}',badge_w:'D-{{d}}',badge_k:'D-{{d}}',
   send_all:'📧 Send global recap',su_t:'⚠️ Product alerts',su_p:'Expired or critical products detected',
   em_t:'📧 Send reminder',em_sub:'Email reminder for urgent products',em_to:'Recipient(s)',em_subj:'Subject',em_body:'Message',em_cancel:'Cancel',su_mail:'📧 Send by email',su_cl:'Close',
@@ -1515,7 +1547,7 @@ const I18N={
   ldlc:'Fecha caducidad',rfsave:'💾 Guardar',rfcancel:'Cancelar',
   nft:'Producto no encontrado',nfsub:"Este código no está en el catálogo.",nfbtn:'Nuevo escaneo',
   gps_load:'Localizando…',gps_denied:'GPS denegado — selección manual',gps_err:'Error GPS',gps_retry:'Reintentar',gps_no_store:'Fuera de zona — selección manual',
-  tl_d:'Panel',tl_s:'Escáner',tl_c:'Pedido',tl_stk:'Existencias',tl_a:'Alertas',tl_p:'Planif.',
+  tl_d:'Panel',tl_s:'Fresh',tl_c:'Pedido',tl_stk:'Existencias',tl_a:'Alertas',tl_p:'Planif.',
   badge_e:'Caducado',badge_o:'D-{{d}}',badge_w:'D-{{d}}',badge_k:'D-{{d}}',
   send_all:'📧 Enviar resumen global',su_t:'⚠️ Alertas productos',su_p:'Productos caducados o críticos',
   em_t:'📧 Enviar recordatorio',em_sub:'Recordatorio de productos urgentes',em_to:'Destinatario',em_subj:'Asunto',em_body:'Mensaje',em_cancel:'Cancelar',su_mail:'📧 Enviar por correo',su_cl:'Cerrar',
@@ -1529,7 +1561,7 @@ const I18N={
   ldlc:'有效期',rfsave:'💾 保存',rfcancel:'取消',
   nft:'产品未找到',nfsub:"此条形码不在目录中。",nfbtn:'重新扫描',
   gps_load:'定位中…',gps_denied:'GPS被拒绝 — 手动选择',gps_err:'GPS错误',gps_retry:'重试',gps_no_store:'不在门店范围内 — 手动选择',
-  tl_d:'仪表盘',tl_s:'扫描',tl_c:'订单',tl_stk:'库存',tl_a:'警报',tl_p:'计划',
+  tl_d:'仪表盘',tl_s:'Fresh',tl_c:'订单',tl_stk:'库存',tl_a:'警报',tl_p:'计划',
   badge_e:'已过期',badge_o:'还剩{{d}}天',badge_w:'还剩{{d}}天',badge_k:'还剩{{d}}天',
   send_all:'📧 发送全局摘要',su_t:'⚠️ 产品警报',su_p:'检测到过期或紧急产品',
   em_t:'📧 发送提醒',em_sub:'紧急产品邮件提醒',em_to:'收件人',em_subj:'主题',em_body:'邮件内容',em_cancel:'取消',su_mail:'📧 发送邮件',su_cl:'关闭',
@@ -1932,7 +1964,8 @@ function renderDashboard(){
       <div class="pc-rt">
         <span class="pbadge ${bc}">${escapeHTML(bt)}</span>
         <div class="pact-row">
-          <button class="pact pact-ok" data-id="${sid}" onclick="archiveProd(this.dataset.id)" aria-label="Archiver" title="Marquer traité">✓</button>
+          <button class="pact pact-ok" data-id="${sid}" onclick="archiveProd(this.dataset.id)" aria-label="Archiver (traité)" title="Traité — géré/retiré">✓</button>
+          <button class="pact pact-abs" data-id="${sid}" onclick="archiveProd(this.dataset.id,'Absent')" aria-label="Absent du rayon" title="Abs — non présent en rayon">∅</button>
           <button class="pact pact-ed" data-id="${sid}" onclick="openEditProd(this.dataset.id)" aria-label="Modifier" title="Modifier">✏️</button>
           <button class="pact pact-dl" data-id="${sid}" onclick="confirmDeleteProd(this.dataset.id)" aria-label="Supprimer" title="Supprimer">🗑</button>
         </div>
@@ -1948,15 +1981,16 @@ function el(tag,cls){const e=document.createElement(tag);e.className=cls;return 
 function findProd(id){ return products.find(x=>String(x.id)===String(id)); }
 function findProdIdx(id){ return products.findIndex(x=>String(x.id)===String(id)); }
 
-function archiveProd(id){
+function archiveProd(id, note){
   const p=findProd(id); if(!p)return;
+  const st = note || 'Traité';            // 'Traité' (géré) ou 'Absent' (pas en rayon)
   const el=document.getElementById('pc-'+String(id));
   if(el){el.style.transition='opacity .28s,transform .28s';el.style.opacity='0';el.style.transform='translateX(36px)'}
   setTimeout(()=>{
-    archive.unshift({...p,archivedAt:new Date().toISOString(),archivedBy:session?.username||'?',note:'Traité'});
+    archive.unshift({...p,archivedAt:new Date().toISOString(),archivedBy:session?.username||'?',note:st});
     products=products.filter(x=>String(x.id)!==String(id));
     save('fc_products',products);save('fc_archive',archive);
-    renderDashboard();toast(T().prod_archived);
+    renderDashboard();toast(st==='Absent'?'∅ Marqué absent du rayon':T().prod_archived);
   },280);
 }
 
@@ -3836,6 +3870,7 @@ function deleteOrder(id){
    ═══════════════════════════════════════════════════════════════════════════ */
 function renderStock(){
   showStoreBadge();
+  renderStockBase();
   renderStockLines();
 }
 
@@ -4117,6 +4152,166 @@ function deleteStock(id){
     renderStocksHistory();
     toast(T().deleted);
   });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DOSSIERS MAGASINS — historique rangé par magasin. Un magasin = un dossier ;
+   sous-dossiers Commandes / Stocks / Fresh-Scan (archive traité·absent). Filtré
+   sur le nom du magasin, déjà porté par chaque enregistrement (orders.store /
+   stockRecords.store / archive.magasin / products.magasin).
+   ═══════════════════════════════════════════════════════════════════════════ */
+function openFolders(){ openModal('folders-modal'); renderFolders(); }
+
+function folderCounts(name){
+  return {
+    cmd: orders.filter(o=>o.store===name).length,
+    stk: stockRecords.filter(r=>r.store===name).length,
+    scanEnCours: products.filter(p=>p.magasin===name).length,
+    scanArch: archive.filter(a=>a.magasin===name).length,
+  };
+}
+function renderFolders(){
+  const t=document.getElementById('folders-title'); if(t) t.textContent='🗂 Dossiers magasins';
+  const el=document.getElementById('folders-body'); if(!el) return;
+  const list=getStores();
+  if(!list.length){ el.innerHTML='<div class="empty">Aucun magasin — ajoutez-en un via « Gestion des magasins ».</div>'; return; }
+  el.innerHTML = list.map(s=>{
+    const c=folderCounts(s.name);
+    const active=selStore&&selStore.id===s.id;
+    return `<div data-sid="${escapeHTMLAttr(s.id)}" onclick="openStoreFolder(this.dataset.sid)" style="cursor:pointer;display:flex;align-items:center;gap:12px;padding:13px 12px;border:1px solid rgba(0,0,0,.07);border-radius:14px;margin-bottom:9px;background:rgba(255,255,255,.5)">
+      <div style="font-size:26px;flex-shrink:0">📁</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:900;color:var(--txt)">${escapeHTML(s.name)}${active?' <span style="color:var(--gd);font-size:10px;font-weight:900">· ACTIF</span>':''}</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:700;margin-top:3px;display:flex;gap:9px;flex-wrap:wrap">
+          <span>📋 ${c.cmd}</span><span>📦 ${c.stk}</span><span>🌿 ${c.scanArch}${c.scanEnCours?` (+${c.scanEnCours} en cours)`:''}</span>
+        </div>
+      </div>
+      <div style="font-size:18px;color:var(--muted);flex-shrink:0">›</div>
+    </div>`;
+  }).join('');
+}
+function openStoreFolder(sid){
+  const s=getStores().find(x=>x.id===sid); if(!s) return;
+  const name=s.name;
+  const t=document.getElementById('folders-title'); if(t) t.textContent='📁 '+name;
+  const el=document.getElementById('folders-body'); if(!el) return;
+  const cmds=orders.filter(o=>o.store===name);
+  const stks=stockRecords.filter(r=>r.store===name);
+  const scans=archive.filter(a=>a.magasin===name);
+  const enCours=products.filter(p=>p.magasin===name);
+
+  const cmdRows = cmds.length ? cmds.slice(0,50).map(o=>{
+    const q=o.lines.reduce((s,l)=>s+l.qty,0);
+    return `<div style="padding:9px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12px">
+      <div style="font-weight:800">🛒 ${escapeHTML(new Date(o.date).toLocaleString(lang))} <span class="pbadge bk" style="font-size:9px">${o.lines.length} réf · ${q}</span></div>
+      <div style="color:var(--muted);font-weight:600;font-size:11px;margin-top:2px">${o.lines.map(l=>escapeHTML(l.name||l.gencod||'—')+' ×'+l.qty).join(', ')}</div>
+    </div>`;
+  }).join('') : '<div class="empty" style="padding:8px 0">Aucune commande</div>';
+
+  const stkRows = stks.length ? stks.slice(0,50).map(r=>{
+    const q=r.lines.reduce((s,l)=>s+l.qty,0);
+    return `<div style="padding:9px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12px">
+      <div style="font-weight:800">📦 ${escapeHTML(new Date(r.date).toLocaleString(lang))} <span class="pbadge bk" style="font-size:9px">${r.lines.length} réf · ${q} u.</span></div>
+      <div style="color:var(--muted);font-weight:600;font-size:11px;margin-top:2px">${r.lines.map(l=>escapeHTML(l.name||l.gencod||'—')+' ×'+l.qty+(l.provenance?' ('+escapeHTML(l.provenance)+')':'')).join(', ')}</div>
+    </div>`;
+  }).join('') : '<div class="empty" style="padding:8px 0">Aucun relevé de stock</div>';
+
+  const scanRows = (scans.length||enCours.length) ? (
+    enCours.slice(0,30).map(p=>`<div style="padding:8px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12px">
+      <span style="font-weight:800">🌿 ${escapeHTML(p.name||p.gencod||'—')}</span>
+      <span class="pbadge bo" style="font-size:9px">en cours</span>
+      <span style="color:var(--muted);font-size:11px"> · DLC ${fmtDate(p.dlc)}</span></div>`).join('')
+    + scans.slice(0,50).map(a=>{
+      const abs=a.note==='Absent';
+      return `<div style="padding:8px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12px">
+        <span style="font-weight:800">🌿 ${escapeHTML(a.name||a.gencod||'—')}</span>
+        <span class="pbadge ${abs?'bo':'bk'}" style="font-size:9px">${abs?'∅ absent':'✓ traité'}</span>
+        <span style="color:var(--muted);font-size:11px"> · DLC ${fmtDate(a.dlc)} · ${escapeHTML(a.archivedBy||'?')} · ${a.archivedAt?new Date(a.archivedAt).toLocaleDateString(lang):''}</span></div>`;
+    }).join('')
+  ) : '<div class="empty" style="padding:8px 0">Aucun scan</div>';
+
+  const section=(icon,title,count,rows)=>`
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:900;color:var(--gd);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">${icon} ${title} <span style="color:var(--muted)">(${count})</span></div>
+      ${rows}
+    </div>`;
+
+  el.innerHTML =
+    `<button class="scan-link-btn" onclick="renderFolders()" style="margin-bottom:14px">‹ Tous les magasins</button>`
+    + section('📋','Commandes',cmds.length,cmdRows)
+    + section('📦','Stocks',stks.length,stkRows)
+    + section('🌿','Fresh / Scan',scans.length+enCours.length,scanRows);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   STOCK DE DÉPART (baseline) → ÉTAT RÉEL. Par magasin (fc_stock_base, clé = nom
+   du magasin actif). On fige un relevé comme « stock de départ » ; un nouveau
+   relevé se compare ensuite au départ → écarts (manquants / excédents). La
+   catégorie vient du code produit via le catalogue (champ famille des lignes).
+   ═══════════════════════════════════════════════════════════════════════════ */
+function stockBaseKey(){ return storeName || '—'; }
+function loadStockBaseAll(){ try{ return JSON.parse(localStorage.getItem('fc_stock_base')||'{}'); }catch(e){ return {}; } }
+function getStockBase(){ return loadStockBaseAll()[stockBaseKey()] || null; }
+
+function renderStockBase(){
+  const el=document.getElementById('stk-base'); if(!el) return;
+  const base=getStockBase();
+  const info = base
+    ? `📥 Stock de départ : <strong>${base.lines.length} réf.</strong> · ${new Date(base.date).toLocaleDateString(lang)}`
+    : `📥 Aucun stock de départ pour ce magasin`;
+  el.innerHTML = `
+    <div style="background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:13px;padding:11px 13px">
+      <div style="font-size:12px;font-weight:800;color:#fff">${info}</div>
+      <div style="display:flex;gap:7px;margin-top:9px;flex-wrap:wrap">
+        <button class="scan-link-btn" style="background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.34)" onclick="setStockBaseFromCurrent()">📥 Figer le relevé comme départ</button>
+        ${base?`<button class="scan-link-btn" style="background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.34)" onclick="openStockState()">📊 État réel vs départ</button>`:''}
+      </div>
+    </div>`;
+}
+function setStockBaseFromCurrent(){
+  if(!currentStock.length){ toast('Relevé vide — scannez d’abord des produits'); return; }
+  showConfirm('Définir comme stock de départ ?', `${currentStock.length} référence(s) deviendront la base de comparaison pour « ${storeName||'—'} ».`, ()=>{
+    const all=loadStockBaseAll();
+    all[stockBaseKey()]={ date:new Date().toISOString(), by:session?.username||'?', lines: currentStock.map(l=>({...l})) };
+    localStorage.setItem('fc_stock_base', JSON.stringify(all));
+    renderStockBase();
+    toast('📥 Stock de départ enregistré');
+  });
+}
+function openStockState(){
+  const base=getStockBase();
+  if(!base){ toast('Aucun stock de départ pour ce magasin'); return; }
+  const key=l=>l.gencod||l.name;
+  const cnt={}; currentStock.forEach(l=>{ cnt[key(l)]=(cnt[key(l)]||0)+l.qty; });
+  const rows=[]; let manquants=0, excedents=0;
+  base.lines.forEach(b=>{
+    const k=key(b); const compte=cnt[k]||0; const ecart=compte-b.qty; delete cnt[k];
+    if(ecart<0) manquants+=(-ecart); if(ecart>0) excedents+=ecart;
+    rows.push({ name:b.name||b.gencod||'—', fam:b.famille||'', depart:b.qty, compte, ecart });
+  });
+  Object.keys(cnt).forEach(k=>{ const l=currentStock.find(x=>key(x)===k); excedents+=cnt[k];
+    rows.push({ name:(l&&(l.name||l.gencod))||k, fam:(l&&l.famille)||'', depart:0, compte:cnt[k], ecart:cnt[k], neuf:true }); });
+
+  const badge=e=> e===0 ? '<span class="pbadge bk" style="font-size:10px">= OK</span>'
+                : e<0  ? `<span class="pbadge bo" style="font-size:10px">${e} manquant</span>`
+                       : `<span class="pbadge bw" style="font-size:10px">+${e}</span>`;
+  const body=document.getElementById('stockstate-body');
+  body.innerHTML =
+    `<div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:10px">
+       Magasin : <strong>${escapeHTML(storeName||'—')}</strong> · départ du ${new Date(base.date).toLocaleDateString(lang)}<br>
+       Relevé en cours : ${currentStock.length} réf. ·
+       <span style="color:var(--o)">${manquants} manquant(s)</span> ·
+       <span style="color:var(--gd)">${excedents} en +</span>
+     </div>`
+    + (currentStock.length ? '' : '<div style="font-size:11px;color:var(--o);font-weight:700;margin-bottom:8px">⚠️ Relevé en cours vide — scannez le rayon puis rouvrez cet écran.</div>')
+    + rows.map(r=>`<div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.05)">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(r.name)}${r.neuf?' <span style="color:var(--muted);font-size:10px;font-weight:700">· hors départ</span>':''}</div>
+          <div style="font-size:11px;color:var(--muted);font-weight:600">${r.fam?escapeHTML(r.fam)+' · ':''}départ ${r.depart} → compté ${r.compte}</div>
+        </div>
+        ${badge(r.ecart)}
+      </div>`).join('');
+  openModal('stockstate-modal');
 }
 
 /* ═══ STORES MODAL (sidebar ☰ → Gestion des magasins) ═══════════════════════ */
