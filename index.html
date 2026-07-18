@@ -1735,6 +1735,7 @@ function startGPS(manual){
       if(err.code===1)  gpsState='denied';
       else if(!gps)     gpsState='unavailable';
       renderStoreBars();
+      if(_startupPending) resolveStartup(null);          // GPS refusé/indispo → repli tous magasins
       if(manual && err.code===1 && /iphone|ipad|ipod/i.test(navigator.userAgent)){
         setTimeout(()=>toast('iOS : Réglages → Confidentialité → Localisation → activez pour Safari'),500);
       }
@@ -1754,9 +1755,11 @@ function applyGpsFix(lat,lng,acc){
     gpsState='ok';
     if(!selStore || selStore.id!==found.id) setActiveStore(found,{toastIt:true});
     else renderStoreBars();
+    if(_startupPending) resolveStartup(found.name);   // popup démarrage ciblé sur le magasin détecté
   }else{
     gpsState='nomatch';       // on est ailleurs qu'un magasin connu
     renderStoreBars();
+    if(_startupPending) resolveStartup(null);          // pas dans un magasin → repli tous magasins
   }
 }
 
@@ -4330,21 +4333,26 @@ function renderStoresModal(){
     el.innerHTML='<div style="font-size:13px;color:var(--muted);padding:6px 0;font-weight:600;text-align:center">Aucun magasin — ajoutez-en un ci-dessous.<br>Le GPS détectera ensuite où vous êtes automatiquement.</div>';
     return;
   }
-  el.innerHTML=list.map(s=>{
+  const hint='<div style="font-size:11.5px;color:var(--gd);font-weight:700;background:rgba(18,168,118,.09);border:1px solid rgba(18,168,118,.22);border-radius:10px;padding:8px 11px;margin-bottom:11px">👉 Touchez « Activer » pour choisir le magasin à la main (repli quand le GPS / le réseau ne détecte rien).</div>';
+  el.innerHTML=hint+list.map(s=>{
     const active=selStore&&selStore.id===s.id;
     const coord=Number.isFinite(s.lat)&&Number.isFinite(s.lng);
-    return `<div style="display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid rgba(0,0,0,.05)">
+    const chip = active
+      ? '<span style="flex-shrink:0;align-self:center;background:rgba(18,168,118,.16);color:var(--gd);border:1px solid rgba(18,168,118,.34);border-radius:100px;padding:5px 11px;font-size:11px;font-weight:900;white-space:nowrap">✓ Actif</span>'
+      : `<button data-sid="${escapeHTMLAttr(s.id)}" onclick="selectStoreFromModal(this.dataset.sid)" style="flex-shrink:0;align-self:center;background:rgba(18,168,118,.1);color:var(--gd);border:1px solid rgba(18,168,118,.3);border-radius:100px;padding:6px 13px;font-size:11px;font-weight:900;cursor:pointer;font-family:var(--font);white-space:nowrap">Activer</button>`;
+    return `<div style="display:flex;align-items:flex-start;gap:8px;padding:11px 0;border-bottom:1px solid rgba(0,0,0,.05)">
       <div data-sid="${escapeHTMLAttr(s.id)}" onclick="selectStoreFromModal(this.dataset.sid)" style="flex:1;min-width:0;cursor:pointer;display:flex;align-items:flex-start;gap:10px">
         <div style="font-size:24px;flex-shrink:0;margin-top:2px">${active?'📍':'🏪'}</div>
         <div style="flex:1;min-width:0">
-          <div style="font-size:14px;font-weight:800;color:var(--txt)">${escapeHTML(s.name)}${active?' <span style="color:var(--gd);font-size:10px;font-weight:900;letter-spacing:.5px">· ACTIF</span>':''}</div>
+          <div style="font-size:14px;font-weight:800;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(s.name)}${active?' <span style="color:var(--gd);font-size:10px;font-weight:900;letter-spacing:.5px">· ACTIF</span>':''}</div>
           ${s.ville?`<div style="font-size:11px;color:var(--muted);margin-top:2px;font-weight:600">📍 ${escapeHTML(s.ville)}</div>`:''}
           <div style="font-size:11px;color:var(--muted);margin-top:1px;font-weight:600">${coord?`${s.lat.toFixed(4)}, ${s.lng.toFixed(4)} · rayon ${s.r||500}m`:'⚠ sans position GPS — non détectable'}</div>
         </div>
       </div>
+      ${chip}
       <button data-sid="${escapeHTMLAttr(s.id)}" onclick="confirmDeleteStoreModal(this.dataset.sid)"
         style="border:1px solid rgba(224,60,60,.28);background:rgba(224,60,60,.1);color:var(--r);
-               border-radius:9px;width:32px;height:32px;cursor:pointer;font-size:14px;flex-shrink:0">🗑</button>
+               border-radius:9px;width:32px;height:32px;cursor:pointer;font-size:14px;flex-shrink:0;align-self:center">🗑</button>
     </div>`;
   }).join('');
 }
@@ -4666,10 +4674,34 @@ async function testGAS(){
 function showStoreBadge(){ renderStoreBars(); }
 
 /* ═══ STARTUP POPUP ══════════════════════════════════════════════════════════ */
+/* Popup d'alertes au démarrage — INTELLIGENT selon le magasin détecté par GPS.
+   Dans un magasin (GPS ok) → n'affiche que SES alertes urgentes ; sinon (pas
+   dans un magasin / GPS refusé / lent) → repli sur tous les magasins. On attend
+   brièvement le verrouillage GPS avant de décider (résolu par applyGpsFix). */
+let _startupPending=false, _startupTimer=null;
 function checkStartup(){
-  if(localStorage.getItem('fc_popup')==='0')return;
-  const urgent=products.filter(p=>{const s=statusOf(p.dlc);return s==='e'||s==='o'}).sort((a,b)=>new Date(a.dlc)-new Date(b.dlc));
-  if(!urgent.length)return;
+  if(localStorage.getItem('fc_popup')==='0') return;
+  if(!products.some(p=>{const s=statusOf(p.dlc);return s==='e'||s==='o'})) return;
+  _startupPending=true;
+  if(selStore && gpsState==='ok'){ resolveStartup(selStore.name); return; }  // magasin déjà détecté
+  clearTimeout(_startupTimer);
+  _startupTimer=setTimeout(()=>resolveStartup(null), 6000);                   // repli si GPS lent/absent
+}
+function resolveStartup(storeName){
+  if(!_startupPending) return;
+  _startupPending=false; clearTimeout(_startupTimer);
+  let urgent=products.filter(p=>{const s=statusOf(p.dlc);return s==='e'||s==='o'});
+  let scoped=false;
+  if(storeName){
+    const forStore=urgent.filter(p=>(p.magasin||'—')===storeName);
+    if(!forStore.length) return;   // magasin détecté sans alerte urgente → pas de popup (rien d'urgent ici)
+    urgent=forStore; scoped=true;
+  }
+  if(!urgent.length) return;
+  urgent.sort((a,b)=>new Date(a.dlc)-new Date(b.dlc));
+  const title=document.getElementById('su-t'), sub=document.getElementById('su-p');
+  if(title) title.textContent = scoped ? '⚠️ Alertes · '+storeName : (T().su_t||'⚠️ Alertes produits');
+  if(sub)   sub.textContent   = scoped ? 'Produits urgents dans ce magasin' : (T().su_p||'Produits expirés ou critiques');
   const byStore={};
   urgent.forEach(p=>{const k=p.magasin||'—';if(!byStore[k])byStore[k]=[];byStore[k].push(p)});
   document.getElementById('su-body').innerHTML=Object.entries(byStore).map(([store,prods])=>`
