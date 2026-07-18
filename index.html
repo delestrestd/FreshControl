@@ -107,7 +107,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .rgpd-no{flex:1;padding:14px;border-radius:var(--rr);border:1.5px solid var(--bdr);background:rgba(0,0,0,.04);color:var(--muted);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)}
 
 /* ── APP SHELL ─────────────────────────────────────────────────────── */
-#app{display:none;height:100%;flex-direction:column}
+#app{display:none;height:100%;width:100%;max-width:100%;flex-direction:column;overflow-x:hidden}
 #app.on{display:flex}
 #hdr{background:rgba(10,107,71,.74);backdrop-filter:blur(26px) saturate(200%);-webkit-backdrop-filter:blur(26px) saturate(200%);border-bottom:1px solid rgba(255,255,255,.18);color:#fff;padding:0 16px;height:var(--hdr-h);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:var(--spec-d),0 3px 20px rgba(0,0,0,.13)}
 #hdr-l{display:flex;align-items:center;gap:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:4px 8px 4px 4px;margin:-4px 0 -4px -4px;border-radius:14px;transition:background .18s}
@@ -121,11 +121,22 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .hmenu{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.32);color:#fff;width:40px;height:40px;border-radius:12px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:var(--spec-d);transition:background .18s}
 .hmenu:hover{background:rgba(255,255,255,.3)}
 .hmenu:active{transform:scale(.94)}
+/* Bouton retour (apparait quand il y a un écran précédent) + troncature du titre */
+.hdr-left{display:flex;align-items:center;gap:9px;min-width:0}
+.hdr-left #hdr-l{min-width:0}
+.hdr-tt{min-width:0}
+.hdr-tt h1,.hdr-tt small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hback{flex-shrink:0;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.32);color:#fff;width:38px;height:40px;border-radius:12px;cursor:pointer;font-size:26px;font-weight:900;line-height:1;display:flex;align-items:center;justify-content:center;padding-bottom:3px;box-shadow:var(--spec-d);transition:background .18s,transform .12s;font-family:var(--font)}
+.hback:hover{background:rgba(255,255,255,.3)}
+.hback:active{transform:scale(.94)}
 #main{flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:14px 13px calc(var(--tab-h) + 12px)}
 .tab{display:none}.tab.on{display:block;animation:fadeIn .2s ease}
 #tbar{background:rgba(240,255,248,.62);backdrop-filter:blur(28px) saturate(200%);-webkit-backdrop-filter:blur(28px) saturate(200%);border-top:1px solid rgba(255,255,255,.7);box-shadow:inset 0 1px 0 rgba(255,255,255,.88),0 -3px 28px rgba(0,0,0,.07);height:var(--tab-h);display:flex;flex-shrink:0}
-.tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;background:transparent;font-size:11px;font-weight:800;color:rgba(13,31,13,.55);cursor:pointer;font-family:var(--font);transition:color .15s;-webkit-tap-highlight-color:transparent;padding-bottom:5px;letter-spacing:.2px;min-height:44px}
-.tb.on{color:var(--g)}.tb-i{font-size:21px;line-height:1;transition:transform .2s}.tb.on .tb-i{transform:scale(1.16)}
+/* Onglets : rétrécissent pour tenir même à 320px avec 7-8 onglets (min-width:0
+   + police/icone en clamp + label tronqué proprement au lieu de déborder). */
+.tb{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:transparent;font-size:clamp(8.5px,2.7vw,11px);font-weight:800;color:rgba(13,31,13,.55);cursor:pointer;font-family:var(--font);transition:color .15s;-webkit-tap-highlight-color:transparent;padding:0 2px 5px;letter-spacing:.1px;min-height:44px}
+.tb.on{color:var(--g)}.tb-i{font-size:clamp(18px,5.2vw,21px);line-height:1;transition:transform .2s}.tb.on .tb-i{transform:scale(1.16)}
+.tb>span:last-child{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* ── SIDEBAR ───────────────────────────────────────────────────────── */
 #sb{position:fixed;inset:0;z-index:800;display:none}
@@ -177,7 +188,9 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .se{background:rgba(176,32,32,.72)}.so{background:rgba(163,99,0,.7)}.sw{background:rgba(29,85,221,.7)}.sk{background:rgba(10,107,71,.74)}
 
 /* ── FILTER CHIPS ────────────────────────────────────────────────────── */
-.frow{display:flex;gap:7px;overflow-x:auto;padding-bottom:3px;scrollbar-width:none;margin-bottom:9px}
+/* Chips de filtre : passent à la ligne au lieu de défiler latéralement
+   (l'utilisateur ne veut aucun mouvement horizontal ; tout doit rester visible). */
+.frow{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:9px}
 .frow::-webkit-scrollbar{display:none}
 .fc{padding:8px 17px;min-height:34px;border-radius:var(--rr);background:rgba(255,255,255,.62);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.7);font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;transition:all .18s;font-family:var(--font);color:var(--muted);box-shadow:var(--spec)}
 .fc:hover:not(.on){background:rgba(255,255,255,.78);color:var(--txt)}
@@ -255,13 +268,13 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 /* Commande — pendant le scan : on supprime tout le « cadre autour » (icône,
    titre, description, gros padding) et on COLLE le bloc en haut ; la caméra
    garde sa taille, et la liste des articles défile dessous. */
-#cmd-scan-box.scanning{position:sticky;top:0;z-index:30;padding:10px 14px 12px;background:rgba(9,77,48,.97);backdrop-filter:blur(10px);box-shadow:0 8px 22px rgba(0,0,0,.32)}
-#cmd-scan-box.scanning::before{display:none}
-#cmd-scan-box.scanning .scan-step-icon,#cmd-scan-box.scanning .scan-step-title,#cmd-scan-box.scanning .scan-step-sub{display:none}
-#cmd-scan-box.scanning .scan-cam-wrap{margin:0 0 8px}
-#cmd-scan-box.scanning .scan-link-btn{color:#fff;border-color:rgba(255,255,255,.42)}
-#cmd-scan-box.scanning #cmd-st{color:#fff;margin-top:4px}
-#cmd-scan-box.scanning #scan-diag-line{font-size:10px;padding:6px 9px;line-height:1.45}
+#cmd-scan-box.scanning,#stk-scan-box.scanning{position:sticky;top:0;z-index:30;padding:10px 14px 12px;background:rgba(9,77,48,.97);backdrop-filter:blur(10px);box-shadow:0 8px 22px rgba(0,0,0,.32)}
+#cmd-scan-box.scanning::before,#stk-scan-box.scanning::before{display:none}
+#cmd-scan-box.scanning .scan-step-icon,#cmd-scan-box.scanning .scan-step-title,#cmd-scan-box.scanning .scan-step-sub,#stk-scan-box.scanning .scan-step-icon,#stk-scan-box.scanning .scan-step-title,#stk-scan-box.scanning .scan-step-sub{display:none}
+#cmd-scan-box.scanning .scan-cam-wrap,#stk-scan-box.scanning .scan-cam-wrap{margin:0 0 8px}
+#cmd-scan-box.scanning .scan-link-btn,#stk-scan-box.scanning .scan-link-btn{color:#fff;border-color:rgba(255,255,255,.42)}
+#cmd-scan-box.scanning #cmd-st,#stk-scan-box.scanning #stk-st{color:#fff;margin-top:4px}
+#cmd-scan-box.scanning #scan-diag-line,#stk-scan-box.scanning #scan-diag-line{font-size:10px;padding:6px 9px;line-height:1.45}
 .sbtn{display:inline-flex;align-items:center;gap:8px;padding:16px 28px;min-height:52px;border-radius:var(--rr);background:rgba(18,168,118,.92);color:#fff;font-size:16px;font-weight:900;cursor:pointer;font-family:var(--font);margin-top:14px;border:1px solid rgba(255,255,255,.32);box-shadow:var(--spec-d),var(--sg);transition:transform .15s,background .18s}
 .sbtn:hover{background:rgba(18,168,118,1)}
 .sbtn:active{transform:scale(.96)}
@@ -283,7 +296,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
 .rf-i:hover:not(:focus):not([readonly]){background:rgba(255,255,255,.82)}
 .rf-i:focus{border-color:rgba(18,168,118,.65);background:rgba(255,255,255,.88);box-shadow:var(--spec),var(--foc)}
 .rf-i[readonly]{cursor:default}
-.rf-row{display:flex;gap:9px}.rf-row .rf-f{flex:1}
+.rf-row{display:flex;flex-wrap:wrap;gap:9px}.rf-row .rf-f{flex:1 1 120px;min-width:0}
 .rfsave{width:100%;padding:15px;min-height:50px;border-radius:var(--rr);background:rgba(18,168,118,.92);color:#fff;border:1px solid rgba(255,255,255,.28);font-size:15px;font-weight:900;cursor:pointer;font-family:var(--font);margin-top:3px;box-shadow:var(--spec-d),var(--sg);transition:transform .13s,background .18s,box-shadow .18s}
 .rfsave:hover{background:rgba(18,168,118,1)}
 .rfsave:active{transform:scale(.97)}
@@ -331,8 +344,8 @@ select.store-sel option{background:#0A6B47;color:#fff}
 .brand-sync:active{transform:scale(.92)}
 .brand-sync:disabled{opacity:.6;cursor:not-allowed}
 .addform{display:flex;flex-direction:column;gap:9px;margin-top:14px;padding-top:14px;border-top:1px solid var(--bdr)}
-.af-row{display:flex;gap:7px}
-.af-in{flex:1;padding:12px 15px;min-height:44px;border-radius:var(--rr);background:rgba(255,255,255,.7);border:1.5px solid var(--bdr);font-size:13px;font-family:var(--font);font-weight:700;outline:none;color:var(--txt);box-shadow:var(--spec);transition:border-color .18s,box-shadow .18s,background .18s}
+.af-row{display:flex;flex-wrap:wrap;gap:7px}
+.af-in{flex:1 1 120px;min-width:0;padding:12px 15px;min-height:44px;border-radius:var(--rr);background:rgba(255,255,255,.7);border:1.5px solid var(--bdr);font-size:13px;font-family:var(--font);font-weight:700;outline:none;color:var(--txt);box-shadow:var(--spec);transition:border-color .18s,box-shadow .18s,background .18s}
 .af-in:hover:not(:focus){background:rgba(255,255,255,.8)}
 .af-in:focus{border-color:rgba(18,168,118,.65);background:rgba(255,255,255,.88);box-shadow:var(--spec),var(--foc)}
 .af-sel{padding:12px 32px 12px 15px;min-height:44px;border-radius:var(--rr);background:rgba(255,255,255,.7);border:1.5px solid var(--bdr);font-size:13px;font-family:var(--font);font-weight:700;outline:none;color:var(--txt);box-shadow:var(--spec);-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'><path d='M1 1.5L6 6.5L11 1.5' stroke='%230D1F0D' stroke-opacity='.55' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 13px center;cursor:pointer;transition:border-color .18s,box-shadow .18s,background-color .18s}
@@ -403,6 +416,12 @@ select.store-sel option{background:#0A6B47;color:#fff}
 .startup-hd p{font-size:12px;opacity:.82;font-weight:600}
 .startup-prow{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-radius:13px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);margin-bottom:6px}
 .startup-ft{padding:13px 16px;border-top:1px solid rgba(0,0,0,.05);display:flex;gap:9px}
+/* Stepper de quantité (popup Commande / Stocks) — grandes cibles tactiles */
+.qm-stepper{display:flex;align-items:center;gap:10px}
+.qm-stepper button{width:52px;height:52px;flex-shrink:0;border-radius:14px;border:1.5px solid var(--bdr);background:rgba(255,255,255,.7);color:var(--gd);font-size:26px;font-weight:900;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;box-shadow:var(--spec);transition:transform .1s,background .18s}
+.qm-stepper button:active{transform:scale(.93)}
+.qm-stepper input{flex:1;min-width:0;text-align:center;padding:13px;min-height:52px;border-radius:14px;background:rgba(255,255,255,.72);border:1.5px solid var(--bdr);font-size:22px;font-weight:900;font-family:var(--font);color:var(--txt);outline:none;box-shadow:var(--spec)}
+.qm-stepper input:focus{border-color:rgba(18,168,118,.65);box-shadow:var(--spec),var(--foc)}
 /* email modal */
 .em-ta{width:100%;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.72);border:1.5px solid var(--bdr);font-size:13px;font-family:var(--font);font-weight:600;outline:none;color:var(--txt);min-height:140px;resize:vertical;line-height:1.65;box-shadow:var(--spec);transition:border-color .18s,box-shadow .18s,background .18s}
 .em-ta:hover:not(:focus){background:rgba(255,255,255,.82)}
@@ -735,6 +754,14 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
   </div>
 </div>
 
+<!-- ═══ STOCKS MODAL ═══════════════════════════════════════════════════ -->
+<div id="stocks-modal" class="modal-bg">
+  <div class="modal-sh">
+    <div class="mhd-row" style="margin-bottom:14px"><div class="mhd-t">🗂 Historique des stocks</div><button class="mcl" onclick="closeModal('stocks-modal')" aria-label="Fermer">✕</button></div>
+    <div id="stocks-list"></div>
+  </div>
+</div>
+
 <!-- ═══ MENTIONS LÉGALES / CGU / RGPD ═══════════════════════════════════
      Textes rédigés en cohérence avec les traitements réels de l'application.
      À soumettre à un avocat avant toute mise en production : tous les
@@ -846,6 +873,38 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
   </div>
 </div>
 
+<!-- ═══ POPUP QUANTITÉ (Commande / Stocks) ═══════════════════════════ -->
+<div id="qty-modal" class="modal-center">
+  <div class="modal-card">
+    <div class="mhd">
+      <div class="mhd-row">
+        <div style="min-width:0"><div class="mhd-t" id="qm-title">📦 Ajouter</div><div id="qm-sub" style="font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px"></div></div>
+        <button class="mcl" onclick="closeQtyPopup()" aria-label="Fermer">✕</button>
+      </div>
+    </div>
+    <div class="mbody">
+      <div id="qm-namewrap" style="display:none;margin-bottom:14px">
+        <div class="rf-l" style="margin-bottom:6px">Nom du produit</div>
+        <input class="rf-i" id="qm-name" placeholder="Nom du produit" autocomplete="off">
+      </div>
+      <div class="rf-l" style="margin-bottom:8px">Nombre de colis</div>
+      <div class="qm-stepper">
+        <button type="button" onclick="qmStep(-1)" aria-label="Un colis de moins">−</button>
+        <input id="qm-qty" type="number" min="1" step="1" value="1" inputmode="numeric" aria-label="Nombre de colis">
+        <button type="button" onclick="qmStep(1)" aria-label="Un colis de plus">+</button>
+      </div>
+      <div id="qm-provwrap" style="display:none;margin-top:16px">
+        <div class="rf-l" style="margin-bottom:6px">Provenance <span style="font-weight:700;color:var(--mutedx)">— optionnel</span></div>
+        <input class="rf-i" id="qm-prov" placeholder="Ex : fournisseur, origine, rayon…" autocomplete="off">
+      </div>
+    </div>
+    <div class="startup-ft">
+      <button class="af-add" style="flex:1;padding:14px" id="qm-ok" onclick="confirmQtyPopup()">✅ Valider</button>
+      <button onclick="closeQtyPopup()" style="flex:1;padding:13px;border-radius:var(--rr);border:1.5px solid var(--bdr);background:rgba(255,255,255,.6);color:var(--muted);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font)">Annuler</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ CONFIRM ══════════════════════════════════════════════════════ -->
 <div id="confirm-modal">
   <div class="confirm-card">
@@ -861,9 +920,12 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
 <!-- ═══ MAIN APP ══════════════════════════════════════════════════════ -->
 <div id="app">
   <div id="hdr">
-    <div id="hdr-l" onclick="showTab('dashboard')">
-      <div class="hico">🌿</div>
-      <div><h1>FreshControl</h1><small id="hdr-sub">Chargement…</small></div>
+    <div class="hdr-left">
+      <button id="hdr-back" class="hback" onclick="goBack()" aria-label="Retour à l'écran précédent" style="display:none">‹</button>
+      <div id="hdr-l" onclick="showTab('dashboard')">
+        <div class="hico">🌿</div>
+        <div class="hdr-tt"><h1>FreshControl</h1><small id="hdr-sub">Chargement…</small></div>
+      </div>
     </div>
     <div id="hdr-r">
       <div id="h-badge"></div>
@@ -982,7 +1044,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       <div class="scan-box" id="cmd-scan-box">
         <div class="scan-step-icon">🛒</div>
         <div class="scan-step-title">Commande par scan</div>
-        <div class="scan-step-sub">Visez les codes-barres : chaque produit reconnu s'ajoute tout seul à la commande (1 colis, re-scannez pour +1). Ajustez le nombre de colis sur chaque ligne, puis validez pour envoyer par mail. Tout reste enregistré localement.</div>
+        <div class="scan-step-sub">Visez un code-barres : une fenêtre s'ouvre pour saisir le nombre de colis, puis validez. Validez la commande pour l'envoyer par mail.</div>
         <div class="scan-cam-wrap" id="cmd-cam-wrap" style="display:none">
           <video id="cmd-video" playsinline muted></video>
           <div class="scan-reticle"></div>
@@ -1022,6 +1084,46 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       <div id="cmd-footer" style="display:none;margin-top:12px">
         <button class="af-add" style="width:100%;padding:14px" onclick="validateOrder()">✅ Valider et envoyer par mail</button>
         <button class="scan-reset-btn" style="width:100%;margin-top:8px" onclick="clearOrder()">🗑 Vider la commande</button>
+      </div>
+    </div>
+
+    <!-- STOCKS (relevé de stock par scan — indépendant de Commande, avec provenance) -->
+    <div id="tab-stocks" class="tab">
+
+      <!-- Magasin détecté automatiquement par GPS -->
+      <div class="sbar idle" data-storebar></div>
+
+      <!-- Scan (caméra live + fallback photo) -->
+      <div class="scan-box" id="stk-scan-box">
+        <div class="scan-step-icon">📦</div>
+        <div class="scan-step-title">Stock par scan</div>
+        <div class="scan-step-sub">Visez un code-barres : une fenêtre s'ouvre pour saisir la quantité et la provenance, puis validez. Validez le relevé pour l'envoyer par mail.</div>
+        <div class="scan-cam-wrap" id="stk-cam-wrap" style="display:none">
+          <video id="stk-video" playsinline muted></video>
+          <div class="scan-reticle"></div>
+          <button class="scan-torch" id="stk-torch" style="display:none" onclick="toggleStkTorch()" aria-label="Torche">🔦</button>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <button class="sbtn" id="stk-scan-btn" onclick="startStockScan()" style="margin-top:0">📷 Démarrer le scan</button>
+          <button class="sbtn" id="stk-stop-btn" onclick="stopStockScan()" style="margin-top:0;display:none;background:rgba(224,60,60,.9);box-shadow:var(--spec-d),var(--sr)">⏹ Arrêter</button>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <input type="file" id="stk-photo-in" accept="image/*" capture="environment" style="display:none">
+          <button class="scan-link-btn" onclick="document.getElementById('stk-photo-in').click()">🖼 Scanner via photo</button>
+          <button class="scan-link-btn" onclick="stockManualEntry()">✏️ Saisie manuelle</button>
+        </div>
+        <div id="stk-st" class="scan-step-status"></div>
+      </div>
+
+      <!-- Liste du relevé de stock en cours -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 2px 10px">
+        <div style="font-size:14px;font-weight:900;color:#fff">📦 Stock en cours <span id="stk-count" style="opacity:.85;font-weight:700"></span></div>
+        <button class="scan-link-btn" onclick="openModal('stocks-modal');renderStocksHistory()" style="background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.32)">🗂 Historique</button>
+      </div>
+      <div id="stock-lines"></div>
+      <div id="stk-footer" style="display:none;margin-top:12px">
+        <button class="af-add" style="width:100%;padding:14px" onclick="validateStock()">✅ Valider et envoyer par mail</button>
+        <button class="scan-reset-btn" style="width:100%;margin-top:8px" onclick="clearStock()">🗑 Vider le relevé</button>
       </div>
     </div>
 
@@ -1188,6 +1290,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
     <button class="tb on" id="tb-d" onclick="showTab('dashboard')"><span class="tb-i">📊</span><span id="tl-d">Tableau</span></button>
     <button class="tb" id="tb-s" onclick="showTab('scanner')"><span class="tb-i">📷</span><span id="tl-s">Scanner</span></button>
     <button class="tb" id="tb-c" onclick="showTab('commande')"><span class="tb-i">🛒</span><span id="tl-c">Commande</span></button>
+    <button class="tb" id="tb-stk" onclick="showTab('stocks')"><span class="tb-i">📦</span><span id="tl-stk">Stocks</span></button>
     <button class="tb" id="tb-a" onclick="showTab('alertes')"><span class="tb-i">🔔</span><span id="tl-a">Alertes</span></button>
     <button class="tb" id="tb-p" onclick="showTab('planning')"><span class="tb-i">📅</span><span id="tl-p">Planning</span></button>
     <button class="tb" id="tb-cat" onclick="showTab('catalogue')"><span class="tb-i">📚</span><span id="tl-cat">Catalogue</span></button>
@@ -1205,6 +1308,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       <div class="sb-it" onclick="showTab('dashboard');closeSB()"><div class="sb-ic">📊</div>Tableau de bord</div>
       <div class="sb-it" onclick="showTab('scanner');closeSB()"><div class="sb-ic">📷</div>Scanner</div>
       <div class="sb-it" onclick="showTab('commande');closeSB()"><div class="sb-ic">🛒</div>Commande</div>
+      <div class="sb-it" onclick="showTab('stocks');closeSB()"><div class="sb-ic">📦</div>Stocks</div>
       <div class="sb-it" onclick="showTab('alertes');closeSB()"><div class="sb-ic">🔔</div>Alertes</div>
       <div class="sb-it" onclick="showTab('planning');closeSB()"><div class="sb-ic">📅</div>Planning</div>
       <div class="sb-it" onclick="showTab('catalogue');closeSB()"><div class="sb-ic">📚</div>Catalogue</div>
@@ -1330,10 +1434,10 @@ function removeStore(id){
    lecture         → Direction régionale / finances — lecture seule + rapports
 ─────────────────────────────────────────────────────────────────────────── */
 const ROLES = {
-  superadmin:  { label:'⚡ Super Admin',    color:'#7c3aed', badge:'SA', level:5, tabs:['dashboard','scanner','commande','alertes','planning','admin'] },
-  directeur:   { label:'👔 Directeur',      color:'#064D30', badge:'DR', level:4, tabs:['dashboard','scanner','commande','alertes','planning','admin'] },
-  responsable: { label:'📋 Responsable',    color:'#0A6B47', badge:'RR', level:3, tabs:['dashboard','scanner','commande','alertes','planning'] },
-  agent:       { label:'👤 Agent',          color:'#1E40AF', badge:'AG', level:2, tabs:['scanner','commande','dashboard'] },
+  superadmin:  { label:'⚡ Super Admin',    color:'#7c3aed', badge:'SA', level:5, tabs:['dashboard','scanner','commande','stocks','alertes','planning','admin'] },
+  directeur:   { label:'👔 Directeur',      color:'#064D30', badge:'DR', level:4, tabs:['dashboard','scanner','commande','stocks','alertes','planning','admin'] },
+  responsable: { label:'📋 Responsable',    color:'#0A6B47', badge:'RR', level:3, tabs:['dashboard','scanner','commande','stocks','alertes','planning'] },
+  agent:       { label:'👤 Agent',          color:'#1E40AF', badge:'AG', level:2, tabs:['scanner','commande','stocks','dashboard'] },
   lecture:     { label:'👁 Lecture seule',  color:'#92400E', badge:'LT', level:1, tabs:['dashboard','alertes'] },
 };
 function getRoleInfo(role){ return ROLES[role] || ROLES.agent; }
@@ -1378,13 +1482,13 @@ if(new URLSearchParams(location.search).get('reset')==='1'){
 /* ═══ I18N ══════════════════════════════════════════════════════════════════ */
 const I18N={
   fr:{tag:'Gestion intelligente des périmés',l_user:'Identifiant',l_pass:'Mot de passe',l_btn:'Se connecter',l_err_empty:'Remplissez tous les champs',l_err_wrong:'Identifiant ou mot de passe incorrect',ph_user:'prenom.nom',ph_pass:'••••••••',rg_t:"🔒 Charte d'usage et protection des données",rg_p:"Le détail des traitements et des durées de conservation figure dans les Mentions légales accessibles depuis le menu.",rg_y:'✓ Accepter',rg_n:'Refuser',
-  lexp:'Périmés',lcrit:'Critiques ≤2j',lwarn:'Attention ≤7j',lok:'OK',lprods:'Produits',all:'Tous',
+  lexp:'Périmés',lcrit:'Critiques ≤2j',lwarn:'Attention ≤7j',lok:'OK',lprods:'Produits',all:'Tous',all_stores:'Tous magasins',all_status:'Tous statuts',
   sct:'Scanner un produit',scsub:'Photographiez le code-barres EAN',scbtn:'Prendre une photo',scanning:'🔍 Analyse…',scan_ok:'✅ Produit reconnu',scan_err:'❌ Erreur de connexion',
   ldlc:'Date limite (DLC)',rfsave:'💾 Enregistrer',rfcancel:'Annuler',
   nft:'Produit non référencé',nfsub:"Ce gencod n'est pas dans le catalogue.",nfbtn:'Nouveau scan',
   gps_load:'Localisation…',gps_denied:'GPS refusé — sélection manuelle',gps_err:'Erreur GPS',gps_retry:'Réessayer',gps_no_store:'Hors zone magasin — sélection manuelle',
-  tl_d:'Tableau',tl_s:'Scanner',tl_c:'Commande',tl_a:'Alertes',tl_p:'Planning',
-  badge_e:'Périmé',badge_o:'J-{{d}}',badge_w:'J-{{d}}',badge_k:'J+{{d}}',
+  tl_d:'Tableau',tl_s:'Scanner',tl_c:'Commande',tl_stk:'Stocks',tl_a:'Alertes',tl_p:'Planning',
+  badge_e:'Périmé',badge_o:'J-{{d}}',badge_w:'J-{{d}}',badge_k:'J-{{d}}',
   send_all:'📧 Envoyer le récap global',su_t:'⚠️ Alertes produits',su_p:'Produits expirés ou critiques détectés',
   em_t:'📧 Envoyer un rappel',em_sub:'Rappel e-mail des produits urgents',em_to:'Destinataire(s)',em_subj:'Objet',em_body:'Corps du message',em_cancel:'Annuler',su_mail:'📧 Envoyer par mail',su_cl:'Fermer',
   email_subj:'[FreshControl] Produits urgents — {{store}} — {{date}}',
@@ -1392,13 +1496,13 @@ const I18N={
   saved:'✅ Sauvegardé',deleted:'🗑 Supprimé',user_added:'👤 Utilisateur ajouté',store_added:'🏪 Magasin ajouté',prod_archived:'✅ Produit archivé',no_prods:'Aucun produit',fill_all:'Remplissez tous les champs',email_sent:'✅ E-mail envoyé',email_err:'❌ Erreur envoi',csv_ok:'📥 CSV téléchargé',
   adm_stores:'🏪 Magasins',adm_users:'👥 Utilisateurs',adm_lang:'🌍 Langue',adm_conf:'⚙️ Configuration'},
   en:{tag:'Smart expiry date management',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err_empty:'Please fill all fields',l_err_wrong:'Wrong username or password',ph_user:'firstname.lastname',ph_pass:'••••••••',rg_t:'🔒 Usage charter & data protection',rg_p:'Full processing details and retention periods are available in the Legal Notice from the menu.',rg_y:'✓ Accept',rg_n:'Decline',
-  lexp:'Expired',lcrit:'Critical ≤2d',lwarn:'Warning ≤7d',lok:'OK',lprods:'Products',all:'All',
+  lexp:'Expired',lcrit:'Critical ≤2d',lwarn:'Warning ≤7d',lok:'OK',lprods:'Products',all:'All',all_stores:'All stores',all_status:'All statuses',
   sct:'Scan a product',scsub:'Photograph the EAN barcode',scbtn:'Take a photo',scanning:'🔍 Analyzing…',scan_ok:'✅ Product found',scan_err:'❌ Connection error',
   ldlc:'Expiry date',rfsave:'💾 Save',rfcancel:'Cancel',
   nft:'Product not found',nfsub:"This barcode isn't in the catalogue.",nfbtn:'New scan',
   gps_load:'Locating…',gps_denied:'GPS denied — manual selection',gps_err:'GPS error',gps_retry:'Retry',gps_no_store:'Outside store zone — manual selection',
-  tl_d:'Dashboard',tl_s:'Scanner',tl_c:'Order',tl_a:'Alerts',tl_p:'Planning',
-  badge_e:'Expired',badge_o:'D-{{d}}',badge_w:'D-{{d}}',badge_k:'D+{{d}}',
+  tl_d:'Dashboard',tl_s:'Scanner',tl_c:'Order',tl_stk:'Stock',tl_a:'Alerts',tl_p:'Planning',
+  badge_e:'Expired',badge_o:'D-{{d}}',badge_w:'D-{{d}}',badge_k:'D-{{d}}',
   send_all:'📧 Send global recap',su_t:'⚠️ Product alerts',su_p:'Expired or critical products detected',
   em_t:'📧 Send reminder',em_sub:'Email reminder for urgent products',em_to:'Recipient(s)',em_subj:'Subject',em_body:'Message',em_cancel:'Cancel',su_mail:'📧 Send by email',su_cl:'Close',
   email_subj:'[FreshControl] Urgent products — {{store}} — {{date}}',
@@ -1406,13 +1510,13 @@ const I18N={
   saved:'✅ Saved',deleted:'🗑 Deleted',user_added:'👤 User added',store_added:'🏪 Store added',prod_archived:'✅ Product archived',no_prods:'No products',fill_all:'Please fill all fields',email_sent:'✅ Email sent',email_err:'❌ Send error',csv_ok:'📥 CSV downloaded',
   adm_stores:'🏪 Stores',adm_users:'👥 Users',adm_lang:'🌍 Language',adm_conf:'⚙️ Config'},
   es:{tag:'Gestión inteligente de caducidades',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Iniciar sesión',l_err_empty:'Rellene todos los campos',l_err_wrong:'Usuario o contraseña incorrectos',ph_user:'nombre.apellido',ph_pass:'••••••••',rg_t:'🔒 Carta de uso y protección de datos',rg_p:'El detalle del tratamiento y los plazos de conservación figuran en el Aviso Legal accesible desde el menú.',rg_y:'✓ Aceptar',rg_n:'Rechazar',
-  lexp:'Caducados',lcrit:'Crítico ≤2d',lwarn:'Atención ≤7d',lok:'OK',lprods:'Productos',all:'Todos',
+  lexp:'Caducados',lcrit:'Crítico ≤2d',lwarn:'Atención ≤7d',lok:'OK',lprods:'Productos',all:'Todos',all_stores:'Todas las tiendas',all_status:'Todos los estados',
   sct:'Escanear producto',scsub:'Fotografíe el código EAN',scbtn:'Tomar foto',scanning:'🔍 Analizando…',scan_ok:'✅ Producto encontrado',scan_err:'❌ Error de conexión',
   ldlc:'Fecha caducidad',rfsave:'💾 Guardar',rfcancel:'Cancelar',
   nft:'Producto no encontrado',nfsub:"Este código no está en el catálogo.",nfbtn:'Nuevo escaneo',
   gps_load:'Localizando…',gps_denied:'GPS denegado — selección manual',gps_err:'Error GPS',gps_retry:'Reintentar',gps_no_store:'Fuera de zona — selección manual',
-  tl_d:'Panel',tl_s:'Escáner',tl_c:'Pedido',tl_a:'Alertas',tl_p:'Planif.',
-  badge_e:'Caducado',badge_o:'D-{{d}}',badge_w:'D-{{d}}',badge_k:'D+{{d}}',
+  tl_d:'Panel',tl_s:'Escáner',tl_c:'Pedido',tl_stk:'Existencias',tl_a:'Alertas',tl_p:'Planif.',
+  badge_e:'Caducado',badge_o:'D-{{d}}',badge_w:'D-{{d}}',badge_k:'D-{{d}}',
   send_all:'📧 Enviar resumen global',su_t:'⚠️ Alertas productos',su_p:'Productos caducados o críticos',
   em_t:'📧 Enviar recordatorio',em_sub:'Recordatorio de productos urgentes',em_to:'Destinatario',em_subj:'Asunto',em_body:'Mensaje',em_cancel:'Cancelar',su_mail:'📧 Enviar por correo',su_cl:'Cerrar',
   email_subj:'[FreshControl] Urgentes — {{store}} — {{date}}',
@@ -1420,13 +1524,13 @@ const I18N={
   saved:'✅ Guardado',deleted:'🗑 Eliminado',user_added:'👤 Usuario añadido',store_added:'🏪 Tienda añadida',prod_archived:'✅ Producto archivado',no_prods:'Sin productos',fill_all:'Rellene todos los campos',email_sent:'✅ Correo enviado',email_err:'❌ Error envío',csv_ok:'📥 CSV descargado',
   adm_stores:'🏪 Tiendas',adm_users:'👥 Usuarios',adm_lang:'🌍 Idioma',adm_conf:'⚙️ Config'},
   zh:{tag:'智能保质期管理系统',l_user:'用户名',l_pass:'密码',l_btn:'登录',l_err_empty:'请填写所有字段',l_err_wrong:'用户名或密码错误',ph_user:'姓名.姓氏',ph_pass:'••••••••',rg_t:'🔒 使用规章与数据保护',rg_p:'数据处理详情与保留期限请查阅菜单中的法律声明。',rg_y:'✓ 接受',rg_n:'拒绝',
-  lexp:'已过期',lcrit:'紧急≤2天',lwarn:'注意≤7天',lok:'正常',lprods:'产品',all:'全部',
+  lexp:'已过期',lcrit:'紧急≤2天',lwarn:'注意≤7天',lok:'正常',lprods:'产品',all:'全部',all_stores:'全部门店',all_status:'全部状态',
   sct:'扫描产品',scsub:'拍摄EAN条形码',scbtn:'拍照',scanning:'🔍 分析中…',scan_ok:'✅ 产品已识别',scan_err:'❌ 连接错误',
   ldlc:'有效期',rfsave:'💾 保存',rfcancel:'取消',
   nft:'产品未找到',nfsub:"此条形码不在目录中。",nfbtn:'重新扫描',
   gps_load:'定位中…',gps_denied:'GPS被拒绝 — 手动选择',gps_err:'GPS错误',gps_retry:'重试',gps_no_store:'不在门店范围内 — 手动选择',
-  tl_d:'仪表盘',tl_s:'扫描',tl_c:'订单',tl_a:'警报',tl_p:'计划',
-  badge_e:'已过期',badge_o:'还剩{{d}}天',badge_w:'还剩{{d}}天',badge_k:'+{{d}}天',
+  tl_d:'仪表盘',tl_s:'扫描',tl_c:'订单',tl_stk:'库存',tl_a:'警报',tl_p:'计划',
+  badge_e:'已过期',badge_o:'还剩{{d}}天',badge_w:'还剩{{d}}天',badge_k:'还剩{{d}}天',
   send_all:'📧 发送全局摘要',su_t:'⚠️ 产品警报',su_p:'检测到过期或紧急产品',
   em_t:'📧 发送提醒',em_sub:'紧急产品邮件提醒',em_to:'收件人',em_subj:'主题',em_body:'邮件内容',em_cancel:'取消',su_mail:'📧 发送邮件',su_cl:'关闭',
   email_subj:'[FreshControl] 紧急产品 — {{store}} — {{date}}',
@@ -1452,7 +1556,7 @@ function applyLang(){
   $('l-exp','lexp');$('l-crit','lcrit');$('l-warn','lwarn');$('l-ok','lok');$('l-prods','lprods');
   $('sc-t','sct');$('sc-sub','scsub');$('sc-btn','scbtn');$('l-dlc','ldlc');
   $('rf-save','rfsave');$('rf-cancel','rfcancel');$('nf-t','nft');$('nf-sub','nfsub');$('nf-btn','nfbtn');
-  $('tl-d','tl_d');$('tl-s','tl_s');$('tl-c','tl_c');$('tl-a','tl_a');$('tl-p','tl_p');
+  $('tl-d','tl_d');$('tl-s','tl_s');$('tl-c','tl_c');$('tl-stk','tl_stk');$('tl-a','tl_a');$('tl-p','tl_p');
   $('l-send-all','send_all');$('su-t','su_t');$('su-p','su_p');$('su-mail','su_mail');$('su-cl','su_cl');
   $('em-t','em_t');$('em-sub','em_sub');$('em-cancel','em_cancel');
   // lang buttons
@@ -1489,8 +1593,10 @@ async function doLogin(){
 
 function doLogout(){
   session=null;
+  navStack=[];                            // repart d'un historique vierge
   sessionStorage.removeItem('fc_session');
   stopCmdScan(); currentOrder=[]; // libère caméra + commande non validée
+  stopStockScan(); currentStock=[]; // libère caméra + relevé de stock non validé
   stopGPS(); gps=null; gpsState='idle'; // le GPS redémarre au prochain login
   closeSB();
   document.getElementById('app').classList.remove('on');
@@ -1640,19 +1746,30 @@ function dist(a,b,c,d){
 
 /* ═══ TAB NAV ════════════════════════════════════════════════════════════════ */
 let curTab='dashboard';
-function showTab(n){
+let navStack=[];                 // historique des onglets pour le bouton « retour »
+function goBack(){
+  if(!navStack.length) return;
+  showTab(navStack.pop(), true); // true = navigation retour (ne ré-empile pas)
+}
+function updateBackBtn(){
+  const bk=document.getElementById('hdr-back');
+  if(bk) bk.style.display = navStack.length ? 'flex' : 'none';
+}
+function showTab(n, isBack){
+  if(!isBack && curTab && curTab!==n){ navStack.push(curTab); if(navStack.length>50) navStack.shift(); }
   if(curTab==='commande' && n!=='commande') stopCmdScan(); // libère la caméra
+  if(curTab==='stocks'   && n!=='stocks')   stopStockScan(); // libère la caméra
   if(curTab==='scanner'  && n!=='scanner')  stopEanScan();  // libère la caméra
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
   // Le bouton de la barre suit le 1er caractère du nom, sauf onglets à nom
   // ambigu (admin/catalogue commencent par 'a'/'c' déjà pris).
-  const tbMap = { admin:'tb-adm', catalogue:'tb-cat' };
+  const tbMap = { admin:'tb-adm', catalogue:'tb-cat', stocks:'tb-stk' };
   const t=document.getElementById('tab-'+n), b=document.getElementById(tbMap[n]||('tb-'+n[0]));
   if(t) t.classList.add('on');
   if(b) b.classList.add('on');
   curTab=n;
-  if(n==='scanner'||n==='commande'){
+  if(n==='scanner'||n==='commande'||n==='stocks'){
     if(gpsWid===null && gpsState!=='denied') startGPS(); // relance la détection si besoin
     renderStoreBars();
   }
@@ -1660,14 +1777,17 @@ function showTab(n){
     checkCatalogueWarning();
   }
   if(n==='commande') renderCommande();
+  if(n==='stocks') renderStock();
   if(n==='alertes') renderAlertes();
   if(n==='planning') renderPlanning();
   if(n==='catalogue') renderCatalogueView();
   if(n==='admin') renderAdmin();
+  updateBackBtn();
 }
 function renderCurrentTab(){
   if(curTab==='dashboard') renderDashboard();
   else if(curTab==='commande') renderCommande();
+  else if(curTab==='stocks') renderStock();
   else if(curTab==='alertes') renderAlertes();
   else if(curTab==='planning') renderPlanning();
   else if(curTab==='catalogue') renderCatalogueView();
@@ -1778,12 +1898,12 @@ function renderDashboard(){
   // store filters
   const fsr=document.getElementById('fsr');fsr.innerHTML='';
   if(sNames.size>0){
-    const all=el('button','fc'+(fsStore===null?' on':''));all.textContent=t.all;all.onclick=()=>{fsStore=null;renderDashboard()};fsr.appendChild(all);
+    const all=el('button','fc'+(fsStore===null?' on':''));all.textContent=t.all_stores;all.onclick=()=>{fsStore=null;renderDashboard()};fsr.appendChild(all);
     sNames.forEach(s=>{const b=el('button','fc'+(fsStore===s?' on':''));b.textContent=s.length>20?s.slice(0,18)+'…':s;b.onclick=()=>{fsStore=s;renderDashboard()};fsr.appendChild(b)});
   }
   // status filters
   const fmr=document.getElementById('fmr');fmr.innerHTML='';
-  [['all',t.all],['e',t.lexp],['o',t.lcrit],['w',t.lwarn],['k',t.lok]].forEach(([k,lbl])=>{
+  [['all',t.all_status],['e',t.lexp],['o',t.lcrit],['w',t.lwarn],['k',t.lok]].forEach(([k,lbl])=>{
     const b=el('button','fc'+((k==='all'&&fsStatus===null)||fsStatus===k?' on':''));
     b.textContent=lbl;b.onclick=()=>{fsStatus=k==='all'?null:k;renderDashboard()};fmr.appendChild(b);
   });
@@ -2972,6 +3092,10 @@ function checkCatalogueWarning(){
    lecture brute). Permet de comprendre un scan qui ne lit pas sur un vrai
    téléphone sans avoir accès à la console. */
 let _scanDiagTimer=null, _diagPrevFrames=-1, _diagStall=0;
+// Ligne technique du diagnostic (⚙ moteur ✓ · 📷 résolution · 🔁 essais · 🔎 code) = debug.
+// Masquée en prod ; réactivable pour le diagnostic terrain via ?debug=1 ou localStorage.fc_debug='1'.
+// Le message d'aide (verdict) reste toujours affiché.
+const SCAN_DIAG_DEBUG = (()=>{ try{ return new URLSearchParams(location.search).get('debug')==='1' || localStorage.getItem('fc_debug')==='1'; }catch(e){ return false; } })();
 function startScanDiag(stId){
   stopScanDiag();
   _diagPrevFrames=-1; _diagStall=0;
@@ -2993,9 +3117,11 @@ function startScanDiag(stId){
     else if(_diagStall>=3){ verdict='⚠️ La caméra ne fournit pas d’images (figées). Ferme et relance le scan.'; col='#ffd08a'; }
     else if(d.lastRaw){ verdict='✅ Code détecté ('+d.lastRaw+').'; col='#8be3c0'; }
     else { verdict='🔍 Images OK, code pas encore lu → rapproche à ~8-12 cm, code BIEN À PLAT, plus de lumière. Sinon utilise « 🖼 Scanner via photo » (fiable).'; col='#ffd08a'; }
-    el.innerHTML =
-      '<div>⚙ '+d.engine+(d.zxing?' ✓':' ✗')+'  ·  📷 '+d.res+'  ·  🔁 '+d.frames+'  ·  🔎 '+(d.lastRaw||'—')+'</div>'+
-      '<div style="margin-top:3px;color:'+col+'">'+verdict+'</div>';
+    const techLine = SCAN_DIAG_DEBUG
+      ? '<div>⚙ '+d.engine+(d.zxing?' ✓':' ✗')+'  ·  📷 '+d.res+'  ·  🔁 '+d.frames+'  ·  🔎 '+(d.lastRaw||'—')+'</div>'
+      : '';
+    el.innerHTML = techLine +
+      '<div style="margin-top:'+(techLine?'3px':'0')+';color:'+col+'">'+verdict+'</div>';
   }, 400);
 }
 function stopScanDiag(){ if(_scanDiagTimer){ clearInterval(_scanDiagTimer); _scanDiagTimer=null; } const e=document.getElementById('scan-diag-line'); if(e) e.remove(); }
@@ -3251,6 +3377,13 @@ let currentOrder = [];
 let cmdScanning  = false;
 let cmdPending   = null;   // produit hors catalogue / saisie manuelle, en attente de nom
 let lastAddedKey = null;   // clé de la dernière ligne ajoutée (pour le flash visuel)
+
+// ── STOCKS : état & stockage indépendants de Commande (localStorage fc_stocks) ──
+let stockRecords    = JSON.parse(localStorage.getItem('fc_stocks') || '[]');
+let currentStock    = [];
+let stkScanning     = false;
+let stkTorchOn      = false;
+let lastAddedStkKey = null;
 // L'anti-doublon de lecture caméra est désormais géré par BarcodeEngine.
 
 function renderCommande(){
@@ -3276,7 +3409,7 @@ async function startCmdScan(){
   cmdScanning = true;
   try{
     await BarcodeEngine.startLiveScan(video, (code) => {
-      if(!cmdScanning || cmdPending) return;   // une saisie quantité est en cours
+      if(!cmdScanning || qtyCtx) return;   // popup quantité ouverte → on ignore
       onCmdDecode(code);
     });
     const tb=document.getElementById('cmd-torch');
@@ -3328,33 +3461,62 @@ function cmdManualEntry(){ onCmdDecode(''); }
 
 function onCmdDecode(ean){
   const prod = ean ? lookupGencod(ean) : null;
-  // Produit reconnu dans le catalogue → ajout direct, la caméra continue de tourner.
+  // Chaque produit scanné ouvre la popup quantité (saisir le nb de colis → valider).
   if(prod){
-    addOrderProduct({
-      gencod:  ean,
-      name:    prod.nom || 'Produit',
-      famille: [prod.famille, prod.marque].filter(Boolean).join(' · '),
-    });
+    openQtyPopup({ mode:'commande', gencod: ean, name: prod.nom || 'Produit',
+      famille: [prod.famille, prod.marque].filter(Boolean).join(' · '), needName:false });
     return;
   }
-  // Code SCANNÉ mais hors catalogue → ajout DIRECT (vitesse) : nom vide et
-  // modifiable sur la ligne, suppression si erreur. Pas de boîte de confirmation.
+  // Code scanné hors catalogue → popup avec saisie du nom.
   if(ean){
-    addOrderProduct({ gencod: ean, name: '', famille: 'Hors catalogue' });
+    openQtyPopup({ mode:'commande', gencod: ean, name:'', famille:'Hors catalogue', needName:true });
     return;
   }
-  // Saisie manuelle (bouton, aucun gencod) → boîte nom + quantité.
-  cmdPending = { gencod: '', famille: '' };
-  document.getElementById('cmd-qty-gc').value  = cmdPending.gencod || '—';
-  document.getElementById('cmd-qty-fam').value = '';
-  const manualInp = document.getElementById('cmd-qty-manualname');
-  document.getElementById('cmd-qty-name').textContent = ean ? 'Produit hors catalogue' : 'Saisie manuelle';
-  document.getElementById('cmd-qty-namewrap').style.display = 'block';
-  manualInp.value = '';
-  document.getElementById('cmd-qty-input').value = '1';
-  document.getElementById('cmd-qty-box').style.display = 'block';
-  if(document.getElementById('cmd-st')) document.getElementById('cmd-st').textContent = '';
-  setTimeout(()=>{ manualInp.focus(); if(manualInp.select) manualInp.select(); }, 120);
+  // Saisie manuelle (bouton, aucun gencod) → popup nom + quantité.
+  openQtyPopup({ mode:'commande', gencod:'', name:'', famille:'', needName:true });
+}
+
+/* ═══ POPUP QUANTITÉ — contrôleur partagé Commande / Stocks ═══════════════════
+   Remplace l'ancien encart inline « saisie quantité » : l'UI de quantité passe
+   dans une fenêtre, donc la liste des articles enregistrés reste lisible. */
+let qtyCtx = null;   // { mode:'commande'|'stocks', gencod, name, famille, needName }
+function openQtyPopup(ctx){
+  qtyCtx = ctx;
+  const isStock = ctx.mode === 'stocks';
+  document.getElementById('qm-title').textContent = isStock ? '📦 Ajouter au stock' : '🛒 Ajouter à la commande';
+  const sub = ctx.needName
+    ? (ctx.gencod ? 'Code ' + ctx.gencod + ' · hors catalogue' : 'Saisie manuelle')
+    : [ctx.name, ctx.famille].filter(Boolean).join(' · ');
+  document.getElementById('qm-sub').textContent = sub;
+  const nameWrap = document.getElementById('qm-namewrap');
+  const nameInp  = document.getElementById('qm-name');
+  nameInp.value = ctx.needName ? (ctx.name || '') : '';
+  nameWrap.style.display = ctx.needName ? 'block' : 'none';
+  document.getElementById('qm-qty').value = '1';
+  const provWrap = document.getElementById('qm-provwrap');
+  provWrap.style.display = isStock ? 'block' : 'none';
+  if(isStock) document.getElementById('qm-prov').value = '';
+  openModal('qty-modal');
+  setTimeout(()=>{ const f = ctx.needName ? nameInp : document.getElementById('qm-qty'); if(f){ f.focus(); if(f.select) f.select(); } }, 130);
+}
+function qmStep(d){ const i=document.getElementById('qm-qty'); i.value = Math.max(1,(parseInt(i.value,10)||1)+d); }
+function closeQtyPopup(){ qtyCtx = null; closeModal('qty-modal'); }
+function confirmQtyPopup(){
+  if(!qtyCtx) return;
+  const qty = parseInt(document.getElementById('qm-qty').value, 10);
+  if(!qty || qty < 1){ toast('Nombre de colis invalide'); return; }
+  let name = qtyCtx.name;
+  if(qtyCtx.needName){
+    name = document.getElementById('qm-name').value.trim();
+    if(!name){ toast('Saisissez le nom du produit'); return; }
+  }
+  if(qtyCtx.mode === 'stocks'){
+    const prov = document.getElementById('qm-prov').value.trim();
+    addStockProduct({ gencod: qtyCtx.gencod, name, famille: qtyCtx.famille, provenance: prov }, qty);
+  } else {
+    addOrderProduct({ gencod: qtyCtx.gencod, name, famille: qtyCtx.famille }, qty);
+  }
+  closeQtyPopup();
 }
 
 /* Ajout direct d'un produit à la commande (scan d'un produit reconnu).
@@ -3662,6 +3824,297 @@ function deleteOrder(id){
     orders = orders.filter(o => o.id !== id);
     localStorage.setItem('fc_orders', JSON.stringify(orders));
     renderOrdersHistory();
+    toast(T().deleted);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   STOCKS — clone fonctionnel de Commande, listes & historique indépendants
+   (localStorage fc_stocks), AVEC champ provenance (optionnel) par ligne.
+   Réutilise openQtyPopup({mode:'stocks'}), la modale e-mail, showConfirm, toast,
+   renderStoreBars/showStoreBadge et BarcodeEngine.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function renderStock(){
+  showStoreBadge();
+  renderStockLines();
+}
+
+async function startStockScan(){
+  const st = document.getElementById('stk-st');
+  if(!BarcodeEngine.isAvailable()){
+    if(st) st.innerHTML = '<div style="color:var(--o);font-weight:800">⚠️ Lecteur indisponible — utilisez « 🖼 Scanner via photo »</div>';
+    return;
+  }
+  const wrap = document.getElementById('stk-cam-wrap');
+  const video = document.getElementById('stk-video');
+  document.getElementById('stk-scan-btn').style.display = 'none';
+  document.getElementById('stk-stop-btn').style.display = 'inline-flex';
+  if(wrap) wrap.style.display = 'block';
+  const box=document.getElementById('stk-scan-box'); if(box) box.classList.add('scanning');
+  if(st) st.textContent = 'Visez un code-barres…';
+  stkScanning = true;
+  try{
+    await BarcodeEngine.startLiveScan(video, (code) => {
+      if(!stkScanning || qtyCtx) return;   // popup quantité ouverte → on ignore
+      onStockDecode(code);
+    });
+    const tb=document.getElementById('stk-torch');
+    if(tb) tb.style.display = BarcodeEngine.hasTorch() ? 'flex' : 'none';
+    startScanDiag('stk-st');
+  }catch(e){
+    console.warn('Caméra stock:', e);
+    if(st) st.innerHTML = '<div style="color:var(--o);font-weight:800">⚠️ Caméra inaccessible — utilisez « 🖼 Scanner via photo »</div>';
+    stopStockScan();
+  }
+}
+
+function stopStockScan(){
+  stkScanning = false;
+  stopScanDiag();
+  BarcodeEngine.stopLiveScan();
+  const wrap = document.getElementById('stk-cam-wrap');
+  if(wrap) wrap.style.display = 'none';
+  const box=document.getElementById('stk-scan-box'); if(box) box.classList.remove('scanning');
+  const b1 = document.getElementById('stk-scan-btn'), b2 = document.getElementById('stk-stop-btn');
+  if(b1) b1.style.display = 'inline-flex';
+  if(b2) b2.style.display = 'none';
+  const tb=document.getElementById('stk-torch'); if(tb){ tb.style.display='none'; tb.classList.remove('on'); }
+  stkTorchOn=false;
+}
+
+function toggleStkTorch(){
+  stkTorchOn=!stkTorchOn;
+  BarcodeEngine.setTorch(stkTorchOn);
+  const tb=document.getElementById('stk-torch'); if(tb) tb.classList.toggle('on',stkTorchOn);
+}
+
+// Scan via photo (repli caméra) — même moteur robuste que Commande
+document.getElementById('stk-photo-in').addEventListener('change', async function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  e.target.value = '';
+  const st = document.getElementById('stk-st');
+  if(!BarcodeEngine.isAvailable()){ if(st) st.textContent = '⚠️ Lecteur indisponible'; return; }
+  if(st) st.innerHTML = '<span class="spin"></span> Lecture…';
+  let code=null;
+  try{ code = await BarcodeEngine.decodeImageFile(file); }
+  catch(err){ console.warn('decodeImageFile (stock):',err); }
+  if(code){ if(st) st.textContent=''; onStockDecode(code); }
+  else if(st) st.innerHTML = '<div style="color:var(--o);font-weight:800">⚠️ Code-barres non détecté — réessayez ou utilisez « 📷 Démarrer le scan »</div>';
+});
+
+function stockManualEntry(){ onStockDecode(''); }
+
+function onStockDecode(ean){
+  const prod = ean ? lookupGencod(ean) : null;
+  if(prod){
+    openQtyPopup({ mode:'stocks', gencod: ean, name: prod.nom || 'Produit',
+      famille: [prod.famille, prod.marque].filter(Boolean).join(' · '), needName:false });
+    return;
+  }
+  if(ean){
+    openQtyPopup({ mode:'stocks', gencod: ean, name:'', famille:'Hors catalogue', needName:true });
+    return;
+  }
+  openQtyPopup({ mode:'stocks', gencod:'', name:'', famille:'', needName:true });
+}
+
+/* Ajout d'un produit au relevé de stock (via popup quantité).
+   +qty si le même gencod est déjà présent ; sinon nouvelle ligne. */
+function addStockProduct(p, qty){
+  const add = (!qty || qty < 1) ? 1 : qty;
+  const existing = p.gencod ? currentStock.find(l => l.gencod === p.gencod) : null;
+  let line;
+  if(existing){
+    existing.qty += add;
+    if(p.provenance) existing.provenance = p.provenance;   // maj provenance si (re)fournie
+    line = existing;
+  } else {
+    line = { gencod: p.gencod || '', name: p.name || '', famille: p.famille || '', provenance: p.provenance || '', qty: add };
+    currentStock.push(line);
+  }
+  lastAddedStkKey = line.gencod || line.name;
+  renderStockLines();
+  toast(`➕ ${line.name || line.gencod || 'Article'} · ${line.qty}`);
+}
+
+function changeStockQty(idx, delta){
+  const l = currentStock[idx]; if(!l) return;
+  l.qty = Math.max(1, l.qty + delta);
+  renderStockLines();
+}
+function setStockName(idx, val){
+  const l = currentStock[idx]; if(!l) return;
+  l.name = String(val || '').trim();
+}
+function setStockQty(idx, val){
+  const l = currentStock[idx]; if(!l) return;
+  const q = parseInt(val, 10);
+  l.qty = (!q || q < 1) ? 1 : q;
+  renderStockLines();
+}
+function setStockProv(idx, val){
+  const l = currentStock[idx]; if(!l) return;
+  l.provenance = String(val || '').trim();
+}
+function removeStockLine(idx){
+  currentStock.splice(idx, 1);
+  renderStockLines();
+}
+
+function renderStockLines(){
+  const el     = document.getElementById('stock-lines');
+  const footer = document.getElementById('stk-footer');
+  const count  = document.getElementById('stk-count');
+  if(!el) return;
+  if(!currentStock.length){
+    el.innerHTML = '<div class="empty">Aucun article — scannez un produit pour commencer</div>';
+    if(footer) footer.style.display = 'none';
+    if(count)  count.textContent = '';
+    return;
+  }
+  const totalQty = currentStock.reduce((s,l)=>s+l.qty, 0);
+  if(count) count.textContent = `(${currentStock.length} réf. · ${totalQty} u.)`;
+  el.innerHTML = currentStock.map((l,i)=>{
+    const flash = (l.gencod||l.name) === lastAddedStkKey ? ' flash' : '';
+    return `
+    <div class="ord-line${flash}">
+      <div style="flex:1;min-width:0">
+        <input class="ord-name-in" value="${escapeHTMLAttr(l.name||'')}" placeholder="Nom (optionnel)" onchange="setStockName(${i},this.value)" aria-label="Nom du produit">
+        <div style="font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(l.gencod||'sans gencod')}${l.famille?' · '+escapeHTML(l.famille):''}</div>
+        <input class="ord-name-in" style="margin-top:4px;font-size:11.5px" value="${escapeHTMLAttr(l.provenance||'')}" placeholder="📍 Provenance (optionnel)" onchange="setStockProv(${i},this.value)" aria-label="Provenance">
+      </div>
+      <div style="flex-shrink:0">
+        <div class="ord-qty">
+          <button onclick="changeStockQty(${i},-1)" aria-label="Une unité de moins">−</button>
+          <input type="number" min="1" value="${l.qty}" onchange="setStockQty(${i},this.value)" inputmode="numeric" aria-label="Quantité">
+          <button onclick="changeStockQty(${i},1)" aria-label="Une unité de plus">+</button>
+        </div>
+        <div class="ord-colis">unités</div>
+      </div>
+      <button class="ord-del" onclick="removeStockLine(${i})" aria-label="Supprimer la ligne">🗑</button>
+    </div>`;
+  }).join('');
+  if(footer) footer.style.display = 'block';
+  lastAddedStkKey = null;   // le flash ne joue qu'une fois
+}
+
+function buildStockText(lines, meta){
+  const out = [
+    `État des stocks — ${meta.date}`,
+    meta.store ? `Magasin : ${meta.store}` : '',
+    meta.by ? `Relevé par : ${meta.by}` : '',
+    '', 'Produits :', '',
+  ].filter((x,idx)=> x!=='' || idx>2);
+  lines.forEach(l => out.push(`- ${l.name || l.gencod || 'sans nom'}  (${l.gencod||'sans gencod'})  ×${l.qty}${l.provenance ? '  · provenance : '+l.provenance : ''}`));
+  const totalQty = lines.reduce((s,l)=>s+l.qty, 0);
+  out.push('', `Total : ${lines.length} référence(s) · ${totalQty} unité(s)`, '', '— FreshControl');
+  return out.join('\n');
+}
+
+function openStockEmail(subject, body){
+  document.getElementById('em-to').value   = localStorage.getItem('fc_email') || emailResp || '';
+  document.getElementById('em-subj').value = subject;
+  document.getElementById('em-body').value = body;
+  const stag = document.getElementById('em-store-tag');
+  if(stag){ stag.style.display = 'inline-block'; stag.textContent = '📦 Stock'; }
+  emailStore = null;
+  openModal('email-modal');
+}
+
+function validateStock(){
+  if(!currentStock.length){ toast('Relevé de stock vide'); return; }
+  stopStockScan();
+  const record = {
+    id:    genId(),
+    date:  new Date().toISOString(),
+    store: storeName || '',
+    by:    session?.username || '?',
+    lines: currentStock.map(l => ({ ...l })),
+  };
+  stockRecords.unshift(record);
+  localStorage.setItem('fc_stocks', JSON.stringify(stockRecords));
+  orderForShare = record.lines;                 // partage image (liste des articles)
+  const dateStr = new Date(record.date).toLocaleDateString(lang);
+  openStockEmail(
+    `[FreshControl] Stock${record.store ? ' — '+record.store : ''} — ${dateStr}`,
+    buildStockText(record.lines, { date: dateStr, store: record.store, by: record.by })
+  );
+  currentStock = [];
+  renderStockLines();
+  toast('✅ Relevé de stock enregistré');
+}
+
+function clearStock(){
+  if(!currentStock.length) return;
+  showConfirm('Vider le relevé de stock en cours ?','Les articles non validés seront perdus.', ()=>{
+    currentStock = [];
+    renderStockLines();
+    toast('🗑 Relevé vidé');
+  });
+}
+
+function exportStockCSV(lines){
+  const cols = ['gencod','name','famille','provenance','qty'];
+  const head = ['gencod','name','famille','provenance','quantite'];
+  const rows = [head.join(';'), ...lines.map(l => cols.map(c => `"${String(l[c]??'').replace(/"/g,'""')}"`).join(';'))];
+  const blob = new Blob(['﻿'+rows.join('\n')], { type:'text/csv;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `Stock_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  toast(T().csv_ok);
+}
+
+/* Historique des relevés de stock (modale) */
+function findStock(id){ return stockRecords.find(o => o.id === id); }
+function renderStocksHistory(){
+  const el = document.getElementById('stocks-list');
+  if(!el) return;
+  if(!stockRecords.length){ el.innerHTML = '<div class="empty">Aucun relevé de stock enregistré</div>'; return; }
+  el.innerHTML = stockRecords.slice(0,100).map(o => {
+    const totalQty = o.lines.reduce((s,l)=>s+l.qty, 0);
+    return `<div style="padding:11px 0;border-bottom:1px solid rgba(0,0,0,.06)">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div style="font-size:13px;font-weight:800">📦 ${escapeHTML(new Date(o.date).toLocaleString(lang))}</div>
+        <span class="pbadge bk" style="font-size:10px">${o.lines.length} réf · ${totalQty} u.</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);font-weight:600;margin:2px 0 6px">${escapeHTML(o.store||'—')} · ${escapeHTML(o.by||'?')}</div>
+      <div style="font-size:11.5px;color:var(--txt);font-weight:600;line-height:1.6">
+        ${o.lines.map(l=>`${escapeHTML(l.name||'—')} <strong>×${l.qty}</strong>${l.provenance?` <span style="color:var(--muted);font-weight:600">· ${escapeHTML(l.provenance)}</span>`:''}`).join('<br>')}
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="restockFrom(this.dataset.oid)">↻ Recharger</button>
+        <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="emailStock(this.dataset.oid)">📧 Renvoyer</button>
+        <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="exportStockId(this.dataset.oid)">📥 CSV</button>
+        <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="deleteStock(this.dataset.oid)" style="color:var(--r)">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function restockFrom(id){
+  const o = findStock(id); if(!o) return;
+  currentStock = o.lines.map(l => ({ ...l }));
+  closeModal('stocks-modal');
+  showTab('stocks');
+  toast('↻ Relevé rechargé');
+}
+function emailStock(id){
+  const o = findStock(id); if(!o) return;
+  orderForShare = o.lines;                       // partage image depuis l'historique
+  const dateStr = new Date(o.date).toLocaleDateString(lang);
+  openStockEmail(
+    `[FreshControl] Stock${o.store ? ' — '+o.store : ''} — ${dateStr}`,
+    buildStockText(o.lines, { date: dateStr, store: o.store, by: o.by })
+  );
+  closeModal('stocks-modal');
+}
+function exportStockId(id){ const o = findStock(id); if(o) exportStockCSV(o.lines); }
+function deleteStock(id){
+  showConfirm('Supprimer ce relevé de stock ?','Suppression définitive de l\'historique.', ()=>{
+    stockRecords = stockRecords.filter(o => o.id !== id);
+    localStorage.setItem('fc_stocks', JSON.stringify(stockRecords));
+    renderStocksHistory();
     toast(T().deleted);
   });
 }
@@ -4142,7 +4595,7 @@ function toolCSV(){
    viewport (rubber-band) quand un geste ne trouve rien à faire défiler. On bloque
    donc tout touchmove qui NE part PAS d'un conteneur réellement défilable
    (vertical OU horizontal). Les vrais scrollers (#main, .modal-sh, .mbody,
-   .sb-body, .frow…) restent libres. No-op tant qu'on est sur le splash/login. */
+   .sb-body…) restent libres. No-op tant qu'on est sur le splash/login. */
 (function installScrollLock(){
   const scrollable = el => {
     for(let n=el; n && n!==document.body && n.nodeType===1; n=n.parentElement){
