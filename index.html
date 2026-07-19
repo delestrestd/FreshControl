@@ -239,6 +239,8 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .scan-step-sub{font-size:12px;color:var(--muted);margin-top:3px;font-weight:600;line-height:1.34;max-width:290px;margin-left:auto;margin-right:auto}
 .scan-step-status{margin-top:10px;font-size:12px;font-weight:700;color:var(--muted);min-height:18px}
 .scan-link-btn{background:rgba(0,0,0,.05);border:1px solid var(--bdr);color:var(--muted);border-radius:var(--rr);padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background .18s,color .18s}
+/* Boutons d'action scan en ICÔNE SEULE (arrêt / photo / saisie manuelle) : carré compact. */
+.scan-ico{width:46px;min-width:46px;height:46px;min-height:46px;padding:0!important;font-size:21px;line-height:1;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center}
 .scan-link-btn:hover{background:rgba(0,0,0,.09);color:var(--txt)}
 .scan-reset-btn{padding:9px 18px;border-radius:var(--rr);border:1px solid var(--bdr);background:rgba(255,255,255,.6);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background .18s,color .18s}
 .scan-reset-btn:hover{background:rgba(255,255,255,.85);color:var(--txt)}
@@ -1007,10 +1009,10 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
 
         <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;align-items:center">
           <button class="sbtn" id="scan-cam-btn" onclick="startEanScan()" style="margin-top:0">📷 Démarrer le scan</button>
-          <button class="sbtn" id="scan-cam-stop" onclick="stopEanScan()" style="margin-top:0;display:none;background:rgba(224,60,60,.9);box-shadow:var(--spec-d),var(--sr)" title="Arrêter" aria-label="Arrêter">⏹</button>
-          <button class="scan-link-btn" onclick="document.getElementById('scan-in-ean').click()" title="Scanner via photo" aria-label="Scanner via photo">🖼</button>
-          <button class="scan-link-btn" onclick="openModal('add-product-modal');fillStoreDL()" title="Saisie manuelle" aria-label="Saisie manuelle">✏️</button>
-          <button id="quick-sync-btn" class="scan-link-btn" onclick="quickSync()" aria-label="Rafraîchir le catalogue" title="Rafraîchir le catalogue depuis Sheets">🔄</button>
+          <button class="sbtn scan-ico" id="scan-cam-stop" onclick="stopEanScan()" style="margin-top:0;display:none;background:rgba(224,60,60,.9);box-shadow:var(--spec-d),var(--sr)" title="Arrêter" aria-label="Arrêter">⏹</button>
+          <button class="scan-link-btn scan-ico" onclick="document.getElementById('scan-in-ean').click()" title="Scanner via photo" aria-label="Scanner via photo">🖼</button>
+          <button class="scan-link-btn scan-ico" onclick="openModal('add-product-modal');fillStoreDL()" title="Saisie manuelle" aria-label="Saisie manuelle">✏️</button>
+          <button id="quick-sync-btn" class="scan-link-btn scan-ico" onclick="quickSync()" aria-label="Rafraîchir le catalogue" title="Rafraîchir le catalogue depuis Sheets">🔄</button>
         </div>
         <div id="scan-st" class="scan-step-status"></div>
       </div>
@@ -1081,9 +1083,9 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
         <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;align-items:center">
           <input type="file" id="cmd-photo-in" accept="image/*" capture="environment" style="display:none">
           <button class="sbtn" id="cmd-scan-btn" onclick="startCmdScan()" style="margin-top:0">📷 Démarrer le scan</button>
-          <button class="sbtn" id="cmd-stop-btn" onclick="stopCmdScan()" style="margin-top:0;display:none;background:rgba(224,60,60,.9);box-shadow:var(--spec-d),var(--sr)" title="Arrêter" aria-label="Arrêter">⏹</button>
-          <button class="scan-link-btn" onclick="document.getElementById('cmd-photo-in').click()" title="Scanner via photo" aria-label="Scanner via photo">🖼</button>
-          <button class="scan-link-btn" onclick="cmdManualEntry()" title="Saisie manuelle" aria-label="Saisie manuelle">✏️</button>
+          <button class="sbtn scan-ico" id="cmd-stop-btn" onclick="stopCmdScan()" style="margin-top:0;display:none;background:rgba(224,60,60,.9);box-shadow:var(--spec-d),var(--sr)" title="Arrêter" aria-label="Arrêter">⏹</button>
+          <button class="scan-link-btn scan-ico" onclick="document.getElementById('cmd-photo-in').click()" title="Scanner via photo" aria-label="Scanner via photo">🖼</button>
+          <button class="scan-link-btn scan-ico" onclick="cmdManualEntry()" title="Saisie manuelle" aria-label="Saisie manuelle">✏️</button>
         </div>
         <div id="cmd-st" class="scan-step-status"></div>
       </div>
@@ -1132,9 +1134,9 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
         <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;align-items:center">
           <input type="file" id="stk-photo-in" accept="image/*" capture="environment" style="display:none">
           <button class="sbtn" id="stk-scan-btn" onclick="startStockScan()" style="margin-top:0">📷 Démarrer le scan</button>
-          <button class="sbtn" id="stk-stop-btn" onclick="stopStockScan()" style="margin-top:0;display:none;background:rgba(224,60,60,.9);box-shadow:var(--spec-d),var(--sr)" title="Arrêter" aria-label="Arrêter">⏹</button>
-          <button class="scan-link-btn" onclick="document.getElementById('stk-photo-in').click()" title="Scanner via photo" aria-label="Scanner via photo">🖼</button>
-          <button class="scan-link-btn" onclick="stockManualEntry()" title="Saisie manuelle" aria-label="Saisie manuelle">✏️</button>
+          <button class="sbtn scan-ico" id="stk-stop-btn" onclick="stopStockScan()" style="margin-top:0;display:none;background:rgba(224,60,60,.9);box-shadow:var(--spec-d),var(--sr)" title="Arrêter" aria-label="Arrêter">⏹</button>
+          <button class="scan-link-btn scan-ico" onclick="document.getElementById('stk-photo-in').click()" title="Scanner via photo" aria-label="Scanner via photo">🖼</button>
+          <button class="scan-link-btn scan-ico" onclick="stockManualEntry()" title="Saisie manuelle" aria-label="Saisie manuelle">✏️</button>
         </div>
         <div id="stk-st" class="scan-step-status"></div>
       </div>
@@ -3860,6 +3862,7 @@ function deleteOrder(id){
     orders = orders.filter(o => o.id !== id);
     localStorage.setItem('fc_orders', JSON.stringify(orders));
     renderOrdersHistory();
+    refreshFolderIfOpen();
     toast(T().deleted);
   });
 }
@@ -4163,6 +4166,7 @@ function deleteStock(id){
     if(store!==null && !stockRecords.some(o => (o.store||'')===store)) clearStockBaseFor(store || '—');
     renderStocksHistory();
     if(curTab==='stocks') renderStockBase();
+    refreshFolderIfOpen();
     toast(T().deleted);
   });
 }
@@ -4173,7 +4177,9 @@ function deleteStock(id){
    sur le nom du magasin, déjà porté par chaque enregistrement (orders.store /
    stockRecords.store / archive.magasin / products.magasin).
    ═══════════════════════════════════════════════════════════════════════════ */
-function openFolders(){ openModal('folders-modal'); renderFolders(); }
+let _folderSid=null;   // magasin dossier ouvert (pour rafraîchir la vue après suppression)
+function openFolders(){ _folderSid=null; openModal('folders-modal'); renderFolders(); }
+function refreshFolderIfOpen(){ if(_folderSid && document.getElementById('folders-modal').classList.contains('on')) openStoreFolder(_folderSid); }
 
 function folderCounts(name){
   return {
@@ -4205,6 +4211,7 @@ function renderFolders(){
 }
 function openStoreFolder(sid){
   const s=getStores().find(x=>x.id===sid); if(!s) return;
+  _folderSid=sid;
   const name=s.name;
   const t=document.getElementById('folders-title'); if(t) t.textContent='📁 '+name;
   const el=document.getElementById('folders-body'); if(!el) return;
@@ -4215,17 +4222,23 @@ function openStoreFolder(sid){
 
   const cmdRows = cmds.length ? cmds.slice(0,50).map(o=>{
     const q=o.lines.reduce((s,l)=>s+l.qty,0);
-    return `<div style="padding:9px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12px">
-      <div style="font-weight:800">🛒 ${escapeHTML(new Date(o.date).toLocaleString(lang))} <span class="pbadge bk" style="font-size:9px">${o.lines.length} réf · ${q}</span></div>
-      <div style="color:var(--muted);font-weight:600;font-size:11px;margin-top:2px">${o.lines.map(l=>escapeHTML(l.name||l.gencod||'—')+' ×'+l.qty).join(', ')}</div>
+    return `<div style="display:flex;align-items:flex-start;gap:8px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12px">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800">🛒 ${escapeHTML(new Date(o.date).toLocaleString(lang))} <span class="pbadge bk" style="font-size:9px">${o.lines.length} réf · ${q}</span></div>
+        <div style="color:var(--muted);font-weight:600;font-size:11px;margin-top:2px">${o.lines.map(l=>escapeHTML(l.name||l.gencod||'—')+' ×'+l.qty).join(', ')}</div>
+      </div>
+      <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="deleteOrder(this.dataset.oid)" style="color:var(--r);flex-shrink:0;padding:6px 10px" title="Supprimer cette commande" aria-label="Supprimer">🗑</button>
     </div>`;
   }).join('') : '<div class="empty" style="padding:8px 0">Aucune commande</div>';
 
   const stkRows = stks.length ? stks.slice(0,50).map(r=>{
     const q=r.lines.reduce((s,l)=>s+l.qty,0);
-    return `<div style="padding:9px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12px">
-      <div style="font-weight:800">📦 ${escapeHTML(new Date(r.date).toLocaleString(lang))} <span class="pbadge bk" style="font-size:9px">${r.lines.length} réf · ${q} u.</span></div>
-      <div style="color:var(--muted);font-weight:600;font-size:11px;margin-top:2px">${r.lines.map(l=>escapeHTML(l.name||l.gencod||'—')+' ×'+l.qty+(l.provenance?' ('+escapeHTML(l.provenance)+')':'')).join(', ')}</div>
+    return `<div style="display:flex;align-items:flex-start;gap:8px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12px">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800">📦 ${escapeHTML(new Date(r.date).toLocaleString(lang))} <span class="pbadge bk" style="font-size:9px">${r.lines.length} réf · ${q} u.</span></div>
+        <div style="color:var(--muted);font-weight:600;font-size:11px;margin-top:2px">${r.lines.map(l=>escapeHTML(l.name||l.gencod||'—')+' ×'+l.qty+(l.provenance?' ('+escapeHTML(l.provenance)+')':'')).join(', ')}</div>
+      </div>
+      <button class="scan-link-btn" data-oid="${escapeHTMLAttr(r.id)}" onclick="deleteStock(this.dataset.oid)" style="color:var(--r);flex-shrink:0;padding:6px 10px" title="Supprimer ce relevé" aria-label="Supprimer">🗑</button>
     </div>`;
   }).join('') : '<div class="empty" style="padding:8px 0">Aucun relevé de stock</div>';
 
