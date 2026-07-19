@@ -1348,6 +1348,9 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       <div class="sb-it" onclick="openFolders();closeSB()"><div class="sb-ic">🗂</div>Dossiers magasins</div>
       <div class="sb-it" onclick="openEmailModal(null);closeSB()"><div class="sb-ic">📧</div>Récap alertes par magasin</div>
       <div class="sb-it" onclick="toolCSV();closeSB()"><div class="sb-ic">📥</div>Exporter CSV</div>
+      <div class="sb-it" onclick="backupData();closeSB()"><div class="sb-ic">💾</div>Sauvegarder mes données</div>
+      <div class="sb-it" onclick="document.getElementById('restore-in').click()"><div class="sb-ic">📂</div>Restaurer une sauvegarde</div>
+      <input type="file" id="restore-in" accept="application/json,.json" style="display:none" onchange="restoreData(this)">
       <div class="sb-it" onclick="openModal('archive-modal');renderArchive();closeSB()"><div class="sb-ic">🗂</div>Historique / Archive</div>
       <div class="sb-it" onclick="openModal('stats-modal');renderStats();closeSB()"><div class="sb-ic">📈</div>Statistiques</div>
       <div class="sb-sec">Informations</div>
@@ -1497,6 +1500,41 @@ function emergencyReset(){
 
 function save(k,v){ localStorage.setItem(k,JSON.stringify(v)); }
 function genId(){ return Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6); }
+
+/* ═══ SAUVEGARDE / RESTAURATION ══════════════════════════════════════════════
+   iOS : l'app ajoutée à l'écran d'accueil (mode standalone) a un stockage SÉPARÉ
+   de Safari → les données n'y apparaissent pas. Exporter depuis Safari puis
+   restaurer dans l'app transfère TOUT (magasins, produits, commandes, stocks,
+   stock de départ, catalogue, config). Sert aussi de sauvegarde de sécurité. */
+function backupData(){
+  const data={};
+  for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); data[k]=localStorage.getItem(k); }
+  const payload={ _fcbackup:1, at:new Date().toISOString(), data };
+  const blob=new Blob([JSON.stringify(payload)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=`freshcontrol-sauvegarde-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
+  toast('💾 Sauvegarde téléchargée');
+}
+function restoreData(input){
+  const file=input.files&&input.files[0]; if(!file) return; input.value='';
+  const rd=new FileReader();
+  rd.onload=()=>{
+    let parsed; try{ parsed=JSON.parse(rd.result); }catch(e){ toast('❌ Fichier illisible'); return; }
+    const data = parsed && parsed._fcbackup ? parsed.data : parsed;
+    if(!data || typeof data!=='object' || Array.isArray(data)){ toast('❌ Sauvegarde invalide'); return; }
+    const keys=Object.keys(data).filter(k=>typeof data[k]==='string');
+    if(!keys.length){ toast('❌ Sauvegarde vide'); return; }
+    showConfirm('Restaurer cette sauvegarde ?', `${keys.length} élément(s) importés. Les données actuelles de CET appareil seront remplacées.`, ()=>{
+      keys.forEach(k=>{ try{ localStorage.setItem(k, data[k]); }catch(e){} });
+      toast('✅ Données restaurées — rechargement…');
+      setTimeout(()=>location.reload(), 800);
+    });
+  };
+  rd.readAsText(file);
+}
 
 /* Emergency reset */
 if(new URLSearchParams(location.search).get('reset')==='1'){
