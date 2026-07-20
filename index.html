@@ -209,6 +209,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .pc-ic{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.52);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:1px solid rgba(255,255,255,.72)}
 .pc-in{flex:1;min-width:0}
 .pc-nm{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qty-badge{display:inline-block;margin-left:5px;padding:1px 8px;border-radius:8px;background:rgba(18,168,118,.14);color:var(--gd);font-size:12px;font-weight:900;vertical-align:middle}
 .pc-sb{font-size:11px;color:var(--muted);margin-top:2px;font-weight:600}
 .pc-rt{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
 .pbadge{font-size:11px;font-weight:900;padding:4px 10px;border-radius:var(--rr);border:1px solid rgba(255,255,255,.28)}
@@ -735,7 +736,10 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       <div class="rf-f"><div class="rf-l">Gencod</div><input class="rf-i" id="ep-gencod"></div>
       <div class="rf-f"><div class="rf-l">Type</div><input class="rf-i" id="ep-type"></div>
     </div>
-    <div class="rf-f"><div class="rf-l">Date limite (DLC)</div><input class="rf-i" type="date" id="ep-dlc"></div>
+    <div class="rf-row">
+      <div class="rf-f"><div class="rf-l">Date limite (DLC)</div><input class="rf-i" type="date" id="ep-dlc"></div>
+      <div class="rf-f"><div class="rf-l">Quantité</div><input class="rf-i" id="ep-qty" type="number" min="1" step="1" value="1" inputmode="numeric"></div>
+    </div>
     <div class="rf-f"><div class="rf-l">Magasin</div><input class="rf-i" id="ep-mag" list="store-list-dl">
       <datalist id="store-list-dl"></datalist></div>
     <button class="rfsave" onclick="saveEditProduct()">💾 Enregistrer</button>
@@ -752,7 +756,10 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
       <div class="rf-f"><div class="rf-l">Gencod (EAN)</div><input class="rf-i" id="ap-gencod" placeholder="3289196040640"></div>
       <div class="rf-f"><div class="rf-l">Type / Rayon</div><input class="rf-i" id="ap-type" placeholder="Laitier"></div>
     </div>
-    <div class="rf-f"><div class="rf-l">Date limite (DLC)</div><input class="rf-i" type="date" id="ap-dlc"></div>
+    <div class="rf-row">
+      <div class="rf-f"><div class="rf-l">Date limite (DLC)</div><input class="rf-i" type="date" id="ap-dlc"></div>
+      <div class="rf-f"><div class="rf-l">Quantité</div><input class="rf-i" id="ap-qty" type="number" min="1" step="1" value="1" inputmode="numeric"></div>
+    </div>
     <div class="rf-f"><div class="rf-l">Magasin</div>
       <input class="rf-i" id="ap-mag" list="store-list-dl2" placeholder="Sélectionner ou saisir">
       <datalist id="store-list-dl2"></datalist>
@@ -1059,6 +1066,13 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
           <div class="rf-f"><div class="rf-l">Type / Marque</div><input class="rf-i" id="rf-ty" readonly style="background:rgba(0,0,0,.04);color:var(--muted)"></div>
         </div>
         <div class="rf-f"><div class="rf-l" id="l-dlc">Date limite (DLC)</div><input class="rf-i" type="date" id="rf-dlc"></div>
+        <div class="rf-f"><div class="rf-l" id="l-qty">Quantité</div>
+          <div class="qm-stepper">
+            <button type="button" onclick="rfQtyStep(-1)" aria-label="Une unité de moins">−</button>
+            <input id="rf-qty" type="number" min="1" step="1" value="1" inputmode="numeric" aria-label="Quantité">
+            <button type="button" onclick="rfQtyStep(1)" aria-label="Une unité de plus">+</button>
+          </div>
+        </div>
         <button class="rfsave" onclick="saveProduct()" id="rf-save">💾 Enregistrer</button>
         <button class="rfcancel" onclick="resetScan()" id="rf-cancel">Annuler</button>
       </div>
@@ -1553,7 +1567,7 @@ const I18N={
   fr:{tag:'Gestion intelligente des périmés',l_user:'Identifiant',l_pass:'Mot de passe',l_btn:'Se connecter',l_err_empty:'Remplissez tous les champs',l_err_wrong:'Identifiant ou mot de passe incorrect',ph_user:'prenom.nom',ph_pass:'••••••••',rg_t:"🔒 Charte d'usage et protection des données",rg_p:"Le détail des traitements et des durées de conservation figure dans les Mentions légales accessibles depuis le menu.",rg_y:'✓ Accepter',rg_n:'Refuser',
   lexp:'Périmés',lcrit:'Critiques ≤2j',lwarn:'Attention ≤7j',lok:'OK',lprods:'Produits',all:'Tous',all_stores:'Tous magasins',all_status:'Tous statuts',
   sct:'Scanner un produit',scsub:'Photographiez le code-barres EAN',scbtn:'Prendre une photo',scanning:'🔍 Analyse…',scan_ok:'✅ Produit reconnu',scan_err:'❌ Erreur de connexion',
-  ldlc:'Date limite (DLC)',rfsave:'💾 Enregistrer',rfcancel:'Annuler',
+  ldlc:'Date limite (DLC)',lqty:'Quantité',rfsave:'💾 Enregistrer',rfcancel:'Annuler',
   nft:'Produit non référencé',nfsub:"Ce gencod n'est pas dans le catalogue.",nfbtn:'Nouveau scan',
   gps_load:'Localisation…',gps_denied:'GPS refusé — sélection manuelle',gps_err:'Erreur GPS',gps_retry:'Réessayer',gps_no_store:'Hors zone magasin — sélection manuelle',
   tl_d:'Tableau',tl_s:'Fresh',tl_c:'Commande',tl_stk:'Stocks',tl_a:'Alertes',tl_p:'Planning',
@@ -1567,7 +1581,7 @@ const I18N={
   en:{tag:'Smart expiry date management',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err_empty:'Please fill all fields',l_err_wrong:'Wrong username or password',ph_user:'firstname.lastname',ph_pass:'••••••••',rg_t:'🔒 Usage charter & data protection',rg_p:'Full processing details and retention periods are available in the Legal Notice from the menu.',rg_y:'✓ Accept',rg_n:'Decline',
   lexp:'Expired',lcrit:'Critical ≤2d',lwarn:'Warning ≤7d',lok:'OK',lprods:'Products',all:'All',all_stores:'All stores',all_status:'All statuses',
   sct:'Scan a product',scsub:'Photograph the EAN barcode',scbtn:'Take a photo',scanning:'🔍 Analyzing…',scan_ok:'✅ Product found',scan_err:'❌ Connection error',
-  ldlc:'Expiry date',rfsave:'💾 Save',rfcancel:'Cancel',
+  ldlc:'Expiry date',lqty:'Quantity',rfsave:'💾 Save',rfcancel:'Cancel',
   nft:'Product not found',nfsub:"This barcode isn't in the catalogue.",nfbtn:'New scan',
   gps_load:'Locating…',gps_denied:'GPS denied — manual selection',gps_err:'GPS error',gps_retry:'Retry',gps_no_store:'Outside store zone — manual selection',
   tl_d:'Dashboard',tl_s:'Fresh',tl_c:'Order',tl_stk:'Stock',tl_a:'Alerts',tl_p:'Planning',
@@ -1581,7 +1595,7 @@ const I18N={
   es:{tag:'Gestión inteligente de caducidades',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Iniciar sesión',l_err_empty:'Rellene todos los campos',l_err_wrong:'Usuario o contraseña incorrectos',ph_user:'nombre.apellido',ph_pass:'••••••••',rg_t:'🔒 Carta de uso y protección de datos',rg_p:'El detalle del tratamiento y los plazos de conservación figuran en el Aviso Legal accesible desde el menú.',rg_y:'✓ Aceptar',rg_n:'Rechazar',
   lexp:'Caducados',lcrit:'Crítico ≤2d',lwarn:'Atención ≤7d',lok:'OK',lprods:'Productos',all:'Todos',all_stores:'Todas las tiendas',all_status:'Todos los estados',
   sct:'Escanear producto',scsub:'Fotografíe el código EAN',scbtn:'Tomar foto',scanning:'🔍 Analizando…',scan_ok:'✅ Producto encontrado',scan_err:'❌ Error de conexión',
-  ldlc:'Fecha caducidad',rfsave:'💾 Guardar',rfcancel:'Cancelar',
+  ldlc:'Fecha caducidad',lqty:'Cantidad',rfsave:'💾 Guardar',rfcancel:'Cancelar',
   nft:'Producto no encontrado',nfsub:"Este código no está en el catálogo.",nfbtn:'Nuevo escaneo',
   gps_load:'Localizando…',gps_denied:'GPS denegado — selección manual',gps_err:'Error GPS',gps_retry:'Reintentar',gps_no_store:'Fuera de zona — selección manual',
   tl_d:'Panel',tl_s:'Fresh',tl_c:'Pedido',tl_stk:'Existencias',tl_a:'Alertas',tl_p:'Planif.',
@@ -1595,7 +1609,7 @@ const I18N={
   zh:{tag:'智能保质期管理系统',l_user:'用户名',l_pass:'密码',l_btn:'登录',l_err_empty:'请填写所有字段',l_err_wrong:'用户名或密码错误',ph_user:'姓名.姓氏',ph_pass:'••••••••',rg_t:'🔒 使用规章与数据保护',rg_p:'数据处理详情与保留期限请查阅菜单中的法律声明。',rg_y:'✓ 接受',rg_n:'拒绝',
   lexp:'已过期',lcrit:'紧急≤2天',lwarn:'注意≤7天',lok:'正常',lprods:'产品',all:'全部',all_stores:'全部门店',all_status:'全部状态',
   sct:'扫描产品',scsub:'拍摄EAN条形码',scbtn:'拍照',scanning:'🔍 分析中…',scan_ok:'✅ 产品已识别',scan_err:'❌ 连接错误',
-  ldlc:'有效期',rfsave:'💾 保存',rfcancel:'取消',
+  ldlc:'有效期',lqty:'数量',rfsave:'💾 保存',rfcancel:'取消',
   nft:'产品未找到',nfsub:"此条形码不在目录中。",nfbtn:'重新扫描',
   gps_load:'定位中…',gps_denied:'GPS被拒绝 — 手动选择',gps_err:'GPS错误',gps_retry:'重试',gps_no_store:'不在门店范围内 — 手动选择',
   tl_d:'仪表盘',tl_s:'Fresh',tl_c:'订单',tl_stk:'库存',tl_a:'警报',tl_p:'计划',
@@ -1623,7 +1637,7 @@ function applyLang(){
   $ph('li-u','ph_user');$ph('li-p','ph_pass');
   $('rg-t','rg_t');$('rg-p','rg_p');$('rg-y','rg_y');$('rg-n','rg_n');
   $('l-exp','lexp');$('l-crit','lcrit');$('l-warn','lwarn');$('l-ok','lok');$('l-prods','lprods');
-  $('sc-t','sct');$('sc-sub','scsub');$('sc-btn','scbtn');$('l-dlc','ldlc');
+  $('sc-t','sct');$('sc-sub','scsub');$('sc-btn','scbtn');$('l-dlc','ldlc');$('l-qty','lqty');
   $('rf-save','rfsave');$('rf-cancel','rfcancel');$('nf-t','nft');$('nf-sub','nfsub');$('nf-btn','nfbtn');
   $('tl-d','tl_d');$('tl-s','tl_s');$('tl-c','tl_c');$('tl-stk','tl_stk');$('tl-a','tl_a');$('tl-p','tl_p');
   $('l-send-all','send_all');$('su-t','su_t');$('su-p','su_p');$('su-mail','su_mail');$('su-cl','su_cl');
@@ -1962,7 +1976,7 @@ function renderDashboard(){
   const t=T();
   const cnt={e:0,o:0,w:0,k:0};
   const sNames=new Set();
-  products.forEach(p=>{cnt[statusOf(p.dlc)]++;if(p.magasin)sNames.add(p.magasin)});
+  products.forEach(p=>{cnt[statusOf(p.dlc)]+=(p.qty||1);if(p.magasin)sNames.add(p.magasin)});
   document.getElementById('cn-e').textContent=cnt.e;
   document.getElementById('cn-o').textContent=cnt.o;
   document.getElementById('cn-w').textContent=cnt.w;
@@ -1999,7 +2013,7 @@ function renderDashboard(){
     return`<div class="pc s-${s}" id="pc-${sid}" data-pid="${sid}">
       <div class="pc-ic">${ico}</div>
       <div class="pc-in">
-        <div class="pc-nm">${escapeHTML(p.name||'—')}</div>
+        <div class="pc-nm">${escapeHTML(p.name||'—')}${(p.qty||1)>1?` <span class="qty-badge">×${p.qty}</span>`:''}</div>
         <div class="pc-sb">${escapeHTML(p.type||'')} · ${escapeHTML(p.magasin||'')} · DLC: ${fmtDate(p.dlc)}</div>
         <div class="pc-sb" style="font-size:10px;opacity:.6">par ${escapeHTML(p.scannedBy||'?')} · ${p.scannedAt?new Date(p.scannedAt).toLocaleDateString(lang):''}</div>
       </div>
@@ -2043,6 +2057,7 @@ function openEditProd(id){
   document.getElementById('ep-gencod').value=p.gencod||'';
   document.getElementById('ep-type').value=p.type||'';
   document.getElementById('ep-dlc').value=p.dlc||'';
+  document.getElementById('ep-qty').value=p.qty||1;
   document.getElementById('ep-mag').value=p.magasin||'';
   fillStoreDL();
   openModal('ep-modal');
@@ -2055,6 +2070,7 @@ function saveEditProduct(){
     gencod:document.getElementById('ep-gencod').value.trim(),
     type:document.getElementById('ep-type').value.trim(),
     dlc:document.getElementById('ep-dlc').value,
+    qty:Math.max(1, parseInt(document.getElementById('ep-qty')?.value, 10) || 1),
     magasin:document.getElementById('ep-mag').value.trim(),
     editedAt:new Date().toISOString(),editedBy:session?.username||'?'
   };
@@ -2126,12 +2142,14 @@ function saveAddProduct(){
     gencod:document.getElementById('ap-gencod').value.trim(),
     type:document.getElementById('ap-type').value.trim(),
     dlc,
+    qty: Math.max(1, parseInt(document.getElementById('ap-qty')?.value, 10) || 1),
     magasin: selStore?.name || storeName || '',
     scannedAt:new Date().toISOString(), scannedBy:session?.username||'?'
   };
   products.unshift(p);save('fc_products',products);
   closeModal('add-product-modal');renderDashboard();toast(T().saved);
   ['ap-name','ap-gencod','ap-type','ap-dlc'].forEach(id=>document.getElementById(id).value='');
+  const apq=document.getElementById('ap-qty'); if(apq) apq.value='1';
   if(gasUrl){
     sendToGAS('save_scan',{...p,statut:statusOf(p.dlc)==='e'?'perime':'ok',email_resp:emailResp,email_finance:emailFin});
     pushCrowdsource(p);
@@ -3414,6 +3432,7 @@ function handleScanResult(data){
   document.getElementById('rf-gc').value        = gencod;
   document.getElementById('rf-ty').value        = typeProd + (marque ? ` · ${marque}` : '');
   document.getElementById('rf-dlc').value       = '';
+  const rfq = document.getElementById('rf-qty'); if(rfq) rfq.value = '1';
   document.getElementById('scan-res').style.display = 'block';
   // Focus sur la date DLC
   setTimeout(()=>{ const dlc=document.getElementById('rf-dlc'); if(dlc) dlc.focus(); }, 150);
@@ -3438,7 +3457,14 @@ function resetScan(){
   document.getElementById('scan-step2').style.display='none';
   document.getElementById('scan-step1').style.display='block';
   document.getElementById('scan-st').textContent='';
+  const rfq=document.getElementById('rf-qty'); if(rfq) rfq.value='1';
   currentEAN=null;
+}
+
+// Stepper − / + de la quantité (formulaire résultat scan Fresh)
+function rfQtyStep(d){
+  const i=document.getElementById('rf-qty'); if(!i) return;
+  i.value = Math.max(1,(parseInt(i.value,10)||1)+d);
 }
 
 /* ═══ COMMANDE — réappro par scan, 100 % locale ═════════════════════════════
@@ -4495,6 +4521,7 @@ function addStoreFromModal(){
 function saveProduct(){
   const dlc  = document.getElementById('rf-dlc').value;
   if(!dlc){ toast(T().fill_all); return; }
+  const qty = Math.max(1, parseInt(document.getElementById('rf-qty')?.value, 10) || 1);
 
   const p = {
     id:         genId(),
@@ -4502,6 +4529,7 @@ function saveProduct(){
     gencod:     document.getElementById('rf-gc').value,
     type:       document.getElementById('rf-ty').value,
     dlc,
+    qty,
     magasin:    selStore?.name || storeName || '',
     scannedAt:  new Date().toISOString(),
     scannedBy:  session?.username || '?',
@@ -4512,7 +4540,7 @@ function saveProduct(){
   products.unshift(p);
   save('fc_products', products);
   resetScan();
-  toast(T().saved);
+  toast(qty > 1 ? `${T().saved} · ×${qty}` : T().saved);
   renderDashboard();
 
   // Envoyer au backend GAS (alerte si périmé + enregistrement)
@@ -4539,11 +4567,11 @@ function renderAlertes(){
   el.innerHTML=Object.entries(byStore).map(([store,prods])=>`
     <div class="astore">
       <div class="asto-hd">
-        <span>🏪 ${escapeHTML(store)} <span class="pbadge be" style="font-size:10px">${prods.length}</span></span>
+        <span>🏪 ${escapeHTML(store)} <span class="pbadge be" style="font-size:10px">${prods.reduce((s,p)=>s+(p.qty||1),0)}</span></span>
         <button data-store="${escapeHTMLAttr(store)}" onclick="openEmailModal(this.dataset.store);event.stopPropagation()" style="background:rgba(18,168,118,.12);border:1px solid rgba(18,168,118,.28);color:var(--gd);border-radius:8px;padding:5px 11px;font-size:11px;font-weight:900;cursor:pointer;font-family:var(--font)">📧 Mail</button>
       </div>
       ${prods.map(p=>{const s=statusOf(p.dlc),d=dDiff(p.dlc);return`<div class="ai">
-        <div><div class="ai-nm">${escapeHTML(p.name)}</div><div class="ai-dt">DLC: ${fmtDate(p.dlc)}</div></div>
+        <div><div class="ai-nm">${escapeHTML(p.name)}${(p.qty||1)>1?` <span class="qty-badge">×${p.qty}</span>`:''}</div><div class="ai-dt">DLC: ${fmtDate(p.dlc)}</div></div>
         <span class="pbadge ${s==='e'?'be':'bo'}">${s==='e'?escapeHTML(T().badge_e):'J'+d}</span>
       </div>`}).join('')}
     </div>`).join('');
@@ -4805,8 +4833,9 @@ function openEmailModal(store){
   const lines=['FreshControl — '+now,''];
   if(store)lines.push('Magasin : '+store,'');
   lines.push('Produits urgents :','');
-  prods.forEach(p=>{const d=dDiff(p.dlc),s=statusOf(p.dlc);lines.push(`${s==='e'?'[PÉRIMÉ]':'[J'+d+']'} ${p.name} — DLC: ${fmtDate(p.dlc)} — ${p.magasin||''}`)});
-  lines.push('','Total : '+prods.length+' produit(s)','','— FreshControl');
+  prods.forEach(p=>{const d=dDiff(p.dlc),s=statusOf(p.dlc),q=(p.qty||1);lines.push(`${s==='e'?'[PÉRIMÉ]':'[J'+d+']'} ${p.name}${q>1?' ×'+q:''} — DLC: ${fmtDate(p.dlc)} — ${p.magasin||''}`)});
+  const totalUnits=prods.reduce((s,p)=>s+(p.qty||1),0);
+  lines.push('','Total : '+prods.length+' produit(s)'+(totalUnits!==prods.length?' · '+totalUnits+' unité(s)':''),'','— FreshControl');
   document.getElementById('em-to').value=defTo;
   document.getElementById('em-subj').value=subj;
   document.getElementById('em-body').value=lines.join('\n');
@@ -4881,9 +4910,9 @@ function renderStats(){
 
 /* ═══ CSV EXPORT ═════════════════════════════════════════════════════════════ */
 function toolCSV(){
-  const all=[...products.map(p=>({...p,status:'actif'})),...archive.map(p=>({...p,status:'archivé'}))];
+  const all=[...products.map(p=>({...p,qty:p.qty||1,status:'actif'})),...archive.map(p=>({...p,qty:p.qty||1,status:'archivé'}))];
   if(!all.length){toast('Aucun produit');return}
-  const cols=['id','name','gencod','type','dlc','magasin','scannedBy','scannedAt','status','archivedBy','archivedAt'];
+  const cols=['id','name','gencod','type','dlc','qty','magasin','scannedBy','scannedAt','status','archivedBy','archivedAt'];
   const rows=[cols.join(';'),...all.map(p=>cols.map(c=>`"${(p[c]||'').toString().replace(/"/g,'""')}"`).join(';'))];
   const blob=new Blob(['\uFEFF'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob);
