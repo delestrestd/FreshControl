@@ -635,11 +635,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
     <div class="rf-f"><div class="rf-l" id="em-l-to">Destinataire(s)</div><input class="rf-i" id="em-to" type="email" placeholder="responsable@bunga.corp"></div>
     <div class="rf-f"><div class="rf-l" id="em-l-subj">Objet</div><input class="rf-i" id="em-subj"></div>
     <div class="rf-f"><div class="rf-l" id="em-l-body">Corps du message</div><textarea class="em-ta" id="em-body"></textarea></div>
-    <div style="display:flex;gap:9px;margin-top:14px">
-      <button class="af-add" style="flex:2" id="em-send-btn" onclick="sendEmailN8N()">🚀 Envoyer via N8N</button>
-      <button onclick="sendMailto()" style="flex:1;padding:13px;border-radius:var(--rr);border:1.5px solid var(--bdr);background:rgba(255,255,255,.6);color:var(--txt);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font)">✉️ Ouvrir</button>
-    </div>
-    <button id="em-share-btn" onclick="shareOrderSheet()" style="width:100%;margin-top:9px;padding:13px;border-radius:var(--rr);border:1.5px solid rgba(18,168,118,.4);background:rgba(18,168,118,.12);color:var(--gd);font-size:13px;font-weight:900;cursor:pointer;font-family:var(--font)">📤 Partager avec code-barres</button>
+    <button class="af-add" style="width:100%;margin-top:14px" id="em-send-btn" onclick="sendMailto()">📧 Envoyer par mail</button>
     <button class="rfcancel" onclick="closeModal('email-modal')" id="em-cancel">Annuler</button>
   </div>
 </div>
@@ -3713,114 +3709,10 @@ function buildOrderText(lines, meta){
     meta.by ? `Préparée par : ${meta.by}` : '',
     '', 'Produits :', '',
   ].filter((x,idx)=> x!=='' || idx>2);
-  lines.forEach(l => out.push(`- ${l.name || l.gencod || 'sans nom'}  (${l.gencod||'sans gencod'})  ×${l.qty} colis`));
+  lines.forEach(l => out.push(`- ${l.name || l.gencod || 'sans nom'}  ×${l.qty} colis  — Code-barres : ${l.gencod || 'non renseigné'}`));
   const totalQty = lines.reduce((s,l)=>s+l.qty, 0);
   out.push('', `Total : ${lines.length} référence(s) · ${totalQty} colis`, '', '— FreshControl');
   return out.join('\n');
-}
-
-/* ═══ Partage commande AVEC code-barres (Web Share) ══════════════════════════
-   Génère une image « feuille de commande » (code-barres EAN-13 + nom + colis
-   par ligne) partagée via la feuille native (Mail, WhatsApp…). Repli =
-   téléchargement de l'image. Aucun backend (le mailto ne peut pas joindre). */
-let orderForShare = [];
-
-// Motif binaire EAN-13 (95 modules). null si le code n'est pas un EAN-13.
-function ean13Pattern(code){
-  code = String(code||'').replace(/\D/g,'');
-  if(code.length===12) code = '0'+code;                 // UPC-A → EAN-13
-  if(code.length!==13) return null;
-  const L={'0':'0001101','1':'0011001','2':'0010011','3':'0111101','4':'0100011','5':'0110001','6':'0101111','7':'0111011','8':'0110111','9':'0001011'};
-  const G={'0':'0100111','1':'0110011','2':'0011011','3':'0100001','4':'0011101','5':'0111001','6':'0000101','7':'0010001','8':'0001001','9':'0010111'};
-  const R={}; for(const k in L){ R[k]=L[k].replace(/./g,b=>b==='1'?'0':'1'); }
-  const par=['LLLLLL','LLGLGG','LLGGLG','LLGGGL','LGLLGG','LGGLLG','LGGGLL','LGLGLG','LGLGGL','LGGLGL'];
-  const d=code.split(''), p=par[+d[0]];
-  let bits='101';
-  for(let i=1;i<=6;i++){ bits += (p[i-1]==='L'?L:G)[d[i]]; }
-  bits+='01010';
-  for(let i=7;i<=12;i++){ bits += R[d[i]]; }
-  return bits+'101';                                     // 95 modules
-}
-// Canvas d'un code-barres EAN-13 (barres + chiffres). null si non EAN-13.
-function renderEan13Canvas(code, moduleW, barH){
-  const bits=ean13Pattern(code); if(!bits) return null;
-  code=String(code).replace(/\D/g,''); if(code.length===12) code='0'+code;
-  moduleW=moduleW||2; barH=barH||52;
-  const quiet=10, total=bits.length+quiet*2, W=total*moduleW, digH=16, pad=5, H=barH+digH+pad;
-  const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
-  const ctx=cv.getContext('2d');
-  ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='#000';
-  let x=quiet*moduleW;
-  for(let i=0;i<bits.length;i++){ if(bits[i]==='1') ctx.fillRect(x,0,moduleW,barH); x+=moduleW; }
-  ctx.font='bold 14px monospace'; ctx.textAlign='center'; ctx.textBaseline='top';
-  ctx.fillText(code, W/2, barH+pad);
-  return cv;
-}
-// Image « feuille de commande » à partir de lignes {gencod,name,qty}.
-function buildOrderSheetCanvas(lines){
-  const W=820, headerH=118, rowH=98, footerH=64;
-  const r=(window.devicePixelRatio||1)>1?2:1;           // net en retina
-  const H=headerH + Math.max(1,lines.length)*rowH + footerH;
-  const cv=document.createElement('canvas'); cv.width=W*r; cv.height=H*r;
-  const ctx=cv.getContext('2d'); ctx.scale(r,r);
-  ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
-  const store=(typeof selStore!=='undefined'&&selStore&&selStore.name)||storeName||'';
-  const totalQty=lines.reduce((s,l)=>s+(l.qty||0),0);
-  const dstr=new Date().toLocaleDateString('fr-FR');
-  ctx.textAlign='left'; ctx.textBaseline='top';
-  ctx.fillStyle='#0A6B47'; ctx.font='bold 30px sans-serif'; ctx.fillText('Commande', 26, 24);
-  ctx.fillStyle='#444'; ctx.font='15px sans-serif';
-  ctx.fillText((store?('Magasin : '+store+'    ·    '):'')+dstr, 26, 66);
-  ctx.strokeStyle='#e2e2e2'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(26,headerH-8); ctx.lineTo(W-26,headerH-8); ctx.stroke();
-  const cut=(s,n)=>{ s=String(s||''); return s.length>n?s.slice(0,n-1)+'…':s; };
-  let y=headerH;
-  lines.forEach(l=>{
-    const bc=renderEan13Canvas(l.gencod,2,52);
-    let tx=26;
-    if(bc){ ctx.drawImage(bc, 26, y+16, bc.width, bc.height); tx = 26 + bc.width + 22; }
-    ctx.fillStyle='#111'; ctx.font='bold 19px sans-serif'; ctx.textBaseline='top';
-    ctx.fillText(cut(l.name||l.gencod||'—', 40), tx, y+22);
-    ctx.fillStyle='#777'; ctx.font='13px sans-serif';
-    ctx.fillText((l.gencod||'sans code')+(bc?'':'  —  code non standard'), tx, y+50);
-    ctx.fillStyle='#0A6B47'; ctx.font='bold 22px sans-serif'; ctx.textAlign='right';
-    ctx.fillText('× '+(l.qty||0)+' colis', W-26, y+32); ctx.textAlign='left';
-    ctx.strokeStyle='#f0f0f0'; ctx.beginPath(); ctx.moveTo(26,y+rowH-1); ctx.lineTo(W-26,y+rowH-1); ctx.stroke();
-    y+=rowH;
-  });
-  ctx.fillStyle='#0A6B47'; ctx.font='bold 17px sans-serif'; ctx.textAlign='left';
-  ctx.fillText('Total : '+lines.length+' réf. · '+totalQty+' colis', 26, y+20);
-  ctx.fillStyle='#aaa'; ctx.font='12px sans-serif'; ctx.textAlign='right';
-  ctx.fillText('FreshControl', W-26, y+24); ctx.textAlign='left';
-  return cv;
-}
-async function shareOrderSheet(){
-  const lines = orderForShare.length ? orderForShare : currentOrder;
-  const bodyEl = document.getElementById('em-body');
-  const text = bodyEl && bodyEl.value ? bodyEl.value : '';
-  if(!lines.length){                                    // contexte sans commande
-    if(navigator.share){ try{ await navigator.share({title:'FreshControl', text}); }catch(e){} }
-    else toast('Rien à partager');
-    return;
-  }
-  const btn=document.getElementById('em-share-btn'); if(btn) btn.disabled=true;
-  try{
-    const cv=buildOrderSheetCanvas(lines);
-    const blob=await new Promise(res=>cv.toBlob(res,'image/png'));
-    if(!blob) throw new Error('image vide');
-    const file=new File([blob],'commande.png',{type:'image/png'});
-    if(navigator.canShare && navigator.canShare({files:[file]})){
-      await navigator.share({ title:'Commande', text, files:[file] });
-    }else{                                              // repli téléchargement
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a'); a.href=url; a.download='commande.png';
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(()=>URL.revokeObjectURL(url),5000);
-      toast('📥 Image téléchargée — joins-la à ton mail');
-    }
-  }catch(e){
-    if(!(e&&e.name==='AbortError')) toast('Partage impossible');
-  }finally{ if(btn) btn.disabled=false; }
 }
 
 function openOrderEmail(subject, body){
@@ -3845,7 +3737,6 @@ function validateOrder(){
   };
   orders.unshift(record);
   localStorage.setItem('fc_orders', JSON.stringify(orders));
-  orderForShare = record.lines;                 // pour le partage image (currentOrder va être vidé)
   const dateStr = new Date(record.date).toLocaleDateString(lang);
   openOrderEmail(
     `[FreshControl] Commande${record.store ? ' — '+record.store : ''} — ${dateStr}`,
@@ -3912,7 +3803,6 @@ function reorderFrom(id){
 }
 function emailOrder(id){
   const o = findOrder(id); if(!o) return;
-  orderForShare = o.lines;                       // partage image depuis l'historique
   const dateStr = new Date(o.date).toLocaleDateString(lang);
   openOrderEmail(
     `[FreshControl] Commande${o.store ? ' — '+o.store : ''} — ${dateStr}`,
@@ -4110,7 +4000,7 @@ function buildStockText(lines, meta){
     meta.by ? `Relevé par : ${meta.by}` : '',
     '', 'Produits :', '',
   ].filter((x,idx)=> x!=='' || idx>2);
-  lines.forEach(l => out.push(`- ${l.name || l.gencod || 'sans nom'}  (${l.gencod||'sans gencod'})  ×${l.qty}${l.provenance ? '  · provenance : '+l.provenance : ''}`));
+  lines.forEach(l => out.push(`- ${l.name || l.gencod || 'sans nom'}  ×${l.qty}  — Code-barres : ${l.gencod || 'non renseigné'}${l.provenance ? '  · provenance : '+l.provenance : ''}`));
   const totalQty = lines.reduce((s,l)=>s+l.qty, 0);
   out.push('', `Total : ${lines.length} référence(s) · ${totalQty} unité(s)`, '', '— FreshControl');
   return out.join('\n');
@@ -4147,7 +4037,6 @@ function validateStock(){
 /* Envoi par mail INDÉPENDANT : ni enregistrement, ni vidage du relevé en cours. */
 function emailCurrentStock(){
   if(!currentStock.length){ toast('Relevé vide — rien à envoyer'); return; }
-  orderForShare = currentStock.map(l => ({ ...l }));
   const dateStr = new Date().toLocaleDateString(lang);
   openStockEmail(
     `[FreshControl] Stock${storeName ? ' — '+storeName : ''} — ${dateStr}`,
@@ -4211,7 +4100,6 @@ function restockFrom(id){
 }
 function emailStock(id){
   const o = findStock(id); if(!o) return;
-  orderForShare = o.lines;                       // partage image depuis l'historique
   const dateStr = new Date(o.date).toLocaleDateString(lang);
   openStockEmail(
     `[FreshControl] Stock${o.store ? ' — '+o.store : ''} — ${dateStr}`,
@@ -4820,7 +4708,6 @@ function openEmailFromStartup(){closeModal('startup-modal');openEmailModal(null)
 let emailStore=null;
 function openEmailModal(store){
   emailStore=store;
-  orderForShare=[];                              // contexte péremption : pas de feuille de commande
   const t=T();
   const defTo=localStorage.getItem('fc_email')||'';
   const now=new Date().toLocaleDateString(lang);
@@ -4833,7 +4720,7 @@ function openEmailModal(store){
   const lines=['FreshControl — '+now,''];
   if(store)lines.push('Magasin : '+store,'');
   lines.push('Produits urgents :','');
-  prods.forEach(p=>{const d=dDiff(p.dlc),s=statusOf(p.dlc),q=(p.qty||1);lines.push(`${s==='e'?'[PÉRIMÉ]':'[J'+d+']'} ${p.name}${q>1?' ×'+q:''} — DLC: ${fmtDate(p.dlc)} — ${p.magasin||''}`)});
+  prods.forEach(p=>{const d=dDiff(p.dlc),s=statusOf(p.dlc),q=(p.qty||1);lines.push(`${s==='e'?'[PÉRIMÉ]':'[J'+d+']'} ${p.name}${q>1?' ×'+q:''} — Code-barres : ${p.gencod||'non renseigné'} — DLC: ${fmtDate(p.dlc)} — ${p.magasin||''}`)});
   const totalUnits=prods.reduce((s,p)=>s+(p.qty||1),0);
   lines.push('','Total : '+prods.length+' produit(s)'+(totalUnits!==prods.length?' · '+totalUnits+' unité(s)':''),'','— FreshControl');
   document.getElementById('em-to').value=defTo;
@@ -4843,29 +4730,14 @@ function openEmailModal(store){
   stag.style.display='inline-block';stag.textContent=store?'🏪 '+store:'🌐 Tous magasins';
   openModal('email-modal');
 }
-async function sendEmailN8N(){
-  const to=document.getElementById('em-to').value.trim();
-  const subject=document.getElementById('em-subj').value.trim();
-  const body=document.getElementById('em-body').value.trim();
-  if(!to){toast(T().fill_all);return}
-  const btn=document.getElementById('em-send-btn');
-  btn.disabled=true;btn.innerHTML='<span class="spin"></span>';
-  try{
-    if(!gasUrl) throw new Error('URL GAS non configurée');
-    const res=await fetch(gasUrl,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'email_reminder',to,subject:document.getElementById('em-subj').value,body:document.getElementById('em-body').value,store:emailStore,lang})});
-    closeModal('email-modal');toast(T().email_sent);
-  }catch(e){
-    toast('📧 Ouverture du client mail…');
-    sendMailto();
-  }
-  finally{btn.disabled=false;btn.textContent='🚀 Envoyer';}
-}
 function sendMailto(){
-  const to=encodeURIComponent(document.getElementById('em-to').value.trim());
+  const toRaw=document.getElementById('em-to').value.trim();
+  if(!toRaw){ toast(T().fill_all); return; }
+  const to=encodeURIComponent(toRaw);
   const s=encodeURIComponent(document.getElementById('em-subj').value.trim());
   const b=encodeURIComponent(document.getElementById('em-body').value.trim());
   window.open(`mailto:${to}?subject=${s}&body=${b}`,'_blank');
+  closeModal('email-modal');
 }
 
 /* ═══ ARCHIVE & STATS ════════════════════════════════════════════════════════ */
