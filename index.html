@@ -2,7 +2,9 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- Zoom désactivé : l'app est une PWA plein écran, le pincement/double-tap ne
+     servait qu'à décaler la page (fenêtres qui « partent » de gauche à droite). -->
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0A6B47">
@@ -46,7 +48,7 @@
 html,body{height:100%;font-family:var(--font);color:var(--txt);overflow:hidden;overscroll-behavior:none;-webkit-text-size-adjust:100%}
 /* Verrou anti « la page part dans tous les sens » sur iOS : body fixe (pas de
    pan/rebond du viewport), seuls les conteneurs internes défilent. */
-body{position:fixed;inset:0;width:100%;height:100%;touch-action:pan-y pinch-zoom;overscroll-behavior:none}
+body{position:fixed;inset:0;width:100%;height:100%;touch-action:pan-y;overscroll-behavior:none}
 /* green bg */
 body::before{content:'';position:fixed;inset:0;z-index:-2;
   background:radial-gradient(ellipse 80% 60% at 20% 10%,#1FD994 0%,transparent 52%),
@@ -129,7 +131,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .hback{flex-shrink:0;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.32);color:#fff;width:38px;height:40px;border-radius:12px;cursor:pointer;font-size:26px;font-weight:900;line-height:1;display:flex;align-items:center;justify-content:center;padding-bottom:3px;box-shadow:var(--spec-d);transition:background .18s,transform .12s;font-family:var(--font)}
 .hback:hover{background:rgba(255,255,255,.3)}
 .hback:active{transform:scale(.94)}
-#main{flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;overscroll-behavior-x:none;touch-action:pan-y pinch-zoom;-webkit-overflow-scrolling:touch;padding:14px 13px calc(var(--tab-h) + 12px)}
+#main{flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;overscroll-behavior-x:none;touch-action:pan-y;-webkit-overflow-scrolling:touch;padding:14px 13px calc(var(--tab-h) + 12px)}
 .tab{display:none}.tab.on{display:block;animation:fadeIn .2s ease}
 #tbar{background:rgba(240,255,248,.62);backdrop-filter:blur(28px) saturate(200%);-webkit-backdrop-filter:blur(28px) saturate(200%);border-top:1px solid rgba(255,255,255,.7);box-shadow:inset 0 1px 0 rgba(255,255,255,.88),0 -3px 28px rgba(0,0,0,.07);height:var(--tab-h);display:flex;flex-shrink:0}
 /* Onglets : rétrécissent pour tenir même à 320px avec 7-8 onglets (min-width:0
@@ -378,7 +380,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
 /* ── MODALS ──────────────────────────────────────────────────────────── */
 .modal-bg{position:fixed;inset:0;z-index:750;display:none;align-items:flex-end;backdrop-filter:blur(7px);background:rgba(0,0,0,.3)}
 .modal-bg.on{display:flex;animation:fadeIn .22s ease}
-.modal-sh{background:rgba(255,255,255,.82);backdrop-filter:blur(30px) saturate(200%);border-radius:var(--rl2) var(--rl2) 0 0;width:100%;max-width:500px;margin:0 auto;padding:22px 18px 36px;max-height:88vh;max-height:88dvh;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;overscroll-behavior-x:none;touch-action:pan-y pinch-zoom;-webkit-overflow-scrolling:touch;border:1px solid rgba(255,255,255,.72);border-bottom:none;box-shadow:var(--spec),0 -10px 44px rgba(0,0,0,.16)}
+.modal-sh{background:rgba(255,255,255,.82);backdrop-filter:blur(30px) saturate(200%);border-radius:var(--rl2) var(--rl2) 0 0;width:100%;max-width:500px;margin:0 auto;padding:22px 18px 36px;max-height:88vh;max-height:88dvh;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;overscroll-behavior-x:none;touch-action:pan-y;-webkit-overflow-scrolling:touch;border:1px solid rgba(255,255,255,.72);border-bottom:none;box-shadow:var(--spec),0 -10px 44px rgba(0,0,0,.16)}
 /* ── Variante plein écran pour les longs textes (Mentions légales / RGPD)
    Mobile : occupe 100% de la hauteur viewport dynamique (gère la barre
    d'adresse iOS qui apparaît/disparaît) et respecte les safe-areas
@@ -412,7 +414,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
   }
   .modal-bg.full .mhd-row{padding:18px 32px 12px;margin:0 -32px;border-radius:var(--rl2) var(--rl2) 0 0}
 }
-.modal-center{position:fixed;inset:0;z-index:750;display:none;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(7px);background:rgba(0,0,0,.3)}
+.modal-center{position:fixed;inset:0;z-index:750;display:none;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(7px);background:rgba(0,0,0,.3);overflow:hidden;overscroll-behavior:contain;touch-action:pan-y}
 .modal-center.on{display:flex;animation:fadeIn .22s ease}
 .modal-card{background:rgba(255,255,255,.85);backdrop-filter:blur(30px) saturate(200%);border-radius:var(--rl2);width:100%;max-width:400px;max-height:80vh;max-height:80dvh;overflow:hidden;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.72);box-shadow:var(--spec),0 20px 60px rgba(0,0,0,.22)}
 .mhd{padding:18px 18px 14px;border-bottom:1px solid rgba(0,0,0,.05)}
@@ -420,7 +422,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
 .mhd-t{font-size:17px;font-weight:900;letter-spacing:-.4px}
 .mcl{min-width:36px;height:36px;padding:0 12px;border-radius:var(--rr);border:1.5px solid var(--bdr);background:rgba(255,255,255,.65);color:var(--muted);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);display:inline-flex;align-items:center;justify-content:center;transition:background .18s,color .18s}
 .mcl:hover{background:rgba(255,255,255,.85);color:var(--txt)}
-.mbody{flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;overscroll-behavior-x:none;touch-action:pan-y pinch-zoom;-webkit-overflow-scrolling:touch;padding:14px}
+.mbody{flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;overscroll-behavior-x:none;touch-action:pan-y;-webkit-overflow-scrolling:touch;padding:14px}
 /* STARTUP popup */
 .startup-hd{background:rgba(176,32,32,.77);backdrop-filter:blur(14px);padding:20px 18px 16px;color:#fff;border-bottom:1px solid rgba(255,255,255,.18);box-shadow:var(--spec-d)}
 .startup-hd h2{font-size:18px;font-weight:900;margin-bottom:3px}
@@ -506,6 +508,24 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
   /* Z-index : sidebar sous les modals (qui sont à 750+) */
   #legal-modal,#stats-modal,#archive-modal,#email-modal,#startup-modal,#confirm-modal,#stores-modal{z-index:850}
 }
+
+/* ═══ VERROU ANTI-ZOOM / ANTI-DÉRIVE HORIZONTALE ═══════════════════════════
+   Cause n°1 des fenêtres qui « partent » de gauche à droite sur iPhone : un
+   champ de saisie dont la police fait moins de 16px déclenche un zoom
+   automatique à la mise au point. La page reste alors zoomée et se balade
+   librement (popup quantité, formulaire de scan Fresh…). On force donc 16px
+   sur tous les champs dès qu'on est au doigt, et on coupe le double-tap-zoom
+   sur les boutons. Le pincement est bloqué par le viewport + touch-action +
+   le garde-fou JS en fin de fichier. */
+@media (pointer:coarse){
+  /* :where() garde la spécificité à 0 → les règles ciblées ci-dessous gagnent */
+  input:not(:where([type=file],[type=checkbox],[type=radio],[type=range])),
+  select,textarea{font-size:16px!important}
+  .qm-stepper input{font-size:22px!important}   /* stepper : reste grand */
+  .ord-qty input{width:58px}                    /* 16px → un peu plus large */
+  .rf-row .rf-i{padding-left:13px;padding-right:13px}  /* gencod 13 chiffres : tient en entier */
+}
+button,label,select{touch-action:manipulation}
 </style>
 </head>
 <body>
@@ -4808,11 +4828,25 @@ function toolCSV(){
     return false;
   };
   document.addEventListener('touchmove', e => {
+    if(e.touches && e.touches.length>1){ e.preventDefault(); return; } // pincement : jamais
     const app=document.getElementById('app');
     if(!app || !app.classList.contains('on')) return; // splash/login : laisser faire
-    if(e.touches && e.touches.length>1) return;        // pincement : laisser faire
     if(!scrollable(e.target)) e.preventDefault();      // rien à défiler → pas de rebond
   }, {passive:false});
+})();
+
+/* ═══ VERROU ANTI-ZOOM ═══════════════════════════════════════════════════════
+   Safari iOS ignore `user-scalable=no` depuis iOS 10 (hors mode standalone) :
+   sans ce garde-fou, un pincement ou un double-tap zoome la page, qui se met
+   alors à glisser de gauche à droite — les fenêtres (popup quantité, formulaire
+   de scan) semblent « bouger toutes seules ». On neutralise donc les trois
+   déclencheurs : le pincement ici, le double-tap via `touch-action` (pan-y sur
+   le body + manipulation sur les boutons — surtout pas un preventDefault sur
+   touchend, qui casserait les appuis rapides sur le stepper ± de quantité), et
+   le zoom automatique des champs via @media (pointer:coarse) dans le CSS. */
+(function installZoomLock(){
+  ['gesturestart','gesturechange','gestureend'].forEach(ev =>
+    document.addEventListener(ev, e => e.preventDefault(), {passive:false}));
 })();
 
 /* ═══ MODALS ═════════════════════════════════════════════════════════════════ */
