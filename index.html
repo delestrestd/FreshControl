@@ -193,6 +193,10 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 /* Chips de filtre : passent à la ligne au lieu de défiler latéralement
    (l'utilisateur ne veut aucun mouvement horizontal ; tout doit rester visible). */
 .frow{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:9px}
+/* Le filtre catégories peut compter 9 entrées : une seule ligne qui défile
+   plutôt que 3 lignes qui repoussent la liste produits hors de l'écran. */
+.frow.frow-scroll{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.frow.frow-scroll .fc{flex-shrink:0}
 .frow::-webkit-scrollbar{display:none}
 .fc{padding:8px 17px;min-height:34px;border-radius:var(--rr);background:rgba(255,255,255,.62);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.7);font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;transition:all .18s;font-family:var(--font);color:var(--muted);box-shadow:var(--spec)}
 .fc:hover:not(.on){background:rgba(255,255,255,.78);color:var(--txt)}
@@ -526,9 +530,60 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{box-shadow:0 
   .rf-row .rf-i{padding-left:13px;padding-right:13px}  /* gencod 13 chiffres : tient en entier */
 }
 button,label,select{touch-action:manipulation}
+
+/* ═══ VERROU D'ORIENTATION — PORTRAIT UNIQUEMENT ═══════════════════════════
+   L'app se tient à une main dans le rayon : elle ne doit jamais basculer
+   quand on incline le téléphone. Le manifest demande déjà `orientation:
+   portrait` (respecté par Android/PWA) et `lockPortrait()` tente l'API
+   screen.orientation.lock() au lancement — mais iOS ignore les deux. Repli
+   universel : dès qu'un mobile passe en paysage, un voile couvre l'écran et
+   invite à revenir en portrait ; l'interface ne se réagence donc jamais de
+   travers. Les garde-fous `pointer:coarse` + `max-height` évitent de gêner
+   les écrans de bureau, toujours « en paysage ». */
+#rot-lock{display:none;position:fixed;inset:0;z-index:2000;flex-direction:column;align-items:center;justify-content:center;gap:13px;padding:22px;text-align:center;
+  background:radial-gradient(ellipse 80% 60% at 20% 10%,#1FD994 0%,transparent 52%),linear-gradient(155deg,#064D30 0%,#0A6B47 60%,#12A876 100%);color:#fff}
+.rl-ico{font-size:50px;line-height:1;animation:rotHint 2.4s ease-in-out infinite}
+.rl-t{font-size:19px;font-weight:900;letter-spacing:-.4px}
+.rl-p{font-size:13px;font-weight:700;color:rgba(255,255,255,.82);max-width:320px;line-height:1.6}
+@keyframes rotHint{0%,58%,100%{transform:rotate(0)}22%,44%{transform:rotate(-90deg)}}
+@media screen and (orientation:landscape) and (max-height:520px) and (pointer:coarse){
+  #rot-lock{display:flex}
+}
+
+/* ═══ CATÉGORIES PRODUITS (liquides, JBFL, salés, sucrés…) ═════════════════
+   Puce compacte réutilisée partout où une ligne produit s'affiche (stock,
+   vrac, BL, tableau de bord) + cartes de la vue de synthèse. */
+.cat-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--rr);font-size:10px;font-weight:900;line-height:1.5;white-space:nowrap;border:1px solid rgba(0,0,0,.06)}
+.cat-card{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:11px 12px;margin-bottom:8px;border-radius:14px;border:1px solid rgba(0,0,0,.07);background:rgba(255,255,255,.6);cursor:pointer;font-family:var(--font);box-shadow:var(--spec)}
+.cat-card.on{border-color:rgba(18,168,118,.5);background:rgba(18,168,118,.09)}
+.cat-card .cc-ico{font-size:22px;flex-shrink:0}
+.cat-card .cc-nm{font-size:13.5px;font-weight:900;color:var(--txt)}
+.cat-card .cc-sb{font-size:11px;font-weight:700;color:var(--muted);margin-top:2px}
+.cat-bar{height:6px;border-radius:6px;background:rgba(0,0,0,.07);overflow:hidden;margin-top:6px}
+.cat-bar i{display:block;height:100%;border-radius:6px}
+.cat-detail{padding:2px 4px 12px;font-size:12px;font-weight:700;color:var(--txt);line-height:1.7}
+.cat-detail .cd-l{display:flex;justify-content:space-between;gap:10px;padding:5px 8px;border-bottom:1px solid rgba(0,0,0,.05)}
+
+/* ═══ VRAC — segmenteur de mode + fiches de traçabilité ════════════════════ */
+.seg{display:flex;gap:6px;background:rgba(0,0,0,.05);border:1px solid var(--bdr);border-radius:var(--rr);padding:4px;margin-bottom:12px}
+.seg button{flex:1;min-height:42px;padding:9px 8px;border-radius:var(--rr);border:none;background:transparent;color:var(--muted);font-size:12.5px;font-weight:800;font-family:var(--font);cursor:pointer;transition:background .18s,color .18s}
+.seg button.on{background:rgba(255,255,255,.92);color:var(--gd);box-shadow:var(--spec),0 2px 8px rgba(0,0,0,.07)}
+.vr-card{background:rgba(255,255,255,.64);border:1px solid rgba(255,255,255,.7);border-radius:14px;padding:11px 12px;margin-bottom:8px;box-shadow:var(--spec)}
+.vr-nm{font-size:13.5px;font-weight:900;color:var(--txt);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.vr-meta{font-size:11px;font-weight:700;color:var(--muted);margin-top:4px;line-height:1.7}
+.vr-meta b{color:var(--txt);font-weight:900}
+.vr-acts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 </style>
 </head>
 <body>
+
+<!-- ═══ VERROU D'ORIENTATION (voile paysage — mobile uniquement) ═══════ -->
+<div id="rot-lock" aria-hidden="true">
+  <div class="rl-ico">📱</div>
+  <div class="rl-t">Tournez votre téléphone</div>
+  <div class="rl-p">FreshControl s'utilise <strong>à la verticale</strong>. Remettez l'appareil en portrait pour reprendre — l'affichage ne bascule jamais en paysage.</div>
+  <div class="rl-p" style="font-size:11.5px;opacity:.72">Astuce iPhone : activez le verrou de rotation dans le centre de contrôle (🔒 cadenas circulaire).</div>
+</div>
 
 <!-- ═══ SPLASH ════════════════════════════════════════════════════════ -->
 <div id="splash">
@@ -817,6 +872,87 @@ button,label,select{touch-action:manipulation}
   </div>
 </div>
 
+<!-- ═══ HISTORIQUE VRAC ═══════════════════════════════════════════════ -->
+<div id="vrac-modal" class="modal-bg">
+  <div class="modal-sh">
+    <div class="mhd-row" style="margin-bottom:12px">
+      <div class="mhd-t">🗂 Historique vrac</div>
+      <button class="mcl" onclick="closeModal('vrac-modal')" aria-label="Fermer">✕</button>
+    </div>
+    <input class="rf-i" id="vrac-hsearch" placeholder="🔍 Filtrer (produit, code, silo, lot, origine)…" oninput="renderVracHistory()" style="margin-bottom:12px">
+    <div id="vrac-hlist"></div>
+    <button class="scan-link-btn" onclick="exportVracCSV()" style="width:100%;margin-top:12px;padding:11px">📥 Exporter la traçabilité (CSV)</button>
+  </div>
+</div>
+
+<!-- ═══ PHOTO D'ÉTIQUETTE PLEIN ÉCRAN ═════════════════════════════════ -->
+<div id="photo-modal" class="modal-bg full" onclick="closeModal('photo-modal')">
+  <div class="modal-sh">
+    <div class="mhd-row" style="margin-bottom:12px">
+      <div class="mhd-t">🏷 Étiquette</div>
+      <button class="mcl" onclick="closeModal('photo-modal')" aria-label="Fermer">✕</button>
+    </div>
+    <div><img id="photo-modal-img" alt="Étiquette" style="width:100%;border-radius:14px"></div>
+  </div>
+</div>
+
+<!-- ═══ IMPORT BON DE LIVRAISON (BL) → ÉTAT DE STOCK ══════════════════ -->
+<div id="bl-modal" class="modal-bg">
+  <div class="modal-sh">
+    <div class="mhd-row" style="margin-bottom:12px">
+      <div class="mhd-t">📄 Importer un bon de livraison</div>
+      <button class="mcl" onclick="closeModal('bl-modal')" aria-label="Fermer">✕</button>
+    </div>
+    <div style="font-size:12px;font-weight:700;color:var(--muted);line-height:1.65;margin-bottom:14px">
+      Chargez le fichier du BL (<strong>.csv</strong> / <strong>.xlsx</strong>) ou collez son texte (copié d'un PDF, d'un mail). Les produits sont reconnus par leur code-barres, complétés depuis le catalogue, puis versés dans l'état de stock : <strong>lignes modifiables</strong> exactement comme un relevé scanné.
+    </div>
+    <div class="rf-row">
+      <div class="rf-f"><div class="rf-l">N° de BL</div><input class="rf-i" id="bl-ref" placeholder="Ex : BL-2026-0421"></div>
+      <div class="rf-f"><div class="rf-l">Fournisseur</div><input class="rf-i" id="bl-prov" placeholder="Ex : Léa Nature"></div>
+    </div>
+    <div class="rf-f"><div class="rf-l">Date du BL</div><input class="rf-i" type="date" id="bl-date"></div>
+    <input type="file" id="bl-file" accept=".csv,.xlsx,text/csv" style="display:none">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <button class="af-add" style="flex:1 1 150px" onclick="document.getElementById('bl-file').click()">📂 Choisir le fichier</button>
+      <button class="scan-link-btn" id="bl-paste-btn" onclick="toggleBLPaste()" style="flex:1 1 150px;padding:12px">✏️ Coller le texte</button>
+    </div>
+    <div id="bl-paste-wrap" style="display:none;margin-bottom:12px">
+      <div class="rf-l" style="margin-bottom:6px">Texte du BL</div>
+      <textarea class="rf-i" id="bl-paste" rows="6" style="border-radius:var(--rm);min-height:120px;resize:vertical;line-height:1.5" placeholder="3289196100641 Pur jus pomme 75 cl   x6&#10;3456300017717 Graines de chia 250 g  12"></textarea>
+      <button class="scan-link-btn" onclick="analyzeBLText()" style="width:100%;margin-top:8px;padding:11px">🔎 Analyser le texte</button>
+    </div>
+    <div id="bl-status" style="font-size:12px;font-weight:800;margin-bottom:10px;line-height:1.6"></div>
+    <div id="bl-lines"></div>
+    <div id="bl-footer" style="display:none;margin-top:12px">
+      <button class="rfsave" onclick="applyBLToStock()">📦 Verser dans le relevé en cours (modifiable)</button>
+      <button class="scan-link-btn" onclick="saveBLAsRecord()" style="width:100%;margin-top:8px;padding:12px">✅ Enregistrer directement dans l'historique</button>
+      <button class="rfcancel" onclick="clearBL()">Vider l'analyse</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VUE PAR CATÉGORIES (vision globale → détail) ═══════════════════ -->
+<div id="cats-modal" class="modal-bg">
+  <div class="modal-sh">
+    <div class="mhd-row" style="margin-bottom:12px">
+      <div class="mhd-t">📊 Vue par catégories</div>
+      <button class="mcl" onclick="closeModal('cats-modal')" aria-label="Fermer">✕</button>
+    </div>
+    <div class="seg">
+      <button data-csrc="stocks" onclick="setCatsSource('stocks')">📦 Stocks</button>
+      <button data-csrc="fresh"  onclick="setCatsSource('fresh')">🌿 Fresh</button>
+      <button data-csrc="vrac"   onclick="setCatsSource('vrac')">🌰 Vrac</button>
+      <button data-csrc="cmd"    onclick="setCatsSource('cmd')">🛒 Cmd</button>
+    </div>
+    <div class="rf-f" style="margin-bottom:10px">
+      <select class="rf-i" id="cats-store" onchange="setCatsStore(this.value)" aria-label="Filtrer par magasin"></select>
+    </div>
+    <div id="cats-scope" style="font-size:11.5px;font-weight:700;color:var(--muted);margin:0 2px 12px;line-height:1.6"></div>
+    <div id="cats-body"></div>
+    <button class="scan-link-btn" onclick="exportCatsCSV()" style="width:100%;margin-top:10px">📥 Exporter la synthèse (CSV)</button>
+  </div>
+</div>
+
 <!-- ═══ MENTIONS LÉGALES / CGU / RGPD ═══════════════════════════════════
      Textes rédigés en cohérence avec les traitements réels de l'application.
      À soumettre à un avocat avant toute mise en production : tous les
@@ -999,6 +1135,9 @@ button,label,select{touch-action:manipulation}
       </div>
       <div class="frow" id="fsr"></div>
       <div class="frow" id="fmr"></div>
+      <!-- Filtre par catégorie de rayon (liquides, JBFL, salés, sucrés…) -->
+      <div class="frow frow-scroll" id="fcr"></div>
+      <button class="scan-link-btn" onclick="openCatsView('fresh')" style="width:100%;margin-bottom:12px;background:rgba(255,255,255,.62);border-color:rgba(255,255,255,.7);font-weight:800">📊 Vision globale par catégorie</button>
       <div class="sh">
         <span class="sh-t" id="l-prods">Produits</span>
         <div style="display:flex;align-items:center;gap:8px">
@@ -1174,10 +1313,19 @@ button,label,select{touch-action:manipulation}
       <!-- Stock de départ (baseline) + accès à l'état réel -->
       <div id="stk-base" style="margin:2px 2px 12px"></div>
 
+      <!-- Bon de livraison : le stock d'un arrivage se saisit en 1 import -->
+      <button class="scan-link-btn" onclick="openBLImport()" style="width:100%;margin-bottom:12px;background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.32);padding:11px;font-weight:800">📄 Importer un bon de livraison (BL)</button>
+
+      <!-- Bandeau « modification d'un relevé de l'historique » -->
+      <div id="stk-editbar" style="display:none"></div>
+
       <!-- Liste du relevé de stock en cours -->
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 2px 10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 2px 10px;flex-wrap:wrap">
         <div style="font-size:14px;font-weight:900;color:#fff">📦 Stock en cours <span id="stk-count" style="opacity:.85;font-weight:700"></span></div>
-        <button class="scan-link-btn" onclick="openModal('stocks-modal');renderStocksHistory()" style="background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.32)">🗂 Historique</button>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="scan-link-btn" onclick="openCatsView('stocks')" style="background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.32)">📊 Catégories</button>
+          <button class="scan-link-btn" onclick="openModal('stocks-modal');renderStocksHistory()" style="background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.32)">🗂 Historique</button>
+        </div>
       </div>
       <div id="stock-lines"></div>
       <div id="stk-footer" style="display:none;margin-top:12px">
@@ -1187,6 +1335,95 @@ button,label,select{touch-action:manipulation}
           <button class="scan-reset-btn" style="flex:1;margin:0" onclick="clearStock()">🗑 Vider</button>
         </div>
       </div>
+    </div>
+
+    <!-- VRAC (traçabilité silo : scan + photo étiquette + silo + DDM) -->
+    <div id="tab-vrac" class="tab">
+
+      <!-- Magasin détecté automatiquement par GPS -->
+      <div class="sbar idle" data-storebar></div>
+
+      <div class="seg" id="vrac-seg">
+        <button data-vmode="add"   class="on" onclick="setVracMode('add')">➕ Mise en rayon</button>
+        <button data-vmode="check"           onclick="setVracMode('check')">🔍 Vérifier un produit</button>
+      </div>
+
+      <!-- Scan (caméra live + repli photo) -->
+      <div class="scan-box" id="vrac-scan-box">
+        <div class="scan-step-icon">🌰</div>
+        <div class="scan-step-title" id="vrac-title">Vrac — mise en rayon</div>
+        <div class="scan-step-sub" id="vrac-sub">Scannez le code-barres du sac : la fiche s'ouvre pour la photo de l'étiquette, le silo et la DDM.</div>
+        <div class="scan-cam-wrap" id="vrac-cam-wrap" style="display:none">
+          <video id="vrac-video" playsinline muted></video>
+          <div class="scan-reticle"></div>
+          <button class="scan-torch" id="vrac-torch" style="display:none" onclick="toggleVracTorch()" aria-label="Torche">🔦</button>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;align-items:center">
+          <input type="file" id="vrac-photo-in" accept="image/*" capture="environment" style="display:none">
+          <button class="sbtn" id="vrac-scan-btn" onclick="startVracScan()" style="margin-top:0">📷 Démarrer le scan</button>
+          <button class="sbtn scan-ico" id="vrac-stop-btn" onclick="stopVracScan()" style="margin-top:0;display:none;background:rgba(224,60,60,.9);box-shadow:var(--spec-d),var(--sr)" title="Arrêter" aria-label="Arrêter">⏹</button>
+          <button class="scan-link-btn scan-ico" onclick="document.getElementById('vrac-photo-in').click()" title="Scanner via photo" aria-label="Scanner via photo">🖼</button>
+          <button class="scan-link-btn scan-ico" onclick="vracManualEntry()" title="Saisie manuelle" aria-label="Saisie manuelle">✏️</button>
+        </div>
+        <div id="vrac-st" class="scan-step-status"></div>
+      </div>
+
+      <!-- Fiche de mise en rayon -->
+      <div class="scan-box" id="vrac-form" style="display:none;text-align:left">
+        <div class="rf-t">🌰 <span id="vrac-f-title">Mise en rayon</span></div>
+        <div class="rf-f"><div class="rf-l">Produit</div><input class="rf-i" id="vrac-name" placeholder="Ex : JBV Pignon de pin 2,5 kg"></div>
+        <div class="rf-row">
+          <div class="rf-f"><div class="rf-l">Code-barres</div><input class="rf-i" id="vrac-gencod" inputmode="numeric" placeholder="EAN"></div>
+          <div class="rf-f"><div class="rf-l">Silo *</div>
+            <input class="rf-i" id="vrac-silo" list="vrac-silos-dl" placeholder="Ex : Silo 12" autocomplete="off">
+            <datalist id="vrac-silos-dl"></datalist>
+          </div>
+        </div>
+        <div class="rf-row">
+          <div class="rf-f"><div class="rf-l">DDM / DLC — MM/AAAA</div><input class="rf-i" id="vrac-ddm" inputmode="numeric" placeholder="06/2027" maxlength="7" onblur="normalizeDDM(this)"></div>
+          <div class="rf-f"><div class="rf-l">Mise en rayon</div><input class="rf-i" type="date" id="vrac-date"></div>
+        </div>
+        <div class="rf-row">
+          <div class="rf-f"><div class="rf-l">N° de lot</div><input class="rf-i" id="vrac-lot" placeholder="Ex : 2623023" autocomplete="off"></div>
+          <div class="rf-f"><div class="rf-l">Origine / provenance</div>
+            <input class="rf-i" id="vrac-prov" list="vrac-prov-dl" placeholder="Ex : Chine" autocomplete="off">
+            <datalist id="vrac-prov-dl"></datalist>
+          </div>
+        </div>
+        <div class="rf-f"><div class="rf-l">Nombre de sacs</div>
+          <div class="qm-stepper">
+            <button type="button" onclick="vracQtyStep(-1)" aria-label="Un sac de moins">−</button>
+            <input id="vrac-qty" type="number" min="1" step="1" value="1" inputmode="numeric" aria-label="Nombre de sacs">
+            <button type="button" onclick="vracQtyStep(1)" aria-label="Un sac de plus">+</button>
+          </div>
+        </div>
+        <div class="rf-f">
+          <div class="rf-l">Photo de l'étiquette</div>
+          <input type="file" id="vrac-label-in" accept="image/*" capture="environment" style="display:none">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <button class="scan-link-btn" onclick="document.getElementById('vrac-label-in').click()" style="padding:11px 16px">📷 Photographier l'étiquette</button>
+            <button class="scan-link-btn" id="vrac-photo-del" onclick="clearVracPhoto()" style="display:none;color:var(--r);padding:11px 16px">🗑 Retirer</button>
+          </div>
+          <div id="vrac-photo-st" style="font-size:11px;font-weight:700;color:var(--muted);margin-top:6px"></div>
+          <img id="vrac-photo-prev" alt="Étiquette photographiée" style="display:none;margin-top:8px;width:100%;max-height:260px;object-fit:contain;border-radius:12px;border:1px solid var(--bdr);background:rgba(0,0,0,.04)">
+        </div>
+        <button class="rfsave" onclick="saveVracEntry()">💾 Enregistrer la mise en rayon</button>
+        <button class="rfcancel" onclick="cancelVracForm()">Annuler</button>
+      </div>
+
+      <!-- Résultat de vérification (mode 🔍) -->
+      <div id="vrac-check" style="display:none;margin-bottom:12px"></div>
+
+      <!-- Historique récent -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 2px 10px;flex-wrap:wrap">
+        <div style="font-size:14px;font-weight:900;color:#fff">🌰 Mises en rayon <span id="vrac-count" style="opacity:.85;font-weight:700"></span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="scan-link-btn" onclick="openCatsView('vrac')" style="background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.32)">📊 Catégories</button>
+          <button class="scan-link-btn" onclick="openModal('vrac-modal');renderVracHistory()" style="background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.32)">🗂 Historique</button>
+        </div>
+      </div>
+      <input class="af-in" id="vrac-search" placeholder="🔍 Rechercher (produit, code, silo, lot, origine)…" oninput="renderVracList()" style="width:100%;margin-bottom:10px">
+      <div id="vrac-list"></div>
     </div>
 
     <!-- ALERTES -->
@@ -1354,6 +1591,7 @@ button,label,select{touch-action:manipulation}
     <button class="tb" id="tb-s" onclick="showTab('scanner')"><span class="tb-i">🌿</span><span id="tl-s">Fresh</span></button>
     <button class="tb" id="tb-c" onclick="showTab('commande')"><span class="tb-i">🛒</span><span id="tl-c">Commande</span></button>
     <button class="tb" id="tb-stk" onclick="showTab('stocks')"><span class="tb-i">📦</span><span id="tl-stk">Stocks</span></button>
+    <button class="tb" id="tb-v" onclick="showTab('vrac')"><span class="tb-i">🌰</span><span id="tl-v">Vrac</span></button>
     <button class="tb" id="tb-a" onclick="showTab('alertes')"><span class="tb-i">🔔</span><span id="tl-a">Alertes</span></button>
   </div>
 </div>
@@ -1369,6 +1607,7 @@ button,label,select{touch-action:manipulation}
       <div class="sb-it" onclick="showTab('scanner');closeSB()"><div class="sb-ic">🌿</div>Fresh</div>
       <div class="sb-it" onclick="showTab('commande');closeSB()"><div class="sb-ic">🛒</div>Commande</div>
       <div class="sb-it" onclick="showTab('stocks');closeSB()"><div class="sb-ic">📦</div>Stocks</div>
+      <div class="sb-it" onclick="showTab('vrac');closeSB()"><div class="sb-ic">🌰</div>Vrac</div>
       <div class="sb-it" onclick="showTab('alertes');closeSB()"><div class="sb-ic">🔔</div>Alertes</div>
       <div class="sb-it" onclick="showTab('planning');closeSB()"><div class="sb-ic">📅</div>Planning</div>
       <div class="sb-it" onclick="showTab('catalogue');closeSB()"><div class="sb-ic">📚</div>Catalogue</div>
@@ -1376,6 +1615,8 @@ button,label,select{touch-action:manipulation}
       <div class="sb-sec">Outils</div>
       <div class="sb-it" onclick="openStoresModal();closeSB()"><div class="sb-ic">🏪</div>Gestion des magasins</div>
       <div class="sb-it" onclick="openFolders();closeSB()"><div class="sb-ic">🗂</div>Dossiers magasins</div>
+      <div class="sb-it" onclick="openCatsView();closeSB()"><div class="sb-ic">📊</div>Vue par catégories</div>
+      <div class="sb-it" onclick="openBLImport();closeSB()"><div class="sb-ic">📄</div>Importer un BL</div>
       <div class="sb-it" onclick="openEmailModal(null);closeSB()"><div class="sb-ic">📧</div>Récap alertes par magasin</div>
       <div class="sb-it" onclick="toolCSV();closeSB()"><div class="sb-ic">📥</div>Exporter CSV</div>
       <div class="sb-it" onclick="backupData();closeSB()"><div class="sb-ic">💾</div>Sauvegarder mes données</div>
@@ -1498,10 +1739,10 @@ function removeStore(id){
    lecture         → Direction régionale / finances — lecture seule + rapports
 ─────────────────────────────────────────────────────────────────────────── */
 const ROLES = {
-  superadmin:  { label:'⚡ Super Admin',    color:'#7c3aed', badge:'SA', level:5, tabs:['dashboard','scanner','commande','stocks','alertes','planning','admin'] },
-  directeur:   { label:'👔 Directeur',      color:'#064D30', badge:'DR', level:4, tabs:['dashboard','scanner','commande','stocks','alertes','planning','admin'] },
-  responsable: { label:'📋 Responsable',    color:'#0A6B47', badge:'RR', level:3, tabs:['dashboard','scanner','commande','stocks','alertes','planning'] },
-  agent:       { label:'👤 Agent',          color:'#1E40AF', badge:'AG', level:2, tabs:['scanner','commande','stocks','dashboard'] },
+  superadmin:  { label:'⚡ Super Admin',    color:'#7c3aed', badge:'SA', level:5, tabs:['dashboard','scanner','commande','stocks','vrac','alertes','planning','admin'] },
+  directeur:   { label:'👔 Directeur',      color:'#064D30', badge:'DR', level:4, tabs:['dashboard','scanner','commande','stocks','vrac','alertes','planning','admin'] },
+  responsable: { label:'📋 Responsable',    color:'#0A6B47', badge:'RR', level:3, tabs:['dashboard','scanner','commande','stocks','vrac','alertes','planning'] },
+  agent:       { label:'👤 Agent',          color:'#1E40AF', badge:'AG', level:2, tabs:['scanner','commande','stocks','vrac','dashboard'] },
   lecture:     { label:'👁 Lecture seule',  color:'#92400E', badge:'LT', level:1, tabs:['dashboard','alertes'] },
 };
 function getRoleInfo(role){ return ROLES[role] || ROLES.agent; }
@@ -1586,7 +1827,7 @@ const I18N={
   ldlc:'Date limite (DLC)',lqty:'Quantité',rfsave:'💾 Enregistrer',rfcancel:'Annuler',
   nft:'Produit non référencé',nfsub:"Ce gencod n'est pas dans le catalogue.",nfbtn:'Nouveau scan',
   gps_load:'Localisation…',gps_denied:'GPS refusé — sélection manuelle',gps_err:'Erreur GPS',gps_retry:'Réessayer',gps_no_store:'Hors zone magasin — sélection manuelle',
-  tl_d:'Tableau',tl_s:'Fresh',tl_c:'Commande',tl_stk:'Stocks',tl_a:'Alertes',tl_p:'Planning',
+  tl_d:'Tableau',tl_s:'Fresh',tl_c:'Commande',tl_stk:'Stocks',tl_v:'Vrac',tl_a:'Alertes',tl_p:'Planning',
   badge_e:'Périmé',badge_o:'J-{{d}}',badge_w:'J-{{d}}',badge_k:'J-{{d}}',
   send_all:'📧 Envoyer le récap global',su_t:'⚠️ Alertes produits',su_p:'Produits expirés ou critiques détectés',
   em_t:'📧 Envoyer un rappel',em_sub:'Rappel e-mail des produits urgents',em_to:'Destinataire(s)',em_subj:'Objet',em_body:'Corps du message',em_cancel:'Annuler',su_mail:'📧 Envoyer par mail',su_cl:'Fermer',
@@ -1600,7 +1841,7 @@ const I18N={
   ldlc:'Expiry date',lqty:'Quantity',rfsave:'💾 Save',rfcancel:'Cancel',
   nft:'Product not found',nfsub:"This barcode isn't in the catalogue.",nfbtn:'New scan',
   gps_load:'Locating…',gps_denied:'GPS denied — manual selection',gps_err:'GPS error',gps_retry:'Retry',gps_no_store:'Outside store zone — manual selection',
-  tl_d:'Dashboard',tl_s:'Fresh',tl_c:'Order',tl_stk:'Stock',tl_a:'Alerts',tl_p:'Planning',
+  tl_d:'Dashboard',tl_s:'Fresh',tl_c:'Order',tl_stk:'Stock',tl_v:'Bulk',tl_a:'Alerts',tl_p:'Planning',
   badge_e:'Expired',badge_o:'D-{{d}}',badge_w:'D-{{d}}',badge_k:'D-{{d}}',
   send_all:'📧 Send global recap',su_t:'⚠️ Product alerts',su_p:'Expired or critical products detected',
   em_t:'📧 Send reminder',em_sub:'Email reminder for urgent products',em_to:'Recipient(s)',em_subj:'Subject',em_body:'Message',em_cancel:'Cancel',su_mail:'📧 Send by email',su_cl:'Close',
@@ -1614,7 +1855,7 @@ const I18N={
   ldlc:'Fecha caducidad',lqty:'Cantidad',rfsave:'💾 Guardar',rfcancel:'Cancelar',
   nft:'Producto no encontrado',nfsub:"Este código no está en el catálogo.",nfbtn:'Nuevo escaneo',
   gps_load:'Localizando…',gps_denied:'GPS denegado — selección manual',gps_err:'Error GPS',gps_retry:'Reintentar',gps_no_store:'Fuera de zona — selección manual',
-  tl_d:'Panel',tl_s:'Fresh',tl_c:'Pedido',tl_stk:'Existencias',tl_a:'Alertas',tl_p:'Planif.',
+  tl_d:'Panel',tl_s:'Fresh',tl_c:'Pedido',tl_stk:'Existencias',tl_v:'Granel',tl_a:'Alertas',tl_p:'Planif.',
   badge_e:'Caducado',badge_o:'D-{{d}}',badge_w:'D-{{d}}',badge_k:'D-{{d}}',
   send_all:'📧 Enviar resumen global',su_t:'⚠️ Alertas productos',su_p:'Productos caducados o críticos',
   em_t:'📧 Enviar recordatorio',em_sub:'Recordatorio de productos urgentes',em_to:'Destinatario',em_subj:'Asunto',em_body:'Mensaje',em_cancel:'Cancelar',su_mail:'📧 Enviar por correo',su_cl:'Cerrar',
@@ -1628,7 +1869,7 @@ const I18N={
   ldlc:'有效期',lqty:'数量',rfsave:'💾 保存',rfcancel:'取消',
   nft:'产品未找到',nfsub:"此条形码不在目录中。",nfbtn:'重新扫描',
   gps_load:'定位中…',gps_denied:'GPS被拒绝 — 手动选择',gps_err:'GPS错误',gps_retry:'重试',gps_no_store:'不在门店范围内 — 手动选择',
-  tl_d:'仪表盘',tl_s:'Fresh',tl_c:'订单',tl_stk:'库存',tl_a:'警报',tl_p:'计划',
+  tl_d:'仪表盘',tl_s:'Fresh',tl_c:'订单',tl_stk:'库存',tl_v:'散装',tl_a:'警报',tl_p:'计划',
   badge_e:'已过期',badge_o:'还剩{{d}}天',badge_w:'还剩{{d}}天',badge_k:'还剩{{d}}天',
   send_all:'📧 发送全局摘要',su_t:'⚠️ 产品警报',su_p:'检测到过期或紧急产品',
   em_t:'📧 发送提醒',em_sub:'紧急产品邮件提醒',em_to:'收件人',em_subj:'主题',em_body:'邮件内容',em_cancel:'取消',su_mail:'📧 发送邮件',su_cl:'关闭',
@@ -1655,7 +1896,7 @@ function applyLang(){
   $('l-exp','lexp');$('l-crit','lcrit');$('l-warn','lwarn');$('l-ok','lok');$('l-prods','lprods');
   $('sc-t','sct');$('sc-sub','scsub');$('sc-btn','scbtn');$('l-dlc','ldlc');$('l-qty','lqty');
   $('rf-save','rfsave');$('rf-cancel','rfcancel');$('nf-t','nft');$('nf-sub','nfsub');$('nf-btn','nfbtn');
-  $('tl-d','tl_d');$('tl-s','tl_s');$('tl-c','tl_c');$('tl-stk','tl_stk');$('tl-a','tl_a');$('tl-p','tl_p');
+  $('tl-d','tl_d');$('tl-s','tl_s');$('tl-c','tl_c');$('tl-stk','tl_stk');$('tl-v','tl_v');$('tl-a','tl_a');$('tl-p','tl_p');
   $('l-send-all','send_all');$('su-t','su_t');$('su-p','su_p');$('su-mail','su_mail');$('su-cl','su_cl');
   $('em-t','em_t');$('em-sub','em_sub');$('em-cancel','em_cancel');
   // lang buttons
@@ -1721,6 +1962,7 @@ function updateSplashBranding(){
 function launchApp(){
   document.getElementById('splash').classList.add('off');
   document.getElementById('app').classList.add('on');
+  lockPortrait();   // 2ᵉ tentative après geste utilisateur (Android l'exige parfois)
 
   const role = session?.role || 'agent';
   const ri   = getRoleInfo(role);
@@ -1863,6 +2105,7 @@ function showTab(n, isBack){
   if(curTab==='commande' && n!=='commande') stopCmdScan(); // libère la caméra
   if(curTab==='stocks'   && n!=='stocks')   stopStockScan(); // libère la caméra
   if(curTab==='scanner'  && n!=='scanner')  stopEanScan();  // libère la caméra
+  if(curTab==='vrac'     && n!=='vrac')     stopVracScan(); // libère la caméra
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
   // Le bouton de la barre suit le 1er caractère du nom, sauf onglets à nom
@@ -1872,7 +2115,7 @@ function showTab(n, isBack){
   if(t) t.classList.add('on');
   if(b) b.classList.add('on');
   curTab=n;
-  if(n==='scanner'||n==='commande'||n==='stocks'){
+  if(n==='scanner'||n==='commande'||n==='stocks'||n==='vrac'){
     if(gpsWid===null && gpsState!=='denied') startGPS(); // relance la détection si besoin
     renderStoreBars();
   }
@@ -1881,17 +2124,22 @@ function showTab(n, isBack){
   }
   if(n==='commande') renderCommande();
   if(n==='stocks') renderStock();
+  if(n==='vrac') renderVrac();
   if(n==='alertes') renderAlertes();
   if(n==='planning') renderPlanning();
   if(n==='catalogue') renderCatalogueView();
   if(n==='admin') renderAdmin();
-  if(n==='dashboard') navStack=[];   // accueil = racine : on repart d'un historique vierge
+  if(n==='dashboard'){
+    navStack=[];              // accueil = racine : on repart d'un historique vierge
+    renderDashboard();        // compteurs + filtres (magasin/statut/catégorie) à jour
+  }
   updateBackBtn();
 }
 function renderCurrentTab(){
   if(curTab==='dashboard') renderDashboard();
   else if(curTab==='commande') renderCommande();
   else if(curTab==='stocks') renderStock();
+  else if(curTab==='vrac') renderVrac();
   else if(curTab==='alertes') renderAlertes();
   else if(curTab==='planning') renderPlanning();
   else if(curTab==='catalogue') renderCatalogueView();
@@ -1988,6 +2236,246 @@ function dDiff(dlc){return Math.ceil((new Date(dlc)-new Date())/86400000)}
 function statusOf(dlc){const d=dDiff(dlc);if(d<0)return'e';if(d<=2)return'o';if(d<=7)return'w';return'k'}
 function fmtDate(d){if(!d)return'—';const[y,m,j]=d.split('-');return`${j}/${m}/${y}`}
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   CATÉGORIES PRODUITS — « vision globale par le détail »
+   Les catalogues portent une famille très fine (≈80 valeurs : « SAUCES
+   CUISINÉES », « PURS JUS », « BISCUITS FOURRÉS »…) : trop granulaire pour
+   piloter un rayon. On la replie donc sur 9 catégories métier stables
+   (liquides, thés, plantes, JBFL, vrac, salés, sucrés, bien-être, autres).
+   La catégorie est DÉRIVÉE, jamais stockée : elle s'applique rétroactivement
+   à tout l'historique déjà saisi et suit le catalogue s'il évolue.
+   Trois signaux, du plus fiable au plus large :
+     1. le préfixe de gamme porté par le nom (JBV = Jardin Bio Vrac,
+        JBFL = Fruits & Légumes, JBEJ = Jus & Boissons, BSE = Biosens…) ;
+     2. les mots-clés de la famille catalogue ;
+     3. les mots-clés du nom du produit (produits hors catalogue).
+   ═══════════════════════════════════════════════════════════════════════════ */
+const FC_CATS = [
+  { k:'liq',     ico:'💧', label:'Liquides',           color:'#3B82F6' },
+  { k:'chaud',   ico:'☕', label:'Thés & infusions',   color:'#92400E' },
+  { k:'plantes', ico:'🌿', label:'Plantes & aromates', color:'#15803D' },
+  { k:'jbfl',    ico:'🥬', label:'JBFL',               color:'#12A876' },
+  { k:'vrac',    ico:'🌰', label:'Vrac',               color:'#B45309' },
+  { k:'sale',    ico:'🧂', label:'Salés',              color:'#0A6B47' },
+  { k:'sucre',   ico:'🍫', label:'Sucrés',             color:'#DB2777' },
+  { k:'sante',   ico:'💊', label:'Bien-être',          color:'#7C3AED' },
+  { k:'autre',   ico:'📦', label:'Autres',             color:'#64748B' },
+];
+const FC_CAT_IDX = {};
+FC_CATS.forEach(c => FC_CAT_IDX[c.k] = c);
+function catInfo(k){ return FC_CAT_IDX[k] || FC_CAT_IDX.autre; }
+
+function _noAcc(s){
+  return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+}
+
+/* Préfixe de gamme en tête de libellé (« JBV Amandes entières ») */
+const CAT_PREFIX = {
+  jbv:'vrac', jbfl:'jbfl', jbej:'liq', jbefl:'plantes',
+  joyce:'chaud', bse:'sante', gm:'sante', kbr:'sante', kv:'sante',
+  ka:'sucre', jom:'sale', gab:'sale', nat:'sante',
+};
+/* Mots-clés testés dans l'ordre : le 1ᵉʳ qui matche gagne. */
+const CAT_RULES = [
+  ['vrac',    /\bvrac\b/],
+  ['liq',     /(purs? jus|jus de|jus |nectar|boisson|kombucha|cocktail|\bshot|smoothie|sirop|limonade|eau de|soda)/],
+  ['chaud',   /(\bthes?\b|the |infusion|rooibos|cafe|chicoree|matcha)/],
+  ['plantes', /(plante|aromate|epice|condiment|\bsel\b|sels|herbes)/],
+  ['sante',   /(gelule|ampoule|comprime|capsule|vitamine|melatonine|collagene|actif|minceur|detox|sommeil|circulation|cardio|marin|proteine|complement|bien-etre|diet)/],
+  ['sucre',   /(petit-dejeuner|petit dejeuner|biscuit|confiture|chocolat|tartiner|tartinable gourmand|sucre|pain d epice|barre|compote|miel|dessert|patissier|sable)/],
+  ['jbfl',    /(fruits a coque|graine|fruits moelleux|fruits seches|legumes secs|farine|cereale|legumineuse|melange fruits|melanges fruits|oleagineux|fruits et graines)/],
+  ['sale',    /(sauce|conserve|legume|plat cuisine|soupe|\bpates?\b|\briz\b|huile|aperitif|antipasti|tartinable|accompagnement|aide culinaire|bocaux|snack|chips|apero)/],
+];
+
+/* Catégorie d'un produit à partir de son libellé + sa famille catalogue. */
+function catOf(name, famille){
+  const nm = _noAcc(name), fm = _noAcc(famille);
+  const pfx = (nm.match(/^([a-z]+)\b/) || [])[1];
+  if(pfx && CAT_PREFIX[pfx]) return CAT_PREFIX[pfx];
+  for(const [k, re] of CAT_RULES){ if(re.test(fm)) return k; }
+  for(const [k, re] of CAT_RULES){ if(re.test(nm)) return k; }
+  return 'autre';
+}
+
+/* Catégorie d'une ligne quelconque (stock, commande, vrac, produit scanné).
+   Si la ligne n'a pas de famille, on la retrouve dans le catalogue via le
+   gencod — l'historique ancien se classe donc tout seul. */
+function catOfLine(l){
+  if(!l) return 'autre';
+  const gc  = l.gencod || l.ean || '';
+  const ref = gc ? lookupGencod(gc) : null;
+  const nm  = l.name || l.nom || (ref && ref.nom) || '';
+  const fam = l.famille || l.type || (ref && ref.famille) || '';
+  return catOf(nm, fam);
+}
+
+/* Puce compacte réutilisable dans toutes les listes. */
+function catChip(k, extra){
+  const c = catInfo(k);
+  return `<span class="cat-chip" style="background:${c.color}18;color:${c.color}"${extra||''}>${c.ico} ${escapeHTML(c.label)}</span>`;
+}
+
+/* Agrège des lignes {name,gencod,qty} par catégorie → tableau trié desc. */
+function groupByCat(lines){
+  const map = {};
+  lines.forEach(l => {
+    const k = catOfLine(l);
+    if(!map[k]) map[k] = { k, refs:0, qty:0, items:[] };
+    map[k].refs++;
+    map[k].qty += (l.qty || 1);
+    map[k].items.push(l);
+  });
+  return FC_CATS.map(c => map[c.k]).filter(Boolean).sort((a,b) => b.qty - a.qty);
+}
+
+/* ── VUE DE SYNTHÈSE PAR CATÉGORIE ────────────────────────────────────────
+   Un même écran pour les 4 flux (stocks, Fresh, vrac, commandes) : total en
+   haut, une carte par catégorie avec sa part du volume, et le détail produit
+   qui se déplie au clic — « la vision globale par le détail ». */
+let _catsSrc='stocks', _catsStore='', _catsOpen=null;
+
+function openCatsView(src){
+  if(src) _catsSrc = src;
+  _catsOpen = null;
+  fillCatsStores();
+  openModal('cats-modal');
+  renderCatsView();
+}
+function setCatsSource(s){ _catsSrc=s; _catsOpen=null; renderCatsView(); }
+function setCatsStore(v){ _catsStore=v; _catsOpen=null; renderCatsView(); }
+function toggleCatDetail(k){ _catsOpen = (_catsOpen===k ? null : k); renderCatsView(); }
+
+function fillCatsStores(){
+  const sel = document.getElementById('cats-store'); if(!sel) return;
+  const names = [];
+  [].concat(
+    getStores().map(s=>s.name),
+    stockRecords.map(r=>r.store),
+    orders.map(o=>o.store),
+    products.map(p=>p.magasin),
+    vracEntries.map(v=>v.store)
+  ).forEach(n=>{ if(n && names.indexOf(n)<0) names.push(n); });
+  names.sort();
+  if(_catsStore && names.indexOf(_catsStore)<0) _catsStore='';
+  sel.innerHTML = '<option value="">🏪 Tous les magasins</option>'
+    + names.map(n=>`<option value="${escapeHTMLAttr(n)}"${n===_catsStore?' selected':''}>${escapeHTML(n)}</option>`).join('');
+}
+
+/* Périmètre de chaque source — choisi pour rester juste (pas de double compte) :
+   • Stocks   = DERNIER relevé de chaque magasin (= état courant) + relevé en cours ;
+   • Fresh    = produits en cours de suivi DLC ;
+   • Vrac     = mises en rayon enregistrées ;
+   • Commande = cumul de toutes les commandes de l'historique. */
+function catsSourceData(){
+  const st = _catsStore;
+  if(_catsSrc==='fresh'){
+    return {
+      unit:'u.',
+      scope:`🌿 Produits Fresh en cours de suivi DLC${st?' · '+st:' · tous magasins'}`,
+      lines: products.filter(p=>!st||p.magasin===st)
+        .map(p=>({ name:p.name, gencod:p.gencod, famille:p.type, qty:p.qty||1,
+                   sub:`DLC ${fmtDate(p.dlc)} · ${p.magasin||'—'}` })),
+    };
+  }
+  if(_catsSrc==='vrac'){
+    return {
+      unit:'u.',
+      scope:`🌰 Mises en rayon vrac enregistrées${st?' · '+st:' · tous magasins'}`,
+      lines: vracEntries.filter(v=>!st||v.store===st)
+        .map(v=>({ name:v.name, gencod:v.gencod, famille:v.famille, qty:v.qty||1,
+                   sub:`Rayon ${fmtDate(v.dateRayon)} · ${v.provenance||'provenance —'}` })),
+    };
+  }
+  if(_catsSrc==='cmd'){
+    const lines=[];
+    orders.filter(o=>!st||o.store===st).forEach(o=>{
+      const d=new Date(o.date).toLocaleDateString(lang);
+      o.lines.forEach(l=>lines.push({ ...l, sub:`${o.store||'—'} · ${d}` }));
+    });
+    return { unit:'colis', scope:`🛒 Cumul de toutes les commandes enregistrées${st?' · '+st:' · tous magasins'}`, lines };
+  }
+  // stocks (défaut) : dernier relevé par magasin — stockRecords est trié du + récent au + ancien
+  const seen={}, lines=[];
+  let nbRel=0;
+  stockRecords.forEach(r=>{
+    if(st && r.store!==st) return;
+    const key=r.store||'—';
+    if(seen[key]) return;
+    seen[key]=1; nbRel++;
+    const d=new Date(r.date).toLocaleDateString(lang);
+    r.lines.forEach(l=>lines.push({ ...l, sub:`${r.store||'—'} · ${d}${r.source==='BL'?' · 📄 BL':''}` }));
+  });
+  if(currentStock.length && (!st || (storeName||'')===st)){
+    currentStock.forEach(l=>lines.push({ ...l, sub:'relevé en cours (non validé)' }));
+  }
+  return {
+    unit:'u.',
+    scope:`📦 Dernier relevé de stock par magasin — ${nbRel} magasin(s)${currentStock.length?' + relevé en cours':''}`,
+    lines,
+  };
+}
+
+function renderCatsView(){
+  document.querySelectorAll('#cats-modal .seg button')
+    .forEach(b=>b.classList.toggle('on', b.dataset.csrc===_catsSrc));
+  const { lines, scope, unit } = catsSourceData();
+  const sc = document.getElementById('cats-scope'); if(sc) sc.textContent = scope;
+  const el = document.getElementById('cats-body'); if(!el) return;
+  if(!lines.length){
+    el.innerHTML = '<div class="empty" style="color:var(--muted);padding:26px 12px">Aucune donnée sur ce périmètre</div>';
+    return;
+  }
+  const groups = groupByCat(lines);
+  const totQty = groups.reduce((s,g)=>s+g.qty, 0) || 1;
+  const totRefs = lines.length;
+  el.innerHTML =
+    `<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:11px 13px;border-radius:14px;background:rgba(18,168,118,.1);border:1px solid rgba(18,168,118,.24);margin-bottom:12px">
+       <div style="font-size:12px;font-weight:900;color:var(--gd);text-transform:uppercase;letter-spacing:.6px">Total</div>
+       <div style="font-size:13px;font-weight:900;color:var(--txt)">${totRefs} ligne(s) · ${totQty} ${unit} · ${groups.length} catégorie(s)</div>
+     </div>`
+    + groups.map(g=>{
+      const c = catInfo(g.k);
+      const pct = Math.round(g.qty*100/totQty);
+      const open = _catsOpen===g.k;
+      const items = g.items.slice().sort((a,b)=>(b.qty||1)-(a.qty||1)).slice(0,80);
+      return `<button class="cat-card${open?' on':''}" onclick="toggleCatDetail('${g.k}')" aria-expanded="${open}">
+          <div class="cc-ico">${c.ico}</div>
+          <div style="flex:1;min-width:0">
+            <div class="cc-nm">${escapeHTML(c.label)}</div>
+            <div class="cc-sb">${g.refs} ligne(s) · <strong>${g.qty} ${unit}</strong> · ${pct}%</div>
+            <div class="cat-bar"><i style="width:${Math.max(pct,2)}%;background:${c.color}"></i></div>
+          </div>
+          <div style="font-size:17px;color:var(--muted);flex-shrink:0">${open?'⌄':'›'}</div>
+        </button>`
+        + (open ? `<div class="cat-detail">${items.map(l=>`
+            <div class="cd-l">
+              <span style="min-width:0">${escapeHTML(l.name||l.gencod||'—')}
+                <br><span style="font-size:10.5px;color:var(--muted);font-weight:700">${escapeHTML(l.gencod||'sans gencod')}${l.sub?' · '+escapeHTML(l.sub):''}</span>
+              </span>
+              <b style="white-space:nowrap">×${l.qty||1}</b>
+            </div>`).join('')}${g.items.length>80?`<div style="padding:8px;color:var(--muted);font-size:11px">… ${g.items.length-80} ligne(s) supplémentaire(s)</div>`:''}</div>` : '');
+    }).join('');
+}
+
+/* Export de la synthèse affichée : une ligne par produit, avec sa catégorie —
+   de quoi refaire un TCD côté bureau si besoin. */
+function exportCatsCSV(){
+  const { lines, unit } = catsSourceData();
+  if(!lines.length){ toast('Rien à exporter'); return; }
+  const rows = [['categorie','produit','gencod','quantite','unite','detail'].join(';')];
+  groupByCat(lines).forEach(g=>{
+    const label = catInfo(g.k).label;
+    g.items.forEach(l=>rows.push([label, l.name||'', l.gencod||'', l.qty||1, unit, l.sub||'']
+      .map(v=>`"${String(v).replace(/"/g,'""')}"`).join(';')));
+  });
+  const blob = new Blob(['﻿'+rows.join('\n')], { type:'text/csv;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download=`Categories_${_catsSrc}_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  toast(T().csv_ok);
+}
+
 function renderDashboard(){
   const t=T();
   const cnt={e:0,o:0,w:0,k:0};
@@ -2011,10 +2499,33 @@ function renderDashboard(){
     const b=el('button','fc'+((k==='all'&&fsStatus===null)||fsStatus===k?' on':''));
     b.textContent=lbl;b.onclick=()=>{fsStatus=k==='all'?null:k;renderDashboard()};fmr.appendChild(b);
   });
+  // category filters — n'affiche que les catégories réellement présentes
+  const fcr=document.getElementById('fcr');
+  if(fcr){
+    fcr.innerHTML='';
+    const per={};
+    products.forEach(p=>{
+      if(fsStore&&p.magasin!==fsStore) return;
+      const k=catOfLine(p); per[k]=(per[k]||0)+(p.qty||1);
+    });
+    const present=FC_CATS.filter(c=>per[c.k]);
+    if(fsCat && !per[fsCat]) fsCat=null;          // catégorie devenue vide → on relâche le filtre
+    if(present.length>1){
+      const all=el('button','fc'+(fsCat===null?' on':''));
+      all.textContent='Toutes catégories'; all.onclick=()=>{fsCat=null;renderDashboard()}; fcr.appendChild(all);
+      present.forEach(c=>{
+        const b=el('button','fc'+(fsCat===c.k?' on':''));
+        b.textContent=`${c.ico} ${c.label} (${per[c.k]})`;
+        b.onclick=()=>{fsCat=c.k;renderDashboard()};
+        fcr.appendChild(b);
+      });
+    }
+  }
   // product list
   let list=products.filter(p=>{
     if(fsStore&&p.magasin!==fsStore)return false;
     if(fsStatus&&statusOf(p.dlc)!==fsStatus)return false;
+    if(fsCat&&catOfLine(p)!==fsCat)return false;
     return true;
   }).sort((a,b)=>new Date(a.dlc)-new Date(b.dlc));
   document.getElementById('pcount').textContent=`(${list.length})`;
@@ -2030,7 +2541,7 @@ function renderDashboard(){
       <div class="pc-ic">${ico}</div>
       <div class="pc-in">
         <div class="pc-nm">${escapeHTML(p.name||'—')}${(p.qty||1)>1?` <span class="qty-badge">×${p.qty}</span>`:''}</div>
-        <div class="pc-sb">${escapeHTML(p.type||'')} · ${escapeHTML(p.magasin||'')} · DLC: ${fmtDate(p.dlc)}</div>
+        <div class="pc-sb" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${catChip(catOfLine(p))}<span>${escapeHTML(p.type||'')} · ${escapeHTML(p.magasin||'')} · DLC: ${fmtDate(p.dlc)}</span></div>
         <div class="pc-sb" style="font-size:10px;opacity:.6">par ${escapeHTML(p.scannedBy||'?')} · ${p.scannedAt?new Date(p.scannedAt).toLocaleDateString(lang):''}</div>
       </div>
       <div class="pc-rt">
@@ -2045,7 +2556,7 @@ function renderDashboard(){
     </div>`;
   }).join('');
 }
-let fsStore=null,fsStatus=null;
+let fsStore=null,fsStatus=null,fsCat=null;
 function setFS(s){fsStatus=s;renderDashboard()}
 function el(tag,cls){const e=document.createElement(tag);e.className=cls;return e}
 
@@ -3502,6 +4013,9 @@ let currentStock    = [];
 let stkScanning     = false;
 let stkTorchOn      = false;
 let lastAddedStkKey = null;
+
+/* Traçabilité vrac (onglet Vrac) — voir le module VRAC plus bas. */
+let vracEntries     = JSON.parse(localStorage.getItem('fc_vrac') || '[]');
 // L'anti-doublon de lecture caméra est désormais géré par BarcodeEngine.
 
 function renderCommande(){
@@ -3850,7 +4364,23 @@ function deleteOrder(id){
 function renderStock(){
   showStoreBadge();
   renderStockBase();
+  renderStockEditBar();
   renderStockLines();
+}
+
+/* Bandeau affiché quand on ré-édite un relevé déjà enregistré (historique ou BL). */
+function renderStockEditBar(){
+  const el = document.getElementById('stk-editbar'); if(!el) return;
+  const rec = _stockEditId ? findStock(_stockEditId) : null;
+  if(!rec){ el.style.display='none'; el.innerHTML=''; return; }
+  el.style.display = 'block';
+  el.innerHTML = `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:11px 13px;border-radius:14px;background:rgba(245,158,11,.16);border:1px solid rgba(245,158,11,.34);margin-bottom:12px">
+      <div style="flex:1;min-width:0;font-size:12.5px;font-weight:800;color:#92400e">
+        ✏️ Modification du relevé du ${escapeHTML(new Date(rec.date).toLocaleString(lang))}${rec.source==='BL'?' · 📄 BL':''}<br>
+        <span style="font-weight:700;opacity:.85">« Valider le relevé » écrasera l'enregistrement de l'historique.</span>
+      </div>
+      <button class="scan-link-btn" onclick="cancelStockEdit()" style="flex-shrink:0">Annuler</button>
+    </div>`;
 }
 
 async function startStockScan(){
@@ -3995,7 +4525,11 @@ function renderStockLines(){
     <div class="ord-line${flash}">
       <div style="flex:1;min-width:0">
         <input class="ord-name-in" value="${escapeHTMLAttr(l.name||'')}" placeholder="Nom (optionnel)" onchange="setStockName(${i},this.value)" aria-label="Nom du produit">
-        <div style="font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(l.gencod||'sans gencod')}${l.famille?' · '+escapeHTML(l.famille):''}</div>
+        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:3px">
+          ${catChip(catOfLine(l))}
+          ${l.src==='BL' ? '<span class="cat-chip" style="background:rgba(59,130,246,.14);color:#1d4ed8">📄 BL</span>' : ''}
+          <span style="font-size:10.5px;color:var(--muted);font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis">${escapeHTML(l.gencod||'sans gencod')}${l.famille?' · '+escapeHTML(l.famille):''}</span>
+        </div>
         <input class="ord-name-in" style="margin-top:4px;font-size:11.5px" value="${escapeHTMLAttr(l.provenance||'')}" placeholder="📍 Provenance (optionnel)" onchange="setStockProv(${i},this.value)" aria-label="Provenance">
       </div>
       <div style="flex-shrink:0">
@@ -4036,22 +4570,69 @@ function openStockEmail(subject, body){
   openModal('email-modal');
 }
 
-/* Valider = ENREGISTRER le relevé dans l'historique (indépendant de l'envoi mail). */
+/* Valider = ENREGISTRER le relevé dans l'historique (indépendant de l'envoi mail).
+   Si on ré-édite un relevé existant (_stockEditId), on le MET À JOUR sur place
+   au lieu d'en créer un doublon — c'est ce qui rend l'historique modifiable,
+   qu'il vienne d'un scan ou d'un bon de livraison. */
+let _stockEditId = null;
 function validateStock(){
   if(!currentStock.length){ toast('Relevé de stock vide'); return; }
   stopStockScan();
+  const lines = currentStock.map(l => ({ ...l }));
+
+  if(_stockEditId){
+    const rec = findStock(_stockEditId);
+    if(rec){
+      rec.lines    = lines;
+      rec.editedAt = new Date().toISOString();
+      rec.editedBy = session?.username || '?';
+      persistStocks();
+      _stockEditId = null; blPending = null; currentStock = [];
+      renderStock();
+      refreshFolderIfOpen();
+      toast('✅ Relevé mis à jour dans l\'historique');
+      return;
+    }
+    _stockEditId = null;         // relevé supprimé entre-temps → on en crée un nouveau
+  }
+
   const record = {
     id:    genId(),
     date:  new Date().toISOString(),
     store: storeName || '',
     by:    session?.username || '?',
-    lines: currentStock.map(l => ({ ...l })),
+    lines,
   };
+  // Relevé issu d'un BL versé → on garde la trace du bon de livraison.
+  if(blPending && lines.some(l => l.src === 'BL')){
+    record.source      = 'BL';
+    record.ref         = blPending.ref;
+    record.fournisseur = blPending.fournisseur;
+  }
   stockRecords.unshift(record);
-  localStorage.setItem('fc_stocks', JSON.stringify(stockRecords));
+  persistStocks();
+  blPending = null;
   currentStock = [];
-  renderStockLines();
+  renderStock();
+  refreshFolderIfOpen();
   toast('✅ Relevé de stock enregistré');
+}
+
+/* Ré-ouvre un relevé enregistré pour le corriger (lignes éditables). */
+function editStockRecord(id){
+  const o = findStock(id); if(!o) return;
+  currentStock = o.lines.map(l => ({ ...l }));
+  _stockEditId = id;
+  blPending = null;
+  closeModal('stocks-modal');
+  showTab('stocks');
+  toast('✏️ Relevé ouvert — modifiez puis validez');
+}
+function cancelStockEdit(){
+  _stockEditId = null;
+  currentStock = [];
+  renderStock();
+  toast('Modification annulée');
 }
 
 /* Envoi par mail INDÉPENDANT : ni enregistrement, ni vidage du relevé en cours. */
@@ -4068,7 +4649,8 @@ function clearStock(){
   if(!currentStock.length) return;
   showConfirm('Vider le relevé de stock en cours ?','Les articles non validés seront perdus.', ()=>{
     currentStock = [];
-    renderStockLines();
+    _stockEditId = null; blPending = null;
+    renderStock();
     toast('🗑 Relevé vidé');
   });
 }
@@ -4098,11 +4680,15 @@ function renderStocksHistory(){
         <div style="font-size:13px;font-weight:800">📦 ${escapeHTML(new Date(o.date).toLocaleString(lang))}</div>
         <span class="pbadge bk" style="font-size:10px">${o.lines.length} réf · ${totalQty} u.</span>
       </div>
-      <div style="font-size:11px;color:var(--muted);font-weight:600;margin:2px 0 6px">${escapeHTML(o.store||'—')} · ${escapeHTML(o.by||'?')}</div>
+      <div style="font-size:11px;color:var(--muted);font-weight:600;margin:2px 0 6px">
+        ${o.source==='BL'?`<span class="cat-chip" style="background:rgba(59,130,246,.14);color:#1d4ed8">📄 BL${o.ref?' '+escapeHTML(o.ref):''}</span> `:''}
+        ${escapeHTML(o.store||'—')} · ${escapeHTML(o.by||'?')}${o.editedAt?` · ✏️ modifié le ${escapeHTML(new Date(o.editedAt).toLocaleDateString(lang))}`:''}
+      </div>
       <div style="font-size:11.5px;color:var(--txt);font-weight:600;line-height:1.6">
         ${o.lines.map(l=>`${escapeHTML(l.name||'—')} <strong>×${l.qty}</strong>${l.provenance?` <span style="color:var(--muted);font-weight:600">· ${escapeHTML(l.provenance)}</span>`:''}`).join('<br>')}
       </div>
       <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="editStockRecord(this.dataset.oid)">✏️ Modifier</button>
         <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="restockFrom(this.dataset.oid)">↻ Recharger</button>
         <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="emailStock(this.dataset.oid)">📧 Renvoyer</button>
         <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="exportStockId(this.dataset.oid)">📥 CSV</button>
@@ -4114,6 +4700,7 @@ function renderStocksHistory(){
 function restockFrom(id){
   const o = findStock(id); if(!o) return;
   currentStock = o.lines.map(l => ({ ...l }));
+  _stockEditId = null;          // recharger = nouveau relevé (≠ « Modifier »)
   closeModal('stocks-modal');
   showTab('stocks');
   toast('↻ Relevé rechargé');
@@ -4133,7 +4720,8 @@ function deleteStock(id){
     const rec = stockRecords.find(o => o.id === id);
     const store = rec ? (rec.store||'') : null;
     stockRecords = stockRecords.filter(o => o.id !== id);
-    localStorage.setItem('fc_stocks', JSON.stringify(stockRecords));
+    if(_stockEditId === id) _stockEditId = null;   // on éditait ce relevé → l'édition devient un nouveau relevé
+    persistStocks();
     // Plus aucun relevé pour ce magasin → on efface aussi son stock de départ
     if(store!==null && !stockRecords.some(o => (o.store||'')===store)) clearStockBaseFor(store || '—');
     renderStocksHistory();
@@ -4141,6 +4729,763 @@ function deleteStock(id){
     refreshFolderIfOpen();
     toast(T().deleted);
   });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VRAC — TRAÇABILITÉ SILO
+   Calé sur l'étiquette fournisseur réelle (« JBV PIGNON PIN REVO 2,5KG BIO ·
+   Lot 2623023 · DDM 06/2027 · Pignon de pin ORIGINE CHINE · EAN
+   3456300020533 ») : on scanne le code-barres du sac, on photographie
+   l'étiquette, on dit dans quel silo il part et jusqu'à quand il est bon.
+   Deux modes seulement :
+     • ➕ Mise en rayon — scan → fiche → enregistrement horodaté ;
+     • 🔍 Vérifier      — scan → tout l'historique du produit (silo, lot,
+       origine, DDM, photo de l'étiquette) pour remonter sa provenance.
+   Choix d'implémentation :
+     • la DDM se saisit en MM/AAAA comme sur l'étiquette et se stocke en
+       'AAAA-MM' (les inputs type=month ne sont pas fiables sur iOS) ;
+     • la photo est recompressée (≤720 px, JPEG) avant stockage, et la photo
+       de l'étiquette sert aussi à lire le code-barres si le champ est vide ;
+     • si le quota du navigateur sature, on sacrifie les photos les plus
+       anciennes — jamais les données de traçabilité.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let vracMode      = 'add';   // 'add' | 'check'
+let vracScanning  = false;
+let vracTorchOn   = false;
+let vracPhoto     = null;    // dataURL de la photo en cours de saisie
+let vracEditId    = null;    // fiche de l'historique en cours de modification
+
+function saveVrac(){
+  for(let i = 0; i < 15; i++){
+    try{ localStorage.setItem('fc_vrac', JSON.stringify(vracEntries)); return true; }
+    catch(e){
+      const withPhoto = vracEntries.filter(v => v.photo)
+        .sort((a,b) => new Date(a.createdAt||0) - new Date(b.createdAt||0));
+      if(!withPhoto.length){ toast('⚠️ Stockage plein — enregistrement impossible'); return false; }
+      withPhoto[0].photo = null;
+      withPhoto[0].photoDropped = true;
+      if(i === 0) toast('⚠️ Stockage saturé — les photos les plus anciennes ont été retirées');
+    }
+  }
+  return false;
+}
+
+function renderVrac(){
+  showStoreBadge();
+  fillVracDatalists();
+  renderVracList();
+}
+
+function setVracMode(m){
+  vracMode = m;
+  document.querySelectorAll('#vrac-seg button').forEach(b => b.classList.toggle('on', b.dataset.vmode === m));
+  const t = document.getElementById('vrac-title'), s = document.getElementById('vrac-sub');
+  if(t) t.textContent = m === 'check' ? 'Vrac — vérifier un produit' : 'Vrac — mise en rayon';
+  if(s) s.textContent = m === 'check'
+    ? "Scannez un sac ou un produit du silo : son historique complet s'affiche (silo, lot, origine, DDM, étiquette)."
+    : "Scannez le code-barres du sac : la fiche s'ouvre pour la photo de l'étiquette, le silo et la DDM.";
+  hideVracForm();
+  const c = document.getElementById('vrac-check'); if(c) c.style.display = 'none';
+}
+
+/* ── Scan ────────────────────────────────────────────────────────────────── */
+async function startVracScan(){
+  const st = document.getElementById('vrac-st');
+  if(!BarcodeEngine.isAvailable()){
+    if(st) st.innerHTML = '<div style="color:var(--o);font-weight:800">⚠️ Lecteur indisponible — utilisez « 🖼 Scanner via photo »</div>';
+    return;
+  }
+  const wrap = document.getElementById('vrac-cam-wrap');
+  document.getElementById('vrac-scan-btn').style.display = 'none';
+  document.getElementById('vrac-stop-btn').style.display = 'inline-flex';
+  if(wrap) wrap.style.display = 'block';
+  const box = document.getElementById('vrac-scan-box'); if(box) box.classList.add('scanning');
+  if(st) st.textContent = 'Visez le code-barres du sac…';
+  vracScanning = true;
+  try{
+    await BarcodeEngine.startLiveScan(document.getElementById('vrac-video'), (code) => {
+      if(!vracScanning) return;
+      onVracDecode(code);
+    });
+    const tb = document.getElementById('vrac-torch');
+    if(tb) tb.style.display = BarcodeEngine.hasTorch() ? 'flex' : 'none';
+    startScanDiag('vrac-st');
+  }catch(e){
+    console.warn('Caméra vrac:', e);
+    if(st) st.innerHTML = '<div style="color:var(--o);font-weight:800">⚠️ Caméra inaccessible — utilisez « 🖼 Scanner via photo »</div>';
+    stopVracScan();
+  }
+}
+function stopVracScan(){
+  vracScanning = false;
+  stopScanDiag();
+  BarcodeEngine.stopLiveScan();
+  const wrap = document.getElementById('vrac-cam-wrap'); if(wrap) wrap.style.display = 'none';
+  const box  = document.getElementById('vrac-scan-box'); if(box) box.classList.remove('scanning');
+  const b1 = document.getElementById('vrac-scan-btn'), b2 = document.getElementById('vrac-stop-btn');
+  if(b1) b1.style.display = 'inline-flex';
+  if(b2) b2.style.display = 'none';
+  const tb = document.getElementById('vrac-torch'); if(tb){ tb.style.display='none'; tb.classList.remove('on'); }
+  vracTorchOn = false;
+}
+function toggleVracTorch(){
+  vracTorchOn = !vracTorchOn;
+  BarcodeEngine.setTorch(vracTorchOn);
+  const tb = document.getElementById('vrac-torch'); if(tb) tb.classList.toggle('on', vracTorchOn);
+}
+document.getElementById('vrac-photo-in').addEventListener('change', async function(e){
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  e.target.value = '';
+  const st = document.getElementById('vrac-st');
+  if(!BarcodeEngine.isAvailable()){ if(st) st.textContent = '⚠️ Lecteur indisponible'; return; }
+  if(st) st.innerHTML = '<span class="spin"></span> Lecture…';
+  let code = null;
+  try{ code = await BarcodeEngine.decodeImageFile(file); }
+  catch(err){ console.warn('decodeImageFile (vrac):', err); }
+  if(code){ if(st) st.textContent = ''; onVracDecode(code); }
+  else if(st) st.innerHTML = '<div style="color:var(--o);font-weight:800">⚠️ Code-barres non détecté — réessayez ou utilisez « 📷 Démarrer le scan »</div>';
+});
+function vracManualEntry(){ onVracDecode(''); }
+
+function onVracDecode(ean){
+  const code = String(ean || '').replace(/\s/g, '');
+  if(vracMode === 'check'){ vracCheck(code); return; }
+  openVracForm({ gencod: code });
+}
+
+/* ── DDM : saisie MM/AAAA ↔ stockage AAAA-MM ─────────────────────────────── */
+function normalizeDDM(inp){
+  const v = String(inp.value || '').replace(/\D/g, '');
+  if(!v){ inp.value = ''; return; }
+  let mm, yy;
+  if(v.length <= 2){ mm = v.padStart(2,'0'); yy = ''; }
+  else if(v.length === 3){ mm = '0' + v[0]; yy = v.slice(1); }
+  else { mm = v.slice(0,2); yy = v.slice(2,6); }
+  if(yy.length === 2) yy = '20' + yy;
+  inp.value = yy ? `${mm}/${yy}` : mm;
+}
+function ddmToIso(s){
+  const m = String(s||'').match(/^(\d{2})\/(\d{4})$/);
+  if(!m) return '';
+  const mm = parseInt(m[1], 10);
+  return (mm >= 1 && mm <= 12) ? `${m[2]}-${m[1]}` : '';
+}
+function ddmLabel(iso){
+  const m = String(iso||'').match(/^(\d{4})-(\d{2})$/);
+  return m ? `${m[2]}/${m[1]}` : '';
+}
+/* Statut d'une DDM au mois : on retient le dernier jour du mois. */
+function ddmStatus(iso){
+  const m = String(iso||'').match(/^(\d{4})-(\d{2})$/);
+  if(!m) return '';
+  const end  = new Date(parseInt(m[1],10), parseInt(m[2],10), 0, 23, 59, 59);
+  const days = Math.ceil((end - new Date()) / 86400000);
+  if(days < 0)  return 'e';
+  if(days <= 30) return 'o';
+  if(days <= 90) return 'w';
+  return 'k';
+}
+
+/* ── Fiche de mise en rayon ──────────────────────────────────────────────── */
+function fillVracDatalists(){
+  const silos = [], provs = [];
+  vracEntries.forEach(v => {
+    if(v.silo && silos.indexOf(v.silo) < 0) silos.push(v.silo);
+    if(v.provenance && provs.indexOf(v.provenance) < 0) provs.push(v.provenance);
+  });
+  const dl = (id, arr) => {
+    const e = document.getElementById(id);
+    if(e) e.innerHTML = arr.sort().map(x => `<option value="${escapeHTMLAttr(x)}">`).join('');
+  };
+  dl('vrac-silos-dl', silos);
+  dl('vrac-prov-dl',  provs);
+}
+function prefillVracFromCatalogue(gencod){
+  const ref = gencod ? lookupGencod(gencod) : null;
+  const n = document.getElementById('vrac-name');
+  if(ref && n && !n.value.trim()) n.value = ref.nom || '';
+}
+function openVracForm(opts){
+  const o = opts || {};
+  vracEditId = o.id || null;
+  vracPhoto  = o.photo || null;
+  fillVracDatalists();
+  const set = (id, v) => { const e = document.getElementById(id); if(e) e.value = v == null ? '' : v; };
+  const ref = o.gencod ? lookupGencod(o.gencod) : null;
+  set('vrac-name',   o.name || (ref ? ref.nom : ''));
+  set('vrac-gencod', o.gencod || '');
+  set('vrac-silo',   o.silo || '');
+  set('vrac-ddm',    o.ddm ? ddmLabel(o.ddm) : '');
+  set('vrac-date',   o.dateRayon || new Date().toISOString().slice(0,10));
+  set('vrac-lot',    o.lot || '');
+  set('vrac-prov',   o.provenance || '');
+  set('vrac-qty',    o.qty || 1);
+  const ft = document.getElementById('vrac-f-title');
+  if(ft) ft.textContent = vracEditId ? 'Modifier la fiche' : 'Mise en rayon';
+  showVracPhoto();
+  const st = document.getElementById('vrac-photo-st'); if(st) st.textContent = '';
+  const f  = document.getElementById('vrac-form'); if(f) f.style.display = 'block';
+  const c  = document.getElementById('vrac-check'); if(c) c.style.display = 'none';
+  if(f) f.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  if(!o.gencod && !o.name){ const n = document.getElementById('vrac-name'); if(n) n.focus(); }
+}
+function hideVracForm(){
+  const f = document.getElementById('vrac-form'); if(f) f.style.display = 'none';
+}
+function cancelVracForm(){
+  vracEditId = null; vracPhoto = null;
+  hideVracForm();
+}
+function vracQtyStep(d){
+  const i = document.getElementById('vrac-qty'); if(!i) return;
+  i.value = Math.max(1, (parseInt(i.value, 10) || 1) + d);
+}
+function showVracPhoto(){
+  const img = document.getElementById('vrac-photo-prev');
+  const del = document.getElementById('vrac-photo-del');
+  if(img){
+    img.style.display = vracPhoto ? 'block' : 'none';
+    if(vracPhoto) img.src = vracPhoto;
+  }
+  if(del) del.style.display = vracPhoto ? 'inline-flex' : 'none';
+}
+function clearVracPhoto(){
+  vracPhoto = null;
+  showVracPhoto();
+  const st = document.getElementById('vrac-photo-st'); if(st) st.textContent = '';
+}
+
+/* Recompression : une photo d'étiquette pèse 2–4 Mo brute, ~40 Ko une fois
+   ramenée à 720 px — indispensable pour le stockage local. */
+function shrinkImage(file, maxSide, quality){
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+      const sc = Math.min(1, (maxSide || 720) / Math.max(w, h, 1));
+      const cv = document.createElement('canvas');
+      cv.width  = Math.max(1, Math.round(w * sc));
+      cv.height = Math.max(1, Math.round(h * sc));
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      URL.revokeObjectURL(url);
+      try{ resolve(cv.toDataURL('image/jpeg', quality || .6)); }
+      catch(e){ reject(e); }
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image illisible')); };
+    img.src = url;
+  });
+}
+
+document.getElementById('vrac-label-in').addEventListener('change', async function(e){
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  const st = document.getElementById('vrac-photo-st');
+  if(st) st.innerHTML = '<span class="spin"></span> Traitement de la photo…';
+  try{
+    vracPhoto = await shrinkImage(file, 720, .62);
+    showVracPhoto();
+    if(st) st.textContent = `✅ Étiquette enregistrée (~${Math.max(1, Math.round(vracPhoto.length/1400))} Ko)`;
+    // L'étiquette porte le code-barres : on le lit si le champ est encore vide.
+    const gc = document.getElementById('vrac-gencod');
+    if(gc && !gc.value.trim() && BarcodeEngine.isAvailable()){
+      try{
+        const code = await BarcodeEngine.decodeImageFile(file);
+        if(code){ gc.value = code; prefillVracFromCatalogue(code); toast('🔖 Code-barres lu sur l\'étiquette'); }
+      }catch(_){ /* pas de code lisible sur la photo : sans conséquence */ }
+    }
+  }catch(err){
+    console.warn('[Vrac photo]', err);
+    if(st){ st.textContent = '❌ Photo illisible'; st.style.color = 'var(--r)'; }
+  }
+});
+
+function saveVracEntry(){
+  const val = id => (document.getElementById(id)?.value || '').trim();
+  const name   = val('vrac-name');
+  const gencod = val('vrac-gencod').replace(/\s/g, '');
+  const silo   = val('vrac-silo');
+  const ddmRaw = val('vrac-ddm');
+  if(!name && !gencod){ toast('⚠️ Indiquez le produit ou son code-barres'); return; }
+  if(!silo){ toast('⚠️ Indiquez le silo'); document.getElementById('vrac-silo')?.focus(); return; }
+  const ddm = ddmToIso(ddmRaw);
+  if(ddmRaw && !ddm){ toast('⚠️ DDM au format MM/AAAA (ex : 06/2027)'); document.getElementById('vrac-ddm')?.focus(); return; }
+  const ref = gencod ? lookupGencod(gencod) : null;
+  const data = {
+    gencod,
+    name:       name || (ref ? ref.nom : ''),
+    famille:    ref ? [ref.famille, ref.marque].filter(Boolean).join(' · ') : '',
+    silo, ddm,
+    lot:        val('vrac-lot'),
+    provenance: val('vrac-prov'),
+    dateRayon:  val('vrac-date') || new Date().toISOString().slice(0,10),
+    qty:        Math.max(1, parseInt(val('vrac-qty'), 10) || 1),
+    photo:      vracPhoto || null,
+    store:      storeName || '',
+    by:         session?.username || '?',
+  };
+  const backup = JSON.stringify(vracEntries);
+  if(vracEditId){
+    const e = vracEntries.find(x => x.id === vracEditId);
+    if(e) Object.assign(e, data, { updatedAt: new Date().toISOString() });
+  } else {
+    vracEntries.unshift(Object.assign({ id: genId(), createdAt: new Date().toISOString() }, data));
+  }
+  if(!saveVrac()){ vracEntries = JSON.parse(backup); return; }
+  toast(vracEditId ? '✅ Fiche mise à jour' : `✅ ${data.name || data.gencod} → ${silo}`);
+  cancelVracForm();
+  fillVracDatalists();
+  renderVracList();
+  if(document.getElementById('vrac-modal').classList.contains('on')) renderVracHistory();
+  refreshFolderIfOpen();
+}
+
+/* ── Vérification de provenance (scan → historique du produit) ───────────── */
+function vracCheck(gencod){
+  const box = document.getElementById('vrac-check'); if(!box) return;
+  hideVracForm();
+  const code = String(gencod || '').replace(/\s/g, '');
+  const hits = code ? vracEntries.filter(v => v.gencod === code) : [];
+  const ref  = code ? lookupGencod(code) : null;
+  const title = (hits[0] && hits[0].name) || (ref ? ref.nom : '') || code || 'Produit';
+  box.style.display = 'block';
+  if(!hits.length){
+    box.innerHTML = `
+      <div class="scan-box" style="text-align:left">
+        <div class="rf-t">🔍 Aucune trace</div>
+        <div style="font-size:12.5px;font-weight:700;color:var(--muted);line-height:1.6">
+          Aucune mise en rayon enregistrée pour <strong>${escapeHTML(title)}</strong>${code?` (${escapeHTML(code)})`:''}.
+        </div>
+        <button class="rfsave" style="margin-top:12px" onclick="setVracMode('add');openVracForm({gencod:'${escapeHTMLAttr(code)}'})">➕ Enregistrer sa mise en rayon</button>
+      </div>`;
+    box.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    return;
+  }
+  const last = hits[0];
+  box.innerHTML = `
+    <div class="scan-box" style="text-align:left">
+      <div class="rf-t">🔍 Traçabilité — ${escapeHTML(title)}</div>
+      <div style="font-size:11.5px;font-weight:700;color:var(--muted);margin:-6px 0 12px">${escapeHTML(code)} · ${hits.length} mise(s) en rayon enregistrée(s)</div>
+      <div style="padding:11px 12px;border-radius:14px;background:rgba(18,168,118,.1);border:1px solid rgba(18,168,118,.24);margin-bottom:12px;font-size:12.5px;font-weight:700;line-height:1.8">
+        <div style="font-weight:900;color:var(--gd);text-transform:uppercase;font-size:10.5px;letter-spacing:.6px;margin-bottom:4px">Dernière mise en rayon</div>
+        🗄 <b>${escapeHTML(last.silo||'silo —')}</b> · 📅 ${fmtDate(last.dateRayon)}<br>
+        🌍 Origine <b>${escapeHTML(last.provenance||'—')}</b> · 🏷 Lot <b>${escapeHTML(last.lot||'—')}</b><br>
+        ⏳ DDM <b>${ddmLabel(last.ddm)||'—'}</b> · 🏪 ${escapeHTML(last.store||'—')} · 👤 ${escapeHTML(last.by||'?')}
+      </div>
+      ${hits.map(v => vracCard(v, { compact:true })).join('')}
+    </div>`;
+  box.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+/* ── Rendu commun d'une fiche vrac ───────────────────────────────────────── */
+function vracCard(v, opts){
+  const o = opts || {};
+  const st = ddmStatus(v.ddm);
+  const bc = { e:'be', o:'bo', w:'bw', k:'bk' }[st] || 'bk';
+  const bl = st === 'e' ? 'DDM dépassée' : (v.ddm ? 'DDM ' + ddmLabel(v.ddm) : 'DDM —');
+  const id = escapeHTMLAttr(String(v.id));
+  return `<div class="vr-card">
+    <div class="vr-nm">
+      <span style="flex:1;min-width:0">${escapeHTML(v.name || v.gencod || '—')}${(v.qty||1) > 1 ? ` <span class="qty-badge">×${v.qty}</span>` : ''}</span>
+      ${v.ddm ? `<span class="pbadge ${bc}" style="font-size:10px">${bl}</span>` : ''}
+    </div>
+    <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:5px">
+      ${catChip(catOfLine(v))}
+      <span class="cat-chip" style="background:rgba(13,31,13,.06);color:var(--muted)">🗄 ${escapeHTML(v.silo || 'silo —')}</span>
+      ${v.provenance ? `<span class="cat-chip" style="background:rgba(59,130,246,.13);color:#1d4ed8">🌍 ${escapeHTML(v.provenance)}</span>` : ''}
+    </div>
+    <div class="vr-meta">
+      📅 Mise en rayon <b>${fmtDate(v.dateRayon)}</b>${v.lot ? ` · 🏷 Lot <b>${escapeHTML(v.lot)}</b>` : ''}<br>
+      ${escapeHTML(v.gencod || 'sans code-barres')} · 🏪 ${escapeHTML(v.store || '—')} · 👤 ${escapeHTML(v.by || '?')}
+    </div>
+    <div class="vr-acts">
+      ${v.photo ? `<button class="scan-link-btn" data-vid="${id}" onclick="openVracPhoto(this.dataset.vid)">🏷 Étiquette</button>` : ''}
+      ${o.compact ? '' : `
+        <button class="scan-link-btn" data-vid="${id}" onclick="checkVracFrom(this.dataset.vid)">🔍 Traçabilité</button>
+        <button class="scan-link-btn" data-vid="${id}" onclick="editVracEntry(this.dataset.vid)">✏️ Modifier</button>
+        <button class="scan-link-btn" data-vid="${id}" onclick="deleteVracEntry(this.dataset.vid)" style="color:var(--r)">🗑</button>`}
+    </div>
+  </div>`;
+}
+function findVrac(id){ return vracEntries.find(v => String(v.id) === String(id)); }
+function openVracPhoto(id){
+  const v = findVrac(id); if(!v || !v.photo) return;
+  const img = document.getElementById('photo-modal-img');
+  if(img) img.src = v.photo;
+  openModal('photo-modal');
+}
+function checkVracFrom(id){
+  const v = findVrac(id); if(!v) return;
+  closeModal('vrac-modal');
+  showTab('vrac');
+  setVracMode('check');
+  vracCheck(v.gencod || '');
+}
+function editVracEntry(id){
+  const v = findVrac(id); if(!v) return;
+  closeModal('vrac-modal');
+  showTab('vrac');
+  setVracMode('add');
+  openVracForm(v);
+}
+function deleteVracEntry(id){
+  showConfirm('Supprimer cette fiche vrac ?', 'La traçabilité de cette mise en rayon sera définitivement perdue.', () => {
+    vracEntries = vracEntries.filter(v => String(v.id) !== String(id));
+    saveVrac();
+    renderVracList();
+    if(document.getElementById('vrac-modal').classList.contains('on')) renderVracHistory();
+    refreshFolderIfOpen();
+    toast(T().deleted);
+  });
+}
+
+function vracFilter(q){
+  const s = _noAcc(q).trim();
+  if(!s) return vracEntries;
+  return vracEntries.filter(v =>
+    _noAcc([v.name, v.gencod, v.silo, v.lot, v.provenance, v.store].join(' ')).includes(s));
+}
+
+function renderVracList(){
+  const el = document.getElementById('vrac-list'); if(!el) return;
+  const q  = document.getElementById('vrac-search')?.value || '';
+  const list = vracFilter(q);
+  const cnt = document.getElementById('vrac-count');
+  if(cnt) cnt.textContent = vracEntries.length ? `(${list.length}/${vracEntries.length})` : '';
+  if(!list.length){
+    el.innerHTML = `<div class="empty">${vracEntries.length ? 'Aucune fiche ne correspond à cette recherche' : 'Aucune mise en rayon — scannez un sac pour commencer'}</div>`;
+    return;
+  }
+  el.innerHTML = list.slice(0, 40).map(v => vracCard(v)).join('')
+    + (list.length > 40 ? `<div style="text-align:center;color:rgba(255,255,255,.75);font-size:12px;font-weight:700;padding:8px">… ${list.length-40} fiche(s) de plus — voir 🗂 Historique</div>` : '');
+}
+
+function renderVracHistory(){
+  const el = document.getElementById('vrac-hlist'); if(!el) return;
+  const q = document.getElementById('vrac-hsearch')?.value || '';
+  const list = vracFilter(q);
+  if(!list.length){ el.innerHTML = '<div class="empty" style="color:var(--muted)">Aucune fiche vrac</div>'; return; }
+  el.innerHTML = list.slice(0, 200).map(v => vracCard(v)).join('');
+}
+
+function exportVracCSV(){
+  if(!vracEntries.length){ toast('Aucune fiche à exporter'); return; }
+  const cols = ['dateRayon','name','gencod','silo','lot','provenance','ddm','qty','store','by','createdAt'];
+  const head = ['date_mise_en_rayon','produit','gencod','silo','lot','origine','ddm','nb_sacs','magasin','operateur','saisi_le'];
+  const rows = [head.join(';'), ...vracEntries.map(v => cols.map(c => {
+    let x = v[c] == null ? '' : v[c];
+    if(c === 'ddm') x = ddmLabel(x);
+    return `"${String(x).replace(/"/g,'""')}"`;
+  }).join(';'))];
+  const blob = new Blob(['﻿' + rows.join('\n')], { type:'text/csv;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `Vrac_tracabilite_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  toast(T().csv_ok);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BON DE LIVRAISON (BL) → ÉTAT DE STOCK
+   Un arrivage se saisit en un import plutôt qu'en cinquante scans. Deux
+   entrées possibles, toutes deux analysées localement (aucun envoi réseau) :
+     • un fichier .csv / .xlsx (mêmes lecteurs que le catalogue) ;
+     • le texte du BL collé depuis un PDF ou un mail.
+   L'analyse cherche AVANT TOUT le code-barres — c'est la seule donnée fiable
+   d'un BL à l'autre : en-têtes tolérantes (gencod/EAN/code, désignation,
+   quantité, fournisseur) et, si aucune en-tête n'est exploitable, repli qui
+   ratisse chaque ligne à la recherche d'un EAN. Chaque ligne est ensuite
+   complétée depuis le catalogue (nom + famille) puis reste MODIFIABLE :
+   soit versée dans le relevé en cours (mêmes lignes éditables qu'un relevé
+   scanné), soit enregistrée directement dans l'historique des stocks.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let blLines   = [];     // lignes analysées, éditables avant versement
+let blPending = null;   // BL versé dans le relevé en cours → tague le futur enregistrement
+
+const BL_EAN_RE = /^\d{8}$|^\d{12,14}$/;
+
+function persistStocks(){ localStorage.setItem('fc_stocks', JSON.stringify(stockRecords)); }
+
+function openBLImport(){
+  const d = document.getElementById('bl-date');
+  if(d && !d.value) d.value = new Date().toISOString().slice(0,10);
+  const p = document.getElementById('bl-prov');
+  if(p && !p.value) p.value = '';
+  blStatus('');
+  renderBLLines();
+  openModal('bl-modal');
+}
+function toggleBLPaste(){
+  const w = document.getElementById('bl-paste-wrap'); if(!w) return;
+  const show = (w.style.display === 'none');
+  w.style.display = show ? 'block' : 'none';
+  if(show){ const t=document.getElementById('bl-paste'); if(t) t.focus(); }
+}
+function blStatus(html, color){
+  const st = document.getElementById('bl-status'); if(!st) return;
+  st.innerHTML = html || '';
+  st.style.color = color || 'var(--muted)';
+}
+function readBLMeta(){
+  return {
+    ref:         (document.getElementById('bl-ref')?.value || '').trim(),
+    fournisseur: (document.getElementById('bl-prov')?.value || '').trim(),
+    date:        (document.getElementById('bl-date')?.value || '').trim(),
+  };
+}
+
+/* Quantité tolérante : « 6 », « 6,0 », « x6 », « 6 UVC » → 6 */
+function blQty(v){
+  const s = String(v == null ? '' : v).replace(',', '.');
+  const m = s.match(/\d+(\.\d+)?/);
+  if(!m) return null;
+  const n = Math.round(parseFloat(m[0]));
+  return (isFinite(n) && n > 0 && n < 100000) ? n : null;
+}
+
+/* Une ligne de BL enrichie par le catalogue. */
+function blLine(gencod, name, qty, prov){
+  const ref = gencod ? lookupGencod(gencod) : null;
+  const nm  = String(name || '').replace(/^"|"$/g, '').trim();
+  return {
+    gencod:     gencod || '',
+    name:       nm || (ref ? ref.nom : '') || '',
+    famille:    ref ? [ref.famille, ref.marque].filter(Boolean).join(' · ') : '',
+    provenance: String(prov || '').trim(),
+    qty:        (!qty || qty < 1) ? 1 : qty,
+    known:      !!ref,
+    src:        'BL',
+  };
+}
+
+/* Fusionne les doublons de gencod d'un même BL (colisage éclaté en 2 lignes). */
+function blMerge(lines){
+  const idx = {}, out = [];
+  lines.forEach(l => {
+    const k = l.gencod || ('#' + l.name.toLowerCase());
+    if(idx[k]){
+      idx[k].qty += l.qty;
+      if(!idx[k].name && l.name) idx[k].name = l.name;
+      if(!idx[k].provenance && l.provenance) idx[k].provenance = l.provenance;
+    } else { idx[k] = l; out.push(l); }
+  });
+  return out;
+}
+
+function blFindCol(headers, keys){
+  for(const k of keys){
+    const i = headers.findIndex(h => h.includes(k));
+    if(i >= 0) return i;
+  }
+  return -1;
+}
+
+/* Lignes brutes (CSV/XLSX) → lignes de BL. */
+function parseBLRows(rows){
+  const scan = Math.min(rows.length, 12);
+  let hi = -1, headers = null, gi = -1;
+  for(let i = 0; i < scan; i++){
+    const hs = (rows[i] || []).map(h => _noAcc(h).replace(/[\s"'.\-_]/g, ''));
+    const g = blFindCol(hs, ['gencod','ean','codebarre','codesbarres','codebarres','cab','upc','codeproduit','code']);
+    if(g >= 0){ hi = i; headers = hs; gi = g; break; }
+  }
+  const out = [];
+  if(hi >= 0){
+    const ni = blFindCol(headers, ['designation','libelle','produit','description','nomduproduit','nom','article']);
+    const qi = blFindCol(headers, ['quantitelivree','qtelivree','quantite','qte','qty','nbcolis','colis','nombre','nbre','uvc','livre']);
+    const pi = blFindCol(headers, ['provenance','fournisseur','origine','lot','pays']);
+    for(let i = hi + 1; i < rows.length; i++){
+      const r  = rows[i] || [];
+      const gc = String(r[gi] == null ? '' : r[gi]).replace(/[\s'"]/g, '');
+      if(!BL_EAN_RE.test(gc)) continue;
+      out.push(blLine(gc, ni >= 0 ? r[ni] : '', blQty(qi >= 0 ? r[qi] : ''), pi >= 0 ? r[pi] : ''));
+    }
+    if(out.length) return blMerge(out);
+  }
+  // Repli : pas d'en-tête exploitable → on ratisse chaque ligne.
+  rows.forEach(r => {
+    if(!r) return;
+    let gc = '', name = '', qty = null;
+    r.forEach(c => {
+      const v = String(c == null ? '' : c).trim();
+      const d = v.replace(/[\s'"]/g, '');
+      if(!gc && BL_EAN_RE.test(d)){ gc = d; return; }
+      if(/^\d{1,4}$/.test(d)) qty = parseInt(d, 10);                       // entier court = quantité
+      else if(v.replace(/[^A-Za-zÀ-ÿ]/g, '').length >= 3 && v.length > name.length) name = v;
+    });
+    if(gc) out.push(blLine(gc, name, qty, ''));
+  });
+  return blMerge(out);
+}
+
+/* Texte libre (copié d'un PDF) → lignes de BL. */
+function parseBLText(text){
+  const out = [];
+  String(text || '').split(/\r?\n/).forEach(raw => {
+    const line = raw.trim();
+    if(!line) return;
+    const m = line.match(/\b\d{13}\b|\b\d{12}\b|\b\d{8}\b/);
+    if(!m) return;
+    const gc = m[0];
+    let rest = (line.slice(0, m.index) + ' ' + line.slice(m.index + gc.length)).trim();
+    let qty  = null;
+    const qm = rest.match(/(?:^|\s)(?:x|×|qte|qté|quantite|quantité|qty)\s*[:=]?\s*(\d{1,4})\b/i)
+            || rest.match(/(\d{1,4})\s*$/);
+    if(qm){
+      qty  = parseInt(qm[1], 10);
+      rest = (rest.slice(0, qm.index) + ' ' + rest.slice(qm.index + qm[0].length)).trim();
+    }
+    const name = rest.replace(/[|;,\t]+/g, ' ').replace(/\s{2,}/g, ' ')
+                     .replace(/^[-–—:.\s]+|[-–—:.\s]+$/g, '').trim();
+    out.push(blLine(gc, name, qty, ''));
+  });
+  return blMerge(out);
+}
+
+function analyzeBLText(){
+  const t = document.getElementById('bl-paste');
+  const lines = parseBLText(t ? t.value : '');
+  if(!lines.length){
+    blStatus('⚠️ Aucun code-barres reconnu dans ce texte — vérifiez que chaque ligne contient un EAN (8, 12 ou 13 chiffres).', 'var(--o)');
+    blLines = []; renderBLLines(); return;
+  }
+  blLines = lines;
+  blDone(lines, 'texte collé');
+}
+
+document.getElementById('bl-file').addEventListener('change', async function(e){
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';                       // permet de ré-importer le même fichier
+  if(!file) return;
+  blStatus('<span class="spin"></span> Lecture du fichier…');
+  try{
+    const nm = (file.name || '').toLowerCase();
+    let rows;
+    if(nm.endsWith('.csv') || nm.endsWith('.txt')) rows = parseCSVSimple(await file.text());
+    else if(nm.endsWith('.xlsx'))                  rows = await XlsxLite.readRows(await file.arrayBuffer());
+    else if(nm.endsWith('.xls'))                   throw new Error('Format .xls (ancien Excel) non supporté — enregistrez en .xlsx ou .csv.');
+    else                                           throw new Error('Format non reconnu — utilisez un .csv, un .xlsx, ou collez le texte du BL.');
+    const lines = parseBLRows(rows);
+    if(!lines.length) throw new Error('Aucun code-barres trouvé dans ce fichier.');
+    blLines = lines;
+    const ref = document.getElementById('bl-ref');
+    if(ref && !ref.value) ref.value = (file.name || '').replace(/\.(csv|xlsx|txt)$/i, '');
+    blDone(lines, file.name);
+  }catch(err){
+    console.error('[BL]', err);
+    blLines = [];
+    blStatus(`❌ ${escapeHTML(err.message || String(err))}`, 'var(--r)');
+    renderBLLines();
+  }
+});
+
+function blDone(lines, src){
+  const unknown = lines.filter(l => !l.known).length;
+  const tot = lines.reduce((s,l) => s + l.qty, 0);
+  blStatus(`✅ <strong>${lines.length}</strong> référence(s) · <strong>${tot}</strong> unité(s) — source : ${escapeHTML(src)}`
+    + (unknown ? `<br>⚠️ ${unknown} produit(s) hors catalogue : complétez le nom si besoin.` : ''), 'var(--gd)');
+  renderBLLines();
+}
+
+function setBLName(i, v){ if(blLines[i]) blLines[i].name = String(v||'').trim(); }
+function setBLProv(i, v){ if(blLines[i]) blLines[i].provenance = String(v||'').trim(); }
+function setBLQty(i, v){
+  const l = blLines[i]; if(!l) return;
+  const q = parseInt(v, 10);
+  l.qty = (!q || q < 1) ? 1 : q;
+  renderBLLines();
+}
+function changeBLQty(i, d){
+  const l = blLines[i]; if(!l) return;
+  l.qty = Math.max(1, l.qty + d);
+  renderBLLines();
+}
+function removeBLLine(i){ blLines.splice(i, 1); renderBLLines(); }
+function clearBL(){
+  blLines = [];
+  const t = document.getElementById('bl-paste'); if(t) t.value = '';
+  blStatus('');
+  renderBLLines();
+}
+
+function renderBLLines(){
+  const el = document.getElementById('bl-lines');
+  const ft = document.getElementById('bl-footer');
+  if(!el) return;
+  if(!blLines.length){ el.innerHTML = ''; if(ft) ft.style.display = 'none'; return; }
+  el.innerHTML = blLines.map((l,i)=>`
+    <div class="ord-line">
+      <div style="flex:1;min-width:0">
+        <input class="ord-name-in" value="${escapeHTMLAttr(l.name||'')}" placeholder="Nom du produit" onchange="setBLName(${i},this.value)" aria-label="Nom du produit">
+        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:3px">
+          ${catChip(catOfLine(l))}
+          ${l.known ? '' : '<span class="cat-chip" style="background:rgba(245,158,11,.16);color:#92400e">⚠️ hors catalogue</span>'}
+          <span style="font-size:10.5px;color:var(--muted);font-weight:700">${escapeHTML(l.gencod||'sans gencod')}</span>
+        </div>
+        <input class="ord-name-in" style="margin-top:4px;font-size:11.5px" value="${escapeHTMLAttr(l.provenance||'')}" placeholder="📍 Provenance / lot (optionnel)" onchange="setBLProv(${i},this.value)" aria-label="Provenance">
+      </div>
+      <div style="flex-shrink:0">
+        <div class="ord-qty">
+          <button onclick="changeBLQty(${i},-1)" aria-label="Une unité de moins">−</button>
+          <input type="number" min="1" value="${l.qty}" onchange="setBLQty(${i},this.value)" inputmode="numeric" aria-label="Quantité">
+          <button onclick="changeBLQty(${i},1)" aria-label="Une unité de plus">+</button>
+        </div>
+        <div class="ord-colis">unités</div>
+      </div>
+      <button class="ord-del" onclick="removeBLLine(${i})" aria-label="Supprimer la ligne">🗑</button>
+    </div>`).join('');
+  if(ft) ft.style.display = 'block';
+}
+
+/* Versement dans le relevé en cours → l'utilisateur ajuste puis valide. */
+function applyBLToStock(){
+  if(!blLines.length){ toast('Aucune ligne à verser'); return; }
+  const meta = readBLMeta();
+  blLines.forEach(l => {
+    const prov = l.provenance || meta.fournisseur || '';
+    const ex   = l.gencod ? currentStock.find(x => x.gencod === l.gencod) : null;
+    if(ex){
+      ex.qty += l.qty;
+      if(prov) ex.provenance = prov;
+      ex.src = 'BL';
+    } else {
+      currentStock.push({ gencod:l.gencod, name:l.name, famille:l.famille, provenance:prov, qty:l.qty, src:'BL' });
+    }
+  });
+  blPending = meta;                 // le futur enregistrement portera la référence du BL
+  const n = blLines.length;
+  blLines = []; renderBLLines(); blStatus('');
+  closeModal('bl-modal');
+  showTab('stocks');
+  toast(`📄 BL versé — ${n} ligne(s) modifiable(s)`);
+}
+
+/* Enregistrement direct dans l'historique (le relevé en cours n'est pas touché). */
+function saveBLAsRecord(){
+  if(!blLines.length){ toast('Aucune ligne à enregistrer'); return; }
+  const meta = readBLMeta();
+  const rec = {
+    id:    genId(),
+    date:  meta.date ? new Date(meta.date + 'T12:00:00').toISOString() : new Date().toISOString(),
+    store: storeName || '',
+    by:    session?.username || '?',
+    source:'BL',
+    ref:   meta.ref,
+    fournisseur: meta.fournisseur,
+    lines: blLines.map(l => ({
+      gencod:l.gencod, name:l.name, famille:l.famille,
+      provenance: l.provenance || meta.fournisseur || '', qty:l.qty, src:'BL',
+    })),
+  };
+  stockRecords.unshift(rec);
+  persistStocks();
+  blLines = []; renderBLLines(); blStatus('');
+  closeModal('bl-modal');
+  if(curTab === 'stocks') renderStock();
+  refreshFolderIfOpen();
+  toast('✅ BL enregistré dans l\'historique des stocks');
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -4159,6 +5504,7 @@ function folderCounts(name){
     stk: stockRecords.filter(r=>r.store===name).length,
     scanEnCours: products.filter(p=>p.magasin===name).length,
     scanArch: archive.filter(a=>a.magasin===name).length,
+    vrac: vracEntries.filter(v=>v.store===name).length,
   };
 }
 function renderFolders(){
@@ -4174,7 +5520,7 @@ function renderFolders(){
       <div style="flex:1;min-width:0">
         <div style="font-size:14px;font-weight:900;color:var(--txt)">${escapeHTML(s.name)}${active?' <span style="color:var(--gd);font-size:10px;font-weight:900">· ACTIF</span>':''}</div>
         <div style="font-size:11px;color:var(--muted);font-weight:700;margin-top:3px;display:flex;gap:9px;flex-wrap:wrap">
-          <span>📋 ${c.cmd}</span><span>📦 ${c.stk}</span><span>🌿 ${c.scanArch}${c.scanEnCours?` (+${c.scanEnCours} en cours)`:''}</span>
+          <span>📋 ${c.cmd}</span><span>📦 ${c.stk}</span><span>🌰 ${c.vrac}</span><span>🌿 ${c.scanArch}${c.scanEnCours?` (+${c.scanEnCours} en cours)`:''}</span>
         </div>
       </div>
       <div style="font-size:18px;color:var(--muted);flex-shrink:0">›</div>
@@ -4234,10 +5580,21 @@ function openStoreFolder(sid){
       ${rows}
     </div>`;
 
+  const vrs = vracEntries.filter(v=>v.store===name);
+  const vracRows = vrs.length ? vrs.slice(0,50).map(v=>`
+    <div style="display:flex;align-items:flex-start;gap:8px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12px">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800">🌰 ${escapeHTML(v.name||v.gencod||'—')} <span class="pbadge bk" style="font-size:9px">🗄 ${escapeHTML(v.silo||'—')}</span></div>
+        <div style="color:var(--muted);font-weight:600;font-size:11px;margin-top:2px">Rayon ${fmtDate(v.dateRayon)}${v.ddm?' · DDM '+ddmLabel(v.ddm):''}${v.lot?' · Lot '+escapeHTML(v.lot):''}${v.provenance?' · '+escapeHTML(v.provenance):''}</div>
+      </div>
+      <button class="scan-link-btn" data-vid="${escapeHTMLAttr(v.id)}" onclick="deleteVracEntry(this.dataset.vid)" style="color:var(--r);flex-shrink:0;padding:6px 10px" title="Supprimer cette fiche" aria-label="Supprimer">🗑</button>
+    </div>`).join('') : '<div class="empty" style="padding:8px 0">Aucune fiche vrac</div>';
+
   el.innerHTML =
     `<button class="scan-link-btn" onclick="renderFolders()" style="margin-bottom:14px">‹ Tous les magasins</button>`
     + section('📋','Commandes',cmds.length,cmdRows)
     + section('📦','Stocks',stks.length,stkRows)
+    + section('🌰','Vrac (traçabilité)',vrs.length,vracRows)
     + section('🌿','Fresh / Scan',scans.length+enCours.length,scanRows);
 }
 
@@ -4881,9 +6238,27 @@ function toast(msg){
   t.textContent=msg;clearTimeout(toastTm);toastTm=setTimeout(()=>t.remove(),2600);
 }
 
+/* ═══ ORIENTATION — PORTRAIT VERROUILLÉ ══════════════════════════════════════
+   Trois niveaux, du plus « natif » au repli universel :
+     1. manifest.json → "orientation":"portrait" (PWA Android installée) ;
+     2. screen.orientation.lock('portrait') → Android/Chrome, refusé hors
+        plein écran (on avale l'erreur, c'est un bonus) ;
+     3. voile CSS #rot-lock en paysage sur mobile → iOS, qui ignore 1 et 2.
+   Résultat : l'interface ne se réagence jamais quand on tourne l'appareil. */
+function lockPortrait(){
+  try{
+    const so = screen.orientation;
+    if(so && typeof so.lock === 'function'){
+      const p = so.lock('portrait');
+      if(p && typeof p.catch === 'function') p.catch(()=>{});   // refus navigateur = normal
+    }
+  }catch(e){ /* API absente (iOS) → le voile CSS prend le relais */ }
+}
+
 /* ═══ INIT ═══════════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded',()=>{
   applyLang();
+  lockPortrait();
   updateSplashBranding();
   ['li-u','li-p'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()}));
   // Session : sessionStorage uniquement → login obligatoire à chaque réouverture
