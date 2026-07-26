@@ -538,15 +538,18 @@ button,label,select{touch-action:manipulation}
    screen.orientation.lock() au lancement — mais iOS ignore les deux. Repli
    universel : dès qu'un mobile passe en paysage, un voile couvre l'écran et
    invite à revenir en portrait ; l'interface ne se réagence donc jamais de
-   travers. Les garde-fous `pointer:coarse` + `max-height` évitent de gêner
-   les écrans de bureau, toujours « en paysage ». */
+   travers. Garde-fous pour ne pas gêner le bureau (toujours « en paysage ») :
+   `pointer:coarse` + `hover:none` = doigt sans souris → mobile ou tablette
+   uniquement ; un PC, même à écran tactile, garde `hover:hover`. Le
+   `max-height:1100px` reste une ceinture de sécurité (une tablette en paysage
+   fait ~810px de haut, un moniteur de bureau bien davantage). */
 #rot-lock{display:none;position:fixed;inset:0;z-index:2000;flex-direction:column;align-items:center;justify-content:center;gap:13px;padding:22px;text-align:center;
   background:radial-gradient(ellipse 80% 60% at 20% 10%,#1FD994 0%,transparent 52%),linear-gradient(155deg,#064D30 0%,#0A6B47 60%,#12A876 100%);color:#fff}
 .rl-ico{font-size:50px;line-height:1;animation:rotHint 2.4s ease-in-out infinite}
 .rl-t{font-size:19px;font-weight:900;letter-spacing:-.4px}
 .rl-p{font-size:13px;font-weight:700;color:rgba(255,255,255,.82);max-width:320px;line-height:1.6}
 @keyframes rotHint{0%,58%,100%{transform:rotate(0)}22%,44%{transform:rotate(-90deg)}}
-@media screen and (orientation:landscape) and (max-height:520px) and (pointer:coarse){
+@media screen and (orientation:landscape) and (max-height:1100px) and (pointer:coarse) and (hover:none){
   #rot-lock{display:flex}
 }
 
@@ -6254,6 +6257,10 @@ function lockPortrait(){
     }
   }catch(e){ /* API absente (iOS) → le voile CSS prend le relais */ }
 }
+/* Android/Chrome refuse parfois le verrou tant que l'app n'est pas installée
+   ou affichée en plein écran : on retente à chaque bascule, c'est gratuit et
+   ça rattrape les cas où le premier appel a été rejeté. */
+window.addEventListener('orientationchange', lockPortrait);
 
 /* ═══ INIT ═══════════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded',()=>{
