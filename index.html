@@ -542,7 +542,13 @@ button,label,select{touch-action:manipulation}
    `pointer:coarse` + `hover:none` = doigt sans souris → mobile ou tablette
    uniquement ; un PC, même à écran tactile, garde `hover:hover`. Le
    `max-height:1100px` reste une ceinture de sécurité (une tablette en paysage
-   fait ~810px de haut, un moniteur de bureau bien davantage). */
+   fait ~810px de haut, un moniteur de bureau bien davantage).
+   DEUX déclencheurs, volontairement redondants : le média CSS ci-dessous ET
+   la classe `.rot-lock-on` posée par `applyRotationLock()` en JS. Motif : les
+   caractéristiques média mentent sur certains appareils (iPadOS en « site
+   bureau » annonce `hover:hover`/`pointer:fine`, des WebView Android aussi),
+   alors que `navigator.maxTouchPoints` + la taille physique de l'écran, eux,
+   ne mentent pas. Il suffit qu'UN des deux se déclenche. */
 #rot-lock{display:none;position:fixed;inset:0;z-index:2000;flex-direction:column;align-items:center;justify-content:center;gap:13px;padding:22px;text-align:center;
   background:radial-gradient(ellipse 80% 60% at 20% 10%,#1FD994 0%,transparent 52%),linear-gradient(155deg,#064D30 0%,#0A6B47 60%,#12A876 100%);color:#fff}
 .rl-ico{font-size:50px;line-height:1;animation:rotHint 2.4s ease-in-out infinite}
@@ -552,6 +558,7 @@ button,label,select{touch-action:manipulation}
 @media screen and (orientation:landscape) and (max-height:1100px) and (pointer:coarse) and (hover:none){
   #rot-lock{display:flex}
 }
+html.rot-lock-on #rot-lock{display:flex}
 
 /* ═══ CATÉGORIES PRODUITS (liquides, JBFL, salés, sucrés…) ═════════════════
    Puce compacte réutilisée partout où une ligne produit s'affiche (stock,
@@ -616,7 +623,7 @@ button,label,select{touch-action:manipulation}
     <button class="lb" id="l-btn" onclick="doLogin()"><span id="l-btn-t">Se connecter</span></button>
     <div class="lerr" id="l-err"></div>
   </div>
-  <div class="lver">FreshControl v3.10 · <span class="brand-logo" style="width:40px;height:18px;margin-left:4px"></span></div>
+  <div class="lver">FreshControl v3.11 · <span class="brand-logo" style="width:40px;height:18px;margin-left:4px"></span></div>
 
   <!-- Bouton reset d'urgence — visible en bas de l'écran de connexion -->
   <div style="margin-top:18px;text-align:center">
@@ -6257,10 +6264,47 @@ function lockPortrait(){
     }
   }catch(e){ /* API absente (iOS) → le voile CSS prend le relais */ }
 }
-/* Android/Chrome refuse parfois le verrou tant que l'app n'est pas installée
-   ou affichée en plein écran : on retente à chaque bascule, c'est gratuit et
-   ça rattrape les cas où le premier appel a été rejeté. */
-window.addEventListener('orientationchange', lockPortrait);
+
+/* Appareil tenu à la main (téléphone ou tablette) ? On interroge le matériel
+   plutôt que les caractéristiques média : `maxTouchPoints` reste juste même
+   quand iPadOS se fait passer pour un ordinateur de bureau, et `screen`, sur
+   iOS, garde les dimensions de l'écran physique quelle que soit la rotation.
+   1050 px de petit côté = tout le parc mobile, iPad Pro 12,9" (1024) inclus ;
+   un moniteur de bureau est au-dessus. */
+function isHandheld(){
+  const mm = window.matchMedia ? (q => matchMedia(q).matches) : (() => false);
+  const tactile = (navigator.maxTouchPoints || 0) > 0 || mm('(pointer:coarse)');
+  /* Une souris ou un pavé tactile disponible = poste de travail, jamais un
+     téléphone : on ne voile pas un portable à écran tactile. */
+  const sourisDispo = mm('(any-pointer:fine)');
+  const petitCote = Math.min(screen.width || 0, screen.height || 0);
+  return !!tactile && !sourisDispo && petitCote > 0 && petitCote <= 1050;
+}
+
+/* Pose/retire `.rot-lock-on` sur <html> → affiche le voile « Tournez votre
+   téléphone ». Doublon assumé du média CSS : voir le commentaire du bloc
+   #rot-lock. */
+function applyRotationLock(){
+  const paysage = window.matchMedia
+    ? matchMedia('(orientation:landscape)').matches
+    : window.innerWidth > window.innerHeight;
+  document.documentElement.classList.toggle('rot-lock-on', paysage && isHandheld());
+}
+
+/* `orientationchange` seul ne suffit pas : il manque à l'appel dans certaines
+   WebView, et une app iOS relancée depuis le sélecteur d'applis reprend en
+   paysage sans jamais l'émettre. On écoute donc aussi le redimensionnement,
+   le média lui-même et le retour au premier plan. */
+function watchOrientation(){
+  applyRotationLock();
+  window.addEventListener('orientationchange', ()=>{ lockPortrait(); applyRotationLock(); });
+  window.addEventListener('resize', applyRotationLock);
+  window.addEventListener('pageshow', applyRotationLock);
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) applyRotationLock(); });
+  try{ matchMedia('(orientation:landscape)').addEventListener('change', applyRotationLock); }
+  catch(e){ /* Safari < 14 : les trois écouteurs ci-dessus suffisent */ }
+}
+watchOrientation();
 
 /* ═══ INIT ═══════════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded',()=>{
