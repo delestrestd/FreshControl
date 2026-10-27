@@ -89,10 +89,11 @@ Onglet 🛒 **Commande** — 100 % local, aucune commande n'est poussée vers un
 1. Un appui unique sur **« 📷 Démarrer le scan »** allume la caméra, qui tourne ensuite **en continu**.
 2. Dès qu'un code-barres est **reconnu dans le catalogue**, la ligne s'ajoute **automatiquement** à la commande (1 colis) — aucune photo à déclencher, aucune boîte à valider. Un flash vert + un toast confirment l'ajout.
 3. Re-scanner le même produit **incrémente** son nombre de colis (anti-doublon de 2 s pour éviter les comptages accidentels).
-4. La quantité de chaque ligne est un **nombre de colis** librement ajustable (`− / +` ou saisie directe). *Le fichier tarif ne contenant pas le conditionnement (unités par colis), aucune conversion en unités n'est faite.*
-5. Un code **hors catalogue** (ou la saisie manuelle) ouvre une boîte pour renseigner le nom du produit avant l'ajout.
+4. La quantité de chaque ligne est un **nombre de colis** librement ajustable (`− / +` ou saisie directe). Quand le catalogue connaît le **PCB** (unités par colis), le bon de commande calcule les unités (colis × PCB).
+5. Un code scanné est cherché comme **EAN**, puis comme **référence fournisseur** (code interne Léa Nature, 7 chiffres).
+6. Un code **hors catalogue** (ou la saisie manuelle) ouvre une boîte avec une **recherche en direct** : dès 4 chiffres (n'importe où dans l'EAN ou la référence — la fin du code suffit, le début étant le préfixe commun Léa Nature) ou 2 lettres du nom. À défaut, on saisit le nom (ajout hors catalogue).
 
-La commande se valide par e-mail ; un **historique local** permet de recharger, renvoyer ou exporter (CSV, colonne `colis`) les commandes passées.
+La commande se valide par e-mail : texte regroupé par gamme (EAN, réf., PCB, colis, unités) et **bon de commande Excel** joint via le partage natif du téléphone (sur PC : téléchargement + ouverture du mail). Un **historique local** permet de recharger, renvoyer ou exporter (Excel ou CSV) les commandes passées.
 
 > La caméra ne démarre pas d'elle-même à l'ouverture de l'onglet : le clic initial sur « Démarrer le scan » reste nécessaire (choix délibéré pour ne pas monopoliser la caméra).
 
