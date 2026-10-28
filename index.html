@@ -115,7 +115,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 #hdr-l{display:flex;align-items:center;gap:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:4px 8px 4px 4px;margin:-4px 0 -4px -4px;border-radius:14px;transition:background .18s}
 #hdr-l:hover{background:rgba(255,255,255,.08)}
 #hdr-l:active{background:rgba(255,255,255,.14)}
-.hico{width:40px;height:40px;background:rgba(255,255,255,.22);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;border:1.5px solid rgba(255,255,255,.34);box-shadow:var(--spec-d);flex-shrink:0}
+.hico{width:40px;height:40px;background:linear-gradient(145deg,#FFFFFF,#D9F5E8);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;border:1.5px solid rgba(255,255,255,.34);box-shadow:var(--spec-d);flex-shrink:0}
 #hdr h1{font-size:18px;font-weight:900;letter-spacing:-.5px}
 #hdr small{font-size:11px;opacity:.85;font-weight:700;display:block;margin-top:1px}
 #hdr-r{display:flex;align-items:center;gap:9px}
@@ -157,7 +157,22 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 #hm-grid .hm-tile{padding:16px 15px}
 #hm-grid .hm-ico{width:62px;height:62px;border-radius:18px;font-size:33px}
 #hm-grid .hm-n{font-size:20px}
-#hm-grid .hm-st{font-size:12px;-webkit-line-clamp:3}
+#hm-grid .hm-st{display:inline-block;margin-top:8px;padding:5px 10px;border-radius:var(--rr);background:rgba(255,255,255,.94);color:var(--gd);font-size:12px;font-weight:900;-webkit-line-clamp:unset;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.hm-news{list-style:none;margin:7px 0 0;padding:0;display:flex;flex-direction:column;gap:3px}
+.hm-news li{font-size:11.5px;font-weight:700;color:rgba(255,255,255,.95);line-height:1.3;padding-left:11px;position:relative;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hm-news li::before{content:'';position:absolute;left:0;top:.45em;width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.8)}
+.hm-news li.r::before{background:#FF8A8A}.hm-news li.o::before{background:#FFD27A}
+/* Petits écrans (iPhone SE…) : cartes plus compactes, 2 actualités maximum */
+@media (max-height:760px){
+  #hm-grid .hm-tile{padding:11px 12px}
+  #hm-grid .hm-ico{width:42px;height:42px;font-size:22px;border-radius:13px}
+  #hm-grid .hm-n{font-size:16.5px}
+  .hm-news{margin-top:4px;gap:2px}
+  .hm-news li{font-size:10.5px;-webkit-line-clamp:1}
+  .hm-news li:nth-child(n+3){display:none}
+  #hm-grid .hm-st{margin-top:5px;padding:3px 8px;font-size:10.5px}
+  .hm-hello-t{font-size:20px}
+}
 #tab-gestion.on{display:flex;flex-direction:column;height:100%;min-height:420px}
 #gs-grid{grid-template-rows:1fr 1fr auto}
 .hm-d{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
@@ -230,6 +245,34 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .hyg-b button.on-n{background:rgba(224,60,60,.9);border-color:transparent;color:#fff}
 .hyg-row.is-n .hyg-l{color:var(--r)}
 .hyg-all{width:100%;margin:6px 0 8px;padding:10px;border-radius:var(--rr);border:1.5px solid rgba(18,168,118,.35);background:rgba(18,168,118,.1);color:var(--gd);font-family:var(--font);font-size:13px;font-weight:900;cursor:pointer}
+/* ── Cahier vrac virtuel ─────────────────────────────────────────── */
+.vb-prod{width:100%;display:flex;align-items:center;gap:10px;text-align:left;border:1px solid var(--bdr);background:rgba(255,255,255,.7);border-radius:14px;padding:11px 12px;margin-bottom:8px;font-family:var(--font);cursor:pointer;color:var(--txt)}
+.vb-prod>div{flex:1;min-width:0}
+.vb-prod b{display:block;font-size:14px;font-weight:900}
+.vb-prod small{display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-top:2px}
+.vb-chip{flex-shrink:0;font-size:11px;font-weight:900;border-radius:var(--rr);padding:4px 9px}
+.vb-chip.ok{background:rgba(18,168,118,.14);color:var(--gd)}.vb-chip.nc{background:rgba(224,60,60,.13);color:var(--r)}
+.vb-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#fff;border-radius:14px;padding:12px;margin-bottom:12px;border:1px solid var(--bdr)}
+.vb-ean{width:190px;max-width:100%;height:auto;display:block}
+.vb-noean{font-size:13px;font-weight:800;color:var(--muted)}
+.vb-stats{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:700;color:var(--muted)}
+.vb-stats b{color:var(--txt);font-size:15px}
+.vb-stats .vb-chip{align-self:flex-start}
+.vb-page{background:#fff;border:1px solid var(--bdr);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.vb-date{font-size:15px;font-weight:900;color:var(--gd);margin-bottom:8px}
+.vb-kv{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:4px 10px;font-size:12.5px}
+.vb-kv span{color:var(--muted);font-weight:700}.vb-kv b{font-weight:800;min-width:0;overflow-wrap:anywhere}
+.vb-sec{font-size:11px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin:12px 0 4px}
+.vb-hyg div{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;font-weight:700;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+.vb-hyg div.n span{color:var(--r)}
+.vb-hyg b{font-weight:900;color:var(--muted)}.vb-hyg b.o{color:var(--gd)}.vb-hyg b.n{color:var(--r)}
+.vb-rem{margin-top:8px;font-size:12.5px;font-weight:700;color:var(--r)}
+.vb-rem b{color:var(--txt)}
+.vb-photos{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.vb-photos figure{margin:0}
+.vb-photos img,.vb-nophoto{width:100%;height:150px;object-fit:contain;border-radius:10px;background:rgba(0,0,0,.05);cursor:zoom-in;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);font-weight:700}
+.vb-photos figcaption{font-size:11px;font-weight:800;color:var(--muted);margin-top:4px}
+@media (max-width:420px){.vb-kv{grid-template-columns:auto 1fr}}
 /* ── RÉGLAGES (liste groupée façon iPhone) ─────────────────────────── */
 .rg-sec{font-size:11px;font-weight:900;color:rgba(255,255,255,.85);letter-spacing:1.2px;text-transform:uppercase;padding:14px 6px 6px}
 .rg-grp{border-radius:var(--rm);overflow:hidden}
@@ -830,7 +873,8 @@ html.rot-lock-on #rot-lock{display:flex}
     <div class="rf-f"><div class="rf-l" id="em-l-to">Destinataire(s)</div><input class="rf-i" id="em-to" type="email" placeholder="responsable@bunga.corp"></div>
     <div class="rf-f"><div class="rf-l" id="em-l-subj">Objet</div><input class="rf-i" id="em-subj"></div>
     <div class="rf-f"><div class="rf-l" id="em-l-body">Corps du message</div><textarea class="em-ta" id="em-body"></textarea></div>
-    <button class="af-add" style="width:100%;margin-top:14px;display:none" id="em-share-btn" onclick="shareOrderWithFile()">📎 Envoyer avec le bon de commande Excel</button>
+    <button class="af-add" style="width:100%;margin-top:14px;display:none" id="em-share-btn" onclick="shareOrderWithFile()">📎 Envoyer avec le bon PDF (codes-barres) + Excel</button>
+    <button class="scan-reset-btn" style="width:100%;margin-top:8px;display:none" id="em-pdf-btn" onclick="downloadOrderPdfFromEmail()">📄 Télécharger le bon PDF (codes-barres)</button>
     <button class="scan-reset-btn" style="width:100%;margin-top:8px;display:none" id="em-dl-btn" onclick="downloadOrderFileFromEmail()">📊 Télécharger seulement l'Excel</button>
     <button class="af-add" style="width:100%;margin-top:14px" id="em-send-btn" onclick="sendMailto()">📧 Envoyer par mail</button>
     <button class="rfcancel" onclick="closeModal('email-modal')" id="em-cancel">Annuler</button>
@@ -1038,6 +1082,20 @@ html.rot-lock-on #rot-lock{display:flex}
   </div>
 </div>
 
+<!-- ═══ CAHIER DE SUIVI VRAC VIRTUEL (consultation par produit) ═══════ -->
+<div id="vrac-book-modal" class="modal-bg full">
+  <div class="modal-sh">
+    <div class="mhd-row" style="margin-bottom:0">
+      <button class="scan-link-btn" id="vb-back" onclick="vbBack()" style="display:none;padding:7px 12px">‹ Produits</button>
+      <div class="mhd-t" id="vb-title" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📖 Cahier de suivi vrac</div>
+      <button class="mcl" onclick="closeModal('vrac-book-modal')" aria-label="Fermer">✕</button>
+    </div>
+    <input class="rf-i" id="vb-search" placeholder="🔍 Produit ou code-barres…" oninput="renderVracBook()" style="margin:12px 0 0">
+    <div id="vb-body"></div>
+    <button class="rfsave" id="vb-send" onclick="sendVracBookPdf()" style="margin:10px 0 4px">📤 Envoyer tout le cahier (PDF)</button>
+  </div>
+</div>
+
 <!-- ═══ CAHIER DE SUIVI VRAC (PDF : traçabilité + hygiène + photos) ═══ -->
 <div id="vrac-cahier-modal" class="modal-bg">
   <div class="modal-sh">
@@ -1048,6 +1106,8 @@ html.rot-lock-on #rot-lock{display:flex}
     <div style="font-size:12.5px;font-weight:700;color:var(--muted);line-height:1.55;margin-bottom:12px">
       Document PDF à envoyer au client ou à présenter lors d'un contrôle : chaque mise en rayon avec son lot, sa DDM, son origine, le contrôle hygiène du silo et les photos des étiquettes.
     </div>
+    <button class="rfsave" style="margin:0 0 14px;background:rgba(255,255,255,.95);color:var(--gd);border:1.5px solid rgba(18,168,118,.4)" onclick="openVracBook()">📖 Consulter le cahier produit par produit</button>
+    <div class="rf-l" style="margin-bottom:6px">Ou créer le PDF d'une période</div>
     <div class="rf-row">
       <div class="rf-f"><div class="rf-l">Du</div><input class="rf-i" type="date" id="vc-from"></div>
       <div class="rf-f"><div class="rf-l">Au</div><input class="rf-i" type="date" id="vc-to"></div>
@@ -1976,8 +2036,7 @@ function setActiveStore(s, opts){
   storeVille= s ? (s.ville || '') : '';
   if(s) localStorage.setItem('fc_active_store', s.id);
   else  localStorage.removeItem('fc_active_store');
-  const hs=document.getElementById('hdr-sub');
-  if(hs) hs.textContent = [storeEnseigne, storeName].filter(Boolean).join(' · ') || 'FreshControl';
+  updateHdrSub();
   const rfm=document.getElementById('rf-mag'); if(rfm) rfm.value = storeName;
   updateSplashBranding();
   renderStoreBars();
@@ -2093,13 +2152,13 @@ if(new URLSearchParams(location.search).get('reset')==='1'){
 
 /* ═══ I18N ══════════════════════════════════════════════════════════════════ */
 const I18N={
-  fr:{tag:'Gestion intelligente des périmés',by:'Créé par',hm_hi:'Bonjour',tl_g:'Gestion',gd_c:'Scanner les rayons|Ajuster les colis|Envoyer le bon Excel',gd_stk:'Compter le stock|Importer un BL|Vérifier un produit',gd_v:'Mise en rayon des silos|Photos + hygiène|Cahier de suivi PDF',gd_mag:'Ajouter, modifier|Repérer par GPS|Dossiers magasins',gd_cat:'Chercher un produit|Nom, EAN ou réf.',tl_mag:'Magasins',hs_g:'Commande · Stocks · Vrac · Magasins',hs_mag:'{n} magasin(s) enregistré(s)',tl_cat:'Catalogue',tl_set:'Réglages',tl_adm:'Administration',fresh_scan:'📷 Scanner une date',hs_fresh:'{e} périmé(s) · {o} sous 2 j',hs_fresh0:'Aucune date urgente',hs_cmd:'{n} réf. · {c} colis en cours',hs_cmd0:'Aucune commande en cours',hs_stk:'{n} produit(s) en cours',hs_stk0:'Aucun relevé en cours',hs_vrac:'{n} mise(s) en rayon',hs_vrac0:'Mises en rayon des silos',hs_al:'{n} magasin(s) à prévenir',hs_al0:'Rien à signaler',hs_pl:'Aujourd’hui : {n} magasin(s)',hs_pl0:'Rien de prévu aujourd’hui',hs_cat:'{n} produits',hs_set:'Magasins, sauvegarde, langue',hm_store:'Magasin',hm_out:'Hors magasin',hm_loc:'Localisation…',l_user:'Identifiant',l_pass:'Mot de passe',l_btn:'Se connecter',l_err_empty:'Remplissez tous les champs',l_err_wrong:'Identifiant ou mot de passe incorrect',ph_user:'prenom.nom',ph_pass:'••••••••',rg_t:"🔒 Charte d'usage et protection des données",rg_p:"Le détail des traitements et des durées de conservation figure dans les Mentions légales accessibles depuis le menu.",rg_y:'✓ Accepter',rg_n:'Refuser',
+  fr:{tag:'Gestion intelligente des périmés',by:'Créé par',hm_hi:'Bonjour',hn_exp:'périmé',hn_today0:"aujourd'hui",hn_in:'J-{n}',hn_tracked:'{n} produit(s) suivi(s)',hn_next:'Prochaine date : {p} le {d}',hn_order:'Dernière commande : {d} ({n} réf.)',hn_stock:'Dernier relevé : {d}',hn_vrac:'Vrac : {p} → {s} ({d})',hn_tday:"Aujourd'hui",hn_cr:'Dernier compte-rendu : {s} ({d})',hn_todo:'À faire',hn_prods:'{n} produit(s)',tl_g:'Gestion',gd_c:'Scanner les rayons|Ajuster les colis|Envoyer le bon Excel',gd_stk:'Compter le stock|Importer un BL|Vérifier un produit',gd_v:'Mise en rayon des silos|Photos + hygiène|Cahier de suivi PDF',gd_mag:'Ajouter, modifier|Repérer par GPS|Dossiers magasins',gd_cat:'Chercher un produit|Nom, EAN ou réf.',tl_mag:'Magasins',hs_g:'Commande · Stocks · Vrac · Magasins',hs_mag:'{n} magasin(s) enregistré(s)',tl_cat:'Catalogue',tl_set:'Réglages',tl_adm:'Administration',fresh_scan:'📷 Scanner une date',hs_fresh:'{e} périmé(s) · {o} sous 2 j',hs_fresh0:'Aucune date urgente',hs_cmd:'{n} réf. · {c} colis en cours',hs_cmd0:'Aucune commande en cours',hs_stk:'{n} produit(s) en cours',hs_stk0:'Aucun relevé en cours',hs_vrac:'{n} mise(s) en rayon',hs_vrac0:'Mises en rayon des silos',hs_al:'{n} magasin(s) à prévenir',hs_al0:'Rien à signaler',hs_pl:'Aujourd’hui : {n} magasin(s)',hs_pl0:'Rien de prévu aujourd’hui',hs_cat:'{n} produits',hs_set:'Magasins, sauvegarde, langue',hm_store:'Magasin',hm_out:'Hors magasin',hm_loc:'Localisation…',l_user:'Identifiant',l_pass:'Mot de passe',l_btn:'Se connecter',l_err_empty:'Remplissez tous les champs',l_err_wrong:'Identifiant ou mot de passe incorrect',ph_user:'prenom.nom',ph_pass:'••••••••',rg_t:"🔒 Charte d'usage et protection des données",rg_p:"Le détail des traitements et des durées de conservation figure dans les Mentions légales accessibles depuis le menu.",rg_y:'✓ Accepter',rg_n:'Refuser',
   lexp:'Périmés',lcrit:'Critiques ≤2j',lwarn:'Attention ≤7j',lok:'OK',lprods:'Produits',all:'Tous',all_stores:'Tous magasins',all_status:'Tous statuts',
   sct:'Scanner un produit',scsub:'Photographiez le code-barres EAN',scbtn:'Prendre une photo',scanning:'🔍 Analyse…',scan_ok:'✅ Produit reconnu',scan_err:'❌ Erreur de connexion',
   ldlc:'Date limite (DLC)',lqty:'Quantité',rfsave:'💾 Enregistrer',rfcancel:'Annuler',
   nft:'Produit non référencé',nfsub:"Ce gencod n'est pas dans le catalogue.",nfbtn:'Nouveau scan',
   gps_load:'Localisation…',gps_denied:'GPS refusé — sélection manuelle',gps_err:'Erreur GPS',gps_retry:'Réessayer',gps_no_store:'Hors zone magasin — sélection manuelle',
-  tl_d:'Tableau',tl_s:'Fresh',tl_c:'Commande',tl_stk:'Stocks',tl_v:'Vrac',tl_a:'Alertes',tl_p:'Planning',
+  tl_d:'Tableau',tl_s:'Fresh Control',tl_c:'Commande',tl_stk:'Stocks',tl_v:'Vrac',tl_a:'Alertes',tl_p:'Planning',
   badge_e:'Périmé',badge_o:'J-{{d}}',badge_w:'J-{{d}}',badge_k:'J-{{d}}',
   send_all:'📧 Envoyer le récap global',su_t:'⚠️ Alertes produits',su_p:'Produits expirés ou critiques détectés',
   em_t:'📧 Envoyer un rappel',em_sub:'Rappel e-mail des produits urgents',em_to:'Destinataire(s)',em_subj:'Objet',em_body:'Corps du message',em_cancel:'Annuler',su_mail:'📧 Envoyer par mail',su_cl:'Fermer',
@@ -2107,13 +2166,13 @@ const I18N={
   days:['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'],
   saved:'✅ Sauvegardé',deleted:'🗑 Supprimé',user_added:'👤 Utilisateur ajouté',store_added:'🏪 Magasin ajouté',prod_archived:'✅ Produit archivé',no_prods:'Aucun produit',fill_all:'Remplissez tous les champs',email_sent:'✅ E-mail envoyé',email_err:'❌ Erreur envoi',csv_ok:'📥 CSV téléchargé',
   adm_stores:'🏪 Magasins',adm_users:'👥 Utilisateurs',adm_lang:'🌍 Langue',adm_conf:'⚙️ Configuration'},
-  en:{tag:'Smart expiry date management',by:'Created by',hm_hi:'Hello',tl_g:'Management',gd_c:'Scan the shelves|Adjust cases|Send the Excel order',gd_stk:'Count stock|Import a delivery note|Check a product',gd_v:'Bin refilling|Photos + hygiene|PDF log book',gd_mag:'Add, edit|Locate by GPS|Store folders',gd_cat:'Find a product|Name, EAN or ref.',tl_mag:'Stores',hs_g:'Orders · Stock · Bulk · Stores',hs_mag:'{n} store(s) saved',tl_cat:'Catalogue',tl_set:'Settings',tl_adm:'Administration',fresh_scan:'📷 Scan a date',hs_fresh:'{e} expired · {o} within 2 d',hs_fresh0:'No urgent dates',hs_cmd:'{n} items · {c} cases in progress',hs_cmd0:'No order in progress',hs_stk:'{n} product(s) in progress',hs_stk0:'No count in progress',hs_vrac:'{n} shelving(s)',hs_vrac0:'Bulk bin shelving',hs_al:'{n} store(s) to notify',hs_al0:'Nothing to report',hs_pl:'Today: {n} store(s)',hs_pl0:'Nothing planned today',hs_cat:'{n} products',hs_set:'Stores, backup, language',hm_store:'Store',hm_out:'Not in a store',hm_loc:'Locating…',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err_empty:'Please fill all fields',l_err_wrong:'Wrong username or password',ph_user:'firstname.lastname',ph_pass:'••••••••',rg_t:'🔒 Usage charter & data protection',rg_p:'Full processing details and retention periods are available in the Legal Notice from the menu.',rg_y:'✓ Accept',rg_n:'Decline',
+  en:{tag:'Smart expiry date management',by:'Created by',hm_hi:'Hello',hn_exp:'expired',hn_today0:'today',hn_in:'D-{n}',hn_tracked:'{n} product(s) tracked',hn_next:'Next date: {p} on {d}',hn_order:'Last order: {d} ({n} items)',hn_stock:'Last count: {d}',hn_vrac:'Bulk: {p} → {s} ({d})',hn_tday:'Today',hn_cr:'Last visit report: {s} ({d})',hn_todo:'To do',hn_prods:'{n} product(s)',tl_g:'Management',gd_c:'Scan the shelves|Adjust cases|Send the Excel order',gd_stk:'Count stock|Import a delivery note|Check a product',gd_v:'Bin refilling|Photos + hygiene|PDF log book',gd_mag:'Add, edit|Locate by GPS|Store folders',gd_cat:'Find a product|Name, EAN or ref.',tl_mag:'Stores',hs_g:'Orders · Stock · Bulk · Stores',hs_mag:'{n} store(s) saved',tl_cat:'Catalogue',tl_set:'Settings',tl_adm:'Administration',fresh_scan:'📷 Scan a date',hs_fresh:'{e} expired · {o} within 2 d',hs_fresh0:'No urgent dates',hs_cmd:'{n} items · {c} cases in progress',hs_cmd0:'No order in progress',hs_stk:'{n} product(s) in progress',hs_stk0:'No count in progress',hs_vrac:'{n} shelving(s)',hs_vrac0:'Bulk bin shelving',hs_al:'{n} store(s) to notify',hs_al0:'Nothing to report',hs_pl:'Today: {n} store(s)',hs_pl0:'Nothing planned today',hs_cat:'{n} products',hs_set:'Stores, backup, language',hm_store:'Store',hm_out:'Not in a store',hm_loc:'Locating…',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err_empty:'Please fill all fields',l_err_wrong:'Wrong username or password',ph_user:'firstname.lastname',ph_pass:'••••••••',rg_t:'🔒 Usage charter & data protection',rg_p:'Full processing details and retention periods are available in the Legal Notice from the menu.',rg_y:'✓ Accept',rg_n:'Decline',
   lexp:'Expired',lcrit:'Critical ≤2d',lwarn:'Warning ≤7d',lok:'OK',lprods:'Products',all:'All',all_stores:'All stores',all_status:'All statuses',
   sct:'Scan a product',scsub:'Photograph the EAN barcode',scbtn:'Take a photo',scanning:'🔍 Analyzing…',scan_ok:'✅ Product found',scan_err:'❌ Connection error',
   ldlc:'Expiry date',lqty:'Quantity',rfsave:'💾 Save',rfcancel:'Cancel',
   nft:'Product not found',nfsub:"This barcode isn't in the catalogue.",nfbtn:'New scan',
   gps_load:'Locating…',gps_denied:'GPS denied — manual selection',gps_err:'GPS error',gps_retry:'Retry',gps_no_store:'Outside store zone — manual selection',
-  tl_d:'Dashboard',tl_s:'Fresh',tl_c:'Order',tl_stk:'Stock',tl_v:'Bulk',tl_a:'Alerts',tl_p:'Planning',
+  tl_d:'Dashboard',tl_s:'Fresh Control',tl_c:'Order',tl_stk:'Stock',tl_v:'Bulk',tl_a:'Alerts',tl_p:'Planning',
   badge_e:'Expired',badge_o:'D-{{d}}',badge_w:'D-{{d}}',badge_k:'D-{{d}}',
   send_all:'📧 Send global recap',su_t:'⚠️ Product alerts',su_p:'Expired or critical products detected',
   em_t:'📧 Send reminder',em_sub:'Email reminder for urgent products',em_to:'Recipient(s)',em_subj:'Subject',em_body:'Message',em_cancel:'Cancel',su_mail:'📧 Send by email',su_cl:'Close',
@@ -2121,13 +2180,13 @@ const I18N={
   days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
   saved:'✅ Saved',deleted:'🗑 Deleted',user_added:'👤 User added',store_added:'🏪 Store added',prod_archived:'✅ Product archived',no_prods:'No products',fill_all:'Please fill all fields',email_sent:'✅ Email sent',email_err:'❌ Send error',csv_ok:'📥 CSV downloaded',
   adm_stores:'🏪 Stores',adm_users:'👥 Users',adm_lang:'🌍 Language',adm_conf:'⚙️ Config'},
-  es:{tag:'Gestión inteligente de caducidades',by:'Creado por',hm_hi:'Hola',tl_g:'Gestión',gd_c:'Escanear los estantes|Ajustar las cajas|Enviar el pedido Excel',gd_stk:'Contar el stock|Importar un albarán|Verificar un producto',gd_v:'Llenado de silos|Fotos + higiene|Registro PDF',gd_mag:'Añadir, modificar|Localizar por GPS|Carpetas de tiendas',gd_cat:'Buscar un producto|Nombre, EAN o ref.',tl_mag:'Tiendas',hs_g:'Pedidos · Stock · Granel · Tiendas',hs_mag:'{n} tienda(s) registrada(s)',tl_cat:'Catálogo',tl_set:'Ajustes',tl_adm:'Administración',fresh_scan:'📷 Escanear una fecha',hs_fresh:'{e} caducado(s) · {o} en 2 d',hs_fresh0:'Sin fechas urgentes',hs_cmd:'{n} ref. · {c} cajas en curso',hs_cmd0:'Sin pedido en curso',hs_stk:'{n} producto(s) en curso',hs_stk0:'Sin recuento en curso',hs_vrac:'{n} reposición(es)',hs_vrac0:'Reposición de silos',hs_al:'{n} tienda(s) a avisar',hs_al0:'Nada que señalar',hs_pl:'Hoy: {n} tienda(s)',hs_pl0:'Nada previsto hoy',hs_cat:'{n} productos',hs_set:'Tiendas, copia, idioma',hm_store:'Tienda',hm_out:'Fuera de tienda',hm_loc:'Localizando…',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Iniciar sesión',l_err_empty:'Rellene todos los campos',l_err_wrong:'Usuario o contraseña incorrectos',ph_user:'nombre.apellido',ph_pass:'••••••••',rg_t:'🔒 Carta de uso y protección de datos',rg_p:'El detalle del tratamiento y los plazos de conservación figuran en el Aviso Legal accesible desde el menú.',rg_y:'✓ Aceptar',rg_n:'Rechazar',
+  es:{tag:'Gestión inteligente de caducidades',by:'Creado por',hm_hi:'Hola',hn_exp:'caducado',hn_today0:'hoy',hn_in:'D-{n}',hn_tracked:'{n} producto(s) seguido(s)',hn_next:'Próxima fecha: {p} el {d}',hn_order:'Último pedido: {d} ({n} ref.)',hn_stock:'Último recuento: {d}',hn_vrac:'Granel: {p} → {s} ({d})',hn_tday:'Hoy',hn_cr:'Último informe: {s} ({d})',hn_todo:'Pendiente',hn_prods:'{n} producto(s)',tl_g:'Gestión',gd_c:'Escanear los estantes|Ajustar las cajas|Enviar el pedido Excel',gd_stk:'Contar el stock|Importar un albarán|Verificar un producto',gd_v:'Llenado de silos|Fotos + higiene|Registro PDF',gd_mag:'Añadir, modificar|Localizar por GPS|Carpetas de tiendas',gd_cat:'Buscar un producto|Nombre, EAN o ref.',tl_mag:'Tiendas',hs_g:'Pedidos · Stock · Granel · Tiendas',hs_mag:'{n} tienda(s) registrada(s)',tl_cat:'Catálogo',tl_set:'Ajustes',tl_adm:'Administración',fresh_scan:'📷 Escanear una fecha',hs_fresh:'{e} caducado(s) · {o} en 2 d',hs_fresh0:'Sin fechas urgentes',hs_cmd:'{n} ref. · {c} cajas en curso',hs_cmd0:'Sin pedido en curso',hs_stk:'{n} producto(s) en curso',hs_stk0:'Sin recuento en curso',hs_vrac:'{n} reposición(es)',hs_vrac0:'Reposición de silos',hs_al:'{n} tienda(s) a avisar',hs_al0:'Nada que señalar',hs_pl:'Hoy: {n} tienda(s)',hs_pl0:'Nada previsto hoy',hs_cat:'{n} productos',hs_set:'Tiendas, copia, idioma',hm_store:'Tienda',hm_out:'Fuera de tienda',hm_loc:'Localizando…',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Iniciar sesión',l_err_empty:'Rellene todos los campos',l_err_wrong:'Usuario o contraseña incorrectos',ph_user:'nombre.apellido',ph_pass:'••••••••',rg_t:'🔒 Carta de uso y protección de datos',rg_p:'El detalle del tratamiento y los plazos de conservación figuran en el Aviso Legal accesible desde el menú.',rg_y:'✓ Aceptar',rg_n:'Rechazar',
   lexp:'Caducados',lcrit:'Crítico ≤2d',lwarn:'Atención ≤7d',lok:'OK',lprods:'Productos',all:'Todos',all_stores:'Todas las tiendas',all_status:'Todos los estados',
   sct:'Escanear producto',scsub:'Fotografíe el código EAN',scbtn:'Tomar foto',scanning:'🔍 Analizando…',scan_ok:'✅ Producto encontrado',scan_err:'❌ Error de conexión',
   ldlc:'Fecha caducidad',lqty:'Cantidad',rfsave:'💾 Guardar',rfcancel:'Cancelar',
   nft:'Producto no encontrado',nfsub:"Este código no está en el catálogo.",nfbtn:'Nuevo escaneo',
   gps_load:'Localizando…',gps_denied:'GPS denegado — selección manual',gps_err:'Error GPS',gps_retry:'Reintentar',gps_no_store:'Fuera de zona — selección manual',
-  tl_d:'Panel',tl_s:'Fresh',tl_c:'Pedido',tl_stk:'Existencias',tl_v:'Granel',tl_a:'Alertas',tl_p:'Planif.',
+  tl_d:'Panel',tl_s:'Fresh Control',tl_c:'Pedido',tl_stk:'Existencias',tl_v:'Granel',tl_a:'Alertas',tl_p:'Planif.',
   badge_e:'Caducado',badge_o:'D-{{d}}',badge_w:'D-{{d}}',badge_k:'D-{{d}}',
   send_all:'📧 Enviar resumen global',su_t:'⚠️ Alertas productos',su_p:'Productos caducados o críticos',
   em_t:'📧 Enviar recordatorio',em_sub:'Recordatorio de productos urgentes',em_to:'Destinatario',em_subj:'Asunto',em_body:'Mensaje',em_cancel:'Cancelar',su_mail:'📧 Enviar por correo',su_cl:'Cerrar',
@@ -2135,13 +2194,13 @@ const I18N={
   days:['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],
   saved:'✅ Guardado',deleted:'🗑 Eliminado',user_added:'👤 Usuario añadido',store_added:'🏪 Tienda añadida',prod_archived:'✅ Producto archivado',no_prods:'Sin productos',fill_all:'Rellene todos los campos',email_sent:'✅ Correo enviado',email_err:'❌ Error envío',csv_ok:'📥 CSV descargado',
   adm_stores:'🏪 Tiendas',adm_users:'👥 Usuarios',adm_lang:'🌍 Idioma',adm_conf:'⚙️ Config'},
-  zh:{tag:'智能保质期管理系统',by:'创建者',hm_hi:'您好',tl_g:'运营',gd_c:'扫描货架|调整箱数|发送 Excel 订单',gd_stk:'盘点库存|导入送货单|核查产品',gd_v:'散装补货|照片 + 卫生检查|PDF 跟踪记录',gd_mag:'添加、修改|GPS 定位|门店档案',gd_cat:'查找产品|名称、EAN 或编号',tl_mag:'门店',hs_g:'订单 · 库存 · 散装 · 门店',hs_mag:'已保存 {n} 家门店',tl_cat:'目录',tl_set:'设置',tl_adm:'管理',fresh_scan:'📷 扫描日期',hs_fresh:'{e} 已过期 · {o} 2天内',hs_fresh0:'无紧急日期',hs_cmd:'{n} 项 · {c} 箱进行中',hs_cmd0:'无进行中的订单',hs_stk:'{n} 个产品进行中',hs_stk0:'无进行中的盘点',hs_vrac:'{n} 次上架',hs_vrac0:'散装上架',hs_al:'{n} 家门店待通知',hs_al0:'无异常',hs_pl:'今天：{n} 家门店',hs_pl0:'今天无安排',hs_cat:'{n} 个产品',hs_set:'门店、备份、语言',hm_store:'门店',hm_out:'不在门店',hm_loc:'定位中…',l_user:'用户名',l_pass:'密码',l_btn:'登录',l_err_empty:'请填写所有字段',l_err_wrong:'用户名或密码错误',ph_user:'姓名.姓氏',ph_pass:'••••••••',rg_t:'🔒 使用规章与数据保护',rg_p:'数据处理详情与保留期限请查阅菜单中的法律声明。',rg_y:'✓ 接受',rg_n:'拒绝',
+  zh:{tag:'智能保质期管理系统',by:'创建者',hm_hi:'您好',hn_exp:'已过期',hn_today0:'今天',hn_in:'剩 {n} 天',hn_tracked:'跟踪 {n} 个产品',hn_next:'下一个日期：{p}（{d}）',hn_order:'最近订单：{d}（{n} 项）',hn_stock:'最近盘点：{d}',hn_vrac:'散装：{p} → {s}（{d}）',hn_tday:'今天',hn_cr:'最近拜访报告：{s}（{d}）',hn_todo:'待办',hn_prods:'{n} 个产品',tl_g:'运营',gd_c:'扫描货架|调整箱数|发送 Excel 订单',gd_stk:'盘点库存|导入送货单|核查产品',gd_v:'散装补货|照片 + 卫生检查|PDF 跟踪记录',gd_mag:'添加、修改|GPS 定位|门店档案',gd_cat:'查找产品|名称、EAN 或编号',tl_mag:'门店',hs_g:'订单 · 库存 · 散装 · 门店',hs_mag:'已保存 {n} 家门店',tl_cat:'目录',tl_set:'设置',tl_adm:'管理',fresh_scan:'📷 扫描日期',hs_fresh:'{e} 已过期 · {o} 2天内',hs_fresh0:'无紧急日期',hs_cmd:'{n} 项 · {c} 箱进行中',hs_cmd0:'无进行中的订单',hs_stk:'{n} 个产品进行中',hs_stk0:'无进行中的盘点',hs_vrac:'{n} 次上架',hs_vrac0:'散装上架',hs_al:'{n} 家门店待通知',hs_al0:'无异常',hs_pl:'今天：{n} 家门店',hs_pl0:'今天无安排',hs_cat:'{n} 个产品',hs_set:'门店、备份、语言',hm_store:'门店',hm_out:'不在门店',hm_loc:'定位中…',l_user:'用户名',l_pass:'密码',l_btn:'登录',l_err_empty:'请填写所有字段',l_err_wrong:'用户名或密码错误',ph_user:'姓名.姓氏',ph_pass:'••••••••',rg_t:'🔒 使用规章与数据保护',rg_p:'数据处理详情与保留期限请查阅菜单中的法律声明。',rg_y:'✓ 接受',rg_n:'拒绝',
   lexp:'已过期',lcrit:'紧急≤2天',lwarn:'注意≤7天',lok:'正常',lprods:'产品',all:'全部',all_stores:'全部门店',all_status:'全部状态',
   sct:'扫描产品',scsub:'拍摄EAN条形码',scbtn:'拍照',scanning:'🔍 分析中…',scan_ok:'✅ 产品已识别',scan_err:'❌ 连接错误',
   ldlc:'有效期',lqty:'数量',rfsave:'💾 保存',rfcancel:'取消',
   nft:'产品未找到',nfsub:"此条形码不在目录中。",nfbtn:'重新扫描',
   gps_load:'定位中…',gps_denied:'GPS被拒绝 — 手动选择',gps_err:'GPS错误',gps_retry:'重试',gps_no_store:'不在门店范围内 — 手动选择',
-  tl_d:'仪表盘',tl_s:'Fresh',tl_c:'订单',tl_stk:'库存',tl_v:'散装',tl_a:'警报',tl_p:'计划',
+  tl_d:'仪表盘',tl_s:'Fresh Control',tl_c:'订单',tl_stk:'库存',tl_v:'散装',tl_a:'警报',tl_p:'计划',
   badge_e:'已过期',badge_o:'还剩{{d}}天',badge_w:'还剩{{d}}天',badge_k:'还剩{{d}}天',
   send_all:'📧 发送全局摘要',su_t:'⚠️ 产品警报',su_p:'检测到过期或紧急产品',
   em_t:'📧 发送提醒',em_sub:'紧急产品邮件提醒',em_to:'收件人',em_subj:'主题',em_body:'邮件内容',em_cancel:'取消',su_mail:'📧 发送邮件',su_cl:'关闭',
@@ -2264,7 +2323,7 @@ function launchApp(){
   const si=document.getElementById('session-info');
   if(si) si.innerHTML=`<strong>${escapeHTML(session.name)}</strong> · ${ri.label}<br>🕐 ${new Date(session.loginTime).toLocaleString(lang)}`;
 
-  document.getElementById('hdr-sub').textContent = [storeEnseigne, storeName].filter(Boolean).join(' · ') || 'FreshControl';
+  updateHdrSub();
 
   // Tout le monde arrive sur l'accueil (grands boutons)
   showTab('home', true);
@@ -2279,7 +2338,7 @@ function launchApp(){
 
 function rgpdYes(){
   document.getElementById('rgpd').classList.add('off');
-  document.getElementById('hdr-sub').textContent = [storeEnseigne, storeName].filter(Boolean).join(' · ') || 'FreshControl';
+  updateHdrSub();
   // Consentement donné (geste utilisateur) → démarrer la détection GPS du magasin
   startGPS();
   renderStoreBars();
@@ -2492,6 +2551,38 @@ function homeStatus(){
     catalogue:{st:fillT(t.hs_cat,{n:catalogue.length})},
     reglages: {st:t.hs_set}};
 }
+/* Dernières actualités affichées dans les grandes cartes de l'accueil
+   (3 lignes maximum par carte) : [{t: texte, c: 'r' | 'o' | ''}] */
+function homeNews(){
+  const t=T(), short=d=>{ try{ return new Date(d).toLocaleDateString(lang==='zh'?'zh-CN':lang,{day:'2-digit',month:'2-digit'}); }catch(e){ return ''; } };
+  const out={dashboard:[],gestion:[],planning:[],alertes:[]};
+  // Fresh Control : les produits les plus urgents, sinon la prochaine date
+  const byDlc=products.slice().sort((a,b)=>new Date(a.dlc)-new Date(b.dlc));
+  byDlc.filter(p=>['e','o'].includes(statusOf(p.dlc))).slice(0,3).forEach(p=>{
+    const d=dDiff(p.dlc), e=statusOf(p.dlc)==='e';
+    out.dashboard.push({t:`${p.name||p.gencod} — ${e?(t.hn_exp||'périmé'):(d===0?(t.hn_today0||"aujourd'hui"):fillT(t.hn_in||'J-{n}',{n:d}))}`, c:e?'r':'o'});
+  });
+  if(!out.dashboard.length){
+    if(products.length) out.dashboard.push({t:fillT(t.hn_tracked||'{n} produit(s) suivi(s)',{n:products.length})});
+    if(byDlc[0]) out.dashboard.push({t:fillT(t.hn_next||'Prochaine date : {p} le {d}',{p:byDlc[0].name||byDlc[0].gencod,d:short(byDlc[0].dlc)})});
+  }
+  // Gestion : dernière commande, dernier relevé, dernière mise en rayon vrac
+  if(orders[0]) out.gestion.push({t:fillT(t.hn_order||'Dernière commande : {d} ({n} réf.)',{d:short(orders[0].date),n:(orders[0].lines||[]).length})});
+  if(stockRecords[0]) out.gestion.push({t:fillT(t.hn_stock||'Dernier relevé : {d}',{d:short(stockRecords[0].date)})});
+  if(vracEntries[0]) out.gestion.push({t:fillT(t.hn_vrac||'Vrac : {p} → {s} ({d})',{p:vracEntries[0].name||vracEntries[0].gencod,s:vracEntries[0].silo||'',d:short(vracEntries[0].dateRayon)})});
+  // Planning : magasins du jour, dernier compte-rendu et action à suivre
+  const dayIdx=(new Date().getDay()+6)%7;
+  const todayStores=Object.keys(planning||{}).filter(k=>Array.isArray(planning[k])&&planning[k].includes(dayIdx));
+  if(todayStores.length) out.planning.push({t:(t.hn_tday||"Aujourd'hui")+' : '+todayStores.slice(0,3).join(', ')});
+  if(visits[0]) out.planning.push({t:fillT(t.hn_cr||'Dernier compte-rendu : {s} ({d})',{s:visits[0].store,d:short(visits[0].date)})});
+  const todo=visits.find(v=>v.actions);
+  if(todo) out.planning.push({t:(t.hn_todo||'À faire')+' : '+todo.actions.split(/\n+/)[0].replace(/^[-•]\s*/,''),c:'o'});
+  // Alertes : magasins à prévenir avec leur nombre de produits
+  const per={};
+  products.filter(p=>['e','o'].includes(statusOf(p.dlc))).forEach(p=>{const k=p.magasin||'—';per[k]=(per[k]||0)+(p.qty||1);});
+  Object.entries(per).sort((a,b)=>b[1]-a[1]).slice(0,3).forEach(([k,n])=>out.alertes.push({t:`${k} : ${fillT(t.hn_prods||'{n} produit(s)',{n})}`,c:'r'}));
+  return out;
+}
 function renderHome(){
   const t=T(), hs=homeStatus();
   const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
@@ -2502,11 +2593,23 @@ function renderHome(){
   updateHomeStore();
   set('hm-e',hs.cnt.e); set('hm-o',hs.cnt.o); set('hm-w',hs.cnt.w);
   set('hm-l-e',t.lexp); set('hm-l-o',t.lcrit); set('hm-l-w',t.lwarn);
+  const nw=homeNews(); Object.keys(nw).forEach(k=>{ if(hs[k]) hs[k].news=nw[k]; });
   renderTiles('hm-grid', HOME_TILES, hs);
 }
 /* Pastille magasin de l'accueil : reflète le GPS, pas seulement le dernier
    magasin utilisé (celui-ci reste actif pour la saisie, mais on affiche
    clairement qu'on n'est dans aucun magasin connu). */
+/* Sous-titre du bandeau : magasin où l'on est (GPS), sinon « Hors magasin »,
+   sinon le magasin choisi à la main — jamais un ancien magasin trompeur. */
+function updateHdrSub(){
+  const h=document.getElementById('hdr-sub'); if(!h) return;
+  const t=T();
+  let txt;
+  if(gpsState==='nomatch')       txt=t.hm_out||'Hors magasin';
+  else if(gpsState==='locating') txt=t.hm_loc||'Localisation…';
+  else                           txt=[storeEnseigne, selStore?selStore.name:''].filter(Boolean).join(' · ');
+  h.textContent = txt || storeEnseigne || '';
+}
 function updateHomeStore(){
   const b=document.getElementById('hm-store'); if(!b) return;
   const t=T();
@@ -2527,6 +2630,7 @@ function renderTiles(gridId, tiles, hs){
       `<span class="hm-ico" style="background:${x.bg}">${x.ico}</span>`+
       `<div><div class="hm-n">${escapeHTML(t[x.k]||'')}</div>`+
         (x.d&&t[x.d]?`<ul class="hm-d">${t[x.d].split('|').map(l=>`<li>${escapeHTML(l)}</li>`).join('')}</ul>`:'')+   // à quoi sert la carte
+        ((s.news||[]).length?`<ul class="hm-news">${s.news.map(n=>`<li class="${n.c||''}">${escapeHTML(n.t)}</li>`).join('')}</ul>`:'')+   // dernières actualités
         `<div class="hm-st">${escapeHTML(s.st||'')}</div></div>`+                                                         // état du moment
       (s.badge?`<span class="hm-badge">${s.badge>99?'99+':s.badge}</span>`:'')+
     `</button>`;
@@ -2573,6 +2677,7 @@ function storeBarState(){
 }
 function renderStoreBars(){
   if(curTab==='home') updateHomeStore();
+  updateHdrSub();
   const st=storeBarState();
   document.querySelectorAll('[data-storebar]').forEach(bar=>{
     bar.className='sbar'+(st.cls?' '+st.cls:'');
@@ -4924,6 +5029,190 @@ function buildOrderXlsx(record){
   return { blob, filename };
 }
 
+/* ═══ CODES-BARRES EAN (dessin vectoriel, zéro dépendance) ══════════════════
+   Pour que le bon de commande PDF se scanne à la douchette dans le logiciel
+   de gestion : EAN-13 (et EAN-8 / UPC-A) aux dimensions standard (module
+   0,33 mm = 100 %, marges blanches 11 et 7 modules). Un code dont la clé de
+   contrôle est fausse n'est pas dessiné (il serait refusé à la lecture). */
+const Ean = (function(){
+  const L = ['0001101','0011001','0010011','0111101','0100011','0110001','0101111','0111011','0110111','0001011'];
+  const R = L.map(p => p.replace(/./g, b => b === '1' ? '0' : '1'));
+  const G = R.map(p => p.split('').reverse().join(''));
+  const PARITY = ['LLLLLL','LLGLGG','LLGGLG','LLGGGL','LGLLGG','LGGLLG','LGGGLL','LGLGLG','LGLGGL','LGGLGL'];
+  function checkOk(code){
+    const d = code.split('').map(Number), last = d.pop();
+    const sum = d.reverse().reduce((s, x, i) => s + x * (i % 2 ? 1 : 3), 0);
+    return (10 - sum % 10) % 10 === last;
+  }
+  /* Normalise : UPC-A (12) → EAN-13 ; renvoie null si non encodable */
+  function normalize(raw){
+    let c = String(raw || '').replace(/\D/g, '');
+    if(c.length === 12) c = '0' + c;
+    if((c.length === 13 || c.length === 8) && checkOk(c)) return c;
+    return null;
+  }
+  /* Suite de 0/1 (95 modules pour EAN-13, 67 pour EAN-8) */
+  function pattern(code){
+    if(code.length === 8){
+      return '101' + code.slice(0,4).split('').map(n => L[n]).join('') + '01010'
+           + code.slice(4).split('').map(n => R[n]).join('') + '101';
+    }
+    const par = PARITY[code[0]];
+    return '101' + code.slice(1,7).split('').map((n,i) => (par[i] === 'L' ? L : G)[n]).join('') + '01010'
+         + code.slice(7).split('').map(n => R[n]).join('') + '101';
+  }
+  /* Indices des modules de garde (barres plus longues) */
+  function isGuard(i, len){
+    const mid = (len - 5) / 2;
+    return i < 3 || i >= len - 3 || (i >= mid && i < mid + 5);
+  }
+  /* Dessin dans jsPDF : x,y = coin haut-gauche de la zone (marges comprises) */
+  function drawPdf(doc, raw, x, y, opts){
+    const o = Object.assign({ mw:0.33, h:18 }, opts || {});
+    const code = normalize(raw); if(!code) return false;
+    const pat = pattern(code), len = pat.length, qz = 11 * o.mw;
+    doc.setFillColor(0, 0, 0);
+    let i = 0;
+    while(i < len){
+      if(pat[i] === '1'){
+        let j = i; while(j < len && pat[j] === '1') j++;
+        const guard = isGuard(i, len);
+        doc.rect(x + qz + i * o.mw, y, (j - i) * o.mw, o.h + (guard ? 2.6 : 0), 'F');
+        i = j;
+      } else i++;
+    }
+    // Chiffres lisibles sous le code (comme sur l'emballage)
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(0);
+    const ty = y + o.h + 3.2, mod = n => x + qz + n * o.mw;
+    if(code.length === 13){
+      doc.text(code[0], x + qz - 1.2, ty, { align:'right' });
+      doc.text(code.slice(1,7).split('').join(' '), mod(3 + 21), ty, { align:'center' });
+      doc.text(code.slice(7).split('').join(' '), mod(50 + 21), ty, { align:'center' });
+    } else {
+      doc.text(code.slice(0,4).split('').join(' '), mod(3 + 14), ty, { align:'center' });
+      doc.text(code.slice(4).split('').join(' '), mod(36 + 14), ty, { align:'center' });
+    }
+    return true;
+  }
+  /* Dessin sur canvas (contrôle de lecture / aperçus) */
+  function drawCanvas(raw, scale){
+    const code = normalize(raw); if(!code) return null;
+    const pat = pattern(code), s = scale || 3, w = (pat.length + 18) * s, h = 70 * s / 3;
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, w, h); g.fillStyle = '#000';
+    for(let i = 0; i < pat.length; i++) if(pat[i] === '1') g.fillRect((11 + i) * s, 4 * s / 3, s, h - 8 * s / 3);
+    return cv;
+  }
+  return { normalize, pattern, drawPdf, drawCanvas };
+})();
+
+/* ═══ BON DE COMMANDE PDF (codes-barres à scanner) ══════════════════════════
+   Une ligne par produit : désignation, réf., PCB, colis (en grand), unités et
+   le code-barres EAN du produit. On scanne la ligne à la douchette puis on
+   saisit le nombre de colis dans le logiciel de gestion. */
+async function buildOrderPdf(record){
+  const JsPDF = await loadJsPDF();
+  const doc = new JsPDF({ unit:'mm', format:'a4' });
+  const rows = orderRows(record.lines), tot = orderTotals(rows);
+  const W = 210, H = 297, M = 12;
+  const GREEN = [11,110,77], GREY = [100,110,105], LINE = [215,225,220];
+  const d = new Date(record.date);
+  const by = displayBy(record.by);
+  const clean = x => String(x == null ? '' : x).replace(/[^\x20-\x7E -ÿŒœ–—’€]/g, '').trim();
+  const COL = { n:M, name:M+8, ref:M+84, pcb:M+104, colis:M+116, units:M+134, bc:M+146 };
+  const ROW_H = 29;
+  let y = 0;
+
+  function header(first){
+    doc.setFillColor(...GREEN); doc.rect(0, 0, W, 17, 'F');
+    doc.setTextColor(255); doc.setFont('helvetica','bold'); doc.setFontSize(14);
+    doc.text('Bon de commande', M, 11);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+    doc.text(clean(record.store || 'Magasin non précisé'), W - M, 7.5, { align:'right' });
+    doc.text(d.toLocaleDateString('fr-FR') + ' à ' + d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }), W - M, 12.5, { align:'right' });
+    doc.setTextColor(0);
+    y = 24;
+    if(first){
+      doc.setFontSize(9.5);
+      [['Magasin', record.store || '—'], ['Préparé par', by || '—'],
+       ['Total', `${tot.refs} référence(s) · ${tot.colis} colis${tot.units ? ' · ' + tot.units + ' unités' : ''}`]].forEach(([k, v]) => {
+        doc.setTextColor(...GREY); doc.text(k, M, y);
+        doc.setTextColor(0); doc.setFont('helvetica','bold'); doc.text(clean(v), M + 28, y);
+        doc.setFont('helvetica','normal'); y += 5.2;
+      });
+      doc.setFontSize(8.5); doc.setTextColor(...GREY);
+      doc.text('Scannez le code-barres de chaque ligne à la douchette, puis saisissez le nombre de colis.', M, y + 1);
+      doc.setTextColor(0); y += 6;
+    }
+    // En-tête du tableau
+    doc.setFillColor(235,245,240); doc.rect(M, y - 4, W - 2*M, 7, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+    doc.text('N°', COL.n + 1, y); doc.text('Désignation', COL.name, y); doc.text('Réf.', COL.ref, y);
+    doc.text('PCB', COL.pcb, y); doc.text('Colis', COL.colis, y); doc.text('Unités', COL.units, y);
+    doc.text('Code-barres EAN', COL.bc + 4, y);
+    doc.setFont('helvetica','normal');
+    y += 5;
+  }
+
+  header(true);
+  let gamme = null;
+  rows.forEach((r, i) => {
+    const needGamme = r.gamme !== gamme;
+    if(y + ROW_H + (needGamme ? 7 : 0) > H - 14){ doc.addPage(); header(false); gamme = null; }
+    if(r.gamme !== gamme){
+      gamme = r.gamme;
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...GREEN);
+      doc.text(clean((gamme || 'Autres').toUpperCase()), M, y + 3);
+      doc.setTextColor(0); doc.setFont('helvetica','normal');
+      y += 6;
+    }
+    const top = y, mid = top + 9;
+    doc.setFontSize(9); doc.setTextColor(...GREY); doc.text(String(i + 1), COL.n + 1, mid);
+    doc.setTextColor(0); doc.setFont('helvetica','bold'); doc.setFontSize(10);
+    const nameLines = doc.splitTextToSize(clean(r.name), COL.ref - COL.name - 3).slice(0, 2);
+    doc.text(nameLines, COL.name, mid);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...GREY);
+    doc.text(clean([r.volume, r.fam].filter(Boolean).join(' · ')), COL.name, mid + nameLines.length * 4.3);
+    doc.setTextColor(0); doc.setFontSize(10);
+    doc.text(clean(r.ref || '—'), COL.ref, mid);
+    doc.text(r.pcb ? String(r.pcb) : '—', COL.pcb, mid);
+    doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.text(String(r.qty), COL.colis + 2, mid + 1.5);
+    doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.text(r.units ? String(r.units) : '—', COL.units, mid);
+    if(!Ean.drawPdf(doc, r.gencod, COL.bc, top + 1, { mw:0.33, h:18 })){
+      doc.setFontSize(8.5); doc.setTextColor(...GREY);
+      doc.text(r.gencod ? ['EAN ' + clean(r.gencod), 'clé de contrôle fausse :', 'code non dessiné'] : 'Pas de code-barres', COL.bc + 4, mid - 3);
+      doc.setTextColor(0);
+    }
+    doc.setDrawColor(...LINE); doc.line(M, top + ROW_H - 2, W - M, top + ROW_H - 2);
+    y += ROW_H;
+  });
+
+  // Total
+  if(y + 12 > H - 14){ doc.addPage(); header(false); }
+  doc.setFont('helvetica','bold'); doc.setFontSize(11);
+  doc.text(`TOTAL : ${tot.refs} référence(s) · ${tot.colis} colis${tot.units ? ' · ' + tot.units + ' unités' : ''}`, M, y + 5);
+
+  const n = doc.getNumberOfPages();
+  for(let i = 1; i <= n; i++){
+    doc.setPage(i);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...GREY);
+    doc.text('FreshControl · S2D COMMERCIAL — imprimer à 100 % (sans « ajuster à la page ») pour la lecture des codes-barres', M, H - 7);
+    doc.text(`Page ${i} / ${n}`, W - M, H - 7, { align:'right' });
+  }
+  const store = (record.store || 'magasin').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w-]+/g,'_').replace(/^_|_$/g,'');
+  return { blob: doc.output('blob'), filename: `Bon_de_commande_${store}_${d.toISOString().slice(0,10)}.pdf` };
+}
+async function exportOrderPdf(id){
+  const o = findOrder(id); if(!o) return;
+  try{ const x = await buildOrderPdf(o); downloadBlob(x.blob, x.filename); toast('📄 Bon de commande PDF téléchargé'); }
+  catch(e){ toast('❌ ' + (e && e.message || 'PDF impossible')); }
+}
+async function downloadOrderPdfFromEmail(){
+  if(!emailAttachOrder) return;
+  try{ const x = await buildOrderPdf(emailAttachOrder); downloadBlob(x.blob, x.filename); toast('📄 Bon de commande PDF téléchargé'); }
+  catch(e){ toast('❌ ' + (e && e.message || 'PDF impossible')); }
+}
+
 function downloadBlob(blob, filename){
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -4953,14 +5242,16 @@ function openOrderEmail(subject, body, record){
    le fichier est téléchargé et le mail s'ouvre : il reste à le glisser. */
 let emailAttachOrder = null;
 function setEmailAttachUI(on){
-  const b = document.getElementById('em-share-btn'), d = document.getElementById('em-dl-btn');
+  const b = document.getElementById('em-share-btn'), d = document.getElementById('em-dl-btn'), pf = document.getElementById('em-pdf-btn');
   if(b) b.style.display = on ? 'block' : 'none';
   if(d) d.style.display = on ? 'block' : 'none';
+  if(pf) pf.style.display = on ? 'block' : 'none';
+  if(on) loadJsPDF().catch(() => {});   // préchargé : le PDF se crée sans délai au moment du partage
   // Titre / bouton texte : version « commande » le temps de la modale, puis
   // on restaure les libellés d'origine (traduits) pour les rappels DLC / stocks.
   const swaps = [
     ['em-t',        '🛒 Envoyer la commande'],
-    ['em-sub',      'Bon de commande : texte dans le mail + tableau Excel joint'],
+    ['em-sub',      'Texte dans le mail + bon PDF avec codes-barres (à scanner) + tableau Excel joints'],
     ['em-send-btn', '📧 Envoyer le texte seul (sans fichier)'],
   ];
   swaps.forEach(([id, txt]) => {
@@ -4974,13 +5265,21 @@ function setEmailAttachUI(on){
 async function shareOrderWithFile(){
   if(!emailAttachOrder) return;
   const { blob, filename } = buildOrderXlsx(emailAttachOrder);
+  let pdf = null;
+  try{ pdf = await buildOrderPdf(emailAttachOrder); }catch(e){ console.warn('PDF commande:', e); }
   const subj = document.getElementById('em-subj').value.trim();
-  const body = document.getElementById('em-body').value.trim();
-  let file = null;
-  try{ file = new File([blob], filename, { type: blob.type }); }catch(e){}
-  if(file && navigator.canShare && navigator.canShare({ files:[file] })){
+  const body = document.getElementById('em-body').value.trim()
+    + (pdf ? '\n\nPièces jointes : bon de commande PDF (codes-barres à scanner) et tableau Excel.' : '');
+  const files = [];
+  try{
+    if(pdf) files.push(new File([pdf.blob], pdf.filename, { type:'application/pdf' }));
+    files.push(new File([blob], filename, { type: blob.type }));
+  }catch(e){}
+  let file = files.length ? files : null;
+  if(file && navigator.canShare && !navigator.canShare({ files:file }) && pdf) file = [files[0]];   // repli : PDF seul
+  if(file && navigator.canShare && navigator.canShare({ files:file })){
     try{
-      await navigator.share({ files:[file], title: subj, text: body });
+      await navigator.share({ files:file, title: subj, text: body });
       closeModal('email-modal');
       return;
     }catch(e){
@@ -4988,8 +5287,9 @@ async function shareOrderWithFile(){
       console.warn('Partage fichier:', e);
     }
   }
+  if(pdf) downloadBlob(pdf.blob, pdf.filename);
   downloadBlob(blob, filename);
-  toast('📎 Excel téléchargé — joignez-le au mail qui s\'ouvre');
+  toast(pdf ? '📎 PDF + Excel téléchargés — joignez-les au mail qui s\'ouvre' : '📎 Excel téléchargé — joignez-le au mail qui s\'ouvre');
   sendMailto();
 }
 function downloadOrderFileFromEmail(){
@@ -5063,6 +5363,7 @@ function renderOrdersHistory(){
       <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
         <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="reorderFrom(this.dataset.oid)">↻ Recharger</button>
         <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="emailOrder(this.dataset.oid)">📧 Renvoyer</button>
+        <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="exportOrderPdf(this.dataset.oid)">📄 PDF</button>
         <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="exportOrderXlsx(this.dataset.oid)">📊 Excel</button>
         <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="exportOrderId(this.dataset.oid)">📥 CSV</button>
         <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="deleteOrder(this.dataset.oid)" style="color:var(--r)">🗑</button>
@@ -6147,7 +6448,7 @@ async function buildVracCahierPDF(list, meta){
   function header(){
     doc.setFillColor(...GREEN); doc.rect(0, 0, W, 18, 'F');
     doc.setTextColor(255); doc.setFont('helvetica','bold'); doc.setFontSize(13);
-    doc.text('Cahier de suivi vrac — traçabilité et hygiène', M, 11.5);
+    doc.text(meta.single ? 'Fiche de mise en rayon vrac — traçabilité et hygiène' : 'Cahier de suivi vrac — traçabilité et hygiène', M, 11.5);
     doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
     doc.text(clean(meta.storeLabel), W - M, 8, { align:'right' });
     doc.text(`Période du ${fmt(meta.from)} au ${fmt(meta.to)}`, W - M, 13, { align:'right' });
@@ -6157,8 +6458,9 @@ async function buildVracCahierPDF(list, meta){
   function newPage(){ doc.addPage(); header(); }
   function ensure(h){ if(y + h > H - 16) newPage(); }
 
-  // ── Page 1 : synthèse ──
+  // ── Page 1 : synthèse (absente pour une fiche seule) ──
   header();
+  if(!meta.single){
   const nNC = list.filter(v => hygSummary(v.hyg).n).length;
   const nOK = list.filter(v => { const h = hygSummary(v.hyg); return v.hyg && !h.n && !h.missing; }).length;
   const nPh = list.filter(v => v.photo || v.photoSilo).length;
@@ -6201,12 +6503,12 @@ async function buildVracCahierPDF(list, meta){
     doc.setDrawColor(...LINE); doc.line(M, y + 1.8, M + CW, y + 1.8);
     y += 5.6;
   });
-
   y += 8;
+  }
   // ── Une fiche par mise en rayon ──
   for(const v of list){
     const phs = [await vracPhotoData(v.photo), await vracPhotoData(v.photoSilo)];
-    ensure(104);                                   // une fiche ne se coupe jamais en deux
+    ensure(124);                                   // une fiche ne se coupe jamais en deux
     const top = y;
     // Titre
     doc.setFillColor(242,248,245); doc.roundedRect(M, top - 4.5, CW, 8.5, 1.5, 1.5, 'F');
@@ -6225,6 +6527,8 @@ async function buildVracCahierPDF(list, meta){
     ];
     if(v.updatedAt) info.push(['Modifié le', fmtDT(v.updatedAt)]);
     let yl = y;
+    // Code-barres du produit (scannable à la douchette, quelle que soit la marque)
+    if(Ean.normalize(v.gencod)){ Ean.drawPdf(doc, v.gencod, L - 1, yl - 3, { mw:0.33, h:14 }); yl += 23; }
     doc.setFontSize(8.5);
     info.forEach(([k, val]) => {
       doc.setTextColor(...GREY); doc.text(k, L, yl);
@@ -6300,6 +6604,127 @@ async function buildVracCahierPDF(list, meta){
   return doc.output('blob');
 }
 
+/* ── Cahier « virtuel » : consultation produit par produit ────────────────
+   Le même contenu que le PDF, à l'écran : une page par produit (code-barres,
+   chaque mise en rayon, contrôle hygiène, photos, remarques), à présenter
+   directement le jour d'un contrôle ou à envoyer en PDF pour ce seul produit. */
+let vbKey = null;
+const vracKey = v => v.gencod || ('nom:' + _noAcc(v.name || ''));
+function vracGroups(list){
+  const g = new Map();
+  list.forEach(v => { const k = vracKey(v); if(!g.has(k)) g.set(k, []); g.get(k).push(v); });
+  return [...g.entries()].map(([k, arr]) => {
+    arr.sort((a,b) => String(b.dateRayon||'').localeCompare(String(a.dateRayon||'')) || String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
+    return { k, arr, name: arr[0].name || arr[0].gencod || 'Produit', gencod: arr[0].gencod || '',
+             nc: arr.filter(v => hygSummary(v.hyg).n).length, last: arr[0].dateRayon };
+  }).sort((a,b) => a.name.localeCompare(b.name, 'fr'));
+}
+function eanSvg(raw){
+  const code = Ean.normalize(raw); if(!code) return '';
+  const pat = Ean.pattern(code), n = pat.length, W = n + 18;
+  let bars = '';
+  for(let i = 0; i < n; i++) if(pat[i] === '1') bars += `<rect x="${11 + i}" y="0" width="1" height="50"/>`;
+  return `<svg class="vb-ean" viewBox="0 0 ${W} 62" role="img" aria-label="Code-barres ${code}"><rect width="${W}" height="62" fill="#fff"/><g fill="#000">${bars}</g>`
+       + `<text x="${W/2}" y="60" text-anchor="middle" font-size="9" font-family="Helvetica,Arial,sans-serif" letter-spacing="1.6">${code}</text></svg>`;
+}
+function openVracBook(){
+  closeModal('vrac-cahier-modal');
+  vbKey = null;
+  openModal('vrac-book-modal');
+  renderVracBook();
+}
+function renderVracBook(){
+  const body = document.getElementById('vb-body'), title = document.getElementById('vb-title');
+  const back = document.getElementById('vb-back'), send = document.getElementById('vb-send');
+  if(!body) return;
+  const groups = vracGroups(vracEntries);
+  const g = vbKey ? groups.find(x => x.k === vbKey) : null;
+  if(!g){
+    vbKey = null;
+    if(title) title.textContent = '📖 Cahier de suivi vrac';
+    if(back) back.style.display = 'none';
+    if(send) send.style.display = vracEntries.length ? 'block' : 'none';
+    const q = _noAcc(document.getElementById('vb-search')?.value || '');
+    const list = groups.filter(x => !q || _noAcc(x.name + ' ' + x.gencod).includes(q));
+    const sb = document.getElementById('vb-search'); if(sb) sb.style.display = '';
+    body.innerHTML = (list.length ? list.map(x => `<button class="vb-prod" data-k="${escapeHTMLAttr(x.k)}" onclick="vbKey=this.dataset.k;renderVracBook()">
+          <div><b>${escapeHTML(x.name)}</b><small>${escapeHTML(x.gencod || 'sans code-barres')} · ${plural(x.arr.length,'mise en rayon','mises en rayon')} · dernière le ${fmtDate(x.last)}</small></div>
+          <span class="vb-chip ${x.nc ? 'nc' : 'ok'}">${x.nc ? plural(x.nc,'non-conformité','non-conformités') : 'Conforme'}</span></button>`).join('')
+        : `<div class="empty" style="color:var(--muted)">${vracEntries.length ? 'Aucun produit ne correspond' : 'Aucune mise en rayon enregistrée'}</div>`);
+    return;
+  }
+  const sb = document.getElementById('vb-search'); if(sb) sb.style.display = 'none';
+  if(title) title.textContent = '📖 ' + g.name;
+  if(back) back.style.display = 'inline-flex';
+  if(send) send.style.display = 'block';
+  body.innerHTML = `<div class="vb-head">
+      ${eanSvg(g.gencod) || `<div class="vb-noean">${escapeHTML(g.gencod || 'Pas de code-barres')}</div>`}
+      <div class="vb-stats"><b>${plural(g.arr.length,'mise en rayon','mises en rayon')}</b><span>du ${fmtDate(g.arr[g.arr.length-1].dateRayon)} au ${fmtDate(g.arr[0].dateRayon)}</span>
+      <span class="vb-chip ${g.nc ? 'nc' : 'ok'}">${g.nc ? plural(g.nc,'non-conformité','non-conformités') : 'Hygiène conforme'}</span></div>
+    </div>`
+    + g.arr.map(v => {
+      const h = v.hyg || {};
+      return `<div class="vb-page">
+        <div class="vb-date" style="display:flex;justify-content:space-between;align-items:center;gap:8px">Mise en rayon du ${fmtDate(v.dateRayon)}
+          <button class="scan-link-btn" data-vid="${escapeHTMLAttr(String(v.id))}" onclick="sendVracFichePdf(this.dataset.vid,this)" style="flex-shrink:0;padding:6px 11px">📤 Envoyer cette fiche</button></div>
+        <div class="vb-kv">
+          <span>Silo</span><b>${escapeHTML(v.silo || '—')}</b><span>N° de lot</span><b>${escapeHTML(v.lot || '—')}</b>
+          <span>DDM / DLC</span><b>${escapeHTML(ddmLabel(v.ddm) || '—')}</b><span>Origine</span><b>${escapeHTML(v.provenance || '—')}</b>
+          <span>Sacs</span><b>${v.qty || 1}</b><span>Magasin</span><b>${escapeHTML(v.store || '—')}</b>
+          <span>Opérateur</span><b>${escapeHTML(v.byName || displayBy(v.by) || '—')}</b><span>Saisi le</span><b>${v.createdAt ? new Date(v.createdAt).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—'}</b>
+        </div>
+        <div class="vb-sec">Contrôle hygiène du silo</div>
+        <div class="vb-hyg">${VRAC_HYG.map(x => `<div class="${h[x.k]==='N'?'n':''}"><span>${escapeHTML(x.l)}</span><b class="${h[x.k]==='O'?'o':h[x.k]==='N'?'n':''}">${h[x.k]==='O'?'OUI':h[x.k]==='N'?'NON':'—'}</b></div>`).join('')}</div>
+        ${v.remarque ? `<div class="vb-rem"><b>Action corrective :</b> ${escapeHTML(v.remarque)}</div>` : ''}
+        <div class="vb-photos">
+          ${['photo','photoSilo'].map((f, i) => `<figure>${v[f] ? `<img data-ref="${escapeHTMLAttr(v[f])}" alt="${i ? 'Étiquette du silo' : 'Étiquette du sac'}" onclick="openVracPhoto('${escapeHTMLAttr(String(v.id))}','${i ? 'silo' : 'sac'}')">` : '<div class="vb-nophoto">pas de photo</div>'}
+            <figcaption>${i ? 'Étiquette du silo' : 'Étiquette du sac'}${v[f + 'At'] ? ' · ' + new Date(v[f + 'At']).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : ''}</figcaption></figure>`).join('')}
+        </div>
+      </div>`;
+    }).join('');
+  // Photos (IndexedDB) chargées après l'affichage
+  body.querySelectorAll('img[data-ref]').forEach(async img => { const d = await vracPhotoData(img.dataset.ref); if(d) img.src = d; });
+  body.scrollTop = 0;
+}
+function vbBack(){ vbKey = null; renderVracBook(); }
+/* « Envoyer tout le cahier » : toutes les mises en rayon de tous les produits */
+async function sendVracBookPdf(){
+  if(!vracEntries.length) return;
+  const btn = document.getElementById('vb-send'), lbl = btn ? btn.innerHTML : '';
+  if(btn){ btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Création du PDF…'; }
+  try{
+    const list = vracEntries.slice().sort((a,b) => String(a.dateRayon||'').localeCompare(String(b.dateRayon||'')));
+    const stores = [...new Set(list.map(v => v.store).filter(Boolean))];
+    const meta = { from: list[0].dateRayon || '', to: list[list.length-1].dateRayon || '',
+      storeLabel: stores.join(', ') || 'Magasin', by: session?.name || '' };
+    const blob = await buildVracCahierPDF(list, meta);
+    await shareVracPdf(blob, `Cahier_vrac_complet_${isoDay(new Date())}.pdf`, `Cahier de suivi vrac complet — ${meta.storeLabel}`);
+  }catch(err){ toast('❌ ' + (err && err.message || 'PDF impossible')); }
+  finally{ if(btn){ btn.disabled = false; btn.innerHTML = lbl; } }
+}
+/* « Envoyer cette fiche » : une seule mise en rayon, sans page de synthèse */
+async function sendVracFichePdf(id, btn){
+  const v = findVrac(id); if(!v) return;
+  const lbl = btn ? btn.innerHTML : '';
+  if(btn){ btn.disabled = true; btn.innerHTML = '<span class="spin"></span>'; }
+  try{
+    const blob = await buildVracCahierPDF([v], { from: v.dateRayon, to: v.dateRayon, storeLabel: v.store || 'Magasin', by: session?.name || '', single: true });
+    const slug = (v.name || v.gencod || 'produit').normalize('NFD').replace(/[^\w]+/g, '_').replace(/^_|_$/g, '').slice(0, 40);
+    await shareVracPdf(blob, `Fiche_vrac_${slug}_${v.dateRayon || ''}.pdf`, `Fiche de mise en rayon vrac — ${v.name || v.gencod} — ${fmtDate(v.dateRayon)}`);
+  }catch(err){ toast('❌ ' + (err && err.message || 'PDF impossible')); }
+  finally{ if(btn){ btn.disabled = false; btn.innerHTML = lbl; } }
+}
+async function shareVracPdf(blob, filename, text){
+  let file = null;
+  try{ file = new File([blob], filename, { type:'application/pdf' }); }catch(e){}
+  if(file && navigator.canShare && navigator.canShare({ files:[file] })){
+    try{ await navigator.share({ files:[file], title:'Cahier de suivi vrac', text }); toast('📘 Cahier envoyé'); return; }
+    catch(e){ if(e && e.name === 'AbortError') return; }
+  }
+  downloadBlob(blob, filename);
+  toast('📘 Cahier PDF téléchargé');
+}
+
 async function generateVracCahier(){
   const list = vracCahierList();
   if(!list.length){ toast('Aucune mise en rayon sur cette période'); return; }
@@ -6317,17 +6742,7 @@ async function generateVracCahier(){
     const blob = await buildVracCahierPDF(list, meta);
     const slug = (st || 'magasins').normalize('NFD').replace(/[^\w]+/g, '_').replace(/^_|_$/g, '');
     const filename = `Cahier_vrac_${slug}_${meta.from}_${meta.to}.pdf`;
-    let file = null;
-    try{ file = new File([blob], filename, { type:'application/pdf' }); }catch(e){}
-    if(file && navigator.canShare && navigator.canShare({ files:[file] })){
-      try{
-        await navigator.share({ files:[file], title:'Cahier de suivi vrac', text:`Cahier de suivi vrac — ${meta.storeLabel} — du ${meta.from} au ${meta.to}` });
-        toast('📘 Cahier envoyé');
-        return;
-      }catch(e){ if(e && e.name === 'AbortError') return; }
-    }
-    downloadBlob(blob, filename);
-    toast('📘 Cahier PDF téléchargé');
+    await shareVracPdf(blob, filename, `Cahier de suivi vrac — ${meta.storeLabel} — du ${meta.from} au ${meta.to}`);
   }catch(err){
     console.warn('[Cahier vrac]', err);
     toast('❌ ' + (err && err.message || 'PDF impossible'));
@@ -7348,7 +7763,7 @@ function saveConfig(){
   localStorage.setItem('fc_gas_url',        gasUrl);
   localStorage.setItem('fc_popup', document.getElementById('adm-popup')?.checked ? '1':'0');
   // Mettre à jour le branding header + splash
-  document.getElementById('hdr-sub').textContent = [storeEnseigne, storeName].filter(Boolean).join(' · ') || 'FreshControl';
+  updateHdrSub();
   updateSplashBranding();
   renderStoreBars();
   toast(T().saved);
@@ -7687,12 +8102,13 @@ function onAppUpdate(){
   document.body.appendChild(bar);
 }
 /* Demande au SW de comparer la page en cache avec celle du serveur.
-   Au chargement, puis à chaque retour au premier plan (une PWA peut rester
-   ouverte des jours en arrière-plan), au plus une fois toutes les 10 min. */
+   Au chargement, à chaque retour au premier plan (une PWA peut rester
+   ouverte des jours en arrière-plan) et toutes les 5 min tant que l'appli est
+   affichée ; au plus une fois par minute (la vérification est légère). */
 let _lastUpdCheck = 0;
 function checkAppUpdate(){
   const ctrl = navigator.serviceWorker && navigator.serviceWorker.controller;
-  if(!ctrl || Date.now() - _lastUpdCheck < 10*60*1000) return;
+  if(!ctrl || Date.now() - _lastUpdCheck < 60*1000) return;
   _lastUpdCheck = Date.now();
   ctrl.postMessage({ type: 'fc-check' });
 }
@@ -7708,6 +8124,9 @@ if('serviceWorker' in navigator){
   document.addEventListener('visibilitychange', () => {
     if(document.visibilityState === 'visible') checkAppUpdate();
   });
+  window.addEventListener('pageshow', checkAppUpdate);   // retour sur l'appli (iOS : pas toujours de visibilitychange)
+  window.addEventListener('focus', checkAppUpdate);
+  setInterval(() => { if(document.visibilityState === 'visible') checkAppUpdate(); }, 5*60*1000);
 }
 </script>
 </body>
