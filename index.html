@@ -175,6 +175,14 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 }
 #tab-gestion.on{display:flex;flex-direction:column;height:100%;min-height:420px}
 #gs-grid{grid-template-rows:repeat(3,minmax(0,1fr))}
+.gs-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:9px;padding:8px 6px;border-radius:var(--rl2);border:1px solid rgba(255,255,255,.34);background:linear-gradient(160deg,rgba(255,255,255,.24),rgba(255,255,255,.08));color:#fff;text-align:center}
+.gs-sum:empty{display:none}
+.gs-sum b{display:block;font-size:17px;font-weight:900;font-variant-numeric:tabular-nums}.gs-sum span{font-size:10px;font-weight:800;opacity:.88}
+.gs-sum .bad b{color:#FFB4B4}
+.mq-bar{height:6px;border-radius:3px;background:rgba(0,0,0,.06);margin:0 0 8px;overflow:hidden}.mq-bar i{display:block;height:100%;background:#1E88E5;border-radius:3px}
+.mq-kpi em{font-style:normal;font-weight:900;font-size:10px}.mq-kpi em.up{color:#0B6E4D}.mq-kpi em.down{color:var(--r)}.mq-kpi em.eq{color:var(--muted)}
+.mq-det{border-top:1px solid rgba(0,0,0,.06);margin-top:8px}
+.mq-kpi div{min-width:0}.mq-kpi b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hm-d{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
 .hm-d li{font-size:11.5px;font-weight:700;color:rgba(255,255,255,.93);line-height:1.25;padding-left:11px;position:relative}
 .hm-d li::before{content:'';position:absolute;left:0;top:.45em;width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.75)}
@@ -322,6 +330,38 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .sf-sec{font-size:11px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin:12px 2px 6px}
 .vs-thumbs{display:flex;gap:6px;margin-top:6px}
 .vs-thumbs img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--bdr)}
+/* ── Statistiques ──────────────────────────────────────────────────── */
+.st-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.stk{background:rgba(255,255,255,.82);border:1px solid var(--bdr);border-radius:14px;padding:10px 8px;text-align:center}
+.stk em{display:block;font-style:normal;font-size:10.5px;font-weight:900;margin-top:2px}
+.stk em.up{color:#0B6E4D}.stk em.down{color:var(--r)}.stk em.eq{color:var(--muted)}
+.stk b{display:block;font-size:20px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--txt)}
+.stk span{font-size:10.5px;font-weight:800;color:var(--muted);line-height:1.2;display:block}
+.stk.bad b,.st-line b.bad,.st-sm .bad{color:var(--r)}
+.st-sm{border-bottom:1px solid rgba(0,0,0,.06);padding:8px 0}.st-sm:last-child{border-bottom:none}
+.st-sm>b{display:block;font-size:13.5px;font-weight:900}.st-sm>small{font-size:10.5px;font-weight:700;color:var(--muted)}
+.st-sm .row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin-top:5px}
+.st-sm .row div{background:rgba(0,0,0,.035);border-radius:8px;padding:5px 6px}
+.st-sm .row b{display:block;font-size:13px;font-weight:900;font-variant-numeric:tabular-nums}.st-sm .row span{font-size:9.5px;font-weight:800;color:var(--muted)}
+.st-pc{color:var(--muted);font-weight:800;font-size:11px;margin-left:4px}
+.st-sec{font-size:11px;font-weight:900;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);margin:16px 2px 7px}
+.st-card{background:rgba(255,255,255,.75);border:1px solid var(--bdr);border-radius:14px;padding:11px 12px}
+.st-stack{display:flex;height:14px;border-radius:7px;overflow:hidden;background:rgba(0,0,0,.06)}
+.st-stack i{display:block;height:100%}
+.st-leg{display:flex;flex-wrap:wrap;gap:4px 12px;margin:7px 0 4px;font-size:11.5px;font-weight:800;color:var(--txt)}
+.st-leg i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px}
+.st-line{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12.5px;font-weight:700}
+.st-line:last-child{border-bottom:none}.st-line b{font-weight:900;font-variant-numeric:tabular-nums;white-space:nowrap}
+.st-chart{width:100%;height:auto;display:block}
+.st-chart text{font-size:8px;font-weight:700;fill:#5d6b64}
+.st-empty{font-size:12px;font-weight:700;color:var(--muted);text-align:center;padding:8px}
+.st-tab{padding:4px 10px;overflow-x:auto}
+.st-th,.st-tr{display:grid;grid-template-columns:minmax(90px,1.8fr) repeat(5,minmax(44px,1fr));gap:4px;align-items:center;font-size:11.5px;font-weight:800;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+.st-th{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.4px}
+.st-tr:last-child{border-bottom:none}.st-tr>span:not(:first-child),.st-th>span:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
+.st-tr small{display:block;font-size:10px;color:var(--muted);font-weight:700}
+.st-hb{display:grid;grid-template-columns:minmax(80px,1.2fr) 2fr auto;gap:8px;align-items:center;font-size:12px;font-weight:800;padding:4px 0}
+.st-hb i{display:block;height:10px;border-radius:5px;background:#1E88E5;min-width:2px}
 /* ── RÉGLAGES (liste groupée façon iPhone) ─────────────────────────── */
 .rg-sec{font-size:11px;font-weight:900;color:rgba(255,255,255,.85);letter-spacing:1.2px;text-transform:uppercase;padding:14px 6px 6px}
 .rg-grp{border-radius:var(--rm);overflow:hidden}
@@ -1070,7 +1110,7 @@ html.rot-lock-on #rot-lock{display:flex}
 </div>
 
 <!-- ═══ STATS MODAL ═══════════════════════════════════════════════════ -->
-<div id="stats-modal" class="modal-bg">
+<div id="stats-modal" class="modal-bg full">
   <div class="modal-sh">
     <div class="mhd-row" style="margin-bottom:14px"><div class="mhd-t">📈 Statistiques</div><button class="mcl" onclick="closeModal('stats-modal')" aria-label="Fermer">✕</button></div>
     <div id="stats-body"></div>
@@ -1502,6 +1542,7 @@ html.rot-lock-on #rot-lock{display:flex}
 
     <!-- GESTION : Commande, Stocks, Vrac, Magasins, Catalogue -->
     <div id="tab-gestion" class="tab">
+      <div class="gs-sum" id="gs-sum"></div>
       <div class="hm-grid" id="gs-grid"></div>
     </div>
 
@@ -2774,7 +2815,24 @@ function updateHomeStore(){
   else                                 txt='🏪 '+(t.hm_store||'Magasin');
   b.textContent=txt;
 }
-function renderGestion(){ renderTiles('gs-grid', GESTION_TILES, homeStatus()); }
+function renderGestion(){
+  const hs = homeStatus();
+  // Bandeau des 30 derniers jours + actualité chiffrée dans les cartes
+  try{
+    const c = brandFigures(30), p = brandFigures(30, Date.now() - 30 * 864e5), t = c.tot;
+    const dl = (a, b) => b ? `${a >= b ? '+' : ''}${((a - b) / b * 100).toFixed(0)} %` : '';
+    const sum = document.getElementById('gs-sum');
+    if(sum) sum.innerHTML = `<div><b>${t.colis}</b><span>colis · 30 j${p.tot.colis ? ' · ' + dl(t.colis, p.tot.colis) : ''}</span></div>`
+      + `<div class="${t.dm ? 'bad' : ''}"><b>${t.dm ? euro(t.dm) : (t.dmQ || 0)}</b><span>démarque${t.val ? ' · ' + (t.dm / t.val * 100).toFixed(1).replace('.', ',') + ' %' : ''}</span></div>`
+      + `<div class="${t.rupt ? 'bad' : ''}"><b>${t.rupt}</b><span>ruptures${p.tot.rupt ? ' · ' + dl(t.rupt, p.tot.rupt) : ''}</span></div>`;
+    if(t.colis) hs.commande = { st: `${t.colis} colis / 30 j${p.tot.colis ? ' (' + dl(t.colis, p.tot.colis) + ')' : ''}` + (currentOrder.length ? ` · ${currentOrder.length} réf. en cours` : '') };
+    const best = Object.entries(c.K).sort((a, b) => b[1].colis - a[1].colis)[0];
+    if(best && best[1].colis) hs.marques = { st: `${best[0]} : ${Math.round(best[1].colis / t.colis * 100)} % des colis` };
+    const vr = vracEntries.filter(v => Date.now() - new Date(v.dateRayon || v.createdAt).getTime() < 30 * 864e5), vd = vr.filter(v => v.hyg && !hygSummary(v.hyg).missing);
+    if(vd.length) hs.vrac = { st: `${vr.length} mises en rayon · ${Math.round(vd.filter(v => !hygSummary(v.hyg).n).length / vd.length * 100)} % hygiène OK` };
+  }catch(e){}
+  renderTiles('gs-grid', GESTION_TILES, hs);
+}
 function renderTiles(gridId, tiles, hs){
   const t=T(), g=document.getElementById(gridId); if(!g) return;
   g.innerHTML=tiles.map(x=>{
@@ -7288,7 +7346,7 @@ const docClient = () => (localStorage.getItem('fc_doc_client') || 'Léa Nature')
 const BRAND_LOGO_FILES = {
   '__client':'lea-nature', 'Jardin BiO':'jardin-bio', 'Joyce':'joyce', 'Karéléa':'karelea', 'Good Moov':'good-moov',
   'Naturasens':'naturasens', 'Biosens':'biosens', 'Kiva':'kiva', "So'Bio étic":'sobio-etic', 'Biovie':'biovie',
-  'Dentavie':'dentavie', 'Floressance':'floressance'
+  'Dentavie':'dentavie', 'Floressance':'floressance', 'Jom Bao':'jom-bao', 'Gusti Amo Bio':'gusti-amo-bio'
 };
 const _userLogos = new Set();
 async function loadDefaultLogo(k){
@@ -7410,41 +7468,80 @@ function bdAdd(gencod){
 }
 
 /* ── Chiffres par marque (Gestion › Par marque) ────────────────────────── */
-let mqDays = 30, mqUniv = 'Tous';
+let mqDays = 30, mqUniv = 'Tous', mqOpen = null;
+/* Chiffres d'une période pour chaque marque (et total) — partagé par
+   « Par marque » et le bandeau de Gestion. */
+function brandFigures(days, from){
+  const end = from == null ? Date.now() + 864e5 : from, start = end - 864e5 - days * 864e5;
+  const inP = d => { const t = new Date(d).getTime(); return t >= start && t < end; };
+  const K = {}, tot = { colis:0, val:0, dm:0, dmQ:0, rupt:0, refs:new Set(), cmd:new Set() };
+  const row = m => (K[m] = K[m] || { colis:0, val:0, refs:new Set(), cmd:new Set(), dm:0, dmQ:0, rupt:0, suivis:0, urg:0, vrac:0, gaps:0, checks:0, top:{}, ruptL:[], dmL:[] });
+  orders.filter(o => inP(o.date)).forEach(o => (o.lines || []).forEach(l => {
+    const m = brandOfGencod(l.gencod) || l.marque || 'Hors catalogue', r = row(m), q = Number(l.qty) || 0;
+    const i = orderLineInfo(l), pr = priceOf(l.gencod), v = pr && pr.tarif != null && i.units ? i.units * pr.tarif : 0;
+    r.colis += q; r.val += v; r.refs.add(l.gencod || l.name); r.cmd.add(o.id);
+    tot.colis += q; tot.val += v; tot.refs.add(l.gencod || l.name); tot.cmd.add(o.id);
+    const k = l.gencod || l.name; r.top[k] = r.top[k] || { n: i.name, q:0 }; r.top[k].q += q;
+  }));
+  ruptures.filter(x => inP(x.at)).forEach(x => { const r = row(x.marque || brandOfGencod(x.gencod) || 'Hors catalogue'); r.rupt++; tot.rupt++; r.ruptL.push(x); });
+  archive.filter(a => a.note === 'Démarque' && inP(a.archivedAt)).forEach(a => {
+    const m = brandOfGencod(a.gencod); if(!m) return; const pr = priceOf(a.gencod), t = a.tarif != null ? a.tarif : (pr ? pr.tarif : null), q = a.qty || 1;
+    const r = row(m); r.dmQ += q; tot.dmQ += q; if(t != null){ r.dm += q * t; tot.dm += q * t; } r.dmL.push({ ...a, v: t != null ? q * t : null });
+  });
+  priceChecks.filter(c => inP(c.day)).forEach(c => { const m = c.marque || brandOfGencod(c.gencod); if(!m) return; const r = row(m); r.checks++; if(Math.abs(c.shelf - c.pmc) >= .005) r.gaps++; });
+  vracEntries.filter(v => inP(v.dateRayon || v.createdAt)).forEach(v => { const m = brandOfGencod(v.gencod); if(m) row(m).vrac++; });
+  if(from == null) products.forEach(p => { const m = brandOfGencod(p.gencod); if(!m) return; const r = row(m); r.suivis += (p.qty || 1); if(['e','o'].includes(statusOf(p.dlc))) r.urg += (p.qty || 1); });
+  return { K, tot };
+}
+const mqPct = (a, b) => b ? Math.round(a / b * 100) + ' %' : '—';
+function mqDelta(cur, prev, goodUp){
+  if(!prev && !cur) return '';
+  if(!prev) return `<em class="${goodUp ? 'up' : 'down'}">nouveau</em>`;
+  const d = (cur - prev) / prev * 100, good = goodUp ? d >= 0 : d <= 0;
+  return `<em class="${Math.abs(d) < .5 ? 'eq' : good ? 'up' : 'down'}">${d > 0 ? '+' : ''}${d.toFixed(0)} %</em>`;
+}
 function renderMarques(){
   const el = document.getElementById('mq-body'); if(!el) return;
-  const since = Date.now() - mqDays * 864e5;
-  const K = {};
-  const row = m => (K[m] = K[m] || { cmd:new Set(), colis:0, refs:new Set(), suivis:0, urg:0, vrac:0, rupt:0, univ:'' });
-  ruptures.filter(r => new Date(r.at).getTime() >= since).forEach(r => { row(r.marque || brandOfGencod(r.gencod) || 'Hors catalogue').rupt++; });
-  orders.filter(o => new Date(o.date).getTime() >= since).forEach(o => (o.lines || []).forEach(l => {
-    const m = brandOfGencod(l.gencod) || l.marque || 'Hors catalogue'; const r = row(m);
-    r.cmd.add(o.id); r.colis += Number(l.qty) || 0; r.refs.add(l.gencod || l.name);
-  }));
-  products.forEach(p => { const m = brandOfGencod(p.gencod); if(!m) return; const r = row(m); r.suivis += (p.qty || 1); if(['e','o'].includes(statusOf(p.dlc))) r.urg += (p.qty || 1); });
-  vracEntries.filter(v => new Date(v.dateRayon || v.createdAt).getTime() >= since).forEach(v => { const m = brandOfGencod(v.gencod); if(m) row(m).vrac++; });
-  archive.filter(x => x.note === 'Démarque' && new Date(x.archivedAt).getTime() >= since).forEach(x => {
-    const m = brandOfGencod(x.gencod); if(!m) return; const pr = priceOf(x.gencod), t = x.tarif != null ? x.tarif : (pr ? pr.tarif : null);
-    const r = row(m); r.dmQ = (r.dmQ || 0) + (x.qty || 1); if(t != null) r.dmV = (r.dmV || 0) + (x.qty || 1) * t;
-  });
+  const cur = brandFigures(mqDays), prev = brandFigures(mqDays, Date.now() - mqDays * 864e5);
   const univOf = m => { const p = catalogue.find(x => x.marque === m); return p ? (p.univers || '') : ''; };
-  let list = Object.entries(K).map(([m, r]) => ({ m, ...r, univ: univOf(m) }));
+  let list = Object.entries(cur.K).map(([m, r]) => ({ m, ...r, univ: univOf(m), p: prev.K[m] || {} }));
   if(mqUniv !== 'Tous') list = list.filter(x => x.univ === mqUniv);
-  list.sort((a,b) => b.colis - a.colis || b.urg - a.urg || a.m.localeCompare(b.m));
-  const tot = list.reduce((t, x) => ({ colis: t.colis + x.colis, urg: t.urg + x.urg, vrac: t.vrac + x.vrac }), { colis:0, urg:0, vrac:0 });
+  const T0 = list.reduce((t, x) => ({ colis: t.colis + x.colis, val: t.val + x.val, dm: t.dm + x.dm, rupt: t.rupt + x.rupt }), { colis:0, val:0, dm:0, rupt:0 });
+  const P0 = list.reduce((t, x) => ({ colis: t.colis + (x.p.colis || 0), dm: t.dm + (x.p.dm || 0), rupt: t.rupt + (x.p.rupt || 0) }), { colis:0, dm:0, rupt:0 });
+  list.sort((a, b) => b.colis - a.colis || b.dm - a.dm || b.rupt - a.rupt || a.m.localeCompare(b.m));
+  const mx = Math.max(1, ...list.map(x => x.colis));
   el.innerHTML = `<div class="seg">${[30,90,365].map(d => `<button class="${d===mqDays?'on':''}" onclick="mqDays=${d};renderMarques()">${d===365?'12 mois':d+' jours'}</button>`).join('')}</div>
     <div class="seg" style="margin-top:6px">${['Tous','Alimentaire','Non alimentaire'].map(u => `<button class="${u===mqUniv?'on':''}" onclick="mqUniv='${u}';renderMarques()">${u}</button>`).join('')}</div>
-    <div class="mq-sum glass"><div><b>${tot.colis}</b><span>colis commandés</span></div><div><b>${tot.urg}</b><span>à retirer (≤ 2 j)</span></div><div><b>${tot.vrac}</b><span>mises en rayon vrac</span></div></div>`
-    + (list.length ? list.map(x => `<div class="mq-card glass">
-        <div class="mq-hd">${brandBadge(x.m)}<div><b>${escapeHTML(x.m)}</b><small>${escapeHTML(x.univ || '')}</small></div></div>
+    <div class="st-grid" style="margin-top:10px">
+      <div class="stk"><b>${T0.colis}</b><span>colis commandés</span>${mqDelta(T0.colis, P0.colis, true)}</div>
+      <div class="stk ${T0.dm ? 'bad' : ''}"><b>${T0.dm ? euro(T0.dm) : '—'}</b><span>démarque · ${T0.val ? (T0.dm / T0.val * 100).toFixed(1).replace('.', ',') + ' %' : '—'}</span>${mqDelta(T0.dm, P0.dm, false)}</div>
+      <div class="stk ${T0.rupt ? 'bad' : ''}"><b>${T0.rupt}</b><span>ruptures</span>${mqDelta(T0.rupt, P0.rupt, false)}</div>
+    </div>
+    <div class="dm-hint" style="margin-top:8px">Évolutions comparées à la période précédente de même durée. Touchez une marque pour le détail.</div>`
+    + (list.length ? list.map(x => {
+      const open = mqOpen === x.m, top = Object.values(x.top).sort((a,b) => b.q - a.q).slice(0, 5);
+      return `<div class="mq-card glass">
+        <div class="mq-hd" data-m="${escapeHTMLAttr(x.m)}" onclick="mqOpen=mqOpen===this.dataset.m?null:this.dataset.m;renderMarques()" style="cursor:pointer">
+          ${brandLogos[x.m] ? `<span class="bd-tlogo" style="height:34px;width:78px"><img src="${brandLogos[x.m]}" alt=""></span>` : brandBadge(x.m)}
+          <div><b>${escapeHTML(x.m)}</b><small>${escapeHTML(x.univ || '')} · ${mqPct(x.colis, T0.colis)} des colis</small></div><span style="margin-left:auto;font-size:18px;color:var(--muted)">${open ? '▴' : '▾'}</span></div>
+        <div class="mq-bar"><i style="width:${x.colis / mx * 100}%"></i></div>
         <div class="mq-kpi">
-          <div><b>${x.colis}</b><span>colis · ${x.cmd.size} cde${x.cmd.size>1?'s':''}</span></div>
-          <div><b>${x.refs.size}</b><span>réf. commandées</span></div>
-          <div class="${x.urg?'bad':''}"><b>${x.urg}</b><span>à retirer / ${x.suivis} suivis</span></div>
-          ${x.rupt ? `<div class="bad"><b>${x.rupt}</b><span>ruptures</span></div>` : ''}
-          ${x.dmQ ? `<div class="bad"><b>${x.dmV ? euro(x.dmV) : x.dmQ + ' u.'}</b><span>démarque</span></div>` : ''}
-          ${x.vrac ? `<div><b>${x.vrac}</b><span>vrac</span></div>` : ''}
-        </div></div>`).join('')
+          <div><b>${x.colis}</b><span>colis ${mqDelta(x.colis, x.p.colis, true)}</span></div>
+          <div><b>${x.val ? euro(x.val) : '—'}</b><span>commandé (tarif)</span></div>
+          <div class="${x.dm || x.dmQ ? 'bad' : ''}"><b>${x.dm ? euro(x.dm) : x.dmQ ? x.dmQ + ' u.' : '0'}</b><span>démarque · ${x.val ? (x.dm / x.val * 100).toFixed(1).replace('.', ',') + ' %' : '—'} ${mqDelta(x.dm, x.p.dm, false)}</span></div>
+          <div class="${x.rupt ? 'bad' : ''}"><b>${x.rupt}</b><span>ruptures · ${mqPct(x.rupt, T0.rupt)} ${mqDelta(x.rupt, x.p.rupt, false)}</span></div>
+          <div class="${x.urg ? 'bad' : ''}"><b>${x.urg}/${x.suivis}</b><span>à retirer / suivis</span></div>
+          <div><b>${x.checks ? mqPct(x.checks - x.gaps, x.checks) : '—'}</b><span>prix conformes</span></div>
+          ${x.vrac ? `<div><b>${x.vrac}</b><span>mises en rayon vrac</span></div>` : ''}
+          <div><b>${x.refs.size}</b><span>réf. · ${x.cmd.size} cde(s)</span></div>
+        </div>
+        ${open ? `<div class="mq-det">
+          ${top.length ? `<div class="st-sec" style="margin-top:10px">Produits les plus commandés</div>${top.map(t => `<div class="st-line"><span>${escapeHTML(t.n || '')}</span><b>${t.q} colis<span class="st-pc">${mqPct(t.q, x.colis)}</span></b></div>`).join('')}` : ''}
+          ${x.ruptL.length ? `<div class="st-sec">Ruptures</div>${x.ruptL.slice(0, 8).map(r => `<div class="st-line"><span>${escapeHTML(r.name || (lookupGencod(r.gencod) || {}).nom || r.gencod)}<small style="display:block;color:var(--muted)">${escapeHTML(r.store || '')}</small></span><b>${fmtDate(r.day)}</b></div>`).join('')}` : ''}
+          ${x.dmL.length ? `<div class="st-sec">Démarque</div>${x.dmL.slice(0, 8).map(a => `<div class="st-line"><span>${escapeHTML(a.name || a.gencod)} ×${a.qty || 1}<small style="display:block;color:var(--muted)">${escapeHTML(a.magasin || '')}</small></span><b class="bad">${a.v != null ? euro(a.v) : '—'}</b></div>`).join('')}` : ''}
+          <button class="bd-open" style="margin-top:8px" data-m="${escapeHTMLAttr(x.m)}" onclick="openBrandBrowser('commande');bdSet('univ',${JSON.stringify(x.univ || 'Alimentaire').replace(/"/g,'&quot;')});bdSet('marque',this.dataset.m)">🛒 Commander ${escapeHTML(x.m)}</button>
+        </div>` : ''}
+      </div>`; }).join('')
       : `<div class="empty">Pas encore de commande ni de produit suivi sur la période — les chiffres par marque se rempliront au fil des scans.</div>`);
 }
 
@@ -8783,29 +8880,146 @@ function renderArchive(){
     </div>`).join('');
 }
 
+/* ═══ STATISTIQUES (tableau de bord complet) ═════════════════════════════════
+   Toutes les données de Tempo sur une période et un magasin : visites,
+   commandes / pré-commandes, ruptures, démarque, contrôle des prix, vrac,
+   dates suivies ; évolution dans le temps, détail par magasin et par marque,
+   résumé texte à partager. Tout est calculé sur l'appareil. */
+let stDays = 30, stStore = '';
 function renderStats(){
-  const total=products.length,archTotal=archive.length;
-  const byStore={};
-  products.forEach(p=>{const k=p.magasin||'?';if(!byStore[k])byStore[k]={e:0,o:0,w:0,k:0};byStore[k][statusOf(p.dlc)]++});
-  const agCnt={};
-  archive.forEach(p=>{agCnt[p.archivedBy||'?']=(agCnt[p.archivedBy||'?']||0)+1});
-  const card=(v,l,c)=>`<div style="flex:1;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);border-radius:14px;padding:13px;text-align:center;box-shadow:var(--spec)"><div style="font-size:26px;font-weight:900;color:${c};font-family:var(--font)">${v}</div><div style="font-size:10px;font-weight:800;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.5px">${l}</div></div>`;
-  document.getElementById('stats-body').innerHTML=`
-    <div style="display:flex;gap:8px;margin-bottom:14px">${card(total,'En cours',`var(--txt)`)}${card(archTotal,'Traités','var(--gd)')}</div>
-    <div style="font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;margin-bottom:9px">Par magasin</div>
-    ${Object.entries(byStore).map(([s,c])=>`<div style="background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);border-radius:13px;padding:12px;margin-bottom:8px;box-shadow:var(--spec)">
-      <div style="font-size:13px;font-weight:800;margin-bottom:7px">🏪 ${escapeHTML(s)}</div>
-      <div style="display:flex;gap:5px;flex-wrap:wrap">
-        ${c.e?`<span class="pbadge be" style="font-size:10px">💀 ${c.e}</span>`:''}
-        ${c.o?`<span class="pbadge bo" style="font-size:10px">⚠️ ${c.o}</span>`:''}
-        ${c.w?`<span class="pbadge bw" style="font-size:10px">⏰ ${c.w}</span>`:''}
-        ${c.k?`<span class="pbadge bk" style="font-size:10px">✅ ${c.k}</span>`:''}
-      </div></div>`).join('')}
-    ${Object.keys(agCnt).length?`<div style="font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;margin:13px 0 9px">Traitements / Agent</div>
-      ${Object.entries(agCnt).sort((a,b)=>b[1]-a[1]).map(([a,n])=>`<div style="display:flex;justify-content:space-between;padding:10px 13px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);border-radius:12px;margin-bottom:7px;box-shadow:var(--spec)">
-        <span style="font-size:12px;font-weight:800">👤 ${escapeHTML(a)}</span>
-        <span style="font-size:12px;font-weight:900;color:var(--gd)">${n} traité${n>1?'s':''}</span>
-      </div>`).join('')}`:''}`;
+  const el = document.getElementById('stats-body'); if(!el) return;
+  const since = Date.now() - stDays * 864e5;
+  const inP = d => { const t = new Date(d).getTime(); return t >= since && t <= Date.now() + 864e5; };
+  const okS = s => !stStore || (s || '') === stStore;
+  const O = orders.filter(o => inP(o.date) && okS(o.store));
+  const V = visits.filter(v => inP(v.date) && okS(v.store));
+  const RU = ruptures.filter(r => inP(r.at) && okS(r.store));
+  const A = archive.filter(a => inP(a.archivedAt) && okS(a.magasin));
+  const DM = A.filter(a => a.note === 'Démarque');
+  const PC = priceChecks.filter(c => inP(c.day) && okS(c.store));
+  const VR = vracEntries.filter(v => inP(v.dateRayon || v.createdAt) && okS(v.store));
+  const P = products.filter(p => okS(p.magasin));
+  const valOf = a => { const pr = priceOf(a.gencod), t = a.tarif != null ? a.tarif : (pr ? pr.tarif : null); return t != null ? (a.qty || 1) * t : 0; };
+  const colis = O.reduce((t, o) => t + (o.lines || []).reduce((s, l) => s + (Number(l.qty) || 0), 0), 0);
+  const dmVal = DM.reduce((t, a) => t + valOf(a), 0);
+  const gaps = PC.filter(c => Math.abs(c.shelf - c.pmc) >= 0.005);
+  const hygDone = VR.filter(v => v.hyg && !hygSummary(v.hyg).missing), hygOk = hygDone.filter(v => !hygSummary(v.hyg).n);
+  const st = { e:0, o:0, w:0, k:0 }; P.forEach(p => st[statusOf(p.dlc)] += (p.qty || 1));
+  const treated = A.filter(a => a.note !== 'Absent').reduce((t, a) => t + (a.qty || 1), 0);
+  const lossRate = treated ? DM.reduce((t, a) => t + (a.qty || 1), 0) / treated * 100 : 0;
+  const storesAll = [...new Set([...getStores().map(s => s.name), ...orders.map(o => o.store), ...visits.map(v => v.store), ...products.map(p => p.magasin)].filter(Boolean))].sort();
+
+  // Évolution : semaines (≤ 90 j) ou mois (12 mois)
+  const byMonth = stDays > 90, buckets = [];
+  const now = new Date(); now.setHours(0,0,0,0);
+  if(byMonth){ for(let i = 11; i >= 0; i--){ const d = new Date(now.getFullYear(), now.getMonth() - i, 1); buckets.push({ k: d.getFullYear() + '-' + d.getMonth(), l: d.toLocaleDateString('fr-FR', { month:'short' }), c:0, d:0 }); } }
+  else { const n = Math.min(13, Math.ceil(stDays / 7)); const mon = new Date(now); mon.setDate(now.getDate() - (now.getDay() + 6) % 7);
+    for(let i = n - 1; i >= 0; i--){ const d = new Date(mon); d.setDate(mon.getDate() - 7 * i); buckets.push({ k: isoDay(d), l: d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' }), c:0, d:0 }); } }
+  const bk = dt => { const d = new Date(dt); if(byMonth) return d.getFullYear() + '-' + d.getMonth(); const m = new Date(d); m.setHours(0,0,0,0); m.setDate(m.getDate() - (m.getDay() + 6) % 7); return isoDay(m); };
+  const bIdx = Object.fromEntries(buckets.map((b, i) => [b.k, i]));
+  O.forEach(o => { const i = bIdx[bk(o.date)]; if(i != null) buckets[i].c += (o.lines || []).reduce((s, l) => s + (Number(l.qty) || 0), 0); });
+  DM.forEach(a => { const i = bIdx[bk(a.archivedAt)]; if(i != null) buckets[i].d += valOf(a); });
+
+  // Par magasin
+  const SM = {};
+  const sm = s => (SM[s || '—'] = SM[s || '—'] || { vis:0, last:'', col:0, rup:0, dm:0, al:0 });
+  V.forEach(v => { const r = sm(v.store); r.vis++; if(v.date > r.last) r.last = v.date; });
+  O.forEach(o => { sm(o.store).col += (o.lines || []).reduce((s, l) => s + (Number(l.qty) || 0), 0); });
+  RU.forEach(r => sm(r.store).rup++);
+  DM.forEach(a => sm(a.magasin).dm += valOf(a));
+  P.forEach(p => { if(['e','o'].includes(statusOf(p.dlc))) sm(p.magasin).al += (p.qty || 1); });
+  // Par marque + top produits
+  const BM = {}, TOP = {};
+  O.forEach(o => (o.lines || []).forEach(l => { const m = brandOfGencod(l.gencod) || l.marque || 'Hors catalogue'; BM[m] = (BM[m] || 0) + (Number(l.qty) || 0);
+    const k = l.gencod || l.name; TOP[k] = TOP[k] || { n: l.name || (lookupGencod(l.gencod) || {}).nom || l.gencod, q:0 }; TOP[k].q += Number(l.qty) || 0; }));
+  const user = {}; A.forEach(a => { const u = displayBy(a.archivedBy) || '?'; user[u] = (user[u] || 0) + 1; });
+
+  // Période précédente (même durée) pour les évolutions en %
+  const pSince = since - stDays * 864e5, inPrev = d => { const t = new Date(d).getTime(); return t >= pSince && t < since; };
+  const pO = orders.filter(o => inPrev(o.date) && okS(o.store)), pV = visits.filter(v => inPrev(v.date) && okS(v.store));
+  const pRU = ruptures.filter(r => inPrev(r.at) && okS(r.store)), pDM = archive.filter(a => a.note === 'Démarque' && inPrev(a.archivedAt) && okS(a.magasin));
+  const pColis = pO.reduce((t, o) => t + (o.lines || []).reduce((s2, l) => s2 + (Number(l.qty) || 0), 0), 0), pDmVal = pDM.reduce((t, a) => t + valOf(a), 0);
+  const delta = (cur, prev, goodUp) => {
+    if(!prev && !cur) return `<em class="eq">=</em>`;
+    if(!prev) return `<em class="${goodUp ? 'up' : 'down'}">nouveau</em>`;
+    const d = (cur - prev) / prev * 100, good = goodUp ? d >= 0 : d <= 0;
+    return `<em class="${Math.abs(d) < 0.5 ? 'eq' : good ? 'up' : 'down'}">${d > 0 ? '+' : ''}${d.toFixed(0)} % vs période préc.</em>`;
+  };
+  const pct = (a, b) => b ? Math.round(a / b * 100) + ' %' : '—';
+  // Valeur commandée au tarif (colis × PCB × tarif unitaire) → taux de démarque
+  const ordVal = O.reduce((t, o) => t + (o.lines || []).reduce((s2, l) => { const i = orderLineInfo(l), pr = priceOf(l.gencod); return s2 + (pr && pr.tarif != null && i.units ? i.units * pr.tarif : 0); }, 0), 0);
+  const lines = O.reduce((t, o) => t + (o.lines || []).length, 0);
+  const kpi = (v, l, cls, dl) => `<div class="stk${cls ? ' ' + cls : ''}"><b>${v}</b><span>${l}</span>${dl || ''}</div>`;
+  const bars = (key, fmt, color) => {
+    const max = Math.max(1, ...buckets.map(b => b[key])), W = 300, H = 96, bw = W / buckets.length;
+    return `<svg viewBox="0 0 ${W} ${H + 16}" class="st-chart" role="img">${buckets.map((b, i) => { const h = Math.round(b[key] / max * H);
+      return `<rect x="${i * bw + 2}" y="${H - h}" width="${bw - 4}" height="${Math.max(h, b[key] ? 2 : 0)}" rx="2" fill="${color}"><title>${b.l} : ${fmt(b[key])}</title></rect>`
+        + (i % Math.ceil(buckets.length / 7) === 0 ? `<text x="${i * bw + bw / 2}" y="${H + 12}" text-anchor="middle">${b.l}</text>` : ''); }).join('')}</svg>`;
+  };
+  const stBar = () => { const tot = st.e + st.o + st.w + st.k || 1, seg = (n, c) => n ? `<i style="width:${n / tot * 100}%;background:${c}"></i>` : '';
+    return `<div class="st-stack">${seg(st.e,'#E04545')}${seg(st.o,'#F59E0B')}${seg(st.w,'#EAB308')}${seg(st.k,'#12A876')}</div>
+      <div class="st-leg"><span><i style="background:#E04545"></i>${st.e} périmés (${pc(st.e)})</span><span><i style="background:#F59E0B"></i>${st.o} ≤ 2 j (${pc(st.o)})</span><span><i style="background:#EAB308"></i>${st.w} ≤ 7 j (${pc(st.w)})</span><span><i style="background:#12A876"></i>${st.k} OK (${pc(st.k)})</span></div>`; };
+  const pc = n => { const t = st.e + st.o + st.w + st.k; return t ? Math.round(n / t * 100) + ' %' : '0 %'; };
+
+  el.innerHTML = `
+    <div class="seg">${[[7,'7 j'],[30,'30 j'],[90,'90 j'],[365,'12 mois']].map(([d,l]) => `<button class="${d===stDays?'on':''}" onclick="stDays=${d};renderStats()">${l}</button>`).join('')}</div>
+    <select class="rf-i" style="margin:8px 0 12px" onchange="stStore=this.value;renderStats()"><option value="">Tous les magasins</option>${storesAll.map(s => `<option ${s===stStore?'selected':''} value="${escapeHTMLAttr(s)}">${escapeHTML(s)}</option>`).join('')}</select>
+    <div class="st-grid">
+      ${kpi(V.length, 'visites', '', delta(V.length, pV.length, true))}
+      ${kpi(colis, `colis · ${O.length} cde(s)`, '', delta(colis, pColis, true))}
+      ${kpi(RU.length, 'ruptures relevées', RU.length ? 'bad' : '', delta(RU.length, pRU.length, false))}
+      ${kpi(dmVal ? euro(dmVal) : DM.length + ' u.', 'démarque', DM.length ? 'bad' : '', delta(dmVal || DM.length, pDmVal || pDM.length, false))}
+      ${kpi(pct(PC.length - gaps.length, PC.length), `prix conformes (${PC.length} contrôles)`)}
+      ${kpi(pct(hygOk.length, hygDone.length), 'hygiène vrac conforme')}
+    </div>
+    <div class="st-sec">Taux</div>
+    <div class="st-card">
+      <div class="st-line"><span>Taux de démarque (démarque ÷ valeur commandée)</span><b class="${dmVal && ordVal && dmVal / ordVal > .03 ? 'bad' : ''}">${ordVal ? (dmVal / ordVal * 100).toFixed(1).replace('.', ',') + ' %' : '—'}</b></div>
+      <div class="st-line"><span>Valeur commandée (tarif HT)</span><b>${ordVal ? euro(ordVal) : '—'}</b></div>
+      <div class="st-line"><span>Ruptures pour 100 lignes commandées</span><b>${lines ? (RU.length / lines * 100).toFixed(0) : '—'}</b></div>
+      <div class="st-line"><span>Part de pré-commandes</span><b>${pct(O.filter(o => o.kind === 'precommande').length, O.length)}</b></div>
+      <div class="st-line"><span>Colis par visite</span><b>${V.length ? (colis / V.length).toFixed(1).replace('.', ',') : '—'}</b></div>
+      <div class="st-line"><span>Mises en rayon vrac avec non-conformité</span><b>${pct(VR.filter(v => hygSummary(v.hyg).n).length, VR.length)}</b></div>
+    </div>
+    <div class="st-sec">Dates suivies maintenant</div>
+    <div class="st-card">${stBar()}<div class="st-line"><span>Produits traités sur la période</span><b>${treated}</b></div><div class="st-line"><span>Part retirée en démarque</span><b>${treated ? lossRate.toFixed(0) + ' %' : '—'}</b></div><div class="st-line"><span>Part à retirer maintenant (périmés + ≤ 2 j)</span><b class="${st.e + st.o ? 'bad' : ''}">${pc(st.e + st.o)}</b></div></div>
+    <div class="st-sec">Colis commandés ${byMonth ? 'par mois' : 'par semaine'}</div>
+    <div class="st-card">${bars('c', n => n + ' colis', '#1E88E5')}</div>
+    <div class="st-sec">Démarque ${byMonth ? 'par mois' : 'par semaine'}</div>
+    <div class="st-card">${dmVal ? bars('d', n => euro(n), '#7C3AED') : '<div class="st-empty">Aucune démarque chiffrée sur la période</div>'}</div>
+    <div class="st-sec">Par magasin</div>
+    <div class="st-card">${Object.entries(SM).sort((x,y) => y[1].col - x[1].col || y[1].vis - x[1].vis).map(([sn, r]) => `<div class="st-sm"><b>${escapeHTML(sn)}</b>${r.last ? `<small>dernière visite ${fmtDate(r.last)}</small>` : ''}
+      <div class="row"><div><b>${r.vis}</b><span>visites · ${pct(r.vis, V.length)}</span></div><div><b>${r.col}</b><span>colis · ${pct(r.col, colis)}</span></div>
+      <div class="${r.rup?'bad':''}"><b>${r.rup}</b><span>ruptures · ${pct(r.rup, RU.length)}</span></div><div class="${r.dm?'bad':''}"><b>${r.dm ? euro(r.dm) : '—'}</b><span>démarque · ${pct(r.dm, dmVal)}</span></div></div>
+      ${r.al ? `<small class="bad">⚠ ${r.al} produit(s) à retirer maintenant</small>` : ''}</div>`).join('') || '<div class="st-empty">Aucune donnée</div>'}</div>
+    ${Object.keys(BM).length ? `<div class="st-sec">Colis par marque</div><div class="st-card">${(() => { const mx = Math.max(...Object.values(BM)); return Object.entries(BM).sort((a,b) => b[1]-a[1]).map(([m, q]) => `<div class="st-hb"><span>${escapeHTML(m)}</span><i style="width:${q / mx * 100}%"></i><b>${q}<span class="st-pc">${pct(q, colis)}</span></b></div>`).join(''); })()}</div>` : ''}
+    ${Object.keys(TOP).length ? `<div class="st-sec">Produits les plus commandés</div><div class="st-card">${Object.values(TOP).sort((a,b) => b.q - a.q).slice(0, 8).map((x, i) => `<div class="st-line"><span>${i+1}. ${escapeHTML(x.n || '')}</span><b>${x.q} colis<span class="st-pc">${pct(x.q, colis)}</span></b></div>`).join('')}</div>` : ''}
+    <div class="st-sec">Commandes et vrac</div>
+    <div class="st-card">
+      <div class="st-line"><span>Commandes passées</span><b>${O.filter(o => o.kind !== 'precommande').length}</b></div>
+      <div class="st-line"><span>Pré-commandes envoyées aux magasins</span><b>${O.filter(o => o.kind === 'precommande').length}</b></div>
+      <div class="st-line"><span>Mises en rayon vrac</span><b>${VR.length}</b></div>
+      <div class="st-line"><span>Non-conformités hygiène</span><b class="${VR.filter(v => hygSummary(v.hyg).n).length ? 'bad' : ''}">${VR.filter(v => hygSummary(v.hyg).n).length}</b></div>
+      <div class="st-line"><span>Écart de prix moyen</span><b>${gaps.length ? euro(gaps.reduce((t, c) => t + (c.shelf - c.pmc), 0) / gaps.length) : '—'}</b></div>
+    </div>
+    ${Object.keys(user).length ? `<div class="st-sec">Produits traités par personne</div><div class="st-card">${Object.entries(user).sort((a,b) => b[1]-a[1]).map(([u, n]) => `<div class="st-line"><span>👤 ${escapeHTML(u)}</span><b>${n}</b></div>`).join('')}</div>` : ''}
+    <button class="fresh-scan-btn" style="margin-top:14px" onclick="shareStats()">📤 Partager le résumé</button>`;
+  window._statsText = [
+    `Statistiques Tempo — ${stDays === 365 ? '12 mois' : stDays + ' jours'} — ${stStore || 'tous magasins'}`, MAIL_SEP,
+    `Visites : ${V.length}`, `Commandes : ${O.length} (${colis} colis)`, `Ruptures relevées : ${RU.length}`,
+    `Démarque : ${dmVal ? euro(dmVal) : DM.length + ' unités'}`, `Écarts de prix : ${gaps.length} sur ${PC.length} contrôles`,
+    `Hygiène vrac conforme : ${hygDone.length ? Math.round(hygOk.length / hygDone.length * 100) + ' %' : '—'}`,
+    `Dates suivies : ${st.e} périmés, ${st.o} sous 2 jours, ${st.w} sous 7 jours`,
+    `Taux de démarque : ${ordVal ? (dmVal / ordVal * 100).toFixed(1).replace('.', ',') + ' %' : '—'} · Prix conformes : ${pct(PC.length - gaps.length, PC.length)} · Hygiène vrac : ${pct(hygOk.length, hygDone.length)}`,
+    `Évolution vs période précédente : colis ${pColis ? ((colis - pColis) / pColis * 100).toFixed(0) + ' %' : '—'}, ruptures ${pRU.length ? ((RU.length - pRU.length) / pRU.length * 100).toFixed(0) + ' %' : '—'}, démarque ${pDmVal ? ((dmVal - pDmVal) / pDmVal * 100).toFixed(0) + ' %' : '—'}`, '',
+    'Par magasin :', ...Object.entries(SM).map(([s, r]) => `• ${s} : ${r.vis} visite(s), ${r.col} colis, ${r.rup} rupture(s), démarque ${r.dm ? euro(r.dm) : '—'}`),
+    ...mailFoot()
+  ].join('\n');
+}
+async function shareStats(){
+  const text = window._statsText || '';
+  if(navigator.share){ try{ await navigator.share({ title:'Statistiques Tempo', text }); return; }catch(e){ if(e && e.name === 'AbortError') return; } }
+  location.href = `mailto:?subject=${encodeURIComponent('Statistiques Tempo')}&body=${encodeURIComponent(text)}`;
 }
 
 /* ═══ CSV EXPORT ═════════════════════════════════════════════════════════════ */
@@ -8964,6 +9178,29 @@ document.addEventListener('DOMContentLoaded',()=>{
    valeur = [anglais, espagnol, chinois]. Données produits (catalogue
    fournisseur) et textes juridiques (data-notr) ne sont pas traduits. */
 const TRD = {
+"colis commandés":["cases ordered","cajas pedidas","已订箱数"],"commandé (tarif)":["ordered (net)","pedido (tarifa)","订货额（进价）"],
+"à retirer / suivis":["to remove / tracked","a retirar / seguidos","待撤 / 跟踪"],"prix conformes":["prices compliant","precios conformes","价格合格"],
+"mises en rayon vrac":["bulk shelvings","reposiciones de granel","散装上架"],"Démarque":["Shrinkage","Mermas","损耗"],"Ruptures":["Out-of-stocks","Roturas","缺货"],
+"Évolutions comparées à la période précédente de même durée. Touchez une marque pour le détail.":["Changes compared with the previous period of the same length. Tap a brand for details.","Evolución comparada con el periodo anterior de la misma duración. Toca una marca para ver el detalle.","与上一同等时长期间相比的变化。点击品牌查看详情。"],
+"Taux":["Rates","Tasas","比率"],"Taux de démarque (démarque ÷ valeur commandée)":["Shrinkage rate (shrinkage ÷ ordered value)","Tasa de mermas (mermas ÷ valor pedido)","损耗率（损耗 ÷ 订货金额）"],
+"Valeur commandée (tarif HT)":["Ordered value (net price)","Valor pedido (tarifa sin IVA)","订货金额（不含税进价）"],"Ruptures pour 100 lignes commandées":["Out-of-stocks per 100 order lines","Roturas por cada 100 líneas","每 100 行订单的缺货数"],
+"Part de pré-commandes":["Share of pre-orders","Parte de prepedidos","预订单占比"],"Colis par visite":["Cases per visit","Cajas por visita","每次拜访箱数"],
+"Mises en rayon vrac avec non-conformité":["Bulk shelvings with non-compliance","Reposiciones de granel con no conformidad","有不合格项的散装上架"],
+"Part à retirer maintenant (périmés + ≤ 2 j)":["Share to remove now (expired + ≤ 2 d)","Parte a retirar ahora (caducados + ≤ 2 d)","需立即撤下占比（过期 + ≤2天）"],
+"hygiène vrac conforme":["bulk hygiene compliant","higiene granel conforme","散装卫生合格"],
+"visites":["visits","visitas","次拜访"],"ruptures relevées":["out-of-stocks recorded","roturas registradas","记录的缺货"],
+"écarts de prix":["price gaps","diferencias de precio","价格差异"],"hygiène vrac conforme":["bulk hygiene compliant","higiene granel conforme","散装卫生合格"],
+"Dates suivies maintenant":["Dates tracked now","Fechas seguidas ahora","当前跟踪日期"],"Produits traités sur la période":["Products handled in the period","Productos tratados en el periodo","期间处理的产品"],
+"Part retirée en démarque":["Share removed as shrinkage","Parte retirada como merma","损耗占比"],"Colis commandés par semaine":["Cases ordered per week","Cajas pedidas por semana","每周订货箱数"],
+"Colis commandés par mois":["Cases ordered per month","Cajas pedidas por mes","每月订货箱数"],"Démarque par semaine":["Shrinkage per week","Mermas por semana","每周损耗"],
+"Démarque par mois":["Shrinkage per month","Mermas por mes","每月损耗"],"Aucune démarque chiffrée sur la période":["No shrinkage valued in this period","Ninguna merma valorada en el periodo","此期间无计价损耗"],
+"Par magasin":["By store","Por tienda","按门店"],"Visites":["Visits","Visitas","拜访"],"Colis":["Cases","Cajas","箱数"],"Rupt.":["OOS","Rot.","缺货"],
+"Alertes":["Alerts","Alertas","提醒"],"Colis par marque":["Cases by brand","Cajas por marca","按品牌箱数"],"Produits les plus commandés":["Most ordered products","Productos más pedidos","订货最多的产品"],
+"Commandes et vrac":["Orders and bulk","Pedidos y granel","订单与散装"],"Commandes passées":["Orders placed","Pedidos realizados","已下订单"],
+"Pré-commandes envoyées aux magasins":["Pre-orders sent to stores","Prepedidos enviados a tiendas","发给门店的预订单"],"Mises en rayon vrac":["Bulk shelvings","Reposiciones de granel","散装上架"],
+"Non-conformités hygiène":["Hygiene non-compliances","No conformidades de higiene","卫生不合格"],"Écart de prix moyen":["Average price gap","Diferencia media de precio","平均价格差"],
+"Produits traités par personne":["Products handled per person","Productos tratados por persona","每人处理的产品"],"Partager le résumé":["Share the summary","Compartir el resumen","分享摘要"],
+"Statistiques":["Statistics","Estadísticas","统计"],"Aucune donnée":["No data","Sin datos","无数据"],"12 mois":["12 months","12 meses","12 个月"],
 "Démarque et bon de reprise":["Shrinkage and return note","Mermas y nota de devolución","损耗与退货单"],
 "Démarque":["Shrinkage","Mermas","损耗"],
 "démarque":["shrinkage","mermas","损耗"],

@@ -17,7 +17,7 @@
 
 const CACHE = 'fc-shell-v1';
 const SHELL = ['/', '/manifest.json', '/icons/icon-192.svg', '/icons/icon-512.svg', '/icons/icon-maskable.svg', '/brand/s2d-monogramme.svg',
-  ...['lea-nature','jardin-bio','joyce','karelea','good-moov','naturasens','biosens','kiva','sobio-etic','biovie','dentavie','floressance'].map(n => '/brand/marques/' + n + '.png')];
+  ...['lea-nature','jardin-bio','joyce','karelea','good-moov','naturasens','biosens','kiva','sobio-etic','biovie','dentavie','floressance','jom-bao','gusti-amo-bio'].map(n => '/brand/marques/' + n + '.png')];
 const CDN_HOSTS = ['cdn.jsdelivr.net', 'fonts.googleapis.com', 'fonts.gstatic.com'];
 
 // Installation : pré-charge la coquille de l'app (toujours depuis le réseau)
