@@ -7,7 +7,7 @@ PWA de gestion des produits périmés en supermarché.
 - Catalogue **multi-marques** synchronisé depuis Google Sheets **ou importé localement** (`.xlsx` / `.csv`, sans dépendance CDN ni envoi serveur).
 - Onglet **Catalogue** : consultation en lecture seule du catalogue agrégé (recherche instantanée nom / gencod / type / marque).
 - Écran d'accueil à 4 grandes icônes (Fresh, Gestion, Planning, Alertes), sans défilement ; Réglages sur la roue ⚙️.
-- **Vrac** : 2 photos (étiquette du sac + étiquette du silo), contrôle hygiène du silo Oui / Non, **cahier de suivi PDF** (traçabilité + hygiène + photos) à envoyer au client ou présenter en contrôle.
+- **Vrac** : 2 photos (étiquette du sac + étiquette du silo), contrôle hygiène du silo Oui / Non, **cahier de suivi** consultable produit par produit à l'écran (jour de contrôle) et envoyable en PDF (cahier complet ou une seule fiche), avec le code-barres de chaque produit.
 - **Planning** : semaine de tournée + comptes-rendus de visite **dictés au micro**, envoyés par mail et modifiables ensuite.
 - Alertes DLC, rappels e-mail.
 - Mono-utilisateur : un seul compte administrateur (outil de terrain personnel).
@@ -96,7 +96,7 @@ Onglet 🛒 **Commande** — 100 % local, aucune commande n'est poussée vers un
 5. Un code scanné est cherché comme **EAN**, puis comme **référence fournisseur** (code interne Léa Nature, 7 chiffres).
 6. Un code **hors catalogue** (ou la saisie manuelle) ouvre une boîte avec une **recherche en direct** : dès 4 chiffres (n'importe où dans l'EAN ou la référence — la fin du code suffit, le début étant le préfixe commun Léa Nature) ou 2 lettres du nom. À défaut, on saisit le nom (ajout hors catalogue).
 
-La commande se valide par e-mail : texte regroupé par gamme (EAN, réf., PCB, colis, unités) et **bon de commande Excel** joint via le partage natif du téléphone (sur PC : téléchargement + ouverture du mail). Un **historique local** permet de recharger, renvoyer ou exporter (Excel ou CSV) les commandes passées.
+La commande se valide par e-mail : texte regroupé par gamme (EAN, réf., PCB, colis, unités), **bon de commande PDF avec le code-barres EAN de chaque ligne** (à scanner à la douchette dans le logiciel de gestion ; règle valable pour toutes les marques) et **bon de commande Excel** joints via le partage natif du téléphone (sur PC : téléchargement + ouverture du mail). Un **historique local** permet de recharger, renvoyer ou exporter (Excel ou CSV) les commandes passées.
 
 > La caméra ne démarre pas d'elle-même à l'ouverture de l'onglet : le clic initial sur « Démarrer le scan » reste nécessaire (choix délibéré pour ne pas monopoliser la caméra).
 
