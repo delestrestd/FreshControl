@@ -277,6 +277,10 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 /* ── Marques : navigateur + chiffres ───────────────────────────────── */
 .bd-logo{width:38px;height:38px;border-radius:11px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:14px;letter-spacing:-.3px;flex-shrink:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 3px 10px rgba(0,0,0,.18)}
 .bd-logo.big{width:52px;height:52px;border-radius:15px;font-size:18px}
+.bd-logo.img{background:#fff;padding:4px;border:1px solid var(--bdr)}
+.bd-logo.img img{width:100%;height:100%;object-fit:contain}
+.lg-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.06)}
+.lg-row>div{flex:1;min-width:0}.lg-row b{display:block;font-size:13.5px;font-weight:900}.lg-row small{font-size:11px;font-weight:700;color:var(--muted)}
 .bd-univ{margin:12px 0 10px}
 .bd-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
 .bd-tile{border:1px solid var(--bdr);background:rgba(255,255,255,.8);border-radius:16px;padding:12px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;font-family:var(--font);cursor:pointer;color:var(--txt);min-width:0}
@@ -306,6 +310,15 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .mq-kpi b{display:block;font-size:17px;font-weight:900;font-variant-numeric:tabular-nums}
 .mq-kpi span{font-size:10.5px;font-weight:700;color:var(--muted);line-height:1.2;display:block}
 .mq-kpi .bad b{color:var(--r)}
+/* ── Mode rupture, fiche magasin, photos de visite ─────────────────── */
+.rupt-toggle{width:100%;margin:0 0 12px;padding:11px 14px;border-radius:var(--rr);border:1.5px dashed rgba(224,60,60,.45);background:rgba(255,255,255,.6);color:var(--r);font-family:var(--font);font-size:13.5px;font-weight:800;cursor:pointer}
+.rupt-toggle.on{background:rgba(224,60,60,.92);color:#fff;border-style:solid;border-color:transparent}
+.rupt-tag{display:inline-block;background:rgba(224,60,60,.13);color:var(--r);border-radius:var(--rr);padding:1px 7px;font-size:10px;font-weight:900;margin-left:4px}
+.sf-actions{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.sf-act{display:inline-flex;align-items:center;gap:5px;padding:9px 12px;border-radius:var(--rr);background:rgba(18,168,118,.92);color:#fff;font-size:13px;font-weight:800;text-decoration:none}
+.sf-sec{font-size:11px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin:12px 2px 6px}
+.vs-thumbs{display:flex;gap:6px;margin-top:6px}
+.vs-thumbs img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--bdr)}
 /* ── RÉGLAGES (liste groupée façon iPhone) ─────────────────────────── */
 .rg-sec{font-size:11px;font-weight:900;color:rgba(255,255,255,.85);letter-spacing:1.2px;text-transform:uppercase;padding:14px 6px 6px}
 .rg-grp{border-radius:var(--rm);overflow:hidden}
@@ -827,7 +840,7 @@ html.rot-lock-on #rot-lock{display:flex}
      traitements réels effectués par l'application (cf. mentions
      légales). Une relecture par un avocat est requise avant tout
      déploiement en production. -->
-<div id="rgpd" class="off">
+<div id="rgpd" class="off" data-notr>
   <div class="rgpd-sh">
     <div class="rgpd-t">🔒 Charte d'usage et protection des données</div>
 
@@ -1105,6 +1118,14 @@ html.rot-lock-on #rot-lock{display:flex}
       <div class="dict-wrap"><textarea class="rf-i" id="vs-actions" rows="3" placeholder="Ex : envoyer le tarif jus 1 L, rappeler pour la commande de Noël" style="resize:vertical;min-height:70px"></textarea>
       <button type="button" class="dict-btn" onclick="dictate('vs-actions',this)" aria-label="Dicter les actions à suivre">🎤</button></div>
     </div>
+    <div class="rf-f"><div class="rf-l">Photos du rayon</div>
+      <input type="file" id="vs-in-avant" data-kind="avant" accept="image/*" capture="environment" style="display:none">
+      <input type="file" id="vs-in-apres" data-kind="apres" accept="image/*" capture="environment" style="display:none">
+      <div class="vr-ph-grid">
+        <div class="vr-ph"><div class="vr-ph-t">📷 Avant</div><img id="vs-img-avant" alt="Rayon avant"><button class="scan-link-btn" onclick="document.getElementById('vs-in-avant').click()">Photographier</button><button class="scan-link-btn" id="vs-del-avant" onclick="clearVisitPhoto('avant')" style="display:none;color:var(--r)">🗑 Retirer</button></div>
+        <div class="vr-ph"><div class="vr-ph-t">📷 Après</div><img id="vs-img-apres" alt="Rayon après"><button class="scan-link-btn" onclick="document.getElementById('vs-in-apres').click()">Photographier</button><button class="scan-link-btn" id="vs-del-apres" onclick="clearVisitPhoto('apres')" style="display:none;color:var(--r)">🗑 Retirer</button></div>
+      </div>
+    </div>
     <div class="rf-row">
       <div class="rf-f"><div class="rf-l">Interlocuteur</div><input class="rf-i" id="vs-contact" placeholder="Ex : Julie, resp. épicerie" autocomplete="off"></div>
       <div class="rf-f"><div class="rf-l">Prochain passage</div><input class="rf-i" type="date" id="vs-next"></div>
@@ -1112,6 +1133,46 @@ html.rot-lock-on #rot-lock{display:flex}
     <div id="vs-hint" style="font-size:11.5px;font-weight:700;color:var(--muted);margin:2px 2px 10px"></div>
     <button class="rfsave" onclick="saveVisit(true)">📤 Enregistrer et envoyer</button>
     <button class="rfcancel" style="margin-bottom:6px" onclick="saveVisit(false)">💾 Enregistrer seulement</button>
+  </div>
+</div>
+
+<!-- ═══ FICHE MAGASIN (contacts, commande, livraison) ═══════════════════ -->
+<div id="store-fiche-modal" class="modal-bg">
+  <div class="modal-sh">
+    <div class="mhd-row" style="margin-bottom:10px">
+      <div class="mhd-t" id="sf-title">📇 Fiche magasin</div>
+      <button class="mcl" onclick="closeModal('store-fiche-modal')" aria-label="Fermer">✕</button>
+    </div>
+    <div class="sf-actions" id="sf-actions"></div>
+    <div class="sf-sec">Contact 1</div>
+    <div class="rf-row"><div class="rf-f"><div class="rf-l">Nom</div><input class="rf-i" id="sf-c1n" placeholder="Julie Martin"></div><div class="rf-f"><div class="rf-l">Fonction</div><input class="rf-i" id="sf-c1r" placeholder="Chef de rayon épicerie"></div></div>
+    <div class="rf-row"><div class="rf-f"><div class="rf-l">Téléphone</div><input class="rf-i" id="sf-c1t" type="tel" inputmode="tel" placeholder="06 12 34 56 78"></div><div class="rf-f"><div class="rf-l">E-mail</div><input class="rf-i" id="sf-c1m" type="email" placeholder="julie@magasin.fr"></div></div>
+    <div class="sf-sec">Contact 2</div>
+    <div class="rf-row"><div class="rf-f"><div class="rf-l">Nom</div><input class="rf-i" id="sf-c2n" placeholder="M. Durand"></div><div class="rf-f"><div class="rf-l">Fonction</div><input class="rf-i" id="sf-c2r" placeholder="Directeur"></div></div>
+    <div class="rf-row"><div class="rf-f"><div class="rf-l">Téléphone</div><input class="rf-i" id="sf-c2t" type="tel" inputmode="tel"></div><div class="rf-f"><div class="rf-l">E-mail</div><input class="rf-i" id="sf-c2m" type="email"></div></div>
+    <div class="sf-sec">Commande et livraison</div>
+    <div class="rf-row"><div class="rf-f"><div class="rf-l">Jour de commande</div><select class="rf-i" id="sf-jcmd"><option value="">—</option><option value="0">Lundi</option><option value="1">Mardi</option><option value="2">Mercredi</option><option value="3">Jeudi</option><option value="4">Vendredi</option><option value="5">Samedi</option><option value="6">Dimanche</option></select></div><div class="rf-f"><div class="rf-l">Avant</div><input class="rf-i" id="sf-hcmd" type="time"></div></div>
+    <div class="rf-row"><div class="rf-f"><div class="rf-l">Jour de livraison</div><select class="rf-i" id="sf-jliv"><option value="">—</option><option value="0">Lundi</option><option value="1">Mardi</option><option value="2">Mercredi</option><option value="3">Jeudi</option><option value="4">Vendredi</option><option value="5">Samedi</option><option value="6">Dimanche</option></select></div><div class="rf-f"><div class="rf-l">Heure</div><input class="rf-i" id="sf-hliv" type="time"></div></div>
+    <div class="rf-f"><div class="rf-l">N° client fournisseur</div><input class="rf-i" id="sf-client" placeholder="Ex : 412 557"></div>
+    <div class="rf-f"><div class="rf-l">Notes</div><textarea class="rf-i" id="sf-notes" rows="2" placeholder="Quai 2, badge à l'accueil…" style="resize:vertical"></textarea></div>
+    <button class="rfsave" onclick="saveStoreFiche()">💾 Enregistrer la fiche</button>
+    <button class="rfcancel" onclick="closeModal('store-fiche-modal')">Fermer</button>
+  </div>
+</div>
+
+<!-- ═══ EN-TÊTE DES DOCUMENTS + LOGOS ═════════════════════════════════ -->
+<div id="logos-modal" class="modal-bg">
+  <div class="modal-sh">
+    <div class="mhd-row" style="margin-bottom:10px">
+      <div class="mhd-t">🏷️ En-tête et logos</div>
+      <button class="mcl" onclick="closeModal('logos-modal');renderCurrentTab()" aria-label="Fermer">✕</button>
+    </div>
+    <div class="rf-f"><div class="rf-l">En-tête des bons (client fournisseur)</div>
+      <div style="display:flex;gap:8px"><input class="rf-i" id="doc-client" placeholder="Léa Nature" style="flex:1"><button class="scan-link-btn" onclick="saveDocClient()" style="padding:10px 14px">OK</button></div>
+      <div style="font-size:11.5px;color:var(--muted);font-weight:600;margin-top:5px">Affiché en haut des bons de commande et de pré-commande. À changer si Tempo sert pour un autre client.</div>
+    </div>
+    <input type="file" id="logo-in" accept="image/*" style="display:none">
+    <div id="logos-list"></div>
   </div>
 </div>
 
@@ -1237,7 +1298,7 @@ html.rot-lock-on #rot-lock{display:flex}
      Textes rédigés en cohérence avec les traitements réels de l'application.
      À soumettre à un avocat avant toute mise en production : tous les
      champs entre crochets [ … ] sont des placeholders à compléter. -->
-<div id="legal-modal" class="modal-bg full">
+<div id="legal-modal" data-notr class="modal-bg full">
   <div class="modal-sh">
     <div class="mhd-row" style="margin-bottom:14px"><div class="mhd-t">⚖️ Mentions légales &amp; RGPD</div><button class="mcl" onclick="closeModal('legal-modal')" aria-label="Fermer">✕</button></div>
     <div style="font-size:12.5px;line-height:1.7;color:var(--txt);font-weight:600">
@@ -1362,6 +1423,11 @@ html.rot-lock-on #rot-lock{display:flex}
       <div id="qm-namewrap" style="display:none;margin-bottom:14px">
         <div class="rf-l" style="margin-bottom:6px">Nom du produit <span style="font-weight:700;color:var(--mutedx)">— si introuvable</span></div>
         <input class="rf-i" id="qm-name" placeholder="Nom du produit" autocomplete="off">
+      </div>
+      <div id="qm-pricewrap" style="display:none;margin-bottom:14px">
+        <div class="rf-l" style="margin-bottom:6px">🏷️ Prix conseillé <b id="qm-pmc" style="color:var(--gd)"></b> · prix en rayon <span style="font-weight:700;color:var(--mutedx)">— optionnel</span></div>
+        <input class="rf-i" id="qm-shelf" inputmode="decimal" placeholder="Ex : 3,79" autocomplete="off" oninput="qmPriceGap()">
+        <div id="qm-gap" style="font-size:12.5px;font-weight:800;margin-top:5px"></div>
       </div>
       <div class="rf-l" style="margin-bottom:8px">Nombre de colis</div>
       <div class="qm-stepper">
@@ -1553,6 +1619,7 @@ html.rot-lock-on #rot-lock{display:flex}
       <div class="scan-box" id="cmd-scan-box">
         <div class="scan-step-icon">🛒</div>
         <div class="scan-step-title">Commande par scan</div>
+        <button type="button" class="rupt-toggle" id="rupt-toggle" onclick="toggleRupture()">🕳 Mode rupture</button>
         <div class="scan-step-sub">Visez un code-barres : une fenêtre s'ouvre pour saisir le nombre de colis, puis validez. Validez la commande pour l'envoyer par mail.</div>
         <div class="scan-cam-wrap" id="cmd-cam-wrap" style="display:none">
           <video id="cmd-video" playsinline muted></video>
@@ -1592,7 +1659,12 @@ html.rot-lock-on #rot-lock{display:flex}
       </div>
       <div id="order-lines"></div>
       <div id="cmd-footer" style="display:none;margin-top:12px">
-        <button class="af-add" style="width:100%;padding:14px" onclick="validateOrder()">✅ Valider et envoyer par mail</button>
+        <div class="seg" id="ord-kind" style="margin-bottom:10px">
+          <button class="on" data-k="commande" onclick="setOrderKind('commande')">🛒 Commande</button>
+          <button data-k="precommande" onclick="setOrderKind('precommande')">📝 Pré-commande client</button>
+        </div>
+        <div id="ord-kind-hint" style="font-size:11.5px;font-weight:700;color:rgba(255,255,255,.85);margin:-4px 2px 10px"></div>
+        <button class="af-add" style="width:100%;padding:14px" onclick="validateOrder()" id="ord-validate">✅ Valider et envoyer par mail</button>
         <button class="scan-reset-btn" style="width:100%;margin-top:8px" onclick="clearOrder()">🗑 Vider la commande</button>
       </div>
     </div>
@@ -1808,6 +1880,9 @@ html.rot-lock-on #rot-lock{display:flex}
         <div class="rg-it" onclick="backupData()"><div class="rg-ic">💾</div>Sauvegarder mes données</div>
         <div class="rg-it" onclick="document.getElementById('restore-in').click()"><div class="rg-ic">📂</div>Restaurer une sauvegarde</div>
         <div class="rg-it" onclick="toolCSV()"><div class="rg-ic">📥</div>Exporter CSV</div>
+        <div class="rg-it" onclick="openLogos()"><div class="rg-ic">🏷️</div>En-tête et logos des documents</div>
+        <div class="rg-it" onclick="document.getElementById('price-in').click()"><div class="rg-ic">💶</div><div>Charger les prix (tarif + PMC)<div id="rg-prices-st" style="font-size:11.5px;color:var(--muted);font-weight:700">Aucun prix chargé</div><div style="font-size:11px;color:var(--muted);font-weight:600">Restent sur ce téléphone, jamais publiés</div></div></div>
+        <input type="file" id="price-in" accept=".xlsx,.csv" multiple style="display:none" onchange="importPriceFiles(this)">
         <div class="rg-it" id="rg-adm" onclick="showTab('admin')" style="display:none"><div class="rg-ic">⚙️</div>Administration (catalogue, compte, configuration)</div>
       </div>
       <div class="rg-sec">Langue</div>
@@ -2196,7 +2271,7 @@ function restoreData(input){
 
 /* Emergency reset */
 if(new URLSearchParams(location.search).get('reset')==='1'){
-  ['fc_users','fc_products','fc_archive','fc_planning','fc_visits','fc_lang',
+  ['fc_users','fc_products','fc_archive','fc_planning','fc_visits','fc_ruptures','fc_prices','fc_pricechecks','fc_lang',
    'fc_gas_url','fc_store_name','fc_store_emoji','fc_store_enseigne','fc_store_region','fc_store_ville',
    'fc_store_lat','fc_store_lng','fc_store_rad',
    'fc_email_resp','fc_email_fin','fc_catalogue','fc_catalogue_ts','fc_catalogues',
@@ -2208,7 +2283,7 @@ if(new URLSearchParams(location.search).get('reset')==='1'){
 
 /* ═══ I18N ══════════════════════════════════════════════════════════════════ */
 const I18N={
-  fr:{tag:'Votre outil terrain en GMS',by:'Créé par',hm_hi:'Bonjour',hn_exp:'périmé',hn_today0:"aujourd'hui",hn_in:'J-{n}',hn_tracked:'{n} produit(s) suivi(s)',hn_next:'Prochaine date : {p} le {d}',hn_order:'Dernière commande : {d} ({n} réf.)',hn_stock:'Dernier relevé : {d}',hn_vrac:'Vrac : {p} → {s} ({d})',hn_tday:"Aujourd'hui",hn_cr:'Dernier compte-rendu : {s} ({d})',hn_todo:'À faire',hn_prods:'{n} produit(s)',tl_g:'Gestion',tl_mq:'Par marque',gd_mq:'Chiffres par marque|Commandes, alertes, vrac',hs_mq:'{n} marques',gd_c:'Scanner les rayons|Ajuster les colis|Envoyer le bon Excel',gd_stk:'Compter le stock|Importer un BL|Vérifier un produit',gd_v:'Mise en rayon des silos|Photos + hygiène|Cahier de suivi PDF',gd_mag:'Ajouter, modifier|Repérer par GPS|Dossiers magasins',gd_cat:'Chercher un produit|Nom, EAN ou réf.',tl_mag:'Magasins',hs_g:'Commande · Stocks · Vrac · Magasins',hs_mag:'{n} magasin(s) enregistré(s)',tl_cat:'Catalogue',tl_set:'Réglages',tl_adm:'Administration',fresh_scan:'📷 Scanner une date',hs_fresh:'{e} périmé(s) · {o} sous 2 j',hs_fresh0:'Aucune date urgente',hs_cmd:'{n} réf. · {c} colis en cours',hs_cmd0:'Aucune commande en cours',hs_stk:'{n} produit(s) en cours',hs_stk0:'Aucun relevé en cours',hs_vrac:'{n} mise(s) en rayon',hs_vrac0:'Mises en rayon des silos',hs_al:'{n} magasin(s) à prévenir',hs_al0:'Rien à signaler',hs_pl:'Aujourd’hui : {n} magasin(s)',hs_pl0:'Rien de prévu aujourd’hui',hs_cat:'{n} produits',hs_set:'Magasins, sauvegarde, langue',hm_store:'Magasin',hm_out:'Hors magasin',hm_loc:'Localisation…',l_user:'Identifiant',l_pass:'Mot de passe',l_btn:'Se connecter',l_err_empty:'Remplissez tous les champs',l_err_wrong:'Identifiant ou mot de passe incorrect',ph_user:'prenom.nom',ph_pass:'••••••••',rg_t:"🔒 Charte d'usage et protection des données",rg_p:"Le détail des traitements et des durées de conservation figure dans les Mentions légales accessibles depuis le menu.",rg_y:'✓ Accepter',rg_n:'Refuser',
+  fr:{tag:'Votre outil terrain en GMS',by:'Créé par',hm_hi:'Bonjour',hn_exp:'périmé',hn_today0:"aujourd'hui",hn_in:'J-{n}',hn_tracked:'{n} produit(s) suivi(s)',hn_next:'Prochaine date : {p} le {d}',hn_order:'Dernière commande : {d} ({n} réf.)',hn_stock:'Dernier relevé : {d}',hn_vrac:'Vrac : {p} → {s} ({d})',hn_tday:"Aujourd'hui",hn_cr:'Dernier compte-rendu : {s} ({d})',hn_todo:'À faire',hn_cmdday:'Jour de commande : {s}',hn_rupt:'Ruptures aujourd’hui : {n}',hn_prods:'{n} produit(s)',tl_g:'Gestion',tl_mq:'Par marque',gd_mq:'Chiffres par marque|Commandes, alertes, vrac',hs_mq:'{n} marques',gd_c:'Scanner les rayons|Ajuster les colis|Envoyer le bon Excel',gd_stk:'Compter le stock|Importer un BL|Vérifier un produit',gd_v:'Mise en rayon des silos|Photos + hygiène|Cahier de suivi PDF',gd_mag:'Ajouter, modifier|Repérer par GPS|Dossiers magasins',gd_cat:'Chercher un produit|Nom, EAN ou réf.',tl_mag:'Magasins',hs_g:'Commande · Stocks · Vrac · Magasins',hs_mag:'{n} magasin(s) enregistré(s)',tl_cat:'Catalogue',tl_set:'Réglages',tl_adm:'Administration',fresh_scan:'📷 Scanner une date',hs_fresh:'{e} périmé(s) · {o} sous 2 j',hs_fresh0:'Aucune date urgente',hs_cmd:'{n} réf. · {c} colis en cours',hs_cmd0:'Aucune commande en cours',hs_stk:'{n} produit(s) en cours',hs_stk0:'Aucun relevé en cours',hs_vrac:'{n} mise(s) en rayon',hs_vrac0:'Mises en rayon des silos',hs_al:'{n} magasin(s) à prévenir',hs_al0:'Rien à signaler',hs_pl:'Aujourd’hui : {n} magasin(s)',hs_pl0:'Rien de prévu aujourd’hui',hs_cat:'{n} produits',hs_set:'Magasins, sauvegarde, langue',hm_store:'Magasin',hm_out:'Hors magasin',hm_loc:'Localisation…',l_user:'Identifiant',l_pass:'Mot de passe',l_btn:'Se connecter',l_err_empty:'Remplissez tous les champs',l_err_wrong:'Identifiant ou mot de passe incorrect',ph_user:'prenom.nom',ph_pass:'••••••••',rg_t:"🔒 Charte d'usage et protection des données",rg_p:"Le détail des traitements et des durées de conservation figure dans les Mentions légales accessibles depuis le menu.",rg_y:'✓ Accepter',rg_n:'Refuser',
   lexp:'Périmés',lcrit:'Critiques ≤2j',lwarn:'Attention ≤7j',lok:'OK',lprods:'Produits',all:'Tous',all_stores:'Tous magasins',all_status:'Tous statuts',
   sct:'Scanner un produit',scsub:'Photographiez le code-barres EAN',scbtn:'Prendre une photo',scanning:'🔍 Analyse…',scan_ok:'✅ Produit reconnu',scan_err:'❌ Erreur de connexion',
   ldlc:'Date limite (DLC)',lqty:'Quantité',rfsave:'💾 Enregistrer',rfcancel:'Annuler',
@@ -2222,7 +2297,7 @@ const I18N={
   days:['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'],
   saved:'✅ Sauvegardé',deleted:'🗑 Supprimé',user_added:'👤 Utilisateur ajouté',store_added:'🏪 Magasin ajouté',prod_archived:'✅ Produit archivé',no_prods:'Aucun produit',fill_all:'Remplissez tous les champs',email_sent:'✅ E-mail envoyé',email_err:'❌ Erreur envoi',csv_ok:'📥 CSV téléchargé',
   adm_stores:'🏪 Magasins',adm_users:'👥 Utilisateurs',adm_lang:'🌍 Langue',adm_conf:'⚙️ Configuration'},
-  en:{tag:'Your in-store field tool',by:'Created by',hm_hi:'Hello',hn_exp:'expired',hn_today0:'today',hn_in:'D-{n}',hn_tracked:'{n} product(s) tracked',hn_next:'Next date: {p} on {d}',hn_order:'Last order: {d} ({n} items)',hn_stock:'Last count: {d}',hn_vrac:'Bulk: {p} → {s} ({d})',hn_tday:'Today',hn_cr:'Last visit report: {s} ({d})',hn_todo:'To do',hn_prods:'{n} product(s)',tl_g:'Management',tl_mq:'By brand',gd_mq:'Figures by brand|Orders, alerts, bulk',hs_mq:'{n} brands',gd_c:'Scan the shelves|Adjust cases|Send the Excel order',gd_stk:'Count stock|Import a delivery note|Check a product',gd_v:'Bin refilling|Photos + hygiene|PDF log book',gd_mag:'Add, edit|Locate by GPS|Store folders',gd_cat:'Find a product|Name, EAN or ref.',tl_mag:'Stores',hs_g:'Orders · Stock · Bulk · Stores',hs_mag:'{n} store(s) saved',tl_cat:'Catalogue',tl_set:'Settings',tl_adm:'Administration',fresh_scan:'📷 Scan a date',hs_fresh:'{e} expired · {o} within 2 d',hs_fresh0:'No urgent dates',hs_cmd:'{n} items · {c} cases in progress',hs_cmd0:'No order in progress',hs_stk:'{n} product(s) in progress',hs_stk0:'No count in progress',hs_vrac:'{n} shelving(s)',hs_vrac0:'Bulk bin shelving',hs_al:'{n} store(s) to notify',hs_al0:'Nothing to report',hs_pl:'Today: {n} store(s)',hs_pl0:'Nothing planned today',hs_cat:'{n} products',hs_set:'Stores, backup, language',hm_store:'Store',hm_out:'Not in a store',hm_loc:'Locating…',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err_empty:'Please fill all fields',l_err_wrong:'Wrong username or password',ph_user:'firstname.lastname',ph_pass:'••••••••',rg_t:'🔒 Usage charter & data protection',rg_p:'Full processing details and retention periods are available in the Legal Notice from the menu.',rg_y:'✓ Accept',rg_n:'Decline',
+  en:{tag:'Your in-store field tool',by:'Created by',hm_hi:'Hello',hn_exp:'expired',hn_today0:'today',hn_in:'D-{n}',hn_tracked:'{n} product(s) tracked',hn_next:'Next date: {p} on {d}',hn_order:'Last order: {d} ({n} items)',hn_stock:'Last count: {d}',hn_vrac:'Bulk: {p} → {s} ({d})',hn_tday:'Today',hn_cr:'Last visit report: {s} ({d})',hn_todo:'To do',hn_cmdday:'Order day: {s}',hn_rupt:'Out-of-stocks today: {n}',hn_prods:'{n} product(s)',tl_g:'Management',tl_mq:'By brand',gd_mq:'Figures by brand|Orders, alerts, bulk',hs_mq:'{n} brands',gd_c:'Scan the shelves|Adjust cases|Send the Excel order',gd_stk:'Count stock|Import a delivery note|Check a product',gd_v:'Bin refilling|Photos + hygiene|PDF log book',gd_mag:'Add, edit|Locate by GPS|Store folders',gd_cat:'Find a product|Name, EAN or ref.',tl_mag:'Stores',hs_g:'Orders · Stock · Bulk · Stores',hs_mag:'{n} store(s) saved',tl_cat:'Catalogue',tl_set:'Settings',tl_adm:'Administration',fresh_scan:'📷 Scan a date',hs_fresh:'{e} expired · {o} within 2 d',hs_fresh0:'No urgent dates',hs_cmd:'{n} items · {c} cases in progress',hs_cmd0:'No order in progress',hs_stk:'{n} product(s) in progress',hs_stk0:'No count in progress',hs_vrac:'{n} shelving(s)',hs_vrac0:'Bulk bin shelving',hs_al:'{n} store(s) to notify',hs_al0:'Nothing to report',hs_pl:'Today: {n} store(s)',hs_pl0:'Nothing planned today',hs_cat:'{n} products',hs_set:'Stores, backup, language',hm_store:'Store',hm_out:'Not in a store',hm_loc:'Locating…',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err_empty:'Please fill all fields',l_err_wrong:'Wrong username or password',ph_user:'firstname.lastname',ph_pass:'••••••••',rg_t:'🔒 Usage charter & data protection',rg_p:'Full processing details and retention periods are available in the Legal Notice from the menu.',rg_y:'✓ Accept',rg_n:'Decline',
   lexp:'Expired',lcrit:'Critical ≤2d',lwarn:'Warning ≤7d',lok:'OK',lprods:'Products',all:'All',all_stores:'All stores',all_status:'All statuses',
   sct:'Scan a product',scsub:'Photograph the EAN barcode',scbtn:'Take a photo',scanning:'🔍 Analyzing…',scan_ok:'✅ Product found',scan_err:'❌ Connection error',
   ldlc:'Expiry date',lqty:'Quantity',rfsave:'💾 Save',rfcancel:'Cancel',
@@ -2236,7 +2311,7 @@ const I18N={
   days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
   saved:'✅ Saved',deleted:'🗑 Deleted',user_added:'👤 User added',store_added:'🏪 Store added',prod_archived:'✅ Product archived',no_prods:'No products',fill_all:'Please fill all fields',email_sent:'✅ Email sent',email_err:'❌ Send error',csv_ok:'📥 CSV downloaded',
   adm_stores:'🏪 Stores',adm_users:'👥 Users',adm_lang:'🌍 Language',adm_conf:'⚙️ Config'},
-  es:{tag:'Su herramienta de campo en tienda',by:'Creado por',hm_hi:'Hola',hn_exp:'caducado',hn_today0:'hoy',hn_in:'D-{n}',hn_tracked:'{n} producto(s) seguido(s)',hn_next:'Próxima fecha: {p} el {d}',hn_order:'Último pedido: {d} ({n} ref.)',hn_stock:'Último recuento: {d}',hn_vrac:'Granel: {p} → {s} ({d})',hn_tday:'Hoy',hn_cr:'Último informe: {s} ({d})',hn_todo:'Pendiente',hn_prods:'{n} producto(s)',tl_g:'Gestión',tl_mq:'Por marca',gd_mq:'Cifras por marca|Pedidos, alertas, granel',hs_mq:'{n} marcas',gd_c:'Escanear los estantes|Ajustar las cajas|Enviar el pedido Excel',gd_stk:'Contar el stock|Importar un albarán|Verificar un producto',gd_v:'Llenado de silos|Fotos + higiene|Registro PDF',gd_mag:'Añadir, modificar|Localizar por GPS|Carpetas de tiendas',gd_cat:'Buscar un producto|Nombre, EAN o ref.',tl_mag:'Tiendas',hs_g:'Pedidos · Stock · Granel · Tiendas',hs_mag:'{n} tienda(s) registrada(s)',tl_cat:'Catálogo',tl_set:'Ajustes',tl_adm:'Administración',fresh_scan:'📷 Escanear una fecha',hs_fresh:'{e} caducado(s) · {o} en 2 d',hs_fresh0:'Sin fechas urgentes',hs_cmd:'{n} ref. · {c} cajas en curso',hs_cmd0:'Sin pedido en curso',hs_stk:'{n} producto(s) en curso',hs_stk0:'Sin recuento en curso',hs_vrac:'{n} reposición(es)',hs_vrac0:'Reposición de silos',hs_al:'{n} tienda(s) a avisar',hs_al0:'Nada que señalar',hs_pl:'Hoy: {n} tienda(s)',hs_pl0:'Nada previsto hoy',hs_cat:'{n} productos',hs_set:'Tiendas, copia, idioma',hm_store:'Tienda',hm_out:'Fuera de tienda',hm_loc:'Localizando…',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Iniciar sesión',l_err_empty:'Rellene todos los campos',l_err_wrong:'Usuario o contraseña incorrectos',ph_user:'nombre.apellido',ph_pass:'••••••••',rg_t:'🔒 Carta de uso y protección de datos',rg_p:'El detalle del tratamiento y los plazos de conservación figuran en el Aviso Legal accesible desde el menú.',rg_y:'✓ Aceptar',rg_n:'Rechazar',
+  es:{tag:'Su herramienta de campo en tienda',by:'Creado por',hm_hi:'Hola',hn_exp:'caducado',hn_today0:'hoy',hn_in:'D-{n}',hn_tracked:'{n} producto(s) seguido(s)',hn_next:'Próxima fecha: {p} el {d}',hn_order:'Último pedido: {d} ({n} ref.)',hn_stock:'Último recuento: {d}',hn_vrac:'Granel: {p} → {s} ({d})',hn_tday:'Hoy',hn_cr:'Último informe: {s} ({d})',hn_todo:'Pendiente',hn_cmdday:'Día de pedido: {s}',hn_rupt:'Roturas hoy: {n}',hn_prods:'{n} producto(s)',tl_g:'Gestión',tl_mq:'Por marca',gd_mq:'Cifras por marca|Pedidos, alertas, granel',hs_mq:'{n} marcas',gd_c:'Escanear los estantes|Ajustar las cajas|Enviar el pedido Excel',gd_stk:'Contar el stock|Importar un albarán|Verificar un producto',gd_v:'Llenado de silos|Fotos + higiene|Registro PDF',gd_mag:'Añadir, modificar|Localizar por GPS|Carpetas de tiendas',gd_cat:'Buscar un producto|Nombre, EAN o ref.',tl_mag:'Tiendas',hs_g:'Pedidos · Stock · Granel · Tiendas',hs_mag:'{n} tienda(s) registrada(s)',tl_cat:'Catálogo',tl_set:'Ajustes',tl_adm:'Administración',fresh_scan:'📷 Escanear una fecha',hs_fresh:'{e} caducado(s) · {o} en 2 d',hs_fresh0:'Sin fechas urgentes',hs_cmd:'{n} ref. · {c} cajas en curso',hs_cmd0:'Sin pedido en curso',hs_stk:'{n} producto(s) en curso',hs_stk0:'Sin recuento en curso',hs_vrac:'{n} reposición(es)',hs_vrac0:'Reposición de silos',hs_al:'{n} tienda(s) a avisar',hs_al0:'Nada que señalar',hs_pl:'Hoy: {n} tienda(s)',hs_pl0:'Nada previsto hoy',hs_cat:'{n} productos',hs_set:'Tiendas, copia, idioma',hm_store:'Tienda',hm_out:'Fuera de tienda',hm_loc:'Localizando…',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Iniciar sesión',l_err_empty:'Rellene todos los campos',l_err_wrong:'Usuario o contraseña incorrectos',ph_user:'nombre.apellido',ph_pass:'••••••••',rg_t:'🔒 Carta de uso y protección de datos',rg_p:'El detalle del tratamiento y los plazos de conservación figuran en el Aviso Legal accesible desde el menú.',rg_y:'✓ Aceptar',rg_n:'Rechazar',
   lexp:'Caducados',lcrit:'Crítico ≤2d',lwarn:'Atención ≤7d',lok:'OK',lprods:'Productos',all:'Todos',all_stores:'Todas las tiendas',all_status:'Todos los estados',
   sct:'Escanear producto',scsub:'Fotografíe el código EAN',scbtn:'Tomar foto',scanning:'🔍 Analizando…',scan_ok:'✅ Producto encontrado',scan_err:'❌ Error de conexión',
   ldlc:'Fecha caducidad',lqty:'Cantidad',rfsave:'💾 Guardar',rfcancel:'Cancelar',
@@ -2250,7 +2325,7 @@ const I18N={
   days:['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],
   saved:'✅ Guardado',deleted:'🗑 Eliminado',user_added:'👤 Usuario añadido',store_added:'🏪 Tienda añadida',prod_archived:'✅ Producto archivado',no_prods:'Sin productos',fill_all:'Rellene todos los campos',email_sent:'✅ Correo enviado',email_err:'❌ Error envío',csv_ok:'📥 CSV descargado',
   adm_stores:'🏪 Tiendas',adm_users:'👥 Usuarios',adm_lang:'🌍 Idioma',adm_conf:'⚙️ Config'},
-  zh:{tag:'门店现场管理工具',by:'创建者',hm_hi:'您好',hn_exp:'已过期',hn_today0:'今天',hn_in:'剩 {n} 天',hn_tracked:'跟踪 {n} 个产品',hn_next:'下一个日期：{p}（{d}）',hn_order:'最近订单：{d}（{n} 项）',hn_stock:'最近盘点：{d}',hn_vrac:'散装：{p} → {s}（{d}）',hn_tday:'今天',hn_cr:'最近拜访报告：{s}（{d}）',hn_todo:'待办',hn_prods:'{n} 个产品',tl_g:'运营',tl_mq:'按品牌',gd_mq:'按品牌统计|订单、提醒、散装',hs_mq:'{n} 个品牌',gd_c:'扫描货架|调整箱数|发送 Excel 订单',gd_stk:'盘点库存|导入送货单|核查产品',gd_v:'散装补货|照片 + 卫生检查|PDF 跟踪记录',gd_mag:'添加、修改|GPS 定位|门店档案',gd_cat:'查找产品|名称、EAN 或编号',tl_mag:'门店',hs_g:'订单 · 库存 · 散装 · 门店',hs_mag:'已保存 {n} 家门店',tl_cat:'目录',tl_set:'设置',tl_adm:'管理',fresh_scan:'📷 扫描日期',hs_fresh:'{e} 已过期 · {o} 2天内',hs_fresh0:'无紧急日期',hs_cmd:'{n} 项 · {c} 箱进行中',hs_cmd0:'无进行中的订单',hs_stk:'{n} 个产品进行中',hs_stk0:'无进行中的盘点',hs_vrac:'{n} 次上架',hs_vrac0:'散装上架',hs_al:'{n} 家门店待通知',hs_al0:'无异常',hs_pl:'今天：{n} 家门店',hs_pl0:'今天无安排',hs_cat:'{n} 个产品',hs_set:'门店、备份、语言',hm_store:'门店',hm_out:'不在门店',hm_loc:'定位中…',l_user:'用户名',l_pass:'密码',l_btn:'登录',l_err_empty:'请填写所有字段',l_err_wrong:'用户名或密码错误',ph_user:'姓名.姓氏',ph_pass:'••••••••',rg_t:'🔒 使用规章与数据保护',rg_p:'数据处理详情与保留期限请查阅菜单中的法律声明。',rg_y:'✓ 接受',rg_n:'拒绝',
+  zh:{tag:'门店现场管理工具',by:'创建者',hm_hi:'您好',hn_exp:'已过期',hn_today0:'今天',hn_in:'剩 {n} 天',hn_tracked:'跟踪 {n} 个产品',hn_next:'下一个日期：{p}（{d}）',hn_order:'最近订单：{d}（{n} 项）',hn_stock:'最近盘点：{d}',hn_vrac:'散装：{p} → {s}（{d}）',hn_tday:'今天',hn_cr:'最近拜访报告：{s}（{d}）',hn_todo:'待办',hn_cmdday:'下单日：{s}',hn_rupt:'今日缺货：{n}',hn_prods:'{n} 个产品',tl_g:'运营',tl_mq:'按品牌',gd_mq:'按品牌统计|订单、提醒、散装',hs_mq:'{n} 个品牌',gd_c:'扫描货架|调整箱数|发送 Excel 订单',gd_stk:'盘点库存|导入送货单|核查产品',gd_v:'散装补货|照片 + 卫生检查|PDF 跟踪记录',gd_mag:'添加、修改|GPS 定位|门店档案',gd_cat:'查找产品|名称、EAN 或编号',tl_mag:'门店',hs_g:'订单 · 库存 · 散装 · 门店',hs_mag:'已保存 {n} 家门店',tl_cat:'目录',tl_set:'设置',tl_adm:'管理',fresh_scan:'📷 扫描日期',hs_fresh:'{e} 已过期 · {o} 2天内',hs_fresh0:'无紧急日期',hs_cmd:'{n} 项 · {c} 箱进行中',hs_cmd0:'无进行中的订单',hs_stk:'{n} 个产品进行中',hs_stk0:'无进行中的盘点',hs_vrac:'{n} 次上架',hs_vrac0:'散装上架',hs_al:'{n} 家门店待通知',hs_al0:'无异常',hs_pl:'今天：{n} 家门店',hs_pl0:'今天无安排',hs_cat:'{n} 个产品',hs_set:'门店、备份、语言',hm_store:'门店',hm_out:'不在门店',hm_loc:'定位中…',l_user:'用户名',l_pass:'密码',l_btn:'登录',l_err_empty:'请填写所有字段',l_err_wrong:'用户名或密码错误',ph_user:'姓名.姓氏',ph_pass:'••••••••',rg_t:'🔒 使用规章与数据保护',rg_p:'数据处理详情与保留期限请查阅菜单中的法律声明。',rg_y:'✓ 接受',rg_n:'拒绝',
   lexp:'已过期',lcrit:'紧急≤2天',lwarn:'注意≤7天',lok:'正常',lprods:'产品',all:'全部',all_stores:'全部门店',all_status:'全部状态',
   sct:'扫描产品',scsub:'拍摄EAN条形码',scbtn:'拍照',scanning:'🔍 分析中…',scan_ok:'✅ 产品已识别',scan_err:'❌ 连接错误',
   ldlc:'有效期',lqty:'数量',rfsave:'💾 保存',rfcancel:'取消',
@@ -2290,6 +2365,7 @@ function applyLang(){
   document.querySelectorAll('.lang-btn,.lsb').forEach(b=>{b.classList.remove('on')});
   document.querySelectorAll(`[onclick*="setLang('${lang}')"]`).forEach(b=>b.classList.add('on'));
   renderStoreBars();
+  if(typeof trApply === 'function') try{ trApply(); }catch(e){}   // écrans récents (dictionnaire TRD)
 }
 
 /* ═══ AUTH ══════════════════════════════════════════════════════════════════ */
@@ -2553,13 +2629,14 @@ function showTab(n, isBack){
   if(n==='scanner'){
     checkCatalogueWarning();
   }
-  if(n==='commande') renderCommande();
+  if(n==='commande'){ renderCommande(); renderRuptureToggle(); }
   if(n==='stocks') renderStock();
   if(n==='vrac') renderVrac();
   if(n==='alertes') renderAlertes();
   if(n==='planning') renderPlanning();
   if(n==='catalogue') renderCatalogueView();
   if(n==='admin') renderAdmin();
+  if(n==='reglages') renderPriceStatus();
   if(n==='gestion') renderGestion();
   if(n==='marques') renderMarques();
   if(n==='dashboard') renderDashboard();   // compteurs + filtres (magasin/statut/catégorie) à jour
@@ -2626,12 +2703,15 @@ function homeNews(){
     if(byDlc[0]) out.dashboard.push({t:fillT(t.hn_next||'Prochaine date : {p} le {d}',{p:byDlc[0].name||byDlc[0].gencod,d:short(byDlc[0].dlc)})});
   }
   // Gestion : dernière commande, dernier relevé, dernière mise en rayon vrac
+  const rupT=ruptures.filter(r=>r.day===isoDay(new Date())).length;
+  if(rupT) out.gestion.push({t:fillT(t.hn_rupt||'Ruptures aujourd’hui : {n}',{n:rupT}),c:'r'});
   if(orders[0]) out.gestion.push({t:fillT(t.hn_order||'Dernière commande : {d} ({n} réf.)',{d:short(orders[0].date),n:(orders[0].lines||[]).length})});
   if(stockRecords[0]) out.gestion.push({t:fillT(t.hn_stock||'Dernier relevé : {d}',{d:short(stockRecords[0].date)})});
   if(vracEntries[0]) out.gestion.push({t:fillT(t.hn_vrac||'Vrac : {p} → {s} ({d})',{p:vracEntries[0].name||vracEntries[0].gencod,s:vracEntries[0].silo||'',d:short(vracEntries[0].dateRayon)})});
   // Planning : magasins du jour, dernier compte-rendu et action à suivre
   const dayIdx=(new Date().getDay()+6)%7;
   const todayStores=Object.keys(planning||{}).filter(k=>Array.isArray(planning[k])&&planning[k].includes(dayIdx));
+  storesOrderDayToday().slice(0,2).forEach(s=>out.planning.push({t:'🛒 '+fillT(t.hn_cmdday||'Jour de commande : {s}',{s:s.name})+(s.fiche.hcmd?' ('+s.fiche.hcmd+')':''),c:'o'}));
   if(todayStores.length) out.planning.push({t:(t.hn_tday||"Aujourd'hui")+' : '+todayStores.slice(0,3).join(', ')});
   if(visits[0]) out.planning.push({t:fillT(t.hn_cr||'Dernier compte-rendu : {s} ({d})',{s:visits[0].store,d:short(visits[0].date)})});
   const todo=visits.find(v=>v.actions);
@@ -4751,7 +4831,7 @@ let qtyCtx = null;   // { mode:'commande'|'stocks', gencod, name, famille, needN
 function openQtyPopup(ctx){
   qtyCtx = ctx;
   const isStock = ctx.mode === 'stocks';
-  document.getElementById('qm-title').textContent = isStock ? '📦 Ajouter au stock' : '🛒 Ajouter à la commande';
+  document.getElementById('qm-title').textContent = isStock ? '📦 Ajouter au stock' : (ruptureMode ? '🕳 Rupture → commande' : '🛒 Ajouter à la commande');
   const sub = ctx.needName
     ? (ctx.gencod ? 'Code ' + ctx.gencod + ' · hors catalogue' : 'Saisie manuelle')
     : [ctx.name, ctx.famille].filter(Boolean).join(' · ');
@@ -4768,6 +4848,7 @@ function openQtyPopup(ctx){
   searchInp.value = ctx.needName ? (ctx.gencod || '') : '';
   qmSearch();
   document.getElementById('qm-qty').value = '1';
+  qmShowPrice(ctx);
   const provWrap = document.getElementById('qm-provwrap');
   provWrap.style.display = isStock ? 'block' : 'none';
   if(isStock) document.getElementById('qm-prov').value = '';
@@ -4824,12 +4905,14 @@ function confirmQtyPopup(){
     if(!gencod && /^\d{8,14}$/.test(typed)) gencod = typed;
   }
   const p = qtyCtx.prod || {};
+  recordPriceCheck(gencod, name);
   if(qtyCtx.mode === 'stocks'){
     const prov = document.getElementById('qm-prov').value.trim();
     addStockProduct({ gencod, name, famille: qtyCtx.famille, provenance: prov }, qty);
   } else {
     addOrderProduct({ gencod, name, famille: qtyCtx.famille,
-      ref: p.ref, volume: p.volume, pcb: p.pcb, marque: p.marque, fam: p.famille }, qty);
+      ref: p.ref, volume: p.volume, pcb: p.pcb, marque: p.marque, fam: p.famille, rupture: ruptureMode }, qty);
+    if(ruptureMode){ recordRupture({ gencod, name, marque: p.marque }); renderRuptureToggle(); }
   }
   closeQtyPopup();
 }
@@ -4847,6 +4930,7 @@ function addOrderProduct(p, qty){
              ref: p.ref || '', volume: p.volume || '', pcb: p.pcb || '', marque: p.marque || '', fam: p.fam || '' };
     currentOrder.push(line);
   }
+  if(p.rupture) line.rupture = true;
   lastAddedKey = line.gencod || line.name;
   renderOrderLines();
   toast(`➕ ${line.name || line.gencod || 'Article'} · ${line.qty} colis`);
@@ -4907,7 +4991,7 @@ function renderOrderLines(){
     <div class="ord-line${flash}">
       <div style="flex:1;min-width:0">
         <input class="ord-name-in" value="${escapeHTML(l.name||'')}" placeholder="Nom (optionnel)" onchange="setOrderName(${i},this.value)" aria-label="Nom du produit">
-        <div style="font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(l.gencod||'sans gencod')}${orderLineInfo(l).ref?' · Réf. '+escapeHTML(orderLineInfo(l).ref):''}${l.famille?' · '+escapeHTML(l.famille):''}</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.rupture?'<span class="rupt-tag">rupture</span> ':''}${escapeHTML(l.gencod||'sans gencod')}${orderLineInfo(l).ref?' · Réf. '+escapeHTML(orderLineInfo(l).ref):''}${l.famille?' · '+escapeHTML(l.famille):''}</div>
       </div>
       <div style="flex-shrink:0">
         <div class="ord-qty">
@@ -4939,6 +5023,7 @@ function orderLineInfo(l){
     pcb,
     qty:    l.qty,
     units:  pcb ? pcb * l.qty : 0,      // unités = colis × PCB (si PCB connu)
+    rupture: !!l.rupture,
   };
 }
 
@@ -4981,7 +5066,8 @@ function buildOrderText(lines, meta){
   const rows = orderRows(lines), tot = orderTotals(rows);
   const totTxt = `${plural(tot.refs,'référence','références')} · ${tot.colis} colis` +
     (tot.units ? ` · ${tot.units} unités` + (tot.unitsKnown ? '' : ' (hors lignes sans PCB)') : '');
-  const out = mailHead('Bon de commande', { ...meta, by: displayBy(meta.by) }, totTxt);
+  const out = mailHead(`${docClient()} — ${meta.kind === 'precommande' ? 'Bon de pré-commande' : 'Bon de commande'}`, { ...meta, by: displayBy(meta.by) }, totTxt);
+  if(meta.kind === 'precommande') out.push('Proposition de commande à passer par le magasin : scannez les codes-barres du bon PDF joint, puis saisissez le nombre de colis.');
   let gamme = null;
   rows.forEach(r => {
     if(r.gamme !== gamme){
@@ -4989,7 +5075,7 @@ function buildOrderText(lines, meta){
       const n = rows.filter(x => x.gamme === gamme).length;
       out.push('', `${(gamme || 'Autres').toUpperCase()} (${plural(n,'réf.','réf.')})`);
     }
-    out.push(`• ${r.qty} colis — ${r.name}${r.volume ? ' ' + r.volume : ''}`);
+    out.push(`• ${r.qty} colis — ${r.name}${r.volume ? ' ' + r.volume : ''}${r.rupture ? ' (rupture en rayon)' : ''}`);
     out.push(`   ${[r.units ? r.units + ' unités (PCB ' + r.pcb + ')' : '', r.ref ? 'Réf. ' + r.ref : '', 'EAN ' + (r.gencod || 'non renseigné')].filter(Boolean).join(' · ')}`);
   });
   out.push('', MAIL_SEP, `TOTAL : ${totTxt}`, ...mailFoot());
@@ -5077,7 +5163,7 @@ function buildOrderXlsx(record){
   const d = new Date(record.date);
   const HEAD = ['N°','Gamme','Famille','Désignation','Volume','EAN (gencod)','Réf. fournisseur','PCB','Colis','Unités'];
   const out = [
-    { cells:['Bon de commande — Tempo'], style:1 },
+    { cells:[docClient() + ' — ' + orderDocTitle(record)], style:1 },
     { cells:['Magasin', record.store || '—'], style:0 },
     { cells:['Date', d.toLocaleString('fr-FR')], style:0 },
     { cells:['Préparée par', record.by || '—'], style:0 },
@@ -5089,7 +5175,7 @@ function buildOrderXlsx(record){
   out.push({ style:5, cells:['TOTAL','', '', `${tot.refs} référence(s)`, '', '', '', '', tot.colis, tot.units || ''] });
   const blob = XlsxWriter.workbook('Commande', out, [5,22,26,44,11,16,15,7,8,9], ['A1:J1']);
   const store = (record.store || 'magasin').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w-]+/g,'_').replace(/^_|_$/g,'');
-  const filename = `Commande_${store}_${d.toISOString().slice(0,10)}.xlsx`;
+  const filename = `${record.kind === 'precommande' ? 'Pre-commande' : 'Commande'}_${store}_${d.toISOString().slice(0,10)}.xlsx`;
   return { blob, filename };
 }
 
@@ -5188,14 +5274,21 @@ async function buildOrderPdf(record){
   let y = 0;
 
   function header(first){
-    doc.setFillColor(...GREEN); doc.rect(0, 0, W, 17, 'F');
-    doc.setTextColor(255); doc.setFont('helvetica','bold'); doc.setFontSize(14);
-    doc.text('Bon de commande', M, 11);
+    doc.setFillColor(...GREEN); doc.rect(0, 0, W, 21, 'F');
+    let tx = M;
+    if(brandLogos.__client){
+      doc.setFillColor(255,255,255); doc.roundedRect(M, 3, 15, 15, 2, 2, 'F');
+      pdfBrandMark(doc, '__client', M + 1, 4, 13, true); tx = M + 18;
+    }
+    doc.setTextColor(255); doc.setFont('helvetica','bold'); doc.setFontSize(15);
+    doc.text(clean(docClient()), tx, 10.5);
+    doc.setFont('helvetica','normal'); doc.setFontSize(11);
+    doc.text(orderDocTitle(record), tx, 16.5);
     doc.setFont('helvetica','normal'); doc.setFontSize(9);
     doc.text(clean(record.store || 'Magasin non précisé'), W - M, 7.5, { align:'right' });
     doc.text(d.toLocaleDateString('fr-FR') + ' à ' + d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }), W - M, 12.5, { align:'right' });
     doc.setTextColor(0);
-    y = 24;
+    y = 28;
     if(first){
       doc.setFontSize(9.5);
       [['Magasin', record.store || '—'], ['Préparé par', by || '—'],
@@ -5205,7 +5298,9 @@ async function buildOrderPdf(record){
         doc.setFont('helvetica','normal'); y += 5.2;
       });
       doc.setFontSize(8.5); doc.setTextColor(...GREY);
-      doc.text('Scannez le code-barres de chaque ligne à la douchette, puis saisissez le nombre de colis.', M, y + 1);
+      doc.text(record.kind === 'precommande'
+        ? 'Pré-commande à passer par le magasin : scannez le code-barres de chaque ligne, puis saisissez le nombre de colis.'
+        : 'Scannez le code-barres de chaque ligne à la douchette, puis saisissez le nombre de colis.', M, y + 1);
       doc.setTextColor(0); y += 6;
     }
     // En-tête du tableau
@@ -5222,13 +5317,14 @@ async function buildOrderPdf(record){
   let gamme = null;
   rows.forEach((r, i) => {
     const needGamme = r.gamme !== gamme;
-    if(y + ROW_H + (needGamme ? 7 : 0) > H - 14){ doc.addPage(); header(false); gamme = null; }
+    if(y + ROW_H + (needGamme ? 9 : 0) > H - 14){ doc.addPage(); header(false); gamme = null; }
     if(r.gamme !== gamme){
       gamme = r.gamme;
-      doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...GREEN);
-      doc.text(clean((gamme || 'Autres').toUpperCase()), M, y + 3);
+      const mw = pdfBrandMark(doc, gamme, M, y - 1, 7);
+      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...GREEN);
+      doc.text(clean((gamme || 'Autres').toUpperCase()), M + (mw ? mw + 2.5 : 0), y + 3.8);
       doc.setTextColor(0); doc.setFont('helvetica','normal');
-      y += 6;
+      y += 8;
     }
     const top = y, mid = top + 9;
     doc.setFontSize(9); doc.setTextColor(...GREY); doc.text(String(i + 1), COL.n + 1, mid);
@@ -5264,7 +5360,7 @@ async function buildOrderPdf(record){
     doc.text(`Page ${i} / ${n}`, W - M, H - 7, { align:'right' });
   }
   const store = (record.store || 'magasin').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w-]+/g,'_').replace(/^_|_$/g,'');
-  return { blob: doc.output('blob'), filename: `Bon_de_commande_${store}_${d.toISOString().slice(0,10)}.pdf` };
+  return { blob: doc.output('blob'), filename: `${record.kind === 'precommande' ? 'Bon_de_pre-commande' : 'Bon_de_commande'}_${store}_${d.toISOString().slice(0,10)}.pdf` };
 }
 async function exportOrderPdf(id){
   const o = findOrder(id); if(!o) return;
@@ -5289,11 +5385,13 @@ function exportOrderXlsx(id){
 }
 
 function openOrderEmail(subject, body, record){
-  document.getElementById('em-to').value   = localStorage.getItem('fc_email') || emailResp || '';
+  const st = record && record.kind === 'precommande' ? getStores().find(s => s.name === record.store) : null;
+  const stMail = st && st.fiche ? (st.fiche.c1m || st.fiche.c2m || '') : '';
+  document.getElementById('em-to').value   = stMail || localStorage.getItem('fc_email') || emailResp || '';
   document.getElementById('em-subj').value = subject;
   document.getElementById('em-body').value = body;
   const stag = document.getElementById('em-store-tag');
-  if(stag){ stag.style.display = 'inline-block'; stag.textContent = '🛒 Commande'; }
+  if(stag){ stag.style.display = 'inline-block'; stag.textContent = record && record.kind === 'precommande' ? '📝 Pré-commande' : '🛒 Commande'; }
   emailStore = null;
   emailAttachOrder = record || null;
   setEmailAttachUI(!!record);
@@ -5362,6 +5460,25 @@ function downloadOrderFileFromEmail(){
   toast('📊 Bon de commande Excel téléchargé');
 }
 
+/* Commande (passée par moi) ou pré-commande (bon envoyé au magasin, qui la
+   passera lui-même) : même bon, mêmes codes-barres, titre et destinataire
+   différents. */
+let orderKind = 'commande';
+const orderDocTitle = o => (o && o.kind === 'precommande') ? 'Bon de pré-commande' : 'Bon de commande';
+function setOrderKind(k){
+  orderKind = k;
+  document.querySelectorAll('#ord-kind button').forEach(b => b.classList.toggle('on', b.dataset.k === k));
+  const h = document.getElementById('ord-kind-hint'), v = document.getElementById('ord-validate');
+  const fiche = selStore && selStore.fiche, mail = fiche && (fiche.c1m || fiche.c2m);
+  if(h) h.textContent = k === 'precommande'
+    ? `Le bon (PDF à codes-barres + Excel) part au magasin, qui passera la commande lui-même${mail ? ' — destinataire : ' + mail : ' — ajoutez l’e-mail du magasin dans sa fiche 📇'}.`
+    : '';
+  if(v) v.textContent = k === 'precommande' ? '📝 Valider et envoyer la pré-commande' : '✅ Valider et envoyer par mail';
+}
+function orderSubject(o){
+  const dateStr = new Date(o.date).toLocaleDateString(lang);
+  return `[Tempo] ${orderDocTitle(o)}${o.store ? ' — ' + o.store : ''} — ${dateStr}`;
+}
 function validateOrder(){
   if(!currentOrder.length){ toast('Commande vide'); return; }
   stopCmdScan();
@@ -5370,19 +5487,21 @@ function validateOrder(){
     date:  new Date().toISOString(),
     store: storeName || '',
     by:    session?.username || '?',
+    kind:  orderKind,
     lines: currentOrder.map(l => ({ ...l })),
   };
   orders.unshift(record);
   localStorage.setItem('fc_orders', JSON.stringify(orders));
   const dateStr = new Date(record.date).toLocaleDateString(lang);
   openOrderEmail(
-    `[Tempo] Bon de commande${record.store ? ' — '+record.store : ''} — ${dateStr}`,
-    buildOrderText(record.lines, { date: dateStr, store: record.store, by: record.by }),
+    orderSubject(record),
+    buildOrderText(record.lines, { date: dateStr, store: record.store, by: record.by, kind: record.kind }),
     record
   );
   currentOrder = [];
   renderOrderLines();
-  toast('✅ Commande enregistrée');
+  toast(record.kind === 'precommande' ? '✅ Pré-commande enregistrée' : '✅ Commande enregistrée');
+  setOrderKind('commande');
 }
 
 function clearOrder(){
@@ -5417,7 +5536,7 @@ function renderOrdersHistory(){
     const totalQty = o.lines.reduce((s,l)=>s+l.qty, 0);
     return `<div style="padding:11px 0;border-bottom:1px solid rgba(0,0,0,.06)">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-        <div style="font-size:13px;font-weight:800">🛒 ${escapeHTML(new Date(o.date).toLocaleString(lang))}</div>
+        <div style="font-size:13px;font-weight:800">${o.kind==='precommande'?'📝 Pré-commande':'🛒'} ${escapeHTML(new Date(o.date).toLocaleString(lang))}</div>
         <span class="pbadge bk" style="font-size:10px">${o.lines.length} réf · ${totalQty} colis</span>
       </div>
       <div style="font-size:11px;color:var(--muted);font-weight:600;margin:2px 0 6px">${escapeHTML(o.store||'—')} · ${escapeHTML(o.by||'?')}</div>
@@ -5446,8 +5565,8 @@ function emailOrder(id){
   const o = findOrder(id); if(!o) return;
   const dateStr = new Date(o.date).toLocaleDateString(lang);
   openOrderEmail(
-    `[Tempo] Commande${o.store ? ' — '+o.store : ''} — ${dateStr}`,
-    buildOrderText(o.lines, { date: dateStr, store: o.store, by: o.by }),
+    orderSubject(o),
+    buildOrderText(o.lines, { date: dateStr, store: o.store, by: o.by, kind: o.kind }),
     o
   );
   closeModal('orders-modal');
@@ -6785,6 +6904,182 @@ async function buildVracCahierPDF(list, meta){
   return doc.output('blob');
 }
 
+/* ═══ PRIX (tarif + prix public conseillé) — gardés sur l'appareil ═══════════
+   Les prix ne sont jamais dans l'appli publiée : on les charge depuis ses
+   fichiers de tarif (.xlsx / .csv : gencod, PMC, Tarif) et ils restent dans le
+   téléphone (fc_prices). Servent au contrôle du prix en rayon et, plus tard,
+   à chiffrer la démarque. */
+let prices = (function(){ try{ return JSON.parse(localStorage.getItem('fc_prices') || '{}'); }catch(e){ return {}; } })();
+const priceOf = g => (g && prices[g]) ? { pmc: prices[g][0], tarif: prices[g][1] } : null;
+const euro = n => (n == null || isNaN(n)) ? '' : n.toLocaleString('fr-FR', { style:'currency', currency:'EUR' });
+const toNum = x => { const v = parseFloat(String(x == null ? '' : x).replace(/\s|€/g, '').replace(',', '.')); return isFinite(v) ? v : null; };
+async function importPriceFiles(input){
+  const files = [...(input.files || [])]; input.value = '';
+  if(!files.length) return;
+  let n = 0;
+  try{
+    for(const f of files){
+      const nm = f.name.toLowerCase();
+      const rows = nm.endsWith('.csv') ? parseCSVSimple(await f.text()) : await XlsxLite.readRows(await f.arrayBuffer());
+      if(rows.length < 2) continue;
+      const h = rows[0].map(x => String(x || '').toLowerCase().replace(/["\s]/g, ''));
+      let gi = h.findIndex(x => x.includes('gencod') || x.includes('ean')); if(gi < 0) gi = h.findIndex(x => x.includes('code') && !x.includes('interne'));
+      const pi = h.findIndex(x => x === 'pmc' || x.includes('prixpublic') || x.includes('prixconseill') || x.includes('pvc'));
+      const ti = h.findIndex(x => x === 'tarif' || x.includes('prixnet') || x.includes('prixachat') || x.includes('tarifht'));
+      if(gi < 0 || (pi < 0 && ti < 0)) throw new Error(`${f.name} : colonnes gencod / PMC / Tarif introuvables`);
+      for(let i = 1; i < rows.length; i++){
+        const g = String(rows[i][gi] == null ? '' : rows[i][gi]).replace(/\D/g, ''); if(!g) continue;
+        const pmc = pi >= 0 ? toNum(rows[i][pi]) : null, tar = ti >= 0 ? toNum(rows[i][ti]) : null;
+        if(pmc == null && tar == null) continue;
+        prices[g] = [pmc, tar]; n++;
+      }
+    }
+    localStorage.setItem('fc_prices', JSON.stringify(prices));
+    localStorage.setItem('fc_prices_ts', Date.now().toString());
+    toast(`💶 ${n} prix chargés (gardés sur ce téléphone uniquement)`);
+    renderPriceStatus();
+  }catch(err){ toast('❌ ' + (err && err.message || 'Fichier illisible')); }
+}
+function renderPriceStatus(){
+  const el = document.getElementById('rg-prices-st'); if(!el) return;
+  const n = Object.keys(prices).length, ts = +localStorage.getItem('fc_prices_ts') || 0;
+  el.textContent = n ? `${n} prix chargés${ts ? ' le ' + new Date(ts).toLocaleDateString('fr-FR') : ''}` : 'Aucun prix chargé';
+}
+
+/* ── Contrôle du prix en rayon (dans la fenêtre de quantité) ── */
+let priceChecks = (function(){ try{ return JSON.parse(localStorage.getItem('fc_pricechecks') || '[]'); }catch(e){ return []; } })();
+function qmShowPrice(ctx){
+  const wrap = document.getElementById('qm-pricewrap'); if(!wrap) return;
+  const pr = ctx && !ctx.needName ? priceOf(ctx.gencod) : null;
+  wrap.style.display = pr && pr.pmc != null ? 'block' : 'none';
+  document.getElementById('qm-shelf').value = '';
+  document.getElementById('qm-gap').textContent = '';
+  if(pr && pr.pmc != null) document.getElementById('qm-pmc').textContent = euro(pr.pmc);
+}
+function qmPriceGap(){
+  const pr = qtyCtx ? priceOf(qtyCtx.gencod) : null, el = document.getElementById('qm-gap');
+  const v = toNum(document.getElementById('qm-shelf').value);
+  if(!pr || pr.pmc == null || v == null){ el.textContent = ''; return; }
+  const d = v - pr.pmc, pc = pr.pmc ? d / pr.pmc * 100 : 0;
+  el.textContent = Math.abs(d) < 0.005 ? '✓ conforme au prix conseillé' : `${d > 0 ? '+' : ''}${euro(d)} (${d > 0 ? '+' : ''}${pc.toFixed(0)} %)`;
+  el.style.color = Math.abs(d) < 0.005 ? 'var(--gd)' : 'var(--r)';
+}
+function recordPriceCheck(gencod, name){
+  const pr = priceOf(gencod), v = toNum(document.getElementById('qm-shelf')?.value);
+  if(!pr || pr.pmc == null || v == null) return;
+  const d = isoDay(new Date()), st = storeName || '';
+  priceChecks = priceChecks.filter(c => !(c.day === d && c.store === st && c.gencod === gencod));
+  priceChecks.unshift({ day: d, store: st, gencod, name, pmc: pr.pmc, shelf: v, marque: brandOfGencod(gencod) });
+  if(priceChecks.length > 3000) priceChecks.length = 3000;
+  localStorage.setItem('fc_pricechecks', JSON.stringify(priceChecks));
+}
+
+/* ═══ MODE RUPTURE ═══════════════════════════════════════════════════════════
+   En rayon, chaque produit scanné (ou lu avec 🔢 sur l'étiquette d'un trou)
+   est noté comme « rupture » ET ajouté à la commande. Les ruptures sont
+   gardées (fc_ruptures) pour le compte-rendu de visite et les chiffres par
+   marque. */
+let ruptureMode = false;
+let ruptures = JSON.parse(localStorage.getItem('fc_ruptures') || '[]');
+function toggleRupture(){
+  ruptureMode = !ruptureMode;
+  renderRuptureToggle();
+  toast(ruptureMode ? '🕳 Mode rupture activé : chaque scan = produit absent du rayon' : 'Mode rupture désactivé');
+}
+function renderRuptureToggle(){
+  const b = document.getElementById('rupt-toggle'); if(!b) return;
+  const n = rupturesToday().length;
+  b.classList.toggle('on', ruptureMode);
+  b.innerHTML = ruptureMode ? `🕳 Mode rupture <b>activé</b>${n ? ` · ${n} aujourd'hui` : ''}` : `🕳 Mode rupture${n ? ` · ${n} relevée(s) aujourd'hui` : ''}`;
+}
+const todayIso = () => isoDay(new Date());
+function rupturesToday(store){
+  const st = store === undefined ? (storeName || '') : store, d = todayIso();
+  return ruptures.filter(r => r.day === d && (r.store || '') === st);
+}
+function recordRupture(p){
+  const d = todayIso(), st = storeName || '';
+  if(ruptures.some(r => r.day === d && (r.store || '') === st && (p.gencod ? r.gencod === p.gencod : r.name === p.name))) return;
+  ruptures.unshift({ id: genId(), at: new Date().toISOString(), day: d, store: st, gencod: p.gencod || '', name: p.name || '', marque: p.marque || brandOfGencod(p.gencod) || '' });
+  if(ruptures.length > 3000) ruptures.length = 3000;
+  save('fc_ruptures', ruptures);
+}
+
+/* ═══ FICHE MAGASIN ══════════════════════════════════════════════════════════
+   Contacts, jour et heure limite de commande, livraison, n° client, notes.
+   Rangée dans la liste des magasins (fc_stores). Le jour de commande
+   s'affiche sur l'accueil (carte Planning). */
+const WEEK_FR = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+let ficheStoreId = null;
+function openStoreFiche(id){
+  const s = getStores().find(x => x.id === id); if(!s) return;
+  ficheStoreId = id;
+  const f = s.fiche || {};
+  const set = (k, v) => { const e = document.getElementById('sf-' + k); if(e) e.value = v == null ? '' : v; };
+  ['c1n','c1r','c1t','c1m','c2n','c2r','c2t','c2m','hcmd','hliv','client','notes'].forEach(k => set(k, f[k]));
+  set('jcmd', f.jcmd ?? ''); set('jliv', f.jliv ?? '');
+  document.getElementById('sf-title').textContent = '📇 ' + s.name;
+  renderFicheActions(s);
+  openModal('store-fiche-modal');
+}
+function renderFicheActions(s){
+  const f = s.fiche || {}, box = document.getElementById('sf-actions'); if(!box) return;
+  const a = [];
+  [['c1n','c1t','c1m'],['c2n','c2t','c2m']].forEach(([n,t,m]) => {
+    if(f[t]) a.push(`<a class="sf-act" href="tel:${escapeHTMLAttr(f[t].replace(/[^\d+]/g,''))}">📞 ${escapeHTML(f[n] || 'Appeler')}</a>`);
+    if(f[m]) a.push(`<a class="sf-act" href="mailto:${escapeHTMLAttr(f[m])}">✉️ ${escapeHTML(f[n] || 'Écrire')}</a>`);
+  });
+  if(Number.isFinite(s.lat) && Number.isFinite(s.lng)) a.push(`<a class="sf-act" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}">🧭 Itinéraire</a>`);
+  box.innerHTML = a.join('');
+  box.style.display = a.length ? 'flex' : 'none';
+}
+function saveStoreFiche(){
+  const list = getStores(), s = list.find(x => x.id === ficheStoreId); if(!s) return;
+  const val = k => (document.getElementById('sf-' + k)?.value || '').trim();
+  s.fiche = {};
+  ['c1n','c1r','c1t','c1m','c2n','c2r','c2t','c2m','hcmd','hliv','client','notes','jcmd','jliv'].forEach(k => { const v = val(k); if(v !== '') s.fiche[k] = v; });
+  saveStores(list);
+  if(selStore && selStore.id === s.id) selStore = s;
+  renderFicheActions(s);
+  toast('✅ Fiche magasin enregistrée');
+  if(document.getElementById('stores-modal')?.classList.contains('on')) renderStoresModal();
+  renderCurrentTab();
+}
+/* Magasins dont c'est le jour de commande aujourd'hui */
+function storesOrderDayToday(){
+  const idx = String((new Date().getDay() + 6) % 7);
+  return getStores().filter(s => s.fiche && s.fiche.jcmd === idx);
+}
+
+/* ═══ PHOTOS AVANT / APRÈS (compte-rendu de visite) ══════════════════════════ */
+let visitPhotos = { avant:{}, apres:{} };
+async function onVisitPhoto(e){
+  const input = e.target, kind = input.dataset.kind;
+  const file = input.files && input.files[0]; input.value = '';
+  if(!file) return;
+  try{
+    const data = await shrinkImage(file, 1100, .7);
+    visitPhotos[kind] = { ref: visitPhotos[kind]?.ref || null, data, at: new Date().toISOString(), changed: true };
+    showVisitPhotos();
+  }catch(err){ toast('❌ Photo illisible'); }
+}
+function showVisitPhotos(){
+  ['avant','apres'].forEach(k => {
+    const ph = visitPhotos[k] || {}, img = document.getElementById('vs-img-' + k), del = document.getElementById('vs-del-' + k);
+    if(img){ img.style.display = ph.data ? 'block' : 'none'; if(ph.data) img.src = ph.data; }
+    if(del) del.style.display = ph.data ? 'block' : 'none';
+  });
+}
+function clearVisitPhoto(k){ visitPhotos[k] = { ref: visitPhotos[k]?.ref || null, data:null, changed:true }; showVisitPhotos(); }
+function dataUrlToFile(data, name){
+  const [h, b] = data.split(','), bin = atob(b), u = new Uint8Array(bin.length);
+  for(let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  return new File([u], name, { type: (h.match(/data:([^;]+)/) || [])[1] || 'image/jpeg' });
+}
+
+document.getElementById('vs-in-avant').addEventListener('change', onVisitPhoto);
+document.getElementById('vs-in-apres').addEventListener('change', onVisitPhoto);
+
 /* ═══ MARQUES : univers → marque → gamme ═════════════════════════════════════
    Le catalogue est rangé comme les marques le sont chez le fournisseur (et
    comme leurs indicateurs sont suivis) : Alimentaire (Jardin BiO, Karéléa…)
@@ -6799,6 +7094,8 @@ const BRAND_STYLE = {
   'Dentavie':['#1565C0','#64B5F6','D'], 'Floressance':['#6A1B9A','#BA68C8','F']
 };
 function brandBadge(name, big){
+  if(typeof brandLogos !== 'undefined' && brandLogos[name]) return `<span class="bd-logo img${big?' big':''}"><img src="${brandLogos[name]}" alt="${escapeHTMLAttr(name)}"></span>`;
+  if(name === '__client') return `<span class="bd-logo${big?' big':''}" style="background:linear-gradient(145deg,#8BC34A,#33691E)">LN</span>`;
   const st = BRAND_STYLE[name] || ['#455A64','#90A4AE', (name||'?').split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase()];
   return `<span class="bd-logo${big?' big':''}" style="background:linear-gradient(145deg,${st[1]},${st[0]})">${escapeHTML(st[2])}</span>`;
 }
@@ -6812,6 +7109,72 @@ function catalogueTree(){
   });
   return t;
 }
+
+/* ═══ EN-TÊTE DES DOCUMENTS + LOGOS DES MARQUES ═══════════════════════════════
+   Les bons (commande / pré-commande) portent l'en-tête du client fournisseur
+   (« Léa Nature » par défaut, modifiable pour un autre client) et le logo de
+   chaque marque présente. Les logos se chargent dans Réglages et restent sur
+   l'appareil (IndexedDB) ; sans logo, la marque garde sa pastille de couleur. */
+let brandLogos = {};
+const docClient = () => (localStorage.getItem('fc_doc_client') || 'Léa Nature').trim();
+(async function loadBrandLogos(){
+  try{ const all = await MediaDB.all(); Object.keys(all).filter(k => k.startsWith('logo:')).forEach(k => { brandLogos[k.slice(5)] = all[k]; }); }catch(e){}
+})();
+function openLogos(){
+  const inp = document.getElementById('doc-client'); if(inp) inp.value = docClient();
+  renderLogos(); openModal('logos-modal');
+}
+function saveDocClient(){
+  const v = (document.getElementById('doc-client')?.value || '').trim();
+  localStorage.setItem('fc_doc_client', v || 'Léa Nature');
+  toast('✅ En-tête des documents : ' + docClient());
+  renderLogos();
+}
+function renderLogos(){
+  const el = document.getElementById('logos-list'); if(!el) return;
+  const brands = [...new Set(catalogue.map(p => p.marque).filter(Boolean))].sort((a,b) => a.localeCompare(b, 'fr'));
+  const rowOf = (key, label, badge) => `<div class="lg-row">${badge}<div><b>${escapeHTML(label)}</b><small>${brandLogos[key] ? 'Logo chargé' : 'Pas de logo'}</small></div>
+      <button class="scan-link-btn" data-k="${escapeHTMLAttr(key)}" onclick="pickLogo(this.dataset.k)">${brandLogos[key] ? 'Changer' : 'Choisir'}</button>
+      ${brandLogos[key] ? `<button class="scan-link-btn" data-k="${escapeHTMLAttr(key)}" onclick="removeLogo(this.dataset.k)" style="color:var(--r)">🗑</button>` : ''}</div>`;
+  el.innerHTML = rowOf('__client', 'En-tête : ' + docClient(), brandBadge('__client'))
+    + `<div class="sf-sec">Marques</div>` + brands.map(b => rowOf(b, b, brandBadge(b))).join('');
+}
+let _logoKey = null;
+function pickLogo(k){ _logoKey = k; document.getElementById('logo-in').click(); }
+async function onLogoFile(e){
+  const f = e.target.files && e.target.files[0]; e.target.value = '';
+  if(!f || !_logoKey) return;
+  try{
+    const url = URL.createObjectURL(f), img = new Image();
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+    const sc = Math.min(1, 320 / Math.max(img.naturalWidth, img.naturalHeight));
+    const cv = document.createElement('canvas'); cv.width = Math.round(img.naturalWidth * sc); cv.height = Math.round(img.naturalHeight * sc);
+    cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); URL.revokeObjectURL(url);
+    const data = cv.toDataURL('image/png');
+    await MediaDB.put('logo:' + _logoKey, data); brandLogos[_logoKey] = data;
+    toast('✅ Logo enregistré'); renderLogos();
+  }catch(err){ toast('❌ Image illisible (PNG, JPG ou SVG)'); }
+}
+async function removeLogo(k){ try{ await MediaDB.del('logo:' + k); }catch(e){} delete brandLogos[k]; renderLogos(); }
+const hexRgb = h => { const n = parseInt(String(h).replace('#',''), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+/* Pastille de marque dans un PDF : logo si chargé, sinon initiales sur la couleur de la marque */
+/* Renvoie la largeur occupée (mm) : un logo peut être jusqu'à 3× plus large que haut */
+function pdfBrandMark(doc, name, x, y, size, square){
+  const logo = brandLogos[name];
+  if(logo){
+    try{ const pr = doc.getImageProperties(logo), maxW = square ? size : size * 3;
+      const sc = Math.min(maxW / pr.width, size / pr.height), w = pr.width * sc, h = pr.height * sc;
+      doc.addImage(logo, 'PNG', square ? x + (size - w) / 2 : x, y + (size - h) / 2, w, h); return square ? size : w; }catch(e){}
+  }
+  const st = BRAND_STYLE[name]; if(!st) return 0;
+  doc.setFillColor(...hexRgb(st[0])); doc.roundedRect(x, y, size, size, 1.3, 1.3, 'F');
+  doc.setTextColor(255); doc.setFont('helvetica','bold'); doc.setFontSize(size * 1.25);
+  doc.text(st[2], x + size / 2, y + size * .68, { align:'center' });
+  doc.setTextColor(0); doc.setFont('helvetica','normal');
+  return size;
+}
+
+document.getElementById('logo-in').addEventListener('change', onLogoFile);
 
 /* ── Navigateur par marque (fenêtre plein écran) ───────────────────────── */
 let bdState = { mode:'view', univ:'Alimentaire', marque:null, gamme:null };
@@ -6873,7 +7236,8 @@ function renderMarques(){
   const el = document.getElementById('mq-body'); if(!el) return;
   const since = Date.now() - mqDays * 864e5;
   const K = {};
-  const row = m => (K[m] = K[m] || { cmd:new Set(), colis:0, refs:new Set(), suivis:0, urg:0, vrac:0, univ:'' });
+  const row = m => (K[m] = K[m] || { cmd:new Set(), colis:0, refs:new Set(), suivis:0, urg:0, vrac:0, rupt:0, univ:'' });
+  ruptures.filter(r => new Date(r.at).getTime() >= since).forEach(r => { row(r.marque || brandOfGencod(r.gencod) || 'Hors catalogue').rupt++; });
   orders.filter(o => new Date(o.date).getTime() >= since).forEach(o => (o.lines || []).forEach(l => {
     const m = brandOfGencod(l.gencod) || l.marque || 'Hors catalogue'; const r = row(m);
     r.cmd.add(o.id); r.colis += Number(l.qty) || 0; r.refs.add(l.gencod || l.name);
@@ -6894,6 +7258,7 @@ function renderMarques(){
           <div><b>${x.colis}</b><span>colis · ${x.cmd.size} cde${x.cmd.size>1?'s':''}</span></div>
           <div><b>${x.refs.size}</b><span>réf. commandées</span></div>
           <div class="${x.urg?'bad':''}"><b>${x.urg}</b><span>à retirer / ${x.suivis} suivis</span></div>
+          ${x.rupt ? `<div class="bad"><b>${x.rupt}</b><span>ruptures</span></div>` : ''}
           ${x.vrac ? `<div><b>${x.vrac}</b><span>vrac</span></div>` : ''}
         </div></div>`).join('')
       : `<div class="empty">Pas encore de commande ni de produit suivi sur la période — les chiffres par marque se rempliront au fil des scans.</div>`);
@@ -7572,6 +7937,8 @@ function renderStoresModal(){
           <div style="font-size:11px;color:var(--muted);margin-top:1px;font-weight:600">${coord?`${s.lat.toFixed(4)}, ${s.lng.toFixed(4)} · rayon ${s.r||500}m`:'⚠ sans position GPS — non détectable'}</div>
         </div>
       </div>
+      <button data-sid="${escapeHTMLAttr(s.id)}" onclick="openStoreFiche(this.dataset.sid)" title="Fiche magasin" aria-label="Fiche magasin"
+        style="border:1px solid rgba(18,168,118,.3);background:rgba(18,168,118,.1);border-radius:9px;width:34px;height:32px;cursor:pointer;font-size:15px;flex-shrink:0;align-self:center">📇</button>
       ${chip}
       <button data-sid="${escapeHTMLAttr(s.id)}" onclick="confirmDeleteStoreModal(this.dataset.sid)"
         style="border:1px solid rgba(224,60,60,.28);background:rgba(224,60,60,.1);color:var(--r);
@@ -7769,6 +8136,7 @@ function renderPlanning(){
 
 function renderVisitList(){
   const el = document.getElementById('pl-visits'); if(!el) return;
+  setTimeout(loadVisitThumbs, 0);
   if(!visits.length){ el.innerHTML = '<div class="empty">Aucun compte-rendu — touchez 🎤 pour dicter le premier</div>'; return; }
   el.innerHTML = visits.slice(0, 15).map(v => {
     const id = escapeHTMLAttr(String(v.id));
@@ -7778,6 +8146,7 @@ function renderVisitList(){
       ${v.notes ? `<div class="vs-tx">${escapeHTML(v.notes)}</div>` : ''}
       ${v.actions ? `<div class="vs-act">➜ ${escapeHTML(v.actions)}</div>` : ''}
       ${v.next ? `<div style="font-size:11.5px;font-weight:700;color:var(--muted);margin-top:4px">Prochain passage : ${fmtDate(v.next)}</div>` : ''}
+      ${(v.photoAvant || v.photoApres) ? `<div class="vs-thumbs">${[v.photoAvant, v.photoApres].filter(Boolean).map(r => `<img data-ref="${escapeHTMLAttr(r)}" alt="Photo du rayon">`).join('')}</div>` : ''}
       <div class="vs-btns">
         <button class="scan-link-btn" data-id="${id}" onclick="shareVisit(this.dataset.id)">📤 Envoyer</button>
         <button class="scan-link-btn" data-id="${id}" onclick="openVisitForm(findVisit(this.dataset.id))">✏️ Modifier</button>
@@ -7786,6 +8155,7 @@ function renderVisitList(){
   }).join('') + (visits.length > 15 ? `<div style="text-align:center;color:rgba(255,255,255,.75);font-size:12px;font-weight:700;padding:6px">… ${visits.length - 15} compte(s)-rendu(s) plus ancien(s)</div>` : '');
 }
 function findVisit(id){ return visits.find(v => String(v.id) === String(id)); }
+function loadVisitThumbs(){ document.querySelectorAll('#pl-visits img[data-ref]').forEach(async img => { const d = await vracPhotoData(img.dataset.ref); if(d) img.src = d; }); }
 
 function openVisitForm(o){
   o = o || {};
@@ -7806,6 +8176,11 @@ function openVisitForm(o){
     ? 'Touchez 🎤, parlez, puis touchez à nouveau pour arrêter. Le texte reste modifiable.'
     : 'Dictée : touchez le champ puis le micro 🎤 du clavier du téléphone.';
   renderVisitTasks();
+  visitPhotos = { avant:{ ref:o.photoAvant || null, data:null, changed:false }, apres:{ ref:o.photoApres || null, data:null, changed:false } };
+  showVisitPhotos();
+  ['avant','apres'].forEach(async k => { const ph = visitPhotos[k]; if(ph.ref){ ph.data = await vracPhotoData(ph.ref); showVisitPhotos(); } });
+  const rn = ruptures.filter(r => r.day === (o.date || plSel || isoDay(new Date())) && (r.store || '') === (o.store || (selStore ? selStore.name : ''))).length;
+  if(hint && rn) hint.textContent = `🕳 ${rn} rupture(s) relevée(s) ce jour : elles seront ajoutées au compte-rendu. ` + hint.textContent;
   openModal('visit-modal');
 }
 function renderVisitTasks(){
@@ -7819,7 +8194,7 @@ function toggleVisitTask(t){
 }
 function closeVisitForm(){ stopDictation(); closeModal('visit-modal'); }
 
-function saveVisit(andShare){
+async function saveVisit(andShare){
   stopDictation();
   const val = id => (document.getElementById(id)?.value || '').trim();
   const store = val('vs-store');
@@ -7828,9 +8203,14 @@ function saveVisit(andShare){
   const data = { store, date: val('vs-date') || isoDay(new Date()), tasks: visitTasks.slice(),
     notes: val('vs-notes'), actions: val('vs-actions'), contact: val('vs-contact'), next: val('vs-next'),
     by: session?.name || session?.username || '' };
-  let id = visitEditId;
-  if(id){ const v = findVisit(id); if(v) Object.assign(v, data, { updatedAt: new Date().toISOString() }); }
-  else { id = genId(); visits.unshift(Object.assign({ id, createdAt: new Date().toISOString() }, data)); }
+  let id = visitEditId || genId();
+  for(const [k, f] of [['avant','photoAvant'],['apres','photoApres']]){
+    const ph = visitPhotos[k] || {};
+    if(ph.changed){ if(ph.ref) await dropVracPhoto(ph.ref); data[f] = ph.data ? await storeVracPhoto(id + ':' + k, ph.data) : null; }
+    else data[f] = ph.ref || null;
+  }
+  if(visitEditId){ const v = findVisit(id); if(v) Object.assign(v, data, { updatedAt: new Date().toISOString() }); }
+  else { visits.unshift(Object.assign({ id, createdAt: new Date().toISOString() }, data)); }
   visits.sort((a,b) => String(b.date).localeCompare(String(a.date)) || String(b.createdAt).localeCompare(String(a.createdAt)));
   save('fc_visits', visits);
   closeModal('visit-modal');
@@ -7840,6 +8220,7 @@ function saveVisit(andShare){
 }
 function deleteVisit(id){
   showConfirm('Supprimer ce compte-rendu ?', 'Il sera définitivement effacé de cet appareil.', () => {
+    const gone = findVisit(id); if(gone){ dropVracPhoto(gone.photoAvant); dropVracPhoto(gone.photoApres); }
     visits = visits.filter(v => String(v.id) !== String(id));
     save('fc_visits', visits); renderPlanning(); toast(T().deleted);
   });
@@ -7847,6 +8228,17 @@ function deleteVisit(id){
 function visitText(v){
   const out = mailHead('Compte-rendu de visite', { store: v.store, date: fmtDate(v.date), by: v.by });
   if((v.tasks || []).length) out.push(`Réalisé : ${v.tasks.join(', ')}`);
+  const rup = ruptures.filter(r => r.day === v.date && (r.store || '') === (v.store || ''));
+  if(rup.length){
+    const byB = {}; rup.forEach(r => { const b = r.marque || 'Autres'; byB[b] = (byB[b] || 0) + 1; });
+    out.push(`Ruptures relevées : ${rup.length} (${Object.entries(byB).map(([b,n]) => n + ' ' + b).join(', ')})`);
+  }
+  const pc = priceChecks.filter(c => c.day === v.date && (c.store || '') === (v.store || '') && Math.abs(c.shelf - c.pmc) >= 0.005);
+  if(pc.length){
+    out.push(`Écarts de prix relevés : ${pc.length}`);
+    pc.slice(0, 15).forEach(c => out.push(`  • ${c.name || c.gencod} : rayon ${euro(c.shelf)} / conseillé ${euro(c.pmc)} (${c.shelf > c.pmc ? '+' : ''}${euro(c.shelf - c.pmc)})`));
+  }
+  if(v.photoAvant || v.photoApres) out.push('Photos du rayon : avant / après jointes');
   if(v.contact) out.push(`Interlocuteur : ${v.contact}`);
   if(v.notes)   out.push('', 'RETOUR DE VISITE', v.notes);
   if(v.actions) out.push('', 'ACTIONS À SUIVRE', ...v.actions.split(/\n+/).map(x => '• ' + x.replace(/^[-•]\s*/, '')));
@@ -7857,9 +8249,16 @@ function visitText(v){
 async function shareVisit(id){
   const v = findVisit(id); if(!v) return;
   const text = visitText(v), title = `[Tempo] Compte-rendu de visite — ${v.store} — ${fmtDate(v.date)}`;
+  const files = [];
+  for(const [f, nm] of [['photoAvant','Rayon_avant.jpg'],['photoApres','Rayon_apres.jpg']]){
+    const d = v[f] ? await vracPhotoData(v[f]) : null; if(d) try{ files.push(dataUrlToFile(d, nm)); }catch(e){}
+  }
   if(navigator.share){
-    try{ await navigator.share({ title, text }); return; }
-    catch(e){ if(e && e.name === 'AbortError') return; }
+    try{
+      if(files.length && navigator.canShare && navigator.canShare({ files })) await navigator.share({ title, text, files });
+      else await navigator.share({ title, text });
+      return;
+    }catch(e){ if(e && e.name === 'AbortError') return; }
   }
   location.href = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(text)}`;
 }
@@ -8374,6 +8773,398 @@ document.addEventListener('DOMContentLoaded',()=>{
   const sd=sessionStorage.getItem('fc_session');
   if(sd){ try{session=JSON.parse(sd);launchApp()}catch(e){sessionStorage.removeItem('fc_session')} }
 });
+/* ═══ TRADUCTION DE L'INTERFACE (EN / ES / 中文) ═══════════════════════════════
+   Les écrans récents sont écrits en français ; ce dictionnaire les traduit à
+   l'affichage, y compris les listes construites à la volée (observateur DOM)
+   et les messages. Clé = texte français sans emoji ni ponctuation de bord ;
+   valeur = [anglais, espagnol, chinois]. Données produits (catalogue
+   fournisseur) et textes juridiques (data-notr) ne sont pas traduits. */
+const TRD = {
+"Ex : traces d'humidité, silo re-nettoyé et séché avant remplissage":["E.g. damp traces, bin cleaned again and dried before refilling","Ej.: rastros de humedad, silo limpiado y secado antes del llenado","例：有潮湿痕迹，补货前已重新清洁并干燥料仓"],
+"Ex : rayon frais bien tenu, 3 yaourts périmés retirés, le responsable veut tester la nouvelle gamme jus":["E.g. chilled aisle well kept, 3 expired yoghurts removed, the manager wants to try the new juice range","Ej.: lineal de frescos bien cuidado, 3 yogures caducados retirados, el responsable quiere probar la nueva gama de zumos","例：冷藏区整洁，撤下 3 个过期酸奶，负责人想试新果汁系列"],
+"Ex : envoyer le tarif jus 1 L, rappeler pour la commande de Noël":["E.g. send the 1 L juice price list, call back about the Christmas order","Ej.: enviar la tarifa de zumo 1 L, llamar por el pedido de Navidad","例：发送 1 升果汁价目表，回电确认圣诞订单"],
+"Ex : Julie, resp. épicerie":["E.g. Julie, grocery manager","Ej.: Julie, resp. de alimentación","例：Julie，杂货主管"],
+"Ex : JBV Pignon de pin 2,5 kg":["E.g. JBV Pine nuts 2.5 kg","Ej.: JBV Piñones 2,5 kg","例：JBV 松子 2.5 公斤"],
+"Ex : Silo 12":["E.g. Bin 12","Ej.: Silo 12","例：料仓 12"],
+"Ex : Chine":["E.g. China","Ej.: China","例：中国"],
+"Ex : fournisseur, origine, rayon":["E.g. supplier, origin, aisle","Ej.: proveedor, origen, lineal","例：供应商、产地、货架"],
+"Quai 2, badge à l'accueil":["Dock 2, badge at reception","Muelle 2, tarjeta en recepción","2 号码头，前台取证"],
+"Ex : 412 557":["E.g. 412 557","Ej.: 412 557","例：412 557"],
+"Ex : 3,79":["E.g. 3.79","Ej.: 3,79","例：3.79"],
+"Nom du produit":["Product name","Nombre del producto","产品名称"],
+"Nom de la marque":["Brand name","Nombre de la marca","品牌名称"],
+"Ce qui a été fait":["What was done","Lo que se hizo","已完成事项"],
+"Accueil":["Home","Inicio","首页"],
+"Actions à suivre":["Follow-up actions","Acciones pendientes","待跟进事项"],
+"Administrateur":["Administrator","Administrador","管理员"],
+"Administration":["Administration","Administración","管理"],
+"Administration (catalogue, compte, configuration)":["Administration (catalogue, account, settings)","Administración (catálogo, cuenta, configuración)","管理（目录、账户、配置）"],
+"Affiché en haut des bons de commande et de pré-commande. À changer si Tempo sert pour un autre client.":["Shown at the top of order and pre-order forms. Change it if Tempo is used for another client.","Aparece en la cabecera de los pedidos y prepedidos. Cámbialo si Tempo se usa para otro cliente.","显示在订单和预订单顶部。若 Tempo 用于其他客户，请修改。"],
+"Ajouter":["Add","Añadir","添加"],
+"Ajouter un produit":["Add a product","Añadir un producto","添加产品"],
+"Ajouter ce magasin":["Add this store","Añadir esta tienda","添加此门店"],
+"Ajouter un magasin":["Add a store","Añadir una tienda","添加门店"],
+"Ajouter à la commande":["Add to order","Añadir al pedido","加入订单"],
+"Ajouter, modifier":["Add, edit","Añadir, modificar","添加、修改"],
+"Ajuster les colis":["Adjust cases","Ajustar cajas","调整箱数"],
+"Alertes":["Alerts","Alertas","提醒"],
+"Alertes produits":["Product alerts","Alertas de productos","产品提醒"],
+"Alimentaire":["Food","Alimentación","食品"],
+"Animation":["Promotion event","Animación","促销活动"],
+"Annuler":["Cancel","Cancelar","取消"],
+"Arrêter":["Stop","Detener","停止"],
+"Astuce iPhone : activez le verrou de rotation dans le centre de contrôle (🔒 cadenas circulaire).":["iPhone tip: turn on rotation lock in Control Centre (🔒 circular padlock).","Consejo iPhone: activa el bloqueo de rotación en el Centro de control (🔒 candado).","iPhone 提示：在控制中心开启竖排方向锁定（🔒）。"],
+"Attention ≤7j":["Watch ≤7d","Atención ≤7d","注意 ≤7天"],
+"Aucun article — scannez un produit pour commencer":["No items — scan a product to start","Ningún artículo — escanea un producto para empezar","暂无商品 — 扫描产品开始"],
+"Aucun compte-rendu — touchez 🎤 pour dicter le premier":["No visit report yet — tap 🎤 to dictate the first one","Ningún informe — toca 🎤 para dictar el primero","暂无拜访报告 — 点击 🎤 口述第一份"],
+"Aucun magasin enregistré. Ajoutez vos magasins : le GPS détectera automatiquement celui où vous êtes.":["No store saved. Add your stores: GPS will detect the one you are in.","Ninguna tienda guardada. Añade tus tiendas: el GPS detectará en cuál estás.","尚未保存门店。添加门店后，GPS 会自动识别您所在的门店。"],
+"Aucun magasin — ajoutez-en dans Gestion › Magasins":["No store — add some in Management › Stores","Ninguna tienda — añádelas en Gestión › Tiendas","暂无门店 — 请在 运营 › 门店 中添加"],
+"Aucun passage prévu ce jour — organisez la semaine plus bas":["No visit planned this day — plan the week below","Ninguna visita prevista este día — organiza la semana abajo","当天无拜访安排 — 在下方安排本周"],
+"Aucun prix chargé":["No prices loaded","Ningún precio cargado","未加载价格"],
+"Aucun produit":["No products","Ningún producto","无产品"],
+"Aucun relevé en cours":["No count in progress","Sin recuento en curso","无进行中的盘点"],
+"Aucune commande en cours":["No order in progress","Sin pedido en curso","无进行中的订单"],
+"Aucune date urgente":["No urgent dates","Sin fechas urgentes","无紧急日期"],
+"Aucune mise en rayon enregistrée":["No shelving recorded","Ninguna reposición registrada","无上架记录"],
+"Aucune mise en rayon — scannez un sac pour commencer":["No shelving yet — scan a bag to start","Ninguna reposición — escanea un saco para empezar","暂无上架 — 扫描一袋开始"],
+"Aucune alerte":["No alerts","Sin alertas","无提醒"],
+"Aujourd'hui":["Today","Hoy","今天"],
+"Autorisez la localisation":["Allow location","Permite la ubicación","请允许定位"],
+"Avant":["Before","Antes","之前"],
+"Après":["After","Después","之后"],
+"Cahier de suivi":["Log book","Registro de seguimiento","跟踪记录簿"],
+"Cahier de suivi PDF":["PDF log book","Registro en PDF","PDF 跟踪记录"],
+"Cahier de suivi (PDF avec photos)":["Log book (PDF with photos)","Registro (PDF con fotos)","跟踪记录（含照片的 PDF）"],
+"Cahier de suivi vrac":["Bulk log book","Registro de granel","散装跟踪记录"],
+"Catalogue":["Catalogue","Catálogo","目录"],
+"Catalogue par marque":["Catalogue by brand","Catálogo por marca","按品牌浏览目录"],
+"Catégories":["Categories","Categorías","类别"],
+"Ce gencod n'est pas dans le catalogue.":["This barcode is not in the catalogue.","Este código no está en el catálogo.","该条码不在目录中。"],
+"Ce qui a été fait":["What was done","Lo que se hizo","已完成事项"],
+"Cette action est irréversible.":["This cannot be undone.","Esta acción es irreversible.","此操作不可撤销。"],
+"Charger les prix (tarif + PMC)":["Load prices (cost + RRP)","Cargar precios (tarifa + PVP)","加载价格（进价 + 建议零售价）"],
+"Chef de rayon épicerie":["Grocery department manager","Jefe de sección de alimentación","杂货区主管"],
+"Chercher un produit":["Find a product","Buscar un producto","查找产品"],
+"Chiffres par marque":["Figures by brand","Cifras por marca","按品牌统计"],
+"Choisir":["Choose","Elegir","选择"],
+"Changer":["Change","Cambiar","更换"],
+"Code-barres":["Barcode","Código de barras","条码"],
+"Code-barres EAN":["EAN barcode","Código EAN","EAN 条码"],
+"Commande":["Order","Pedido","订单"],
+"Commande et livraison":["Ordering and delivery","Pedido y entrega","下单与配送"],
+"Commande en cours":["Current order","Pedido en curso","当前订单"],
+"Commande par scan":["Order by scanning","Pedido por escaneo","扫码下单"],
+"Commander par marque":["Order by brand","Pedir por marca","按品牌下单"],
+"Commander par marque (sans scanner)":["Order by brand (no scanning)","Pedir por marca (sin escanear)","按品牌下单（无需扫码）"],
+"Commande · Stocks · Vrac · Magasins":["Orders · Stock · Bulk · Stores","Pedidos · Stock · Granel · Tiendas","订单 · 库存 · 散装 · 门店"],
+"Commandes, alertes, vrac":["Orders, alerts, bulk","Pedidos, alertas, granel","订单、提醒、散装"],
+"Compter le stock":["Count stock","Contar stock","盘点库存"],
+"Compter par marque (sans scanner)":["Count by brand (no scanning)","Contar por marca (sin escanear)","按品牌盘点（无需扫码）"],
+"Compte-rendu de visite":["Visit report","Informe de visita","拜访报告"],
+"Confirmer":["Confirm","Confirmar","确认"],
+"Consulter le cahier produit par produit":["Browse the log book product by product","Consultar el registro producto por producto","按产品查看记录簿"],
+"Contact 1":["Contact 1","Contacto 1","联系人 1"],
+"Contact 2":["Contact 2","Contacto 2","联系人 2"],
+"Contrôle DLC":["Date check","Control de fechas","保质期检查"],
+"Contrôle hygiène du silo":["Bin hygiene check","Control de higiene del silo","料仓卫生检查"],
+"Créé par":["Created by","Creado por","创建者"],
+"Critiques ≤2j":["Critical ≤2d","Críticos ≤2d","紧急 ≤2天"],
+"Date":["Date","Fecha","日期"],
+"Date limite (DLC)":["Use-by date","Fecha de caducidad","保质期"],
+"Dates (Fresh)":["Dates (Fresh)","Fechas (Fresh)","日期 (Fresh)"],
+"DDM / DLC — MM/AAAA":["Best-before / use-by — MM/YYYY","Consumo pref. / caducidad — MM/AAAA","最佳食用期 / 保质期 — 月/年"],
+"Démarrer le scan":["Start scanning","Iniciar escaneo","开始扫描"],
+"Derniers comptes-rendus":["Latest visit reports","Últimos informes","最近的拜访报告"],
+"Déconnexion":["Log out","Cerrar sesión","退出登录"],
+"Dicter le retour de visite":["Dictate the visit feedback","Dictar el informe de la visita","口述拜访反馈"],
+"Dicter les actions à suivre":["Dictate follow-up actions","Dictar las acciones pendientes","口述待跟进事项"],
+"Directeur":["Manager","Director","经理"],
+"Document PDF à envoyer au client ou à présenter lors d'un contrôle : chaque mise en rayon avec son lot, sa DDM, son origine, le contrôle hygiène du silo et les photos des étiquettes.":["PDF to send to the client or show during an inspection: each shelving with its batch, best-before date, origin, bin hygiene check and label photos.","PDF para enviar al cliente o mostrar en una inspección: cada reposición con su lote, fecha, origen, control de higiene y fotos de etiquetas.","可发送给客户或在检查时出示的 PDF：每次上架的批号、日期、产地、料仓卫生检查和标签照片。"],
+"Données":["Data","Datos","数据"],
+"Dossiers magasins":["Store folders","Carpetas de tiendas","门店档案"],
+"E-mail":["E-mail","Correo","电子邮件"],
+"EAN":["EAN","EAN","EAN"],
+"En-tête des bons (client fournisseur)":["Form header (supplier client)","Cabecera de los pedidos (cliente proveedor)","单据抬头（供应商客户）"],
+"En-tête et logos":["Header and logos","Cabecera y logotipos","抬头与标志"],
+"En-tête et logos des documents":["Document header and logos","Cabecera y logotipos de documentos","文件抬头与标志"],
+"Enregistrer":["Save","Guardar","保存"],
+"Enregistrer et envoyer":["Save and send","Guardar y enviar","保存并发送"],
+"Enregistrer la fiche":["Save the record","Guardar la ficha","保存档案"],
+"Enregistrer la mise en rayon":["Save the shelving","Guardar la reposición","保存上架"],
+"Enregistrer le magasin où je suis":["Save the store I'm in","Guardar la tienda donde estoy","保存当前所在门店"],
+"Enregistrer seulement":["Save only","Solo guardar","仅保存"],
+"Envoyer":["Send","Enviar","发送"],
+"Envoyer avec le bon PDF (codes-barres) + Excel":["Send with PDF form (barcodes) + Excel","Enviar con el PDF (códigos de barras) + Excel","附 PDF（条码）+ Excel 发送"],
+"Envoyer cette fiche":["Send this record","Enviar esta ficha","发送此记录"],
+"Envoyer le bon Excel":["Send the Excel form","Enviar el Excel","发送 Excel 单据"],
+"Envoyer le récap global":["Send the overall summary","Enviar el resumen global","发送总汇总"],
+"Envoyer par mail":["Send by e-mail","Enviar por correo","通过邮件发送"],
+"Envoyer tout le cahier (PDF)":["Send the whole log book (PDF)","Enviar todo el registro (PDF)","发送完整记录簿（PDF）"],
+"Étiquette du sac":["Bag label","Etiqueta del saco","袋子标签"],
+"Étiquette du silo":["Bin label","Etiqueta del silo","料仓标签"],
+"Exporter CSV":["Export CSV","Exportar CSV","导出 CSV"],
+"Exporter la traçabilité (CSV)":["Export traceability (CSV)","Exportar trazabilidad (CSV)","导出追溯记录（CSV）"],
+"Famille":["Family","Familia","类别"],
+"Famille / Marque":["Family / Brand","Familia / Marca","类别 / 品牌"],
+"Fermer":["Close","Cerrar","关闭"],
+"Fiche magasin":["Store record","Ficha de tienda","门店档案"],
+"Fonction":["Role","Cargo","职位"],
+"Formation équipe":["Staff training","Formación del equipo","员工培训"],
+"Fournisseur":["Supplier","Proveedor","供应商"],
+"Gencod":["Barcode","Código","条码"],
+"Gestion":["Management","Gestión","运营"],
+"Gestion des magasins":["Store management","Gestión de tiendas","门店管理"],
+"Générer et envoyer le PDF":["Create and send the PDF","Crear y enviar el PDF","生成并发送 PDF"],
+"GPS refusé":["GPS denied","GPS denegado","GPS 被拒绝"],
+"Heure":["Time","Hora","时间"],
+"Historique":["History","Historial","历史"],
+"Historique / Archive":["History / Archive","Historial / Archivo","历史 / 归档"],
+"Historique vrac":["Bulk history","Historial de granel","散装历史"],
+"Hors magasin":["Not in a store","Fuera de tienda","不在门店"],
+"Identifiant":["Username","Usuario","用户名"],
+"Importer un BL":["Import a delivery note","Importar un albarán","导入送货单"],
+"Importer un bon de livraison (BL)":["Import a delivery note","Importar un albarán","导入送货单"],
+"Informations":["Information","Información","信息"],
+"Interlocuteur":["Contact person","Interlocutor","联系人"],
+"Jour de commande":["Order day","Día de pedido","下单日"],
+"Jour de livraison":["Delivery day","Día de entrega","配送日"],
+"Langue":["Language","Idioma","语言"],
+"Lire les chiffres de l'étiquette":["Read the label digits","Leer los dígitos de la etiqueta","读取标签数字"],
+"Lire les chiffres de l'étiquette (EAN ou réf.)":["Read the label digits (EAN or ref.)","Leer los dígitos de la etiqueta (EAN o ref.)","读取标签数字（EAN 或编号）"],
+"Lundi":["Monday","Lunes","星期一"],"Mardi":["Tuesday","Martes","星期二"],"Mercredi":["Wednesday","Miércoles","星期三"],"Jeudi":["Thursday","Jueves","星期四"],"Vendredi":["Friday","Viernes","星期五"],"Samedi":["Saturday","Sábado","星期六"],"Dimanche":["Sunday","Domingo","星期日"],
+"Magasin":["Store","Tienda","门店"],
+"Magasins":["Stores","Tiendas","门店"],
+"Marques":["Brands","Marcas","品牌"],
+"Mentions légales & RGPD":["Legal notice & GDPR","Aviso legal y RGPD","法律声明与 GDPR"],
+"Mes magasins (ajouter, modifier)":["My stores (add, edit)","Mis tiendas (añadir, modificar)","我的门店（添加、修改）"],
+"Mise en avant":["Feature display","Exposición destacada","重点陈列"],
+"Mise en rayon":["Shelving","Reposición","上架"],
+"Mise en rayon des silos":["Bin refilling","Llenado de silos","料仓补货"],
+"Mises en rayon":["Shelvings","Reposiciones","上架记录"],
+"Mises en rayon des silos":["Bin refilling","Llenado de silos","料仓补货"],
+"Mode rupture":["Out-of-stock mode","Modo rotura","缺货模式"],
+"Mot de passe":["Password","Contraseña","密码"],
+"N° client fournisseur":["Supplier customer no.","N.º de cliente del proveedor","供应商客户编号"],
+"N° de lot":["Batch no.","N.º de lote","批号"],
+"Navigation":["Navigation","Navegación","导航"],
+"Nom":["Name","Nombre","名称"],
+"Nom du produit":["Product name","Nombre del producto","产品名称"],
+"Nom du produit (hors catalogue)":["Product name (not in catalogue)","Nombre del producto (fuera de catálogo)","产品名称（目录外）"],
+"Nom, EAN ou réf.":["Name, EAN or ref.","Nombre, EAN o ref.","名称、EAN 或编号"],
+"Nombre de colis":["Number of cases","Número de cajas","箱数"],
+"Nombre de sacs":["Number of bags","Número de sacos","袋数"],
+"Non alimentaire":["Non-food","No alimentación","非食品"],
+"Notes":["Notes","Notas","备注"],
+"Nouveau compte-rendu de visite":["New visit report","Nuevo informe de visita","新建拜访报告"],
+"Nouveau scan":["New scan","Nuevo escaneo","重新扫描"],
+"Organiser la semaine (passages réguliers)":["Plan the week (regular visits)","Organizar la semana (visitas regulares)","安排本周（定期拜访）"],
+"Origine / provenance":["Origin","Origen / procedencia","产地 / 来源"],
+"Ou créer le PDF d'une période":["Or create the PDF for a period","O crear el PDF de un periodo","或生成某一时段的 PDF"],
+"Outils":["Tools","Herramientas","工具"],
+"Par marque":["By brand","Por marca","按品牌"],
+"Parcourir par marque":["Browse by brand","Explorar por marca","按品牌浏览"],
+"Pas de code-barres":["No barcode","Sin código de barras","无条码"],
+"Pas de logo":["No logo","Sin logotipo","无标志"],
+"Logo chargé":["Logo loaded","Logotipo cargado","已加载标志"],
+"Pas de photo":["No photo","Sin foto","无照片"],
+"Pas encore de commande ni de produit suivi sur la période — les chiffres par marque se rempliront au fil des scans.":["No orders or tracked products in this period yet — figures by brand will fill in as you scan.","Aún no hay pedidos ni productos en el periodo — las cifras por marca se irán llenando con los escaneos.","此期间尚无订单或跟踪产品 — 品牌统计会随扫码逐步填充。"],
+"Périmés":["Expired","Caducados","已过期"],
+"Photographier":["Take a photo","Fotografiar","拍照"],
+"Photographier l'emballage":["Photograph the packaging","Fotografiar el envase","拍摄包装"],
+"Photos (preuve de traçabilité)":["Photos (traceability proof)","Fotos (prueba de trazabilidad)","照片（追溯凭证）"],
+"Photos + hygiène":["Photos + hygiene","Fotos + higiene","照片 + 卫生"],
+"Photos du rayon":["Shelf photos","Fotos del lineal","货架照片"],
+"Planning":["Planning","Planificación","计划"],
+"Pré-commande client":["Client pre-order","Prepedido del cliente","客户预订单"],
+"Prix conseillé":["Recommended price","Precio recomendado","建议零售价"],
+"prix en rayon":["shelf price","precio en lineal","货架价格"],
+"Prochain passage":["Next visit","Próxima visita","下次拜访"],
+"Produit":["Product","Producto","产品"],
+"Produit non référencé":["Product not listed","Producto no referenciado","未收录的产品"],
+"Produits":["Products","Productos","产品"],
+"Provenance":["Origin","Procedencia","来源"],
+"Quantité":["Quantity","Cantidad","数量"],
+"Rafraîchir le catalogue":["Refresh the catalogue","Actualizar el catálogo","刷新目录"],
+"Récap alertes par magasin":["Alert summary by store","Resumen de alertas por tienda","按门店汇总提醒"],
+"Recommencer depuis le début":["Start over","Empezar de nuevo","重新开始"],
+"Réglages":["Settings","Ajustes","设置"],
+"Relevé de stock":["Stock count","Recuento de stock","库存盘点"],
+"Remarques / action corrective":["Remarks / corrective action","Observaciones / acción correctiva","备注 / 纠正措施"],
+"Repérer par GPS":["Locate by GPS","Localizar por GPS","GPS 定位"],
+"Responsable magasin":["Store manager","Responsable de tienda","门店负责人"],
+"Restaurer une sauvegarde":["Restore a backup","Restaurar una copia","恢复备份"],
+"Restent sur ce téléphone, jamais publiés":["Stay on this phone, never published","Se quedan en este teléfono, nunca se publican","仅保存在本机，绝不公开"],
+"Retirer":["Remove","Quitar","移除"],
+"Retour à l'écran précédent":["Back to previous screen","Volver a la pantalla anterior","返回上一屏"],
+"Retour de visite — touchez 🎤 et parlez":["Visit feedback — tap 🎤 and speak","Informe de visita — toca 🎤 y habla","拜访反馈 — 点击 🎤 说话"],
+"Rien de prévu aujourd’hui":["Nothing planned today","Nada previsto hoy","今天无安排"],
+"Rien à signaler":["Nothing to report","Nada que señalar","无异常"],
+"Saisie manuelle":["Manual entry","Entrada manual","手动输入"],
+"Sauvegarder mes données":["Back up my data","Guardar mis datos","备份我的数据"],
+"Scanner les rayons":["Scan the shelves","Escanear los lineales","扫描货架"],
+"Scanner une date":["Scan a date","Escanear una fecha","扫描日期"],
+"Scanner via photo":["Scan from a photo","Escanear desde una foto","通过照片扫描"],
+"Se connecter":["Sign in","Iniciar sesión","登录"],
+"Silo":["Bin","Silo","料仓"],
+"Statistiques":["Statistics","Estadísticas","统计"],
+"Stock par scan":["Stock by scanning","Stock por escaneo","扫码盘点"],
+"Stock en cours":["Current stock count","Recuento en curso","当前盘点"],
+"Stocks":["Stock","Stock","库存"],
+"Suivi":["Follow-up","Seguimiento","跟踪"],
+"Supprimer":["Delete","Eliminar","删除"],
+"Téléphone":["Phone","Teléfono","电话"],
+"Télécharger le bon PDF (codes-barres)":["Download the PDF form (barcodes)","Descargar el PDF (códigos de barras)","下载 PDF 单据（条码）"],
+"Télécharger seulement l'Excel":["Download the Excel only","Descargar solo el Excel","仅下载 Excel"],
+"Torche":["Torch","Linterna","手电筒"],
+"Touchez 🎤, parlez, puis touchez à nouveau pour arrêter. Le texte reste modifiable.":["Tap 🎤, speak, then tap again to stop. You can still edit the text.","Toca 🎤, habla y vuelve a tocar para parar. El texto sigue siendo editable.","点击 🎤 说话，再次点击停止。文字仍可修改。"],
+"Tournez votre téléphone":["Turn your phone","Gira tu teléfono","请旋转手机"],
+"Tous":["All","Todos","全部"],
+"Tous statuts":["All statuses","Todos los estados","所有状态"],
+"Toutes":["All","Todas","全部"],
+"Tout est conforme":["Everything compliant","Todo conforme","全部合格"],
+"Un colis de moins":["One case less","Una caja menos","少一箱"],
+"Un colis de plus":["One case more","Una caja más","多一箱"],
+"Un sac de moins":["One bag less","Un saco menos","少一袋"],
+"Un sac de plus":["One bag more","Un saco más","多一袋"],
+"Une unité de moins":["One unit less","Una unidad menos","少一件"],
+"Une unité de plus":["One unit more","Una unidad más","多一件"],
+"Valider":["Confirm","Validar","确认"],
+"Valider et envoyer par mail":["Confirm and send by e-mail","Validar y enviar por correo","确认并邮件发送"],
+"Valider et envoyer la pré-commande":["Confirm and send the pre-order","Validar y enviar el prepedido","确认并发送预订单"],
+"Valider le relevé":["Confirm the count","Validar el recuento","确认盘点"],
+"Vérifier un produit":["Check a product","Verificar un producto","核查产品"],
+"Vider":["Clear","Vaciar","清空"],
+"Vider la commande":["Clear the order","Vaciar el pedido","清空订单"],
+"Vue par catégories":["View by category","Vista por categorías","按类别查看"],
+"Vision globale par catégorie":["Overview by category","Visión global por categoría","按类别总览"],
+"Votre outil terrain en GMS":["Your in-store field tool","Su herramienta de campo en tienda","门店现场管理工具"],
+"Vrac":["Bulk","Granel","散装"],
+"Vrac — mise en rayon":["Bulk — shelving","Granel — reposición","散装 — 上架"],
+"Vrac — vérifier un produit":["Bulk — check a product","Granel — verificar un producto","散装 — 核查产品"],
+"Mises en rayon":["Shelvings","Reposiciones","上架记录"],
+"colis commandés":["cases ordered","cajas pedidas","已订箱数"],
+"mises en rayon vrac":["bulk shelvings","reposiciones de granel","散装上架"],
+"à retirer (≤ 2 j)":["to remove (≤ 2 d)","a retirar (≤ 2 d)","待撤下（≤2天）"],
+"30 jours":["30 days","30 días","30 天"],"90 jours":["90 days","90 días","90 天"],"12 mois":["12 months","12 meses","12 个月"],
+"réf. commandées":["refs ordered","ref. pedidas","已订品项"],
+"ruptures":["out-of-stocks","roturas","缺货"],
+"vrac":["bulk","granel","散装"],
+"Hygiène conforme":["Hygiene compliant","Higiene conforme","卫生合格"],
+"Hygiène non renseignée":["Hygiene not filled in","Higiene sin rellenar","未填写卫生检查"],
+"Conforme":["Compliant","Conforme","合格"],
+"Oui":["Yes","Sí","是"],"Non":["No","No","否"],
+"Silo vidé entièrement (pas de mélange de lots)":["Bin fully emptied (no batch mixing)","Silo vaciado por completo (sin mezcla de lotes)","料仓完全清空（无批次混合）"],
+"Silo nettoyé":["Bin cleaned","Silo limpiado","料仓已清洁"],
+"Silo désinfecté":["Bin disinfected","Silo desinfectado","料仓已消毒"],
+"Silo sec avant remplissage":["Bin dry before refilling","Silo seco antes del llenado","补货前料仓干燥"],
+"Aucune trace de nuisibles ou d'insectes":["No trace of pests or insects","Sin rastro de plagas ni insectos","无害虫或昆虫痕迹"],
+"Sac fournisseur intact":["Supplier bag intact","Saco del proveedor intacto","供应商袋子完好"],
+"Produit conforme (aspect, odeur, sans corps étranger)":["Product compliant (look, smell, no foreign body)","Producto conforme (aspecto, olor, sin cuerpos extraños)","产品合格（外观、气味、无异物）"],
+"Pelle et ustensiles propres":["Scoop and utensils clean","Pala y utensilios limpios","铲子和器具干净"],
+"Étiquette du silo à jour (lot, DDM, allergènes)":["Bin label up to date (batch, date, allergens)","Etiqueta del silo al día (lote, fecha, alérgenos)","料仓标签已更新（批号、日期、过敏原）"],
+"Photos du rayon : avant / après jointes":["Shelf photos: before / after attached","Fotos del lineal: antes / después adjuntas","货架照片：前 / 后 已附"],
+"Envoyer le cahier de ce produit (PDF)":["Send this product's log (PDF)","Enviar el registro de este producto (PDF)","发送该产品的记录（PDF）"],
+"Produit ou code-barres":["Product or barcode","Producto o código","产品或条码"],
+"Produit, EAN ou réf. dans toutes les marques":["Product, EAN or ref. in all brands","Producto, EAN o ref. en todas las marcas","在所有品牌中搜索产品、EAN 或编号"],
+"Rechercher (nom, gencod, réf., type, marque)":["Search (name, barcode, ref., type, brand)","Buscar (nombre, código, ref., tipo, marca)","搜索（名称、条码、编号、类型、品牌）"],
+"Rechercher (produit, code, silo, lot, origine)":["Search (product, code, bin, batch, origin)","Buscar (producto, código, silo, lote, origen)","搜索（产品、条码、料仓、批号、产地）"],
+"Filtrer (produit, code, silo, lot, origine)":["Filter (product, code, bin, batch, origin)","Filtrar (producto, código, silo, lote, origen)","筛选（产品、条码、料仓、批号、产地）"],
+"Retrouver le produit — code-barres, réf. ou nom":["Find the product — barcode, ref. or name","Buscar el producto — código, ref. o nombre","查找产品 — 条码、编号或名称"],
+"si introuvable":["if not found","si no se encuentra","若找不到"],
+"optionnel":["optional","opcional","可选"],
+"Commander":["Order","Pedir","下单"],
+"Compter":["Count","Contar","盘点"],
+"Recherche":["Search","Búsqueda","搜索"],
+"Bon de commande":["Purchase order","Orden de pedido","订货单"],
+"Bon de pré-commande":["Pre-order form","Prepedido","预订单"],
+"Pré-commande":["Pre-order","Prepedido","预订单"],
+"Historique des commandes":["Order history","Historial de pedidos","订单历史"],
+"Historique des stocks":["Stock history","Historial de stock","库存历史"],
+"Ajouter le magasin":["Add the store","Añadir la tienda","添加门店"],
+"Nom du magasin":["Store name","Nombre de la tienda","门店名称"],
+"Rechercher un magasin":["Search for a store","Buscar una tienda","搜索门店"],
+"Utiliser ma position actuelle":["Use my current location","Usar mi ubicación actual","使用当前位置"],
+"Activer":["Activate","Activar","启用"],
+"Actif":["Active","Activo","已启用"],
+"Fresh Control":["Fresh Control","Fresh Control","Fresh Control"],
+"Planning et comptes-rendus":["Planning and visit reports","Planificación e informes","计划与拜访报告"],
+"Passage prévu":["Visit planned","Visita prevista","计划拜访"],
+"Fait":["Done","Hecho","已完成"],
+"Compte-rendu":["Visit report","Informe","拜访报告"],
+"Envoyer":["Send","Enviar","发送"],
+"Modifier":["Edit","Modificar","编辑"],
+"Traçabilité":["Traceability","Trazabilidad","追溯"],
+"Sac":["Bag","Saco","袋子"],
+"Produits":["Products","Productos","产品"],
+"Menu":["Menu","Menú","菜单"],
+"Dernière mise en rayon":["Last shelving","Última reposición","最近上架"],
+"Aucune trace":["No record","Sin registro","无记录"],
+"Enregistrer sa mise en rayon":["Record its shelving","Registrar su reposición","登记其上架"],
+"Mise en rayon du":["Shelving on","Reposición del","上架日期"],
+"Bonjour":["Hello","Hola","您好"],
+"Diagnostic":["Diagnostics","Diagnóstico","诊断"]
+};
+/* Textes avec des nombres ou des noms variables */
+const TR_RX = [
+  [/^(\d+) produits?$/, ['$1 products','$1 productos','$1 个产品']],
+  [/^(\d+) marques?$/, ['$1 brands','$1 marcas','$1 个品牌']],
+  [/^(\d+) mises? en rayon$/, ['$1 shelvings','$1 reposiciones','$1 次上架']],
+  [/^(\d+) non-conformités?$/, ['$1 non-compliance(s)','$1 no conformidad(es)','$1 项不合格']],
+  [/^(\d+) non conforme\(s\)$/, ['$1 non-compliant','$1 no conforme(s)','$1 项不合格']],
+  [/^(\d+) produits? · (.+)$/, ['$1 products · $2','$1 productos · $2','$1 个产品 · $2']],
+  [/^Supprimer (.+)$/, ['Delete $1','Eliminar $1','删除 $1']],
+  [/^Mise en rayon du (.+)$/, ['Shelving on $1','Reposición del $1','上架日期 $1']],
+  [/^(\d+) colis$/, ['$1 cases','$1 cajas','$1 箱']],
+  [/^(\d+) relevée?\(s\) aujourd'hui$/, ['$1 recorded today','$1 registradas hoy','今天记录 $1 个']],
+  [/^Mode rupture · (\d+) relevée\(s\) aujourd'hui$/, ["Out-of-stock mode · $1 recorded today","Modo rotura · $1 registradas hoy","缺货模式 · 今天记录 $1 个"]],
+  [/^En-tête : (.+)$/, ['Header: $1','Cabecera: $1','抬头：$1']],
+  [/^(\d+) mise\(s\) en rayon dans le cahier$/, ['$1 shelving(s) in the log book','$1 reposición(es) en el registro','记录簿中有 $1 次上架']],
+];
+const TR_IDX = { en:0, es:1, zh:2 };
+function trStr(s){
+  const L = TR_IDX[lang]; if(L == null || !s) return s;
+  const m = s.match(/^([^\p{L}\p{N}«(]*)([\s\S]*?)([\s:…*]*)$/u); if(!m) return s;
+  const core = m[2]; if(!core) return s;
+  const t = TRD[core]; if(t) return m[1] + t[L] + m[3];
+  for(const [rx, arr] of TR_RX) if(rx.test(core)) return m[1] + core.replace(rx, arr[L]) + m[3];
+  return s;
+}
+const TR_ATTRS = ['placeholder','title','aria-label'];
+function trTextNode(n){
+  const p = n.parentElement; if(!p || /^(SCRIPT|STYLE|TEXTAREA)$/.test(p.tagName) || p.closest('[data-notr]')) return;
+  if(n.__fr === undefined) n.__fr = n.nodeValue;
+  const src = n.__fr, core = src.trim(); if(!core) return;
+  const out = lang === 'fr' ? src : src.replace(core, trStr(core));
+  if(n.nodeValue !== out) n.nodeValue = out;
+}
+function trElAttrs(el){
+  if(el.closest && el.closest('[data-notr]')) return;
+  TR_ATTRS.forEach(a => {
+    if(!el.hasAttribute(a)) return;
+    const k = 'fr' + a.replace(/-./g, x => x[1].toUpperCase()).replace(/^./, c => c.toUpperCase());
+    if(el.dataset[k] === undefined) el.dataset[k] = el.getAttribute(a);
+    const out = lang === 'fr' ? el.dataset[k] : trStr(el.dataset[k]);
+    if(el.getAttribute(a) !== out) el.setAttribute(a, out);
+  });
+}
+function trDom(root){
+  if(!root) return;
+  if(root.nodeType === 3){ trTextNode(root); return; }
+  if(root.nodeType !== 1) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let n; while((n = w.nextNode())) trTextNode(n);
+  trElAttrs(root);
+  root.querySelectorAll('[placeholder],[title],[aria-label]').forEach(trElAttrs);
+}
+let _trOn = false;
+new MutationObserver(muts => {
+  if(lang === 'fr' && !_trOn) return;
+  muts.forEach(m => m.addedNodes.forEach(trDom));
+}).observe(document.body, { childList:true, subtree:true });
+function trApply(){ if(lang !== 'fr') _trOn = true; if(_trOn) trDom(document.body); }
+
+trApply();
+
 /* Cache hors-ligne (sw.js) : ouverture instantanée + utilisation sans réseau.
    Remplace l'ancien kill-switch : le SW revérifie la page à chaque ouverture
    et prévient quand une nouvelle version est en cache (message 'fc-update').

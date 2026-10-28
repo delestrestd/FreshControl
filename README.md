@@ -11,6 +11,9 @@ PWA de gestion des produits périmés en supermarché.
 - Écran d'accueil à 4 grandes icônes (Fresh, Gestion, Planning, Alertes), sans défilement ; Réglages sur la roue ⚙️.
 - **Vrac** : 2 photos (étiquette du sac + étiquette du silo), contrôle hygiène du silo Oui / Non, **cahier de suivi** consultable produit par produit à l'écran (jour de contrôle) et envoyable en PDF (cahier complet ou une seule fiche), avec le code-barres de chaque produit.
 - **Planning** : semaine de tournée + comptes-rendus de visite **dictés au micro**, envoyés par mail et modifiables ensuite.
+- **Commande** : mode rupture (les trous du rayon partent dans la commande et dans le compte-rendu), contrôle du prix en rayon (prix conseillé chargé localement via Réglages › Charger les prix, jamais publié), bon de **pré-commande** client (même PDF à codes-barres), en-tête « Léa Nature » (modifiable) et logos des marques sur les bons.
+- **Fiche magasin** (contacts, jour de commande / livraison, n° client) ; photos avant / après dans les comptes-rendus.
+- Interface traduite FR / EN / ES / ZH (dictionnaire `TRD` pour les écrans récents ; mentions légales et charte RGPD restent en français).
 - Alertes DLC, rappels e-mail.
 - Mono-utilisateur : un seul compte administrateur (outil de terrain personnel).
 - Multilingue (FR / EN / ES / ZH).
