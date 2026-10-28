@@ -1,7 +1,7 @@
 {
-  "name": "FreshControl — Gestion des périmés",
-  "short_name": "FreshControl",
-  "description": "Application PWA de gestion des produits périmés en supermarché — scan code-barres, alertes DLC, planning multi-magasins.",
+  "name": "Tempo — S2D COMMERCIAL",
+  "short_name": "Tempo",
+  "description": "Tempo : l'outil terrain GMS de S2D COMMERCIAL — dates de péremption (Fresh Control), commandes, stocks, vrac, tournée et comptes-rendus.",
   "lang": "fr",
   "dir": "ltr",
   "scope": "/",
