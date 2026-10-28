@@ -1,4 +1,6 @@
-# FreshControl
+# Tempo (ex-FreshControl)
+
+Outil terrain GMS de S2D COMMERCIAL. Le module des dates de péremption garde le nom « Fresh Control ».
 
 PWA de gestion des produits périmés en supermarché.
 
