@@ -16,7 +16,7 @@
    version qui fait self.registration.unregister() et vide les caches. */
 
 const CACHE = 'fc-shell-v1';
-const SHELL = ['/', '/manifest.json', '/icons/icon-192.svg', '/icons/icon-512.svg', '/icons/icon-maskable.svg'];
+const SHELL = ['/', '/manifest.json', '/icons/icon-192.svg', '/icons/icon-512.svg', '/icons/icon-maskable.svg', '/brand/s2d-monogramme.svg'];
 const CDN_HOSTS = ['cdn.jsdelivr.net', 'fonts.googleapis.com', 'fonts.gstatic.com'];
 
 // Installation : pré-charge la coquille de l'app (toujours depuis le réseau)
@@ -48,7 +48,7 @@ self.addEventListener('fetch', event => {
       event.respondWith(servePage(event));
       return;
     }
-    // Manifest et icônes : cache puis rafraîchissement silencieux
+    // Manifest, icônes et logo : cache puis rafraîchissement silencieux
     if (SHELL.includes(url.pathname)) {
       event.respondWith(staleWhileRevalidate(event, req, url.pathname));
       return;
