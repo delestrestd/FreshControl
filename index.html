@@ -160,6 +160,12 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 #hm-grid .hm-st{font-size:12px;-webkit-line-clamp:3}
 #tab-gestion.on{display:flex;flex-direction:column;height:100%;min-height:420px}
 #gs-grid{grid-template-rows:1fr 1fr auto}
+.hm-d{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
+.hm-d li{font-size:11.5px;font-weight:700;color:rgba(255,255,255,.93);line-height:1.25;padding-left:11px;position:relative}
+.hm-d li::before{content:'';position:absolute;left:0;top:.45em;width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.75)}
+#gs-grid .hm-st{display:inline-block;margin-top:8px;padding:5px 10px;border-radius:var(--rr);background:rgba(255,255,255,.94);color:var(--gd);font-size:12.5px;font-weight:900;-webkit-line-clamp:unset;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+#gs-grid .hm-tile.wide>div{flex-direction:column;align-items:flex-start;gap:0}
+#gs-grid .hm-tile.wide .hm-d{flex-direction:row;flex-wrap:wrap;gap:2px 14px;margin-top:3px}
 .hset{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.32);color:#fff;width:40px;height:40px;border-radius:12px;cursor:pointer;font-size:19px;display:flex;align-items:center;justify-content:center;box-shadow:var(--spec-d)}
 .hset:active{transform:scale(.94)}
 /* ── PLANNING : semaine + comptes-rendus dictés ────────────────────── */
@@ -195,7 +201,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .hm-tile{position:relative;min-height:0;border:1px solid rgba(255,255,255,.34);border-radius:22px;background:linear-gradient(160deg,rgba(255,255,255,.24),rgba(255,255,255,.08));backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.4),0 8px 26px rgba(0,0,0,.14);padding:10px 12px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;text-align:left;font-family:var(--font);color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s;overflow:hidden}
 .hm-tile:active{transform:scale(.97)}
 .hm-tile>div{min-width:0}
-.hm-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:21px;box-shadow:inset 0 1px 0 rgba(255,255,255,.35);flex-shrink:0}
+.hm-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:21px;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 4px 14px rgba(0,0,0,.22);flex-shrink:0}
 .hm-n{font-size:15px;font-weight:900;letter-spacing:-.2px;line-height:1.15}
 .hm-st{font-size:11px;font-weight:700;color:rgba(255,255,255,.82);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .hm-badge{position:absolute;top:8px;right:9px;min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:var(--r);color:#fff;font-size:11.5px;font-weight:900;display:flex;align-items:center;justify-content:center}
@@ -2087,7 +2093,7 @@ if(new URLSearchParams(location.search).get('reset')==='1'){
 
 /* ═══ I18N ══════════════════════════════════════════════════════════════════ */
 const I18N={
-  fr:{tag:'Gestion intelligente des périmés',by:'Créé par',hm_hi:'Bonjour',tl_g:'Gestion',tl_mag:'Magasins',hs_g:'Commande · Stocks · Vrac · Magasins',hs_mag:'{n} magasin(s) enregistré(s)',tl_cat:'Catalogue',tl_set:'Réglages',tl_adm:'Administration',fresh_scan:'📷 Scanner une date',hs_fresh:'{e} périmé(s) · {o} sous 2 j',hs_fresh0:'Aucune date urgente',hs_cmd:'{n} réf. · {c} colis en cours',hs_cmd0:'Aucune commande en cours',hs_stk:'{n} produit(s) en cours',hs_stk0:'Aucun relevé en cours',hs_vrac:'{n} mise(s) en rayon',hs_vrac0:'Mises en rayon des silos',hs_al:'{n} magasin(s) à prévenir',hs_al0:'Rien à signaler',hs_pl:'Aujourd’hui : {n} magasin(s)',hs_pl0:'Rien de prévu aujourd’hui',hs_cat:'{n} produits',hs_set:'Magasins, sauvegarde, langue',hm_store:'Magasin',l_user:'Identifiant',l_pass:'Mot de passe',l_btn:'Se connecter',l_err_empty:'Remplissez tous les champs',l_err_wrong:'Identifiant ou mot de passe incorrect',ph_user:'prenom.nom',ph_pass:'••••••••',rg_t:"🔒 Charte d'usage et protection des données",rg_p:"Le détail des traitements et des durées de conservation figure dans les Mentions légales accessibles depuis le menu.",rg_y:'✓ Accepter',rg_n:'Refuser',
+  fr:{tag:'Gestion intelligente des périmés',by:'Créé par',hm_hi:'Bonjour',tl_g:'Gestion',gd_c:'Scanner les rayons|Ajuster les colis|Envoyer le bon Excel',gd_stk:'Compter le stock|Importer un BL|Vérifier un produit',gd_v:'Mise en rayon des silos|Photos + hygiène|Cahier de suivi PDF',gd_mag:'Ajouter, modifier|Repérer par GPS|Dossiers magasins',gd_cat:'Chercher un produit|Nom, EAN ou réf.',tl_mag:'Magasins',hs_g:'Commande · Stocks · Vrac · Magasins',hs_mag:'{n} magasin(s) enregistré(s)',tl_cat:'Catalogue',tl_set:'Réglages',tl_adm:'Administration',fresh_scan:'📷 Scanner une date',hs_fresh:'{e} périmé(s) · {o} sous 2 j',hs_fresh0:'Aucune date urgente',hs_cmd:'{n} réf. · {c} colis en cours',hs_cmd0:'Aucune commande en cours',hs_stk:'{n} produit(s) en cours',hs_stk0:'Aucun relevé en cours',hs_vrac:'{n} mise(s) en rayon',hs_vrac0:'Mises en rayon des silos',hs_al:'{n} magasin(s) à prévenir',hs_al0:'Rien à signaler',hs_pl:'Aujourd’hui : {n} magasin(s)',hs_pl0:'Rien de prévu aujourd’hui',hs_cat:'{n} produits',hs_set:'Magasins, sauvegarde, langue',hm_store:'Magasin',hm_out:'Hors magasin',hm_loc:'Localisation…',l_user:'Identifiant',l_pass:'Mot de passe',l_btn:'Se connecter',l_err_empty:'Remplissez tous les champs',l_err_wrong:'Identifiant ou mot de passe incorrect',ph_user:'prenom.nom',ph_pass:'••••••••',rg_t:"🔒 Charte d'usage et protection des données",rg_p:"Le détail des traitements et des durées de conservation figure dans les Mentions légales accessibles depuis le menu.",rg_y:'✓ Accepter',rg_n:'Refuser',
   lexp:'Périmés',lcrit:'Critiques ≤2j',lwarn:'Attention ≤7j',lok:'OK',lprods:'Produits',all:'Tous',all_stores:'Tous magasins',all_status:'Tous statuts',
   sct:'Scanner un produit',scsub:'Photographiez le code-barres EAN',scbtn:'Prendre une photo',scanning:'🔍 Analyse…',scan_ok:'✅ Produit reconnu',scan_err:'❌ Erreur de connexion',
   ldlc:'Date limite (DLC)',lqty:'Quantité',rfsave:'💾 Enregistrer',rfcancel:'Annuler',
@@ -2097,11 +2103,11 @@ const I18N={
   badge_e:'Périmé',badge_o:'J-{{d}}',badge_w:'J-{{d}}',badge_k:'J-{{d}}',
   send_all:'📧 Envoyer le récap global',su_t:'⚠️ Alertes produits',su_p:'Produits expirés ou critiques détectés',
   em_t:'📧 Envoyer un rappel',em_sub:'Rappel e-mail des produits urgents',em_to:'Destinataire(s)',em_subj:'Objet',em_body:'Corps du message',em_cancel:'Annuler',su_mail:'📧 Envoyer par mail',su_cl:'Fermer',
-  email_subj:'[FreshControl] Produits urgents — {{store}} — {{date}}',
+  email_subj:'[FreshControl] Produits à retirer — {{store}} — {{date}}',
   days:['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'],
   saved:'✅ Sauvegardé',deleted:'🗑 Supprimé',user_added:'👤 Utilisateur ajouté',store_added:'🏪 Magasin ajouté',prod_archived:'✅ Produit archivé',no_prods:'Aucun produit',fill_all:'Remplissez tous les champs',email_sent:'✅ E-mail envoyé',email_err:'❌ Erreur envoi',csv_ok:'📥 CSV téléchargé',
   adm_stores:'🏪 Magasins',adm_users:'👥 Utilisateurs',adm_lang:'🌍 Langue',adm_conf:'⚙️ Configuration'},
-  en:{tag:'Smart expiry date management',by:'Created by',hm_hi:'Hello',tl_g:'Management',tl_mag:'Stores',hs_g:'Orders · Stock · Bulk · Stores',hs_mag:'{n} store(s) saved',tl_cat:'Catalogue',tl_set:'Settings',tl_adm:'Administration',fresh_scan:'📷 Scan a date',hs_fresh:'{e} expired · {o} within 2 d',hs_fresh0:'No urgent dates',hs_cmd:'{n} items · {c} cases in progress',hs_cmd0:'No order in progress',hs_stk:'{n} product(s) in progress',hs_stk0:'No count in progress',hs_vrac:'{n} shelving(s)',hs_vrac0:'Bulk bin shelving',hs_al:'{n} store(s) to notify',hs_al0:'Nothing to report',hs_pl:'Today: {n} store(s)',hs_pl0:'Nothing planned today',hs_cat:'{n} products',hs_set:'Stores, backup, language',hm_store:'Store',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err_empty:'Please fill all fields',l_err_wrong:'Wrong username or password',ph_user:'firstname.lastname',ph_pass:'••••••••',rg_t:'🔒 Usage charter & data protection',rg_p:'Full processing details and retention periods are available in the Legal Notice from the menu.',rg_y:'✓ Accept',rg_n:'Decline',
+  en:{tag:'Smart expiry date management',by:'Created by',hm_hi:'Hello',tl_g:'Management',gd_c:'Scan the shelves|Adjust cases|Send the Excel order',gd_stk:'Count stock|Import a delivery note|Check a product',gd_v:'Bin refilling|Photos + hygiene|PDF log book',gd_mag:'Add, edit|Locate by GPS|Store folders',gd_cat:'Find a product|Name, EAN or ref.',tl_mag:'Stores',hs_g:'Orders · Stock · Bulk · Stores',hs_mag:'{n} store(s) saved',tl_cat:'Catalogue',tl_set:'Settings',tl_adm:'Administration',fresh_scan:'📷 Scan a date',hs_fresh:'{e} expired · {o} within 2 d',hs_fresh0:'No urgent dates',hs_cmd:'{n} items · {c} cases in progress',hs_cmd0:'No order in progress',hs_stk:'{n} product(s) in progress',hs_stk0:'No count in progress',hs_vrac:'{n} shelving(s)',hs_vrac0:'Bulk bin shelving',hs_al:'{n} store(s) to notify',hs_al0:'Nothing to report',hs_pl:'Today: {n} store(s)',hs_pl0:'Nothing planned today',hs_cat:'{n} products',hs_set:'Stores, backup, language',hm_store:'Store',hm_out:'Not in a store',hm_loc:'Locating…',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err_empty:'Please fill all fields',l_err_wrong:'Wrong username or password',ph_user:'firstname.lastname',ph_pass:'••••••••',rg_t:'🔒 Usage charter & data protection',rg_p:'Full processing details and retention periods are available in the Legal Notice from the menu.',rg_y:'✓ Accept',rg_n:'Decline',
   lexp:'Expired',lcrit:'Critical ≤2d',lwarn:'Warning ≤7d',lok:'OK',lprods:'Products',all:'All',all_stores:'All stores',all_status:'All statuses',
   sct:'Scan a product',scsub:'Photograph the EAN barcode',scbtn:'Take a photo',scanning:'🔍 Analyzing…',scan_ok:'✅ Product found',scan_err:'❌ Connection error',
   ldlc:'Expiry date',lqty:'Quantity',rfsave:'💾 Save',rfcancel:'Cancel',
@@ -2115,7 +2121,7 @@ const I18N={
   days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
   saved:'✅ Saved',deleted:'🗑 Deleted',user_added:'👤 User added',store_added:'🏪 Store added',prod_archived:'✅ Product archived',no_prods:'No products',fill_all:'Please fill all fields',email_sent:'✅ Email sent',email_err:'❌ Send error',csv_ok:'📥 CSV downloaded',
   adm_stores:'🏪 Stores',adm_users:'👥 Users',adm_lang:'🌍 Language',adm_conf:'⚙️ Config'},
-  es:{tag:'Gestión inteligente de caducidades',by:'Creado por',hm_hi:'Hola',tl_g:'Gestión',tl_mag:'Tiendas',hs_g:'Pedidos · Stock · Granel · Tiendas',hs_mag:'{n} tienda(s) registrada(s)',tl_cat:'Catálogo',tl_set:'Ajustes',tl_adm:'Administración',fresh_scan:'📷 Escanear una fecha',hs_fresh:'{e} caducado(s) · {o} en 2 d',hs_fresh0:'Sin fechas urgentes',hs_cmd:'{n} ref. · {c} cajas en curso',hs_cmd0:'Sin pedido en curso',hs_stk:'{n} producto(s) en curso',hs_stk0:'Sin recuento en curso',hs_vrac:'{n} reposición(es)',hs_vrac0:'Reposición de silos',hs_al:'{n} tienda(s) a avisar',hs_al0:'Nada que señalar',hs_pl:'Hoy: {n} tienda(s)',hs_pl0:'Nada previsto hoy',hs_cat:'{n} productos',hs_set:'Tiendas, copia, idioma',hm_store:'Tienda',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Iniciar sesión',l_err_empty:'Rellene todos los campos',l_err_wrong:'Usuario o contraseña incorrectos',ph_user:'nombre.apellido',ph_pass:'••••••••',rg_t:'🔒 Carta de uso y protección de datos',rg_p:'El detalle del tratamiento y los plazos de conservación figuran en el Aviso Legal accesible desde el menú.',rg_y:'✓ Aceptar',rg_n:'Rechazar',
+  es:{tag:'Gestión inteligente de caducidades',by:'Creado por',hm_hi:'Hola',tl_g:'Gestión',gd_c:'Escanear los estantes|Ajustar las cajas|Enviar el pedido Excel',gd_stk:'Contar el stock|Importar un albarán|Verificar un producto',gd_v:'Llenado de silos|Fotos + higiene|Registro PDF',gd_mag:'Añadir, modificar|Localizar por GPS|Carpetas de tiendas',gd_cat:'Buscar un producto|Nombre, EAN o ref.',tl_mag:'Tiendas',hs_g:'Pedidos · Stock · Granel · Tiendas',hs_mag:'{n} tienda(s) registrada(s)',tl_cat:'Catálogo',tl_set:'Ajustes',tl_adm:'Administración',fresh_scan:'📷 Escanear una fecha',hs_fresh:'{e} caducado(s) · {o} en 2 d',hs_fresh0:'Sin fechas urgentes',hs_cmd:'{n} ref. · {c} cajas en curso',hs_cmd0:'Sin pedido en curso',hs_stk:'{n} producto(s) en curso',hs_stk0:'Sin recuento en curso',hs_vrac:'{n} reposición(es)',hs_vrac0:'Reposición de silos',hs_al:'{n} tienda(s) a avisar',hs_al0:'Nada que señalar',hs_pl:'Hoy: {n} tienda(s)',hs_pl0:'Nada previsto hoy',hs_cat:'{n} productos',hs_set:'Tiendas, copia, idioma',hm_store:'Tienda',hm_out:'Fuera de tienda',hm_loc:'Localizando…',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Iniciar sesión',l_err_empty:'Rellene todos los campos',l_err_wrong:'Usuario o contraseña incorrectos',ph_user:'nombre.apellido',ph_pass:'••••••••',rg_t:'🔒 Carta de uso y protección de datos',rg_p:'El detalle del tratamiento y los plazos de conservación figuran en el Aviso Legal accesible desde el menú.',rg_y:'✓ Aceptar',rg_n:'Rechazar',
   lexp:'Caducados',lcrit:'Crítico ≤2d',lwarn:'Atención ≤7d',lok:'OK',lprods:'Productos',all:'Todos',all_stores:'Todas las tiendas',all_status:'Todos los estados',
   sct:'Escanear producto',scsub:'Fotografíe el código EAN',scbtn:'Tomar foto',scanning:'🔍 Analizando…',scan_ok:'✅ Producto encontrado',scan_err:'❌ Error de conexión',
   ldlc:'Fecha caducidad',lqty:'Cantidad',rfsave:'💾 Guardar',rfcancel:'Cancelar',
@@ -2129,7 +2135,7 @@ const I18N={
   days:['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],
   saved:'✅ Guardado',deleted:'🗑 Eliminado',user_added:'👤 Usuario añadido',store_added:'🏪 Tienda añadida',prod_archived:'✅ Producto archivado',no_prods:'Sin productos',fill_all:'Rellene todos los campos',email_sent:'✅ Correo enviado',email_err:'❌ Error envío',csv_ok:'📥 CSV descargado',
   adm_stores:'🏪 Tiendas',adm_users:'👥 Usuarios',adm_lang:'🌍 Idioma',adm_conf:'⚙️ Config'},
-  zh:{tag:'智能保质期管理系统',by:'创建者',hm_hi:'您好',tl_g:'运营',tl_mag:'门店',hs_g:'订单 · 库存 · 散装 · 门店',hs_mag:'已保存 {n} 家门店',tl_cat:'目录',tl_set:'设置',tl_adm:'管理',fresh_scan:'📷 扫描日期',hs_fresh:'{e} 已过期 · {o} 2天内',hs_fresh0:'无紧急日期',hs_cmd:'{n} 项 · {c} 箱进行中',hs_cmd0:'无进行中的订单',hs_stk:'{n} 个产品进行中',hs_stk0:'无进行中的盘点',hs_vrac:'{n} 次上架',hs_vrac0:'散装上架',hs_al:'{n} 家门店待通知',hs_al0:'无异常',hs_pl:'今天：{n} 家门店',hs_pl0:'今天无安排',hs_cat:'{n} 个产品',hs_set:'门店、备份、语言',hm_store:'门店',l_user:'用户名',l_pass:'密码',l_btn:'登录',l_err_empty:'请填写所有字段',l_err_wrong:'用户名或密码错误',ph_user:'姓名.姓氏',ph_pass:'••••••••',rg_t:'🔒 使用规章与数据保护',rg_p:'数据处理详情与保留期限请查阅菜单中的法律声明。',rg_y:'✓ 接受',rg_n:'拒绝',
+  zh:{tag:'智能保质期管理系统',by:'创建者',hm_hi:'您好',tl_g:'运营',gd_c:'扫描货架|调整箱数|发送 Excel 订单',gd_stk:'盘点库存|导入送货单|核查产品',gd_v:'散装补货|照片 + 卫生检查|PDF 跟踪记录',gd_mag:'添加、修改|GPS 定位|门店档案',gd_cat:'查找产品|名称、EAN 或编号',tl_mag:'门店',hs_g:'订单 · 库存 · 散装 · 门店',hs_mag:'已保存 {n} 家门店',tl_cat:'目录',tl_set:'设置',tl_adm:'管理',fresh_scan:'📷 扫描日期',hs_fresh:'{e} 已过期 · {o} 2天内',hs_fresh0:'无紧急日期',hs_cmd:'{n} 项 · {c} 箱进行中',hs_cmd0:'无进行中的订单',hs_stk:'{n} 个产品进行中',hs_stk0:'无进行中的盘点',hs_vrac:'{n} 次上架',hs_vrac0:'散装上架',hs_al:'{n} 家门店待通知',hs_al0:'无异常',hs_pl:'今天：{n} 家门店',hs_pl0:'今天无安排',hs_cat:'{n} 个产品',hs_set:'门店、备份、语言',hm_store:'门店',hm_out:'不在门店',hm_loc:'定位中…',l_user:'用户名',l_pass:'密码',l_btn:'登录',l_err_empty:'请填写所有字段',l_err_wrong:'用户名或密码错误',ph_user:'姓名.姓氏',ph_pass:'••••••••',rg_t:'🔒 使用规章与数据保护',rg_p:'数据处理详情与保留期限请查阅菜单中的法律声明。',rg_y:'✓ 接受',rg_n:'拒绝',
   lexp:'已过期',lcrit:'紧急≤2天',lwarn:'注意≤7天',lok:'正常',lprods:'产品',all:'全部',all_stores:'全部门店',all_status:'全部状态',
   sct:'扫描产品',scsub:'拍摄EAN条形码',scbtn:'拍照',scanning:'🔍 分析中…',scan_ok:'✅ 产品已识别',scan_err:'❌ 连接错误',
   ldlc:'有效期',lqty:'数量',rfsave:'💾 保存',rfcancel:'取消',
@@ -2454,17 +2460,17 @@ function openFresh(st){ fsStatus=st||null; showTab('dashboard'); }
    Grands boutons sans défilement ; chaque bouton affiche l'état de son menu
    en une ligne et une pastille rouge quand il y a quelque chose à traiter. */
 const HOME_TILES=[
-  {id:'dashboard',k:'tl_s',  ico:'🌿',bg:'linear-gradient(145deg,#1FC287,#0B7D57)'},
+  {id:'dashboard',k:'tl_s',  ico:'🌿',bg:'linear-gradient(145deg,#FFFFFF,#D9F5E8)'},   // fond blanc : la feuille ressort sur le vert de l'app
   {id:'gestion',  k:'tl_g',  ico:'🗂️',bg:'linear-gradient(145deg,#4C9BFF,#1E5FD0)'},
   {id:'planning', k:'tl_p',  ico:'📅',bg:'linear-gradient(145deg,#A58BFF,#6544D6)'},
   {id:'alertes',  k:'tl_a',  ico:'🔔',bg:'linear-gradient(145deg,#FF7070,#D13A3A)'}
 ];
 const GESTION_TILES=[
-  {id:'commande', k:'tl_c',  ico:'🛒',bg:'linear-gradient(145deg,#4C9BFF,#1E5FD0)'},
-  {id:'stocks',   k:'tl_stk',ico:'📦',bg:'linear-gradient(145deg,#F2A33A,#D0700F)'},
-  {id:'vrac',     k:'tl_v',  ico:'🌰',bg:'linear-gradient(145deg,#C99A6E,#8A5E38)'},
-  {id:'magasins', k:'tl_mag',ico:'🏪',bg:'linear-gradient(145deg,#1FC287,#0B7D57)',fn:'openStoresModal()'},
-  {id:'catalogue',k:'tl_cat',ico:'📚',bg:'linear-gradient(145deg,#45C2D2,#16808F)',cls:'wide'}
+  {id:'commande', k:'tl_c',  d:'gd_c',  ico:'🛒',bg:'linear-gradient(145deg,#4C9BFF,#1E5FD0)'},
+  {id:'stocks',   k:'tl_stk',d:'gd_stk',ico:'📦',bg:'linear-gradient(145deg,#F2A33A,#D0700F)'},
+  {id:'vrac',     k:'tl_v',  d:'gd_v',  ico:'🌰',bg:'linear-gradient(145deg,#C99A6E,#8A5E38)'},
+  {id:'magasins', k:'tl_mag',d:'gd_mag',ico:'🏪',bg:'linear-gradient(145deg,#F27BC9,#A23D93)',fn:'openStoresModal()'},
+  {id:'catalogue',k:'tl_cat',d:'gd_cat',ico:'📚',bg:'linear-gradient(145deg,#45C2D2,#16808F)',cls:'wide'}
 ];
 const fillT=(str,o)=>String(str||'').replace(/\{(\w+)\}/g,(m,k)=>o[k]!=null?o[k]:m);
 function homeStatus(){
@@ -2493,10 +2499,24 @@ function renderHome(){
   set('hm-hi', (t.hm_hi||'Bonjour')+(first?' '+first.charAt(0).toUpperCase()+first.slice(1):''));
   let dt=''; try{ dt=new Date().toLocaleDateString(lang==='zh'?'zh-CN':lang,{weekday:'long',day:'numeric',month:'long'}); }catch(e){}
   set('hm-date', dt);
-  set('hm-store', '🏪 '+(selStore ? selStore.name : (t.hm_store||'Magasin')));
+  updateHomeStore();
   set('hm-e',hs.cnt.e); set('hm-o',hs.cnt.o); set('hm-w',hs.cnt.w);
   set('hm-l-e',t.lexp); set('hm-l-o',t.lcrit); set('hm-l-w',t.lwarn);
   renderTiles('hm-grid', HOME_TILES, hs);
+}
+/* Pastille magasin de l'accueil : reflète le GPS, pas seulement le dernier
+   magasin utilisé (celui-ci reste actif pour la saisie, mais on affiche
+   clairement qu'on n'est dans aucun magasin connu). */
+function updateHomeStore(){
+  const b=document.getElementById('hm-store'); if(!b) return;
+  const t=T();
+  let txt;
+  if(gpsState==='locating')            txt='📡 '+(t.hm_loc||'Localisation…');
+  else if(gpsState==='ok' && selStore) txt='📍 '+selStore.name;
+  else if(gpsState==='nomatch')        txt='📍 '+(t.hm_out||'Hors magasin');
+  else if(selStore)                    txt='🏪 '+selStore.name;
+  else                                 txt='🏪 '+(t.hm_store||'Magasin');
+  b.textContent=txt;
 }
 function renderGestion(){ renderTiles('gs-grid', GESTION_TILES, homeStatus()); }
 function renderTiles(gridId, tiles, hs){
@@ -2505,7 +2525,9 @@ function renderTiles(gridId, tiles, hs){
     const s=hs[x.id]||{};
     return `<button class="hm-tile${x.cls?' '+x.cls:''}" onclick="${x.fn||`showTab('${x.id}')`}">`+
       `<span class="hm-ico" style="background:${x.bg}">${x.ico}</span>`+
-      `<div><div class="hm-n">${escapeHTML(t[x.k]||'')}</div><div class="hm-st">${escapeHTML(s.st||'')}</div></div>`+
+      `<div><div class="hm-n">${escapeHTML(t[x.k]||'')}</div>`+
+        (x.d&&t[x.d]?`<ul class="hm-d">${t[x.d].split('|').map(l=>`<li>${escapeHTML(l)}</li>`).join('')}</ul>`:'')+   // à quoi sert la carte
+        `<div class="hm-st">${escapeHTML(s.st||'')}</div></div>`+                                                         // état du moment
       (s.badge?`<span class="hm-badge">${s.badge>99?'99+':s.badge}</span>`:'')+
     `</button>`;
   }).join('');
@@ -2550,6 +2572,7 @@ function storeBarState(){
   return {cls:'idle',ico:'🏪',nm:n?'Choisir un magasin':'Aucun magasin',sub:'Touchez pour localiser',act:{lbl:'📍 Localiser',fn:'relocateGPS()'}};
 }
 function renderStoreBars(){
+  if(curTab==='home') updateHomeStore();
   const st=storeBarState();
   document.querySelectorAll('[data-storebar]').forEach(bar=>{
     bar.className='sbar'+(st.cls?' '+st.cls:'');
@@ -4761,23 +4784,46 @@ function orderTotals(rows){
            unitsKnown: rows.every(r => r.pcb) };
 }
 
+/* ═══ GABARIT DES E-MAILS ════════════════════════════════════════════════════
+   Tous les e-mails (commande, alertes, stock, compte-rendu) suivent la même
+   présentation, lisible dans n'importe quelle messagerie (texte simple) :
+   titre, magasin / date / auteur, résumé chiffré, puis une ligne par produit
+   avec son détail en retrait, total et signature. */
+const MAIL_SEP = '────────────────────────────';
+function mailHead(title, meta, summary){
+  return [title.toUpperCase(), MAIL_SEP,
+    meta.store ? `Magasin : ${meta.store}` : '',
+    meta.date  ? `Date : ${meta.date}` : '',
+    meta.by    ? `Préparé par : ${meta.by}` : '',
+    summary    ? `Résumé : ${summary}` : '',
+    MAIL_SEP].filter(Boolean);
+}
+function mailFoot(){ return ['', '—', 'Envoyé depuis FreshControl · S2D COMMERCIAL']; }
+const plural = (n, one, many) => `${n} ${n > 1 ? many : one}`;
+/* Nom affiché de l'auteur : les anciens enregistrements ne gardent que l'identifiant */
+function displayBy(by){
+  if(!by || by === '?') return '';
+  try{ const u = (Array.isArray(users) ? users : []).find(x => x.username === by); if(u && u.name) return u.name; }catch(e){}
+  if(session && session.username === by && session.name) return session.name;
+  return by;
+}
+
 function buildOrderText(lines, meta){
   const rows = orderRows(lines), tot = orderTotals(rows);
-  const SEP = '────────────────────────────';
-  const out = ['BON DE COMMANDE — FreshControl', SEP,
-    `Date : ${meta.date}`,
-    meta.store ? `Magasin : ${meta.store}` : '',
-    meta.by ? `Préparée par : ${meta.by}` : '',
-  ].filter(Boolean);
+  const totTxt = `${plural(tot.refs,'référence','références')} · ${tot.colis} colis` +
+    (tot.units ? ` · ${tot.units} unités` + (tot.unitsKnown ? '' : ' (hors lignes sans PCB)') : '');
+  const out = mailHead('Bon de commande', { ...meta, by: displayBy(meta.by) }, totTxt);
   let gamme = null;
   rows.forEach(r => {
-    if(r.gamme !== gamme){ gamme = r.gamme; out.push('', `▌ ${(gamme || 'Autres').toUpperCase()}`); }
-    out.push(`• ${r.qty} colis${r.units ? ' (' + r.units + ' u.)' : ''} — ${r.name}${r.volume ? ' — ' + r.volume : ''}`);
-    out.push(`   EAN ${r.gencod || 'non renseigné'}${r.ref ? ' · Réf. ' + r.ref : ''}${r.pcb ? ' · PCB ' + r.pcb : ''}`);
+    if(r.gamme !== gamme){
+      gamme = r.gamme;
+      const n = rows.filter(x => x.gamme === gamme).length;
+      out.push('', `${(gamme || 'Autres').toUpperCase()} (${plural(n,'réf.','réf.')})`);
+    }
+    out.push(`• ${r.qty} colis — ${r.name}${r.volume ? ' ' + r.volume : ''}`);
+    out.push(`   ${[r.units ? r.units + ' unités (PCB ' + r.pcb + ')' : '', r.ref ? 'Réf. ' + r.ref : '', 'EAN ' + (r.gencod || 'non renseigné')].filter(Boolean).join(' · ')}`);
   });
-  out.push('', SEP,
-    `TOTAL : ${tot.refs} référence(s) · ${tot.colis} colis${tot.units ? ' · ' + tot.units + ' unités' + (tot.unitsKnown ? '' : ' (hors lignes sans PCB)') : ''}`,
-    '', '— FreshControl');
+  out.push('', MAIL_SEP, `TOTAL : ${totTxt}`, ...mailFoot());
   return out.join('\n');
 }
 
@@ -4966,7 +5012,7 @@ function validateOrder(){
   localStorage.setItem('fc_orders', JSON.stringify(orders));
   const dateStr = new Date(record.date).toLocaleDateString(lang);
   openOrderEmail(
-    `[FreshControl] Commande${record.store ? ' — '+record.store : ''} — ${dateStr}`,
+    `[FreshControl] Bon de commande${record.store ? ' — '+record.store : ''} — ${dateStr}`,
     buildOrderText(record.lines, { date: dateStr, store: record.store, by: record.by }),
     record
   );
@@ -5241,15 +5287,15 @@ function renderStockLines(){
 }
 
 function buildStockText(lines, meta){
-  const out = [
-    `État des stocks — ${meta.date}`,
-    meta.store ? `Magasin : ${meta.store}` : '',
-    meta.by ? `Relevé par : ${meta.by}` : '',
-    '', 'Produits :', '',
-  ].filter((x,idx)=> x!=='' || idx>2);
-  lines.forEach(l => out.push(`- ${l.name || l.gencod || 'sans nom'}  ×${l.qty}  — Code-barres : ${l.gencod || 'non renseigné'}${l.provenance ? '  · provenance : '+l.provenance : ''}`));
-  const totalQty = lines.reduce((s,l)=>s+l.qty, 0);
-  out.push('', `Total : ${lines.length} référence(s) · ${totalQty} unité(s)`, '', '— FreshControl');
+  const totalQty = lines.reduce((t,l) => t + l.qty, 0);
+  const totTxt = `${plural(lines.length,'référence','références')} · ${plural(totalQty,'unité','unités')}`;
+  const out = mailHead('Relevé de stock', { ...meta, by: displayBy(meta.by) }, totTxt);
+  out.push('');
+  lines.forEach(l => {
+    out.push(`• ${l.name || 'Produit sans nom'} — ${plural(l.qty,'unité','unités')}`);
+    out.push(`   EAN ${l.gencod || 'non renseigné'}${l.provenance ? ' · Provenance : ' + l.provenance : ''}`);
+  });
+  out.push('', MAIL_SEP, `TOTAL : ${totTxt}`, ...mailFoot());
   return out.join('\n');
 }
 
@@ -5403,7 +5449,7 @@ function emailStock(id){
   const o = findStock(id); if(!o) return;
   const dateStr = new Date(o.date).toLocaleDateString(lang);
   openStockEmail(
-    `[FreshControl] Stock${o.store ? ' — '+o.store : ''} — ${dateStr}`,
+    `[FreshControl] Relevé de stock${o.store ? ' — '+o.store : ''} — ${dateStr}`,
     buildStockText(o.lines, { date: dateStr, store: o.store, by: o.by })
   );
   closeModal('stocks-modal');
@@ -7088,19 +7134,18 @@ function deleteVisit(id){
   });
 }
 function visitText(v){
-  return [
-    `Compte-rendu de visite — ${v.store}`,
-    `Date : ${fmtDate(v.date)}${v.contact ? ' · Interlocuteur : ' + v.contact : ''}`,
-    (v.tasks || []).length ? `Réalisé : ${v.tasks.join(', ')}` : '',
-    '', v.notes ? 'Retour :\n' + v.notes : '',
-    v.actions ? '\nActions à suivre :\n' + v.actions : '',
-    v.next ? `\nProchain passage : ${fmtDate(v.next)}` : '',
-    '', `— ${v.by || 'FreshControl'}`
-  ].filter((x, i, a) => x !== '' || a[i-1] !== '').join('\n').trim();
+  const out = mailHead('Compte-rendu de visite', { store: v.store, date: fmtDate(v.date), by: v.by });
+  if((v.tasks || []).length) out.push(`Réalisé : ${v.tasks.join(', ')}`);
+  if(v.contact) out.push(`Interlocuteur : ${v.contact}`);
+  if(v.notes)   out.push('', 'RETOUR DE VISITE', v.notes);
+  if(v.actions) out.push('', 'ACTIONS À SUIVRE', ...v.actions.split(/\n+/).map(x => '• ' + x.replace(/^[-•]\s*/, '')));
+  if(v.next)    out.push('', `Prochain passage : ${fmtDate(v.next)}`);
+  out.push(...mailFoot());
+  return out.join('\n');
 }
 async function shareVisit(id){
   const v = findVisit(id); if(!v) return;
-  const text = visitText(v), title = `Visite ${v.store} — ${fmtDate(v.date)}`;
+  const text = visitText(v), title = `[FreshControl] Compte-rendu de visite — ${v.store} — ${fmtDate(v.date)}`;
   if(navigator.share){
     try{ await navigator.share({ title, text }); return; }
     catch(e){ if(e && e.name === 'AbortError') return; }
@@ -7384,14 +7429,9 @@ function openEmailModal(store){
     ?products.filter(p=>p.magasin===store&&['e','o'].includes(statusOf(p.dlc)))
     :products.filter(p=>['e','o'].includes(statusOf(p.dlc)));
   prods.sort((a,b)=>new Date(a.dlc)-new Date(b.dlc));
-  const storeName=store||'— Tous magasins —';
+  const storeName=store||'Tous magasins';
   const subj=(t.email_subj||'[FreshControl] Urgents').replace('{{store}}',storeName).replace('{{date}}',now);
-  const lines=['FreshControl — '+now,''];
-  if(store)lines.push('Magasin : '+store,'');
-  lines.push('Produits urgents :','');
-  prods.forEach(p=>{const d=dDiff(p.dlc),s=statusOf(p.dlc),q=(p.qty||1);lines.push(`${s==='e'?'[PÉRIMÉ]':'[J'+d+']'} ${p.name}${q>1?' ×'+q:''} — Code-barres : ${p.gencod||'non renseigné'} — DLC: ${fmtDate(p.dlc)} — ${p.magasin||''}`)});
-  const totalUnits=prods.reduce((s,p)=>s+(p.qty||1),0);
-  lines.push('','Total : '+prods.length+' produit(s)'+(totalUnits!==prods.length?' · '+totalUnits+' unité(s)':''),'','— FreshControl');
+  const lines=buildAlertText(prods,{store:storeName,date:now,by:session?.name||''});
   document.getElementById('em-to').value=defTo;
   document.getElementById('em-subj').value=subj;
   document.getElementById('em-body').value=lines.join('\n');
@@ -7399,6 +7439,30 @@ function openEmailModal(store){
   stag.style.display='inline-block';stag.textContent=store?'🏪 '+store:'🌐 Tous magasins';
   emailAttachOrder = null; setEmailAttachUI(false);   // pas de pièce jointe hors commande
   openModal('email-modal');
+}
+/* Produits à retirer : groupés par magasin, puis « périmés » / « sous 2 jours » */
+function buildAlertText(prods, meta){
+  const nE=prods.filter(p=>statusOf(p.dlc)==='e').length, nO=prods.length-nE;
+  const units=prods.reduce((s,p)=>s+(p.qty||1),0);
+  const out=mailHead('Produits à retirer du rayon', meta,
+    prods.length ? `${plural(nE,'produit périmé','produits périmés')} · ${plural(nO,'produit à retirer sous 2 jours','produits à retirer sous 2 jours')}` : 'aucun produit à retirer');
+  const stores=[...new Set(prods.map(p=>p.magasin||'Magasin non précisé'))];
+  stores.forEach(st=>{
+    const ps=prods.filter(p=>(p.magasin||'Magasin non précisé')===st);
+    if(stores.length>1 || meta.store!==st) out.push('',`■ ${st.toUpperCase()}`);
+    [['e','PÉRIMÉS — à retirer immédiatement'],['o','À RETIRER SOUS 2 JOURS']].forEach(([k,title])=>{
+      const g=ps.filter(p=>statusOf(p.dlc)===k); if(!g.length) return;
+      out.push('',title);
+      g.forEach(p=>{
+        const d=dDiff(p.dlc), q=p.qty||1;
+        const when = d<0 ? `dépassée depuis ${plural(-d,'jour','jours')}` : d===0 ? "aujourd'hui" : `dans ${plural(d,'jour','jours')}`;
+        out.push(`• ${p.name||'Produit sans nom'}${q>1?' × '+q:''}`);
+        out.push(`   DLC ${fmtDate(p.dlc)} (${when}) · EAN ${p.gencod||'non renseigné'}`);
+      });
+    });
+  });
+  out.push('',MAIL_SEP,`TOTAL : ${plural(prods.length,'produit','produits')}${units!==prods.length?' · '+units+' unités':''}`,...mailFoot());
+  return out;
 }
 function sendMailto(){
   const toRaw=document.getElementById('em-to').value.trim();
