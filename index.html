@@ -43,7 +43,7 @@
   --foc:0 0 0 3px rgba(18,168,118,.32);
   --rr:100px;--rl2:22px;--rm:16px;--ri:14px;
   --font:'Nunito',sans-serif;
-  --tab-h:72px;--hdr-h:70px;
+  --tab-h:0px;--hdr-h:70px;   /* plus de barre d'onglets en bas : navigation par l'accueil */
 }
 html,body{height:100%;font-family:var(--font);color:var(--txt);overflow:hidden;overscroll-behavior:none;-webkit-text-size-adjust:100%}
 /* Verrou anti « la page part dans tous les sens » sur iOS : body fixe (pas de
@@ -131,12 +131,108 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .hback{flex-shrink:0;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.32);color:#fff;width:38px;height:40px;border-radius:12px;cursor:pointer;font-size:26px;font-weight:900;line-height:1;display:flex;align-items:center;justify-content:center;padding-bottom:3px;box-shadow:var(--spec-d);transition:background .18s,transform .12s;font-family:var(--font)}
 .hback:hover{background:rgba(255,255,255,.3)}
 .hback:active{transform:scale(.94)}
-#main{flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;overscroll-behavior-x:none;touch-action:pan-y;-webkit-overflow-scrolling:touch;padding:14px 13px calc(var(--tab-h) + 12px)}
+#main{flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;overscroll-behavior-x:none;touch-action:pan-y;-webkit-overflow-scrolling:touch;padding:14px 13px calc(var(--tab-h) + 12px + env(safe-area-inset-bottom,0px))}
 .tab{display:none}.tab.on{display:block;animation:fadeIn .2s ease}
 #tbar{background:rgba(240,255,248,.62);backdrop-filter:blur(28px) saturate(200%);-webkit-backdrop-filter:blur(28px) saturate(200%);border-top:1px solid rgba(255,255,255,.7);box-shadow:inset 0 1px 0 rgba(255,255,255,.88),0 -3px 28px rgba(0,0,0,.07);height:var(--tab-h);display:flex;flex-shrink:0}
 /* Onglets : rétrécissent pour tenir même à 320px avec 7-8 onglets (min-width:0
    + police/icone en clamp + label tronqué proprement au lieu de déborder). */
 .tb{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:transparent;font-size:clamp(8.5px,2.7vw,11px);font-weight:800;color:rgba(13,31,13,.55);cursor:pointer;font-family:var(--font);transition:color .15s;-webkit-tap-highlight-color:transparent;padding:0 2px 5px;letter-spacing:.1px;min-height:44px}
+/* Barre d'onglets et menu ☰ retirés (étape 1 de la refonte « appli iPhone ») :
+   l'écran d'accueil est la seule porte d'entrée, le retour se fait par ‹ ou par
+   glissement depuis le bord gauche. Le HTML reste en place pour le mode bureau. */
+#tbar,.hmenu{display:none!important}
+
+/* ── ACCUEIL (grands boutons, sans défilement) ─────────────────────── */
+#tab-home.on{display:flex;flex-direction:column;gap:10px;height:100%;min-height:470px}
+.hm-hello{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#fff;padding:0 2px}
+.hm-hello>div:first-child{min-width:0}
+.hm-hello-t{font-size:23px;font-weight:900;letter-spacing:-.5px;line-height:1.15}
+.hm-hello-s{font-size:12px;font-weight:700;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-store{flex-shrink:0;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.34);color:#fff;border-radius:var(--rr);padding:7px 12px;font-size:12px;font-weight:800;font-family:var(--font);cursor:pointer;max-width:46%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:10px 8px;border-radius:var(--rl2);border:1px solid rgba(255,255,255,.34);background:linear-gradient(160deg,rgba(255,255,255,.24),rgba(255,255,255,.08));backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.4)}
+.hm-sum button{border:none;background:none;font-family:var(--font);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;padding:2px;border-radius:12px}
+.hm-sum b{font-size:24px;font-weight:900;line-height:1.1;font-variant-numeric:tabular-nums}
+.hm-sum span{font-size:10.5px;font-weight:800;color:rgba(255,255,255,.85);text-align:center;line-height:1.2}
+.hm-grid{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(0,1fr);gap:10px}
+#hm-grid .hm-tile{padding:16px 15px}
+#hm-grid .hm-ico{width:62px;height:62px;border-radius:18px;font-size:33px}
+#hm-grid .hm-n{font-size:20px}
+#hm-grid .hm-st{font-size:12px;-webkit-line-clamp:3}
+#tab-gestion.on{display:flex;flex-direction:column;height:100%;min-height:420px}
+#gs-grid{grid-template-rows:1fr 1fr auto}
+.hset{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.32);color:#fff;width:40px;height:40px;border-radius:12px;cursor:pointer;font-size:19px;display:flex;align-items:center;justify-content:center;box-shadow:var(--spec-d)}
+.hset:active{transform:scale(.94)}
+/* ── PLANNING : semaine + comptes-rendus dictés ────────────────────── */
+.pl-week{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:4px}
+.pl-day{border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.5);border-radius:13px;padding:6px 0;text-align:center;font-family:var(--font);cursor:pointer;color:var(--txt);font-size:10.5px;font-weight:800}
+.pl-day b{display:block;font-size:17px;font-weight:900;line-height:1.15}
+.pl-day i{display:block;font-style:normal;font-size:9.5px;color:var(--muted);min-height:12px}
+.pl-day.today{border-color:#fff}
+.pl-day.on{background:rgba(18,168,118,.92);color:#fff;border-color:transparent}
+.pl-day.on i{color:rgba(255,255,255,.85)}
+.pl-card{border-radius:var(--rm);padding:12px 13px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.pl-card>div{flex:1;min-width:0}
+.pl-card b{display:block;font-size:14px;font-weight:900}
+.pl-card small{display:block;font-size:11.5px;font-weight:700;color:var(--muted);line-height:1.35}
+.pl-go{flex-shrink:0;border:none;border-radius:var(--rr);background:rgba(18,168,118,.92);color:#fff;font-family:var(--font);font-weight:900;font-size:12.5px;padding:9px 13px;cursor:pointer}
+.pl-ok{flex-shrink:0;font-size:12px;font-weight:900;color:var(--gd);background:rgba(18,168,118,.13);border-radius:var(--rr);padding:6px 11px}
+.vs-card{border-radius:var(--rm);padding:12px 13px;margin-bottom:8px}
+.vs-hd{display:flex;justify-content:space-between;gap:8px;font-size:13.5px;font-weight:900}
+.vs-hd small{font-weight:700;color:var(--muted);white-space:nowrap}
+.vs-tx{font-size:12.5px;font-weight:600;line-height:1.45;margin-top:4px;white-space:pre-wrap;color:var(--txt)}
+.vs-act{font-size:12px;font-weight:700;color:#B45309;margin-top:4px;white-space:pre-wrap}
+.vs-btns{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.vs-tasks{display:flex;flex-wrap:wrap;gap:6px}
+.vs-task{border:1.5px solid var(--bdr);background:rgba(255,255,255,.6);border-radius:var(--rr);padding:7px 11px;font-family:var(--font);font-size:12px;font-weight:800;color:var(--muted);cursor:pointer}
+.vs-task.on{background:rgba(18,168,118,.92);color:#fff;border-color:transparent}
+.dict-wrap{position:relative}
+.dict-wrap textarea{padding-right:58px}
+.dict-btn{position:absolute;right:7px;top:7px;width:44px;height:44px;border-radius:50%;border:none;background:rgba(18,168,118,.92);color:#fff;font-size:20px;cursor:pointer;box-shadow:var(--sg)}
+.dict-btn.rec{background:rgba(224,60,60,.95);animation:dictPulse 1.1s ease-in-out infinite}
+@keyframes dictPulse{0%,100%{box-shadow:0 0 0 0 rgba(224,60,60,.5)}50%{box-shadow:0 0 0 10px rgba(224,60,60,0)}}
+@media (prefers-reduced-motion:reduce){.dict-btn.rec{animation:none}}
+.hm-tile.wide{grid-column:span 2;flex-direction:row;align-items:center;justify-content:flex-start;gap:12px;padding:8px 12px}
+.hm-tile{position:relative;min-height:0;border:1px solid rgba(255,255,255,.34);border-radius:22px;background:linear-gradient(160deg,rgba(255,255,255,.24),rgba(255,255,255,.08));backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.4),0 8px 26px rgba(0,0,0,.14);padding:10px 12px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;text-align:left;font-family:var(--font);color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s;overflow:hidden}
+.hm-tile:active{transform:scale(.97)}
+.hm-tile>div{min-width:0}
+.hm-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:21px;box-shadow:inset 0 1px 0 rgba(255,255,255,.35);flex-shrink:0}
+.hm-n{font-size:15px;font-weight:900;letter-spacing:-.2px;line-height:1.15}
+.hm-st{font-size:11px;font-weight:700;color:rgba(255,255,255,.82);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hm-badge{position:absolute;top:8px;right:9px;min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:var(--r);color:#fff;font-size:11.5px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.hm-tile.big{grid-column:span 2;flex-direction:row;align-items:center;justify-content:flex-start;gap:14px}
+.hm-tile.big .hm-ico{width:58px;height:58px;border-radius:17px;font-size:31px}
+.hm-tile.big .hm-n{font-size:21px}
+.hm-tile.wide{grid-column:span 2;flex-direction:row;align-items:center;justify-content:flex-start;gap:12px;padding:8px 12px}
+.hm-tile.wide .hm-ico{width:34px;height:34px;font-size:18px;border-radius:10px}
+.hm-tile.wide>div{display:flex;align-items:baseline;gap:8px}
+/* Bouton « Scanner une date » en tête de la liste Fresh */
+.fresh-scan-btn{width:100%;margin-bottom:12px;padding:14px;border:none;border-radius:var(--rr);background:rgba(18,168,118,.9);color:#fff;font-size:15px;font-weight:900;font-family:var(--font);cursor:pointer;box-shadow:var(--spec-d),var(--sg)}
+/* ── VRAC : photos + contrôle hygiène ─────────────────────────────── */
+.vr-ph-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.vr-ph{border:1.5px dashed var(--bdr);border-radius:14px;padding:9px;display:flex;flex-direction:column;gap:6px;min-width:0;background:rgba(255,255,255,.35)}
+.vr-ph-t{font-size:11.5px;font-weight:900;color:var(--txt);line-height:1.25}
+.vr-ph img{width:100%;height:120px;object-fit:contain;border-radius:10px;background:rgba(0,0,0,.05);display:none}
+.vr-ph button{font-size:12px!important;padding:9px 8px!important;width:100%}
+.vr-ph-st{font-size:10.5px;font-weight:700;color:var(--muted)}
+.hyg-box{border-radius:14px;border:1px solid var(--bdr);background:rgba(255,255,255,.4);padding:4px 11px}
+.hyg-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,.06)}
+.hyg-row:last-child{border-bottom:none}
+.hyg-l{flex:1;min-width:0;font-size:12.5px;font-weight:700;line-height:1.3;color:var(--txt)}
+.hyg-b{display:flex;gap:4px;flex-shrink:0}
+.hyg-b button{min-width:46px;height:34px;border-radius:10px;border:1.5px solid var(--bdr);background:rgba(255,255,255,.7);font-family:var(--font);font-size:12.5px;font-weight:900;color:var(--muted);cursor:pointer}
+.hyg-b button.on-o{background:rgba(18,168,118,.92);border-color:transparent;color:#fff}
+.hyg-b button.on-n{background:rgba(224,60,60,.9);border-color:transparent;color:#fff}
+.hyg-row.is-n .hyg-l{color:var(--r)}
+.hyg-all{width:100%;margin:6px 0 8px;padding:10px;border-radius:var(--rr);border:1.5px solid rgba(18,168,118,.35);background:rgba(18,168,118,.1);color:var(--gd);font-family:var(--font);font-size:13px;font-weight:900;cursor:pointer}
+/* ── RÉGLAGES (liste groupée façon iPhone) ─────────────────────────── */
+.rg-sec{font-size:11px;font-weight:900;color:rgba(255,255,255,.85);letter-spacing:1.2px;text-transform:uppercase;padding:14px 6px 6px}
+.rg-grp{border-radius:var(--rm);overflow:hidden}
+.rg-it{display:flex;align-items:center;gap:12px;padding:12px 13px;cursor:pointer;font-size:14px;font-weight:700;color:var(--txt);border-bottom:1px solid rgba(0,0,0,.06)}
+.rg-it:last-child{border-bottom:none}
+.rg-it:active{background:rgba(18,168,118,.1)}
+.rg-it::after{content:'›';margin-left:auto;color:var(--muted);font-size:20px;font-weight:700;line-height:1}
+.rg-ic{width:32px;height:32px;border-radius:9px;background:rgba(18,168,118,.12);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.rg-langs{display:flex;gap:7px;flex-wrap:wrap;padding:11px 13px}
 .tb.on{color:var(--g)}.tb-i{font-size:clamp(18px,5.2vw,21px);line-height:1;transition:transform .2s}.tb.on .tb-i{transform:scale(1.16)}
 .tb>span:last-child{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
@@ -614,8 +710,6 @@ html.rot-lock-on #rot-lock{display:flex}
       </div>
     </div>
     <div class="sp-tag" id="sp-tag">Gestion intelligente des périmés</div>
-    <div id="sp-powered" style="font-size:10px;color:rgba(255,255,255,.38);font-weight:700;margin-top:4px;letter-spacing:.5px">Créé par / Created by</div>
-    <img src="brand/s2d-monogramme.svg" alt="S2D" width="160" style="display:block;margin:10px auto 0;background:#000">
   </div>
   <div class="lang-row">
     <button class="lang-btn on" onclick="setLang('fr')"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#fff"/><rect width="1" height="2" fill="#0055A4"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>FR</button>
@@ -631,8 +725,8 @@ html.rot-lock-on #rot-lock{display:flex}
     <button class="lb" id="l-btn" onclick="doLogin()"><span id="l-btn-t">Se connecter</span></button>
     <div class="lerr" id="l-err"></div>
   </div>
-  <div class="lver">FreshControl v3.11 · Créé par / Created by
-    <img src="brand/s2d-monogramme.svg" alt="S2D" width="72" style="display:block;margin:8px auto 0;background:#000">
+  <div class="lver">FreshControl v3.11 · <span id="l-by">Créé par</span>
+    <img src="brand/s2d-monogramme.svg" alt="S2D" width="56" style="display:block;margin:8px auto 0;background:#000">
   </div>
 
   <!-- Bouton reset d'urgence — visible en bas de l'écran de connexion -->
@@ -903,7 +997,59 @@ html.rot-lock-on #rot-lock{display:flex}
     </div>
     <input class="rf-i" id="vrac-hsearch" placeholder="🔍 Filtrer (produit, code, silo, lot, origine)…" oninput="renderVracHistory()" style="margin-bottom:12px">
     <div id="vrac-hlist"></div>
-    <button class="scan-link-btn" onclick="exportVracCSV()" style="width:100%;margin-top:12px;padding:11px">📥 Exporter la traçabilité (CSV)</button>
+    <button class="scan-link-btn" onclick="closeModal('vrac-modal');openVracCahier()" style="width:100%;margin-top:12px;padding:11px;font-weight:900;color:var(--gd)">📘 Cahier de suivi (PDF avec photos)</button>
+    <button class="scan-link-btn" onclick="exportVracCSV()" style="width:100%;margin-top:8px;padding:11px">📥 Exporter la traçabilité (CSV)</button>
+  </div>
+</div>
+
+<!-- ═══ COMPTE-RENDU DE VISITE (dictée vocale) ═══════════════════════ -->
+<div id="visit-modal" class="modal-bg">
+  <div class="modal-sh">
+    <div class="mhd-row" style="margin-bottom:12px">
+      <div class="mhd-t" id="vs-title">🎤 Compte-rendu de visite</div>
+      <button class="mcl" onclick="closeVisitForm()" aria-label="Fermer">✕</button>
+    </div>
+    <div class="rf-row">
+      <div class="rf-f"><div class="rf-l">Magasin</div><input class="rf-i" id="vs-store" list="vs-store-dl" autocomplete="off" placeholder="Nom du magasin"><datalist id="vs-store-dl"></datalist></div>
+      <div class="rf-f"><div class="rf-l">Date</div><input class="rf-i" type="date" id="vs-date"></div>
+    </div>
+    <div class="rf-f"><div class="rf-l">Ce qui a été fait</div><div class="vs-tasks" id="vs-tasks"></div></div>
+    <div class="rf-f"><div class="rf-l">Retour de visite — touchez 🎤 et parlez</div>
+      <div class="dict-wrap"><textarea class="rf-i" id="vs-notes" rows="5" placeholder="Ex : rayon frais bien tenu, 3 yaourts périmés retirés, le responsable veut tester la nouvelle gamme jus…" style="resize:vertical;min-height:110px"></textarea>
+      <button type="button" class="dict-btn" onclick="dictate('vs-notes',this)" aria-label="Dicter le retour de visite">🎤</button></div>
+    </div>
+    <div class="rf-f"><div class="rf-l">Actions à suivre</div>
+      <div class="dict-wrap"><textarea class="rf-i" id="vs-actions" rows="3" placeholder="Ex : envoyer le tarif jus 1 L, rappeler pour la commande de Noël" style="resize:vertical;min-height:70px"></textarea>
+      <button type="button" class="dict-btn" onclick="dictate('vs-actions',this)" aria-label="Dicter les actions à suivre">🎤</button></div>
+    </div>
+    <div class="rf-row">
+      <div class="rf-f"><div class="rf-l">Interlocuteur</div><input class="rf-i" id="vs-contact" placeholder="Ex : Julie, resp. épicerie" autocomplete="off"></div>
+      <div class="rf-f"><div class="rf-l">Prochain passage</div><input class="rf-i" type="date" id="vs-next"></div>
+    </div>
+    <div id="vs-hint" style="font-size:11.5px;font-weight:700;color:var(--muted);margin:2px 2px 10px"></div>
+    <button class="rfsave" onclick="saveVisit(true)">📤 Enregistrer et envoyer</button>
+    <button class="rfcancel" style="margin-bottom:6px" onclick="saveVisit(false)">💾 Enregistrer seulement</button>
+  </div>
+</div>
+
+<!-- ═══ CAHIER DE SUIVI VRAC (PDF : traçabilité + hygiène + photos) ═══ -->
+<div id="vrac-cahier-modal" class="modal-bg">
+  <div class="modal-sh">
+    <div class="mhd-row" style="margin-bottom:12px">
+      <div class="mhd-t">📘 Cahier de suivi vrac</div>
+      <button class="mcl" onclick="closeModal('vrac-cahier-modal')" aria-label="Fermer">✕</button>
+    </div>
+    <div style="font-size:12.5px;font-weight:700;color:var(--muted);line-height:1.55;margin-bottom:12px">
+      Document PDF à envoyer au client ou à présenter lors d'un contrôle : chaque mise en rayon avec son lot, sa DDM, son origine, le contrôle hygiène du silo et les photos des étiquettes.
+    </div>
+    <div class="rf-row">
+      <div class="rf-f"><div class="rf-l">Du</div><input class="rf-i" type="date" id="vc-from"></div>
+      <div class="rf-f"><div class="rf-l">Au</div><input class="rf-i" type="date" id="vc-to"></div>
+    </div>
+    <div class="rf-f"><div class="rf-l">Magasin</div><select class="rf-i" id="vc-store"></select></div>
+    <div id="vc-info" style="font-size:12px;font-weight:800;color:var(--gd);margin:4px 2px 12px"></div>
+    <button class="rfsave" id="vc-go" onclick="generateVracCahier()">📄 Générer et envoyer le PDF</button>
+    <button class="rfcancel" onclick="closeModal('vrac-cahier-modal')">Fermer</button>
   </div>
 </div>
 
@@ -1140,20 +1286,41 @@ html.rot-lock-on #rot-lock{display:flex}
   <div id="hdr">
     <div class="hdr-left">
       <button id="hdr-back" class="hback" onclick="goBack()" aria-label="Retour à l'écran précédent" style="display:none">‹</button>
-      <div id="hdr-l" onclick="showTab('dashboard')">
+      <div id="hdr-l" onclick="goHome()">
         <div class="hico">🌿</div>
-        <div class="hdr-tt"><h1>FreshControl</h1><small id="hdr-sub">Chargement…</small></div>
+        <div class="hdr-tt"><h1 id="hdr-title">FreshControl</h1><small id="hdr-sub">Chargement…</small></div>
       </div>
     </div>
     <div id="hdr-r">
       <div id="h-badge"></div>
       <button class="hmenu" onclick="toggleSB()" aria-label="Menu">☰</button>
+      <button class="hset" id="hdr-set" onclick="showTab('reglages')" aria-label="Réglages">⚙️</button>
     </div>
   </div>
 
   <div id="main">
-    <!-- DASHBOARD -->
-    <div id="tab-dashboard" class="tab on">
+    <!-- ACCUEIL : grands boutons, tout tient sur l'écran (rempli par renderHome) -->
+    <div id="tab-home" class="tab on">
+      <div class="hm-hello">
+        <div><div class="hm-hello-t" id="hm-hi">Bonjour</div><div class="hm-hello-s" id="hm-date"></div></div>
+        <button class="hm-store" id="hm-store" onclick="openStoresManager()">🏪</button>
+      </div>
+      <div class="hm-sum">
+        <button onclick="openFresh('e')"><b id="hm-e" style="color:#FFB4B4">0</b><span id="hm-l-e">Périmés</span></button>
+        <button onclick="openFresh('o')"><b id="hm-o" style="color:#FFD27A">0</b><span id="hm-l-o">Critiques ≤2j</span></button>
+        <button onclick="openFresh('w')"><b id="hm-w" style="color:#FFF3A6">0</b><span id="hm-l-w">Attention ≤7j</span></button>
+      </div>
+      <div class="hm-grid" id="hm-grid"></div>
+    </div>
+
+    <!-- GESTION : Commande, Stocks, Vrac, Magasins, Catalogue -->
+    <div id="tab-gestion" class="tab">
+      <div class="hm-grid" id="gs-grid"></div>
+    </div>
+
+    <!-- FRESH : liste des dates de péremption (ex-tableau de bord) -->
+    <div id="tab-dashboard" class="tab">
+      <button class="fresh-scan-btn" onclick="showTab('scanner')" id="l-fresh-scan">📷 Scanner une date</button>
       <div class="sgrid">
         <div class="sc se" onclick="setFS('e')"><div class="sc-n" id="cn-e">0</div><div class="sc-l" id="l-exp">Périmés</div></div>
         <div class="sc so" onclick="setFS('o')"><div class="sc-n" id="cn-o">0</div><div class="sc-l" id="l-crit">Critiques ≤2j</div></div>
@@ -1425,14 +1592,33 @@ html.rot-lock-on #rot-lock{display:flex}
           </div>
         </div>
         <div class="rf-f">
-          <div class="rf-l">Photo de l'étiquette</div>
-          <input type="file" id="vrac-label-in" accept="image/*" capture="environment" style="display:none">
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <button class="scan-link-btn" onclick="document.getElementById('vrac-label-in').click()" style="padding:11px 16px">📷 Photographier l'étiquette</button>
-            <button class="scan-link-btn" id="vrac-photo-del" onclick="clearVracPhoto()" style="display:none;color:var(--r);padding:11px 16px">🗑 Retirer</button>
+          <div class="rf-l">Photos (preuve de traçabilité)</div>
+          <input type="file" id="vrac-label-in" data-kind="sac" accept="image/*" capture="environment" style="display:none">
+          <input type="file" id="vrac-silo-in" data-kind="silo" accept="image/*" capture="environment" style="display:none">
+          <div class="vr-ph-grid">
+            <div class="vr-ph">
+              <div class="vr-ph-t">🏷 Étiquette du sac<br><span style="font-weight:700;color:var(--muted)">fournisseur : lot, DDM, origine</span></div>
+              <img id="vrac-ph-sac" alt="Étiquette du sac">
+              <button class="scan-link-btn" onclick="document.getElementById('vrac-label-in').click()">📷 Photographier</button>
+              <button class="scan-link-btn" id="vrac-del-sac" onclick="clearVracPhoto('sac')" style="display:none;color:var(--r)">🗑 Retirer</button>
+              <div class="vr-ph-st" id="vrac-st-sac"></div>
+            </div>
+            <div class="vr-ph">
+              <div class="vr-ph-t">🗄 Étiquette du silo<br><span style="font-weight:700;color:var(--muted)">affichée en rayon, après remplissage</span></div>
+              <img id="vrac-ph-silo" alt="Étiquette du silo">
+              <button class="scan-link-btn" onclick="document.getElementById('vrac-silo-in').click()">📷 Photographier</button>
+              <button class="scan-link-btn" id="vrac-del-silo" onclick="clearVracPhoto('silo')" style="display:none;color:var(--r)">🗑 Retirer</button>
+              <div class="vr-ph-st" id="vrac-st-silo"></div>
+            </div>
           </div>
-          <div id="vrac-photo-st" style="font-size:11px;font-weight:700;color:var(--muted);margin-top:6px"></div>
-          <img id="vrac-photo-prev" alt="Étiquette photographiée" style="display:none;margin-top:8px;width:100%;max-height:260px;object-fit:contain;border-radius:12px;border:1px solid var(--bdr);background:rgba(0,0,0,.04)">
+        </div>
+        <div class="rf-f">
+          <div class="rf-l">Contrôle hygiène du silo</div>
+          <button type="button" class="hyg-all" onclick="setAllHyg()">✓ Tout est conforme</button>
+          <div class="hyg-box" id="vrac-hyg"></div>
+        </div>
+        <div class="rf-f"><div class="rf-l">Remarques / action corrective</div>
+          <textarea class="rf-i" id="vrac-rem" rows="2" placeholder="Ex : traces d'humidité, silo re-nettoyé et séché avant remplissage" style="resize:vertical;min-height:54px"></textarea>
         </div>
         <button class="rfsave" onclick="saveVracEntry()">💾 Enregistrer la mise en rayon</button>
         <button class="rfcancel" onclick="cancelVracForm()">Annuler</button>
@@ -1447,6 +1633,7 @@ html.rot-lock-on #rot-lock{display:flex}
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button class="scan-link-btn" onclick="openCatsView('vrac')" style="background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.32)">📊 Catégories</button>
           <button class="scan-link-btn" onclick="openModal('vrac-modal');renderVracHistory()" style="background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.32)">🗂 Historique</button>
+          <button class="scan-link-btn" onclick="openVracCahier()" style="background:rgba(255,255,255,.92);color:var(--gd);border-color:transparent;font-weight:900">📘 Cahier de suivi</button>
         </div>
       </div>
       <input class="af-in" id="vrac-search" placeholder="🔍 Rechercher (produit, code, silo, lot, origine)…" oninput="renderVracList()" style="width:100%;margin-bottom:10px">
@@ -1461,6 +1648,13 @@ html.rot-lock-on #rot-lock{display:flex}
 
     <!-- PLANNING -->
     <div id="tab-planning" class="tab">
+      <div class="pl-week" id="pl-week"></div>
+      <div class="rg-sec" id="pl-day-t">Aujourd'hui</div>
+      <div id="pl-day"></div>
+      <button class="fresh-scan-btn" style="margin-top:4px" onclick="openVisitForm()">🎤 Nouveau compte-rendu de visite</button>
+      <div class="rg-sec">Derniers comptes-rendus</div>
+      <div id="pl-visits"></div>
+      <div class="rg-sec">Organiser la semaine (passages réguliers)</div>
       <div id="planning-list"></div>
     </div>
 
@@ -1469,6 +1663,43 @@ html.rot-lock-on #rot-lock{display:flex}
       <input class="af-in" id="cat-view-search" placeholder="🔍 Rechercher (nom, gencod, réf., type, marque)…" oninput="filterCatalogueView()" style="width:100%;margin-bottom:12px">
       <div id="cat-view-stats" style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:12px">—</div>
       <div id="cat-view-list"></div>
+    </div>
+
+    <!-- RÉGLAGES : outils rangés au même endroit (remplace le menu ☰ sur téléphone) -->
+    <div id="tab-reglages" class="tab">
+      <div class="rg-sec">Magasins</div>
+      <div class="rg-grp glass">
+        <div class="rg-it" onclick="openStoresModal()"><div class="rg-ic">🏪</div>Mes magasins (ajouter, modifier)</div>
+        <div class="rg-it" onclick="registerStoreHere()"><div class="rg-ic">📍</div>Enregistrer le magasin où je suis</div>
+        <div class="rg-it" onclick="openFolders()"><div class="rg-ic">🗂</div>Dossiers magasins</div>
+      </div>
+      <div class="rg-sec">Suivi</div>
+      <div class="rg-grp glass">
+        <div class="rg-it" onclick="openEmailModal(null)"><div class="rg-ic">📧</div>Récap alertes par magasin</div>
+        <div class="rg-it" onclick="openCatsView()"><div class="rg-ic">📊</div>Vue par catégories</div>
+        <div class="rg-it" onclick="openBLImport()"><div class="rg-ic">📄</div>Importer un BL</div>
+        <div class="rg-it" onclick="openModal('archive-modal');renderArchive()"><div class="rg-ic">🗂</div>Historique / Archive</div>
+        <div class="rg-it" onclick="openModal('stats-modal');renderStats()"><div class="rg-ic">📈</div>Statistiques</div>
+      </div>
+      <div class="rg-sec">Données</div>
+      <div class="rg-grp glass">
+        <div class="rg-it" onclick="backupData()"><div class="rg-ic">💾</div>Sauvegarder mes données</div>
+        <div class="rg-it" onclick="document.getElementById('restore-in').click()"><div class="rg-ic">📂</div>Restaurer une sauvegarde</div>
+        <div class="rg-it" onclick="toolCSV()"><div class="rg-ic">📥</div>Exporter CSV</div>
+        <div class="rg-it" id="rg-adm" onclick="showTab('admin')" style="display:none"><div class="rg-ic">⚙️</div>Administration (catalogue, compte, configuration)</div>
+      </div>
+      <div class="rg-sec">Langue</div>
+      <div class="rg-grp glass rg-langs">
+        <button class="lang-btn" onclick="setLang('fr')"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#fff"/><rect width="1" height="2" fill="#0055A4"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>FR</button>
+        <button class="lang-btn" onclick="setLang('en')"><svg class="flag" viewBox="0 0 60 30" aria-hidden="true"><rect width="60" height="30" fill="#012169"/><path d="M0,0L60,30M60,0L0,30" stroke="#fff" stroke-width="6"/><path d="M30,0v30M0,15h60" stroke="#fff" stroke-width="10"/><path d="M30,0v30M0,15h60" stroke="#C8102E" stroke-width="6"/></svg>EN</button>
+        <button class="lang-btn" onclick="setLang('es')"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#AA151B"/><rect y=".5" width="3" height="1" fill="#F1BF00"/></svg>ES</button>
+        <button class="lang-btn" onclick="setLang('zh')"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#EE1C25"/><polygon points="7,3 8.5,7 4.5,4.5 9.5,4.5 5.5,7" fill="#FFDE00"/></svg>中文</button>
+      </div>
+      <div class="rg-sec">Informations</div>
+      <div class="rg-grp glass">
+        <div class="rg-it" onclick="openLegalNotice()"><div class="rg-ic">⚖️</div>Mentions légales & RGPD</div>
+      </div>
+      <button class="sb-out" style="margin-top:18px" onclick="doLogout()">🚪 Déconnexion</button>
     </div>
 
     <!-- ADMIN -->
@@ -1630,8 +1861,9 @@ html.rot-lock-on #rot-lock{display:flex}
     <div class="sb-hd"><div class="sb-un" id="sb-un">—</div><div class="sb-rl" id="sb-rl">—</div></div>
     <div class="sb-body">
       <div class="sb-sec">Navigation</div>
-      <div class="sb-it" onclick="showTab('dashboard');closeSB()"><div class="sb-ic">📊</div>Tableau de bord</div>
-      <div class="sb-it" onclick="showTab('scanner');closeSB()"><div class="sb-ic">🌿</div>Fresh</div>
+      <div class="sb-it" onclick="goHome();closeSB()"><div class="sb-ic">🏠</div>Accueil</div>
+      <div class="sb-it" onclick="showTab('dashboard');closeSB()"><div class="sb-ic">📊</div>Dates (Fresh)</div>
+      <div class="sb-it" onclick="showTab('scanner');closeSB()"><div class="sb-ic">🌿</div>Scanner une date</div>
       <div class="sb-it" onclick="showTab('commande');closeSB()"><div class="sb-ic">🛒</div>Commande</div>
       <div class="sb-it" onclick="showTab('stocks');closeSB()"><div class="sb-ic">📦</div>Stocks</div>
       <div class="sb-it" onclick="showTab('vrac');closeSB()"><div class="sb-ic">🌰</div>Vrac</div>
@@ -1639,6 +1871,7 @@ html.rot-lock-on #rot-lock{display:flex}
       <div class="sb-it" onclick="showTab('planning');closeSB()"><div class="sb-ic">📅</div>Planning</div>
       <div class="sb-it" onclick="showTab('catalogue');closeSB()"><div class="sb-ic">📚</div>Catalogue</div>
       <div class="sb-it" id="sb-adm" onclick="showTab('admin');closeSB()" style="display:none"><div class="sb-ic">⚙️</div>Administration</div>
+      <div class="sb-it" onclick="showTab('reglages');closeSB()"><div class="sb-ic">🔧</div>Réglages</div>
       <div class="sb-sec">Outils</div>
       <div class="sb-it" onclick="openStoresModal();closeSB()"><div class="sb-ic">🏪</div>Gestion des magasins</div>
       <div class="sb-it" onclick="openFolders();closeSB()"><div class="sb-ic">🗂</div>Dossiers magasins</div>
@@ -1804,10 +2037,11 @@ function genId(){ return Date.now().toString(36)+'_'+Math.random().toString(36).
    de Safari → les données n'y apparaissent pas. Exporter depuis Safari puis
    restaurer dans l'app transfère TOUT (magasins, produits, commandes, stocks,
    stock de départ, catalogue, config). Sert aussi de sauvegarde de sécurité. */
-function backupData(){
+async function backupData(){
   const data={};
   for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); data[k]=localStorage.getItem(k); }
-  const payload={ _fcbackup:1, at:new Date().toISOString(), data };
+  let media={}; try{ media=await MediaDB.all(); }catch(e){}   // photos vrac (IndexedDB)
+  const payload={ _fcbackup:1, at:new Date().toISOString(), data, media };
   const blob=new Blob([JSON.stringify(payload)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
@@ -1827,7 +2061,12 @@ function restoreData(input){
     if(!keys.length){ toast('❌ Sauvegarde vide'); return; }
     showConfirm('Restaurer cette sauvegarde ?', `${keys.length} élément(s) importés. Les données actuelles de CET appareil seront remplacées.`, ()=>{
       keys.forEach(k=>{ try{ localStorage.setItem(k, data[k]); }catch(e){} });
-      toast('✅ Données restaurées — rechargement…');
+      const media = parsed && parsed.media && typeof parsed.media==='object' ? parsed.media : {};
+      Promise.all(Object.keys(media).map(k=>MediaDB.put(k, media[k]).catch(()=>{}))).then(()=>{
+        toast('✅ Données restaurées — rechargement…');
+        setTimeout(()=>location.reload(), 800);
+      });
+      return;
       setTimeout(()=>location.reload(), 800);
     });
   };
@@ -1836,7 +2075,7 @@ function restoreData(input){
 
 /* Emergency reset */
 if(new URLSearchParams(location.search).get('reset')==='1'){
-  ['fc_users','fc_products','fc_archive','fc_planning','fc_lang',
+  ['fc_users','fc_products','fc_archive','fc_planning','fc_visits','fc_lang',
    'fc_gas_url','fc_store_name','fc_store_emoji','fc_store_enseigne','fc_store_region','fc_store_ville',
    'fc_store_lat','fc_store_lng','fc_store_rad',
    'fc_email_resp','fc_email_fin','fc_catalogue','fc_catalogue_ts','fc_catalogues',
@@ -1848,7 +2087,7 @@ if(new URLSearchParams(location.search).get('reset')==='1'){
 
 /* ═══ I18N ══════════════════════════════════════════════════════════════════ */
 const I18N={
-  fr:{tag:'Gestion intelligente des périmés',l_user:'Identifiant',l_pass:'Mot de passe',l_btn:'Se connecter',l_err_empty:'Remplissez tous les champs',l_err_wrong:'Identifiant ou mot de passe incorrect',ph_user:'prenom.nom',ph_pass:'••••••••',rg_t:"🔒 Charte d'usage et protection des données",rg_p:"Le détail des traitements et des durées de conservation figure dans les Mentions légales accessibles depuis le menu.",rg_y:'✓ Accepter',rg_n:'Refuser',
+  fr:{tag:'Gestion intelligente des périmés',by:'Créé par',hm_hi:'Bonjour',tl_g:'Gestion',tl_mag:'Magasins',hs_g:'Commande · Stocks · Vrac · Magasins',hs_mag:'{n} magasin(s) enregistré(s)',tl_cat:'Catalogue',tl_set:'Réglages',tl_adm:'Administration',fresh_scan:'📷 Scanner une date',hs_fresh:'{e} périmé(s) · {o} sous 2 j',hs_fresh0:'Aucune date urgente',hs_cmd:'{n} réf. · {c} colis en cours',hs_cmd0:'Aucune commande en cours',hs_stk:'{n} produit(s) en cours',hs_stk0:'Aucun relevé en cours',hs_vrac:'{n} mise(s) en rayon',hs_vrac0:'Mises en rayon des silos',hs_al:'{n} magasin(s) à prévenir',hs_al0:'Rien à signaler',hs_pl:'Aujourd’hui : {n} magasin(s)',hs_pl0:'Rien de prévu aujourd’hui',hs_cat:'{n} produits',hs_set:'Magasins, sauvegarde, langue',hm_store:'Magasin',l_user:'Identifiant',l_pass:'Mot de passe',l_btn:'Se connecter',l_err_empty:'Remplissez tous les champs',l_err_wrong:'Identifiant ou mot de passe incorrect',ph_user:'prenom.nom',ph_pass:'••••••••',rg_t:"🔒 Charte d'usage et protection des données",rg_p:"Le détail des traitements et des durées de conservation figure dans les Mentions légales accessibles depuis le menu.",rg_y:'✓ Accepter',rg_n:'Refuser',
   lexp:'Périmés',lcrit:'Critiques ≤2j',lwarn:'Attention ≤7j',lok:'OK',lprods:'Produits',all:'Tous',all_stores:'Tous magasins',all_status:'Tous statuts',
   sct:'Scanner un produit',scsub:'Photographiez le code-barres EAN',scbtn:'Prendre une photo',scanning:'🔍 Analyse…',scan_ok:'✅ Produit reconnu',scan_err:'❌ Erreur de connexion',
   ldlc:'Date limite (DLC)',lqty:'Quantité',rfsave:'💾 Enregistrer',rfcancel:'Annuler',
@@ -1862,7 +2101,7 @@ const I18N={
   days:['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'],
   saved:'✅ Sauvegardé',deleted:'🗑 Supprimé',user_added:'👤 Utilisateur ajouté',store_added:'🏪 Magasin ajouté',prod_archived:'✅ Produit archivé',no_prods:'Aucun produit',fill_all:'Remplissez tous les champs',email_sent:'✅ E-mail envoyé',email_err:'❌ Erreur envoi',csv_ok:'📥 CSV téléchargé',
   adm_stores:'🏪 Magasins',adm_users:'👥 Utilisateurs',adm_lang:'🌍 Langue',adm_conf:'⚙️ Configuration'},
-  en:{tag:'Smart expiry date management',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err_empty:'Please fill all fields',l_err_wrong:'Wrong username or password',ph_user:'firstname.lastname',ph_pass:'••••••••',rg_t:'🔒 Usage charter & data protection',rg_p:'Full processing details and retention periods are available in the Legal Notice from the menu.',rg_y:'✓ Accept',rg_n:'Decline',
+  en:{tag:'Smart expiry date management',by:'Created by',hm_hi:'Hello',tl_g:'Management',tl_mag:'Stores',hs_g:'Orders · Stock · Bulk · Stores',hs_mag:'{n} store(s) saved',tl_cat:'Catalogue',tl_set:'Settings',tl_adm:'Administration',fresh_scan:'📷 Scan a date',hs_fresh:'{e} expired · {o} within 2 d',hs_fresh0:'No urgent dates',hs_cmd:'{n} items · {c} cases in progress',hs_cmd0:'No order in progress',hs_stk:'{n} product(s) in progress',hs_stk0:'No count in progress',hs_vrac:'{n} shelving(s)',hs_vrac0:'Bulk bin shelving',hs_al:'{n} store(s) to notify',hs_al0:'Nothing to report',hs_pl:'Today: {n} store(s)',hs_pl0:'Nothing planned today',hs_cat:'{n} products',hs_set:'Stores, backup, language',hm_store:'Store',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err_empty:'Please fill all fields',l_err_wrong:'Wrong username or password',ph_user:'firstname.lastname',ph_pass:'••••••••',rg_t:'🔒 Usage charter & data protection',rg_p:'Full processing details and retention periods are available in the Legal Notice from the menu.',rg_y:'✓ Accept',rg_n:'Decline',
   lexp:'Expired',lcrit:'Critical ≤2d',lwarn:'Warning ≤7d',lok:'OK',lprods:'Products',all:'All',all_stores:'All stores',all_status:'All statuses',
   sct:'Scan a product',scsub:'Photograph the EAN barcode',scbtn:'Take a photo',scanning:'🔍 Analyzing…',scan_ok:'✅ Product found',scan_err:'❌ Connection error',
   ldlc:'Expiry date',lqty:'Quantity',rfsave:'💾 Save',rfcancel:'Cancel',
@@ -1876,7 +2115,7 @@ const I18N={
   days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
   saved:'✅ Saved',deleted:'🗑 Deleted',user_added:'👤 User added',store_added:'🏪 Store added',prod_archived:'✅ Product archived',no_prods:'No products',fill_all:'Please fill all fields',email_sent:'✅ Email sent',email_err:'❌ Send error',csv_ok:'📥 CSV downloaded',
   adm_stores:'🏪 Stores',adm_users:'👥 Users',adm_lang:'🌍 Language',adm_conf:'⚙️ Config'},
-  es:{tag:'Gestión inteligente de caducidades',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Iniciar sesión',l_err_empty:'Rellene todos los campos',l_err_wrong:'Usuario o contraseña incorrectos',ph_user:'nombre.apellido',ph_pass:'••••••••',rg_t:'🔒 Carta de uso y protección de datos',rg_p:'El detalle del tratamiento y los plazos de conservación figuran en el Aviso Legal accesible desde el menú.',rg_y:'✓ Aceptar',rg_n:'Rechazar',
+  es:{tag:'Gestión inteligente de caducidades',by:'Creado por',hm_hi:'Hola',tl_g:'Gestión',tl_mag:'Tiendas',hs_g:'Pedidos · Stock · Granel · Tiendas',hs_mag:'{n} tienda(s) registrada(s)',tl_cat:'Catálogo',tl_set:'Ajustes',tl_adm:'Administración',fresh_scan:'📷 Escanear una fecha',hs_fresh:'{e} caducado(s) · {o} en 2 d',hs_fresh0:'Sin fechas urgentes',hs_cmd:'{n} ref. · {c} cajas en curso',hs_cmd0:'Sin pedido en curso',hs_stk:'{n} producto(s) en curso',hs_stk0:'Sin recuento en curso',hs_vrac:'{n} reposición(es)',hs_vrac0:'Reposición de silos',hs_al:'{n} tienda(s) a avisar',hs_al0:'Nada que señalar',hs_pl:'Hoy: {n} tienda(s)',hs_pl0:'Nada previsto hoy',hs_cat:'{n} productos',hs_set:'Tiendas, copia, idioma',hm_store:'Tienda',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Iniciar sesión',l_err_empty:'Rellene todos los campos',l_err_wrong:'Usuario o contraseña incorrectos',ph_user:'nombre.apellido',ph_pass:'••••••••',rg_t:'🔒 Carta de uso y protección de datos',rg_p:'El detalle del tratamiento y los plazos de conservación figuran en el Aviso Legal accesible desde el menú.',rg_y:'✓ Aceptar',rg_n:'Rechazar',
   lexp:'Caducados',lcrit:'Crítico ≤2d',lwarn:'Atención ≤7d',lok:'OK',lprods:'Productos',all:'Todos',all_stores:'Todas las tiendas',all_status:'Todos los estados',
   sct:'Escanear producto',scsub:'Fotografíe el código EAN',scbtn:'Tomar foto',scanning:'🔍 Analizando…',scan_ok:'✅ Producto encontrado',scan_err:'❌ Error de conexión',
   ldlc:'Fecha caducidad',lqty:'Cantidad',rfsave:'💾 Guardar',rfcancel:'Cancelar',
@@ -1890,7 +2129,7 @@ const I18N={
   days:['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],
   saved:'✅ Guardado',deleted:'🗑 Eliminado',user_added:'👤 Usuario añadido',store_added:'🏪 Tienda añadida',prod_archived:'✅ Producto archivado',no_prods:'Sin productos',fill_all:'Rellene todos los campos',email_sent:'✅ Correo enviado',email_err:'❌ Error envío',csv_ok:'📥 CSV descargado',
   adm_stores:'🏪 Tiendas',adm_users:'👥 Usuarios',adm_lang:'🌍 Idioma',adm_conf:'⚙️ Config'},
-  zh:{tag:'智能保质期管理系统',l_user:'用户名',l_pass:'密码',l_btn:'登录',l_err_empty:'请填写所有字段',l_err_wrong:'用户名或密码错误',ph_user:'姓名.姓氏',ph_pass:'••••••••',rg_t:'🔒 使用规章与数据保护',rg_p:'数据处理详情与保留期限请查阅菜单中的法律声明。',rg_y:'✓ 接受',rg_n:'拒绝',
+  zh:{tag:'智能保质期管理系统',by:'创建者',hm_hi:'您好',tl_g:'运营',tl_mag:'门店',hs_g:'订单 · 库存 · 散装 · 门店',hs_mag:'已保存 {n} 家门店',tl_cat:'目录',tl_set:'设置',tl_adm:'管理',fresh_scan:'📷 扫描日期',hs_fresh:'{e} 已过期 · {o} 2天内',hs_fresh0:'无紧急日期',hs_cmd:'{n} 项 · {c} 箱进行中',hs_cmd0:'无进行中的订单',hs_stk:'{n} 个产品进行中',hs_stk0:'无进行中的盘点',hs_vrac:'{n} 次上架',hs_vrac0:'散装上架',hs_al:'{n} 家门店待通知',hs_al0:'无异常',hs_pl:'今天：{n} 家门店',hs_pl0:'今天无安排',hs_cat:'{n} 个产品',hs_set:'门店、备份、语言',hm_store:'门店',l_user:'用户名',l_pass:'密码',l_btn:'登录',l_err_empty:'请填写所有字段',l_err_wrong:'用户名或密码错误',ph_user:'姓名.姓氏',ph_pass:'••••••••',rg_t:'🔒 使用规章与数据保护',rg_p:'数据处理详情与保留期限请查阅菜单中的法律声明。',rg_y:'✓ 接受',rg_n:'拒绝',
   lexp:'已过期',lcrit:'紧急≤2天',lwarn:'注意≤7天',lok:'正常',lprods:'产品',all:'全部',all_stores:'全部门店',all_status:'全部状态',
   sct:'扫描产品',scsub:'拍摄EAN条形码',scbtn:'拍照',scanning:'🔍 分析中…',scan_ok:'✅ 产品已识别',scan_err:'❌ 连接错误',
   ldlc:'有效期',lqty:'数量',rfsave:'💾 保存',rfcancel:'取消',
@@ -1917,7 +2156,7 @@ function applyLang(){
   const t=T();
   const $=(id,k)=>{const el=document.getElementById(id);if(el)el.textContent=t[k]||k};
   const $ph=(id,k)=>{const el=document.getElementById(id);if(el && t[k]) el.placeholder=t[k]};
-  $('sp-tag','tag');$('l-user','l_user');$('l-pass','l_pass');$('l-btn-t','l_btn');
+  $('sp-tag','tag');$('l-by','by');$('l-fresh-scan','fresh_scan');$('l-user','l_user');$('l-pass','l_pass');$('l-btn-t','l_btn');
   $ph('li-u','ph_user');$ph('li-p','ph_pass');
   $('rg-t','rg_t');$('rg-p','rg_p');$('rg-y','rg_y');$('rg-n','rg_n');
   $('l-exp','lexp');$('l-crit','lcrit');$('l-warn','lwarn');$('l-ok','lok');$('l-prods','lprods');
@@ -1969,7 +2208,8 @@ function doLogout(){
   document.getElementById('app').classList.remove('on');
   document.getElementById('splash').classList.remove('off');
   document.getElementById('li-u').value='admin'; // mono-utilisateur : identifiant pré-rempli
-  showTab('dashboard');
+  histDepth=0; goingHome=false;
+  showTab('home', true);
 }
 
 /* ═══ APP LAUNCH ════════════════════════════════════════════════════════════ */
@@ -2003,6 +2243,8 @@ function launchApp(){
   const sbAdm = document.getElementById('sb-adm');
   if(tbAdm) tbAdm.style.display = isAdminRole() ? 'flex' : 'none';
   if(sbAdm) sbAdm.style.display = isAdminRole() ? 'flex' : 'none';
+  const rgAdm = document.getElementById('rg-adm');
+  if(rgAdm) rgAdm.style.display = isAdminRole() ? 'flex' : 'none';
 
   // Charger config admin (identité globale : enseigne/emoji/région ; les magasins
   // sont une liste gérée à part et détectée par GPS)
@@ -2018,9 +2260,8 @@ function launchApp(){
 
   document.getElementById('hdr-sub').textContent = [storeEnseigne, storeName].filter(Boolean).join(' · ') || 'FreshControl';
 
-  // Agent = direct scanner ; autres = dashboard
-  if(role === 'agent') showTab('scanner');
-  else showTab('dashboard');
+  // Tout le monde arrive sur l'accueil (grands boutons)
+  showTab('home', true);
 
   showStoreBadge();
   renderDashboard();
@@ -2115,20 +2356,61 @@ function dist(a,b,c,d){
   return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
 }
 
-/* ═══ TAB NAV ════════════════════════════════════════════════════════════════ */
-let curTab='dashboard';
+/* ═══ TAB NAV ════════════════════════════════════════════════════════════════
+   L'accueil (« home ») est la racine. Chaque écran ouvert ajoute une entrée
+   d'historique : le bouton retour d'Android, le geste retour du navigateur,
+   le bouton ‹ et le glissement depuis le bord gauche reviennent d'un cran. */
+let curTab='home';
 let navStack=[];                 // historique des onglets pour le bouton « retour »
+let histDepth=0;                 // entrées poussées dans history depuis l'accueil
+let goingHome=false;
 function goBack(){
-  if(!navStack.length) return;
-  showTab(navStack.pop(), true); // true = navigation retour (ne ré-empile pas)
+  if(histDepth>0) history.back(); // → popstate → backStep()
+  else backStep();
 }
+function backStep(){ showTab(navStack.pop()||'home', true); }
+function goHome(){
+  if(curTab==='home') return;
+  if(histDepth>0){ goingHome=true; history.go(-histDepth); } // → popstate
+  else showTab('home', true);
+}
+window.addEventListener('popstate', ()=>{
+  const appOn=document.getElementById('app').classList.contains('on');
+  if(goingHome){ goingHome=false; histDepth=0; if(appOn && curTab!=='home') showTab('home', true); return; }
+  histDepth=Math.max(0,histDepth-1);
+  if(appOn && curTab!=='home') backStep();
+});
+/* Glisser depuis le bord gauche de l'écran = retour (comme sur iPhone) */
+(function(){
+  let x0=null, y0=0;
+  document.addEventListener('touchstart',e=>{
+    const t=e.touches[0];
+    x0 = (e.touches.length===1 && t.clientX<26 && curTab!=='home' && !document.querySelector('.modal-bg.on')) ? t.clientX : null;
+    y0 = t.clientY;
+  },{passive:true});
+  document.addEventListener('touchend',e=>{
+    if(x0===null) return;
+    const t=e.changedTouches[0];
+    if(t.clientX-x0>70 && Math.abs(t.clientY-y0)<60) goBack();
+    x0=null;
+  },{passive:true});
+})();
+const TAB_TITLE={dashboard:'tl_s',scanner:'tl_s',commande:'tl_c',stocks:'tl_stk',vrac:'tl_v',alertes:'tl_a',planning:'tl_p',catalogue:'tl_cat',reglages:'tl_set',admin:'tl_adm',gestion:'tl_g'};
 function updateBackBtn(){
   const bk=document.getElementById('hdr-back');
-  // Le dashboard est l'écran d'accueil (racine) → jamais de bouton retour dessus.
-  if(bk) bk.style.display = (navStack.length && curTab!=='dashboard') ? 'flex' : 'none';
+  // L'accueil est la racine → jamais de bouton retour dessus.
+  if(bk) bk.style.display = curTab!=='home' ? 'flex' : 'none';
+  const hs=document.getElementById('hdr-set');
+  if(hs) hs.style.display = curTab==='reglages' ? 'none' : 'flex';
+  const h=document.getElementById('hdr-title');
+  if(h) h.textContent = curTab==='home' ? 'FreshControl' : (T()[TAB_TITLE[curTab]] || 'FreshControl');
 }
 function showTab(n, isBack){
-  if(!isBack && curTab && curTab!==n){ navStack.push(curTab); if(navStack.length>50) navStack.shift(); }
+  if(!isBack && curTab && curTab!==n){
+    if(n==='home'){ goHome(); return; }
+    navStack.push(curTab); if(navStack.length>50) navStack.shift();
+    try{ history.pushState({fc:1},''); histDepth++; }catch(e){}
+  }
   if(curTab==='commande' && n!=='commande') stopCmdScan(); // libère la caméra
   if(curTab==='stocks'   && n!=='stocks')   stopStockScan(); // libère la caméra
   if(curTab==='scanner'  && n!=='scanner')  stopEanScan();  // libère la caméra
@@ -2142,6 +2424,7 @@ function showTab(n, isBack){
   if(t) t.classList.add('on');
   if(b) b.classList.add('on');
   curTab=n;
+  const mn=document.getElementById('main'); if(mn) mn.scrollTop=0;
   if(n==='scanner'||n==='commande'||n==='stocks'||n==='vrac'){
     if(gpsWid===null && gpsState!=='denied') startGPS(); // relance la détection si besoin
     renderStoreBars();
@@ -2156,14 +2439,82 @@ function showTab(n, isBack){
   if(n==='planning') renderPlanning();
   if(n==='catalogue') renderCatalogueView();
   if(n==='admin') renderAdmin();
-  if(n==='dashboard'){
+  if(n==='gestion') renderGestion();
+  if(n==='dashboard') renderDashboard();   // compteurs + filtres (magasin/statut/catégorie) à jour
+  if(n==='home'){
     navStack=[];              // accueil = racine : on repart d'un historique vierge
-    renderDashboard();        // compteurs + filtres (magasin/statut/catégorie) à jour
+    renderHome();
   }
   updateBackBtn();
 }
+/* Ouvre la liste Fresh, éventuellement filtrée sur un statut (e / o / w) */
+function openFresh(st){ fsStatus=st||null; showTab('dashboard'); }
+
+/* ═══ ACCUEIL ════════════════════════════════════════════════════════════════
+   Grands boutons sans défilement ; chaque bouton affiche l'état de son menu
+   en une ligne et une pastille rouge quand il y a quelque chose à traiter. */
+const HOME_TILES=[
+  {id:'dashboard',k:'tl_s',  ico:'🌿',bg:'linear-gradient(145deg,#1FC287,#0B7D57)'},
+  {id:'gestion',  k:'tl_g',  ico:'🗂️',bg:'linear-gradient(145deg,#4C9BFF,#1E5FD0)'},
+  {id:'planning', k:'tl_p',  ico:'📅',bg:'linear-gradient(145deg,#A58BFF,#6544D6)'},
+  {id:'alertes',  k:'tl_a',  ico:'🔔',bg:'linear-gradient(145deg,#FF7070,#D13A3A)'}
+];
+const GESTION_TILES=[
+  {id:'commande', k:'tl_c',  ico:'🛒',bg:'linear-gradient(145deg,#4C9BFF,#1E5FD0)'},
+  {id:'stocks',   k:'tl_stk',ico:'📦',bg:'linear-gradient(145deg,#F2A33A,#D0700F)'},
+  {id:'vrac',     k:'tl_v',  ico:'🌰',bg:'linear-gradient(145deg,#C99A6E,#8A5E38)'},
+  {id:'magasins', k:'tl_mag',ico:'🏪',bg:'linear-gradient(145deg,#1FC287,#0B7D57)',fn:'openStoresModal()'},
+  {id:'catalogue',k:'tl_cat',ico:'📚',bg:'linear-gradient(145deg,#45C2D2,#16808F)',cls:'wide'}
+];
+const fillT=(str,o)=>String(str||'').replace(/\{(\w+)\}/g,(m,k)=>o[k]!=null?o[k]:m);
+function homeStatus(){
+  const t=T(), cnt={e:0,o:0,w:0,k:0};
+  products.forEach(p=>{cnt[statusOf(p.dlc)]+=(p.qty||1)});
+  const alertStores=new Set(products.filter(p=>{const s=statusOf(p.dlc);return s==='e'||s==='o'}).map(p=>p.magasin||'—'));
+  const colis=currentOrder.reduce((a,l)=>a+(Number(l.qty)||0),0);
+  const dayIdx=(new Date().getDay()+6)%7;      // planning : 0 = lundi
+  const today=Object.values(planning||{}).filter(d=>Array.isArray(d)&&d.includes(dayIdx)).length;
+  return {cnt,
+    dashboard:{st:(cnt.e||cnt.o)?fillT(t.hs_fresh,{e:cnt.e,o:cnt.o}):t.hs_fresh0, badge:cnt.e+cnt.o},
+    commande: {st:currentOrder.length?fillT(t.hs_cmd,{n:currentOrder.length,c:colis}):t.hs_cmd0},
+    stocks:   {st:currentStock.length?fillT(t.hs_stk,{n:currentStock.length}):t.hs_stk0},
+    vrac:     {st:vracEntries.length?fillT(t.hs_vrac,{n:vracEntries.length}):t.hs_vrac0},
+    alertes:  {st:alertStores.size?fillT(t.hs_al,{n:alertStores.size}):t.hs_al0, badge:alertStores.size},
+    planning: {st:today?fillT(t.hs_pl,{n:today}):t.hs_pl0},
+    gestion:  {st:currentOrder.length?fillT(t.hs_cmd,{n:currentOrder.length,c:colis}):t.hs_g},
+    magasins: {st:fillT(t.hs_mag,{n:getStores().length})},
+    catalogue:{st:fillT(t.hs_cat,{n:catalogue.length})},
+    reglages: {st:t.hs_set}};
+}
+function renderHome(){
+  const t=T(), hs=homeStatus();
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
+  const first=(session?.name||'').split(/[\s.]/)[0];
+  set('hm-hi', (t.hm_hi||'Bonjour')+(first?' '+first.charAt(0).toUpperCase()+first.slice(1):''));
+  let dt=''; try{ dt=new Date().toLocaleDateString(lang==='zh'?'zh-CN':lang,{weekday:'long',day:'numeric',month:'long'}); }catch(e){}
+  set('hm-date', dt);
+  set('hm-store', '🏪 '+(selStore ? selStore.name : (t.hm_store||'Magasin')));
+  set('hm-e',hs.cnt.e); set('hm-o',hs.cnt.o); set('hm-w',hs.cnt.w);
+  set('hm-l-e',t.lexp); set('hm-l-o',t.lcrit); set('hm-l-w',t.lwarn);
+  renderTiles('hm-grid', HOME_TILES, hs);
+}
+function renderGestion(){ renderTiles('gs-grid', GESTION_TILES, homeStatus()); }
+function renderTiles(gridId, tiles, hs){
+  const t=T(), g=document.getElementById(gridId); if(!g) return;
+  g.innerHTML=tiles.map(x=>{
+    const s=hs[x.id]||{};
+    return `<button class="hm-tile${x.cls?' '+x.cls:''}" onclick="${x.fn||`showTab('${x.id}')`}">`+
+      `<span class="hm-ico" style="background:${x.bg}">${x.ico}</span>`+
+      `<div><div class="hm-n">${escapeHTML(t[x.k]||'')}</div><div class="hm-st">${escapeHTML(s.st||'')}</div></div>`+
+      (s.badge?`<span class="hm-badge">${s.badge>99?'99+':s.badge}</span>`:'')+
+    `</button>`;
+  }).join('');
+}
 function renderCurrentTab(){
-  if(curTab==='dashboard') renderDashboard();
+  updateBackBtn();
+  if(curTab==='home') renderHome();
+  else if(curTab==='gestion') renderGestion();
+  else if(curTab==='dashboard') renderDashboard();
   else if(curTab==='commande') renderCommande();
   else if(curTab==='stocks') renderStock();
   else if(curTab==='vrac') renderVrac();
@@ -5095,18 +5446,99 @@ function deleteStock(id){
 let vracMode      = 'add';   // 'add' | 'check'
 let vracScanning  = false;
 let vracTorchOn   = false;
-let vracPhoto     = null;    // dataURL de la photo en cours de saisie
 let vracEditId    = null;    // fiche de l'historique en cours de modification
+// Photos en cours de saisie : ref = référence enregistrée ('idb:…' ou dataURL),
+// data = image affichée, at = date de prise de vue, changed = à réenregistrer.
+let vracPhotos    = { sac:{}, silo:{} };
+let vracHyg       = {};      // contrôle hygiène en cours : { clé: 'O' | 'N' }
+
+/* Contrôle hygiène à chaque remplissage de silo (guide de bonnes pratiques
+   vrac : pas de mélange de lots, silo propre et sec, produit et étiquetage
+   conformes). Les réponses partent dans le cahier de suivi PDF. */
+const VRAC_HYG = [
+  { k:'vide',     l:'Silo vidé entièrement (pas de mélange de lots)' },
+  { k:'nettoye',  l:'Silo nettoyé' },
+  { k:'desinfecte', l:'Silo désinfecté' },
+  { k:'sec',      l:'Silo sec avant remplissage' },
+  { k:'nuisibles',l:'Aucune trace de nuisibles ou d\'insectes' },
+  { k:'sac',      l:'Sac fournisseur intact' },
+  { k:'produit',  l:'Produit conforme (aspect, odeur, sans corps étranger)' },
+  { k:'ustensiles', l:'Pelle et ustensiles propres' },
+  { k:'etiquette',l:'Étiquette du silo à jour (lot, DDM, allergènes)' }
+];
+
+/* Photos rangées dans IndexedDB (des centaines de Mo possibles) plutôt que
+   dans localStorage (5 Mo) : un cahier de preuve ne doit jamais perdre ses
+   photos. Repli : si IndexedDB est indisponible, la photo reste en ligne. */
+const MediaDB = (function(){
+  let dbp = null;
+  function db(){
+    if(!dbp) dbp = new Promise((res, rej) => {
+      if(!window.indexedDB) return rej(new Error('IndexedDB indisponible'));
+      const r = indexedDB.open('fc_media', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('photos');
+      r.onsuccess = () => res(r.result);
+      r.onerror   = () => rej(r.error);
+    });
+    return dbp;
+  }
+  function run(mode, fn){
+    return db().then(d => new Promise((res, rej) => {
+      const t = d.transaction('photos', mode), req = fn(t.objectStore('photos'));
+      t.oncomplete = () => res(req ? req.result : undefined);
+      t.onerror = t.onabort = () => rej(t.error);
+    }));
+  }
+  return {
+    put: (k, v) => run('readwrite', st => st.put(v, k)),
+    get: k      => run('readonly',  st => st.get(k)),
+    del: k      => run('readwrite', st => st.delete(k)),
+    all: () => db().then(d => new Promise((res, rej) => {
+      const out = {}, r = d.transaction('photos').objectStore('photos').openCursor();
+      r.onsuccess = () => { const c = r.result; if(c){ out[c.key] = c.value; c.continue(); } else res(out); };
+      r.onerror = () => rej(r.error);
+    }))
+  };
+})();
+try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){}
+
+const VRAC_PH_FIELD = { sac:'photo', silo:'photoSilo' };   // champ de la fiche par type de photo
+async function vracPhotoData(ref){
+  if(!ref) return null;
+  if(String(ref).startsWith('idb:')){ try{ return (await MediaDB.get(ref.slice(4))) || null; }catch(e){ return null; } }
+  return ref;
+}
+async function storeVracPhoto(key, data){
+  try{ await MediaDB.put(key, data); return 'idb:' + key; }catch(e){ return data; }
+}
+async function dropVracPhoto(ref){
+  if(ref && String(ref).startsWith('idb:')){ try{ await MediaDB.del(ref.slice(4)); }catch(e){} }
+}
+/* Migration : les anciennes photos (dans localStorage) passent dans IndexedDB */
+(async function migrateVracPhotos(){
+  let moved = 0;
+  for(const v of vracEntries){
+    if(v.photo && String(v.photo).startsWith('data:')){
+      const ref = await storeVracPhoto(v.id + ':sac', v.photo);
+      if(ref !== v.photo){ v.photo = ref; moved++; }
+    }
+  }
+  if(moved) saveVrac();
+})();
 
 function saveVrac(){
   for(let i = 0; i < 15; i++){
     try{ localStorage.setItem('fc_vrac', JSON.stringify(vracEntries)); return true; }
     catch(e){
-      const withPhoto = vracEntries.filter(v => v.photo)
-        .sort((a,b) => new Date(a.createdAt||0) - new Date(b.createdAt||0));
-      if(!withPhoto.length){ toast('⚠️ Stockage plein — enregistrement impossible'); return false; }
-      withPhoto[0].photo = null;
-      withPhoto[0].photoDropped = true;
+      // Seules les photos restées en ligne (repli sans IndexedDB) peuvent saturer
+      const inline = [];
+      vracEntries.forEach(v => ['photo','photoSilo'].forEach(f => {
+        if(v[f] && String(v[f]).startsWith('data:')) inline.push([v, f]);
+      }));
+      inline.sort((a,b) => new Date(a[0].createdAt||0) - new Date(b[0].createdAt||0));
+      if(!inline.length){ toast('⚠️ Stockage plein — enregistrement impossible'); return false; }
+      inline[0][0][inline[0][1]] = null;
+      inline[0][0].photoDropped = true;
       if(i === 0) toast('⚠️ Stockage saturé — les photos les plus anciennes ont été retirées');
     }
   }
@@ -5252,7 +5684,17 @@ function prefillVracFromCatalogue(gencod){
 function openVracForm(opts){
   const o = opts || {};
   vracEditId = o.id || null;
-  vracPhoto  = o.photo || null;
+  vracPhotos = {
+    sac:  { ref:o.photo || null,     at:o.photoAt || null,     data:null, changed:false },
+    silo: { ref:o.photoSilo || null, at:o.photoSiloAt || null, data:null, changed:false }
+  };
+  vracHyg = Object.assign({}, o.hyg || {});
+  renderHygForm();
+  ['sac','silo'].forEach(k => { const st = document.getElementById('vrac-st-'+k); if(st) st.textContent = ''; });
+  ['sac','silo'].forEach(async k => {          // aperçu des photos déjà enregistrées
+    const ph = vracPhotos[k];
+    if(ph.ref){ ph.data = await vracPhotoData(ph.ref); showVracPhoto(); }
+  });
   fillVracDatalists();
   const set = (id, v) => { const e = document.getElementById(id); if(e) e.value = v == null ? '' : v; };
   const ref = o.gencod ? lookupGencod(o.gencod) : null;
@@ -5264,10 +5706,10 @@ function openVracForm(opts){
   set('vrac-lot',    o.lot || '');
   set('vrac-prov',   o.provenance || '');
   set('vrac-qty',    o.qty || 1);
+  set('vrac-rem',    o.remarque || '');
   const ft = document.getElementById('vrac-f-title');
   if(ft) ft.textContent = vracEditId ? 'Modifier la fiche' : 'Mise en rayon';
   showVracPhoto();
-  const st = document.getElementById('vrac-photo-st'); if(st) st.textContent = '';
   const f  = document.getElementById('vrac-form'); if(f) f.style.display = 'block';
   const c  = document.getElementById('vrac-check'); if(c) c.style.display = 'none';
   if(f) f.scrollIntoView({ behavior:'smooth', block:'nearest' });
@@ -5277,7 +5719,7 @@ function hideVracForm(){
   const f = document.getElementById('vrac-form'); if(f) f.style.display = 'none';
 }
 function cancelVracForm(){
-  vracEditId = null; vracPhoto = null;
+  vracEditId = null; vracPhotos = { sac:{}, silo:{} }; vracHyg = {};
   hideVracForm();
 }
 function vracQtyStep(d){
@@ -5285,18 +5727,39 @@ function vracQtyStep(d){
   i.value = Math.max(1, (parseInt(i.value, 10) || 1) + d);
 }
 function showVracPhoto(){
-  const img = document.getElementById('vrac-photo-prev');
-  const del = document.getElementById('vrac-photo-del');
-  if(img){
-    img.style.display = vracPhoto ? 'block' : 'none';
-    if(vracPhoto) img.src = vracPhoto;
-  }
-  if(del) del.style.display = vracPhoto ? 'inline-flex' : 'none';
+  ['sac','silo'].forEach(k => {
+    const ph = vracPhotos[k] || {};
+    const img = document.getElementById('vrac-ph-'+k), del = document.getElementById('vrac-del-'+k);
+    if(img){ img.style.display = ph.data ? 'block' : 'none'; if(ph.data) img.src = ph.data; }
+    if(del) del.style.display = ph.data ? 'block' : 'none';
+  });
 }
-function clearVracPhoto(){
-  vracPhoto = null;
+function clearVracPhoto(kind){
+  vracPhotos[kind] = { ref:vracPhotos[kind]?.ref || null, data:null, at:null, changed:true };
   showVracPhoto();
-  const st = document.getElementById('vrac-photo-st'); if(st) st.textContent = '';
+  const st = document.getElementById('vrac-st-'+kind); if(st) st.textContent = '';
+}
+
+/* ── Contrôle hygiène (cases Oui / Non) ─────────────────────────────────── */
+function renderHygForm(){
+  const box = document.getElementById('vrac-hyg'); if(!box) return;
+  box.innerHTML = VRAC_HYG.map(h => {
+    const v = vracHyg[h.k];
+    return `<div class="hyg-row${v==='N'?' is-n':''}">
+      <div class="hyg-l">${escapeHTML(h.l)}</div>
+      <div class="hyg-b">
+        <button type="button" class="${v==='O'?'on-o':''}" onclick="setHyg('${h.k}','O')">Oui</button>
+        <button type="button" class="${v==='N'?'on-n':''}" onclick="setHyg('${h.k}','N')">Non</button>
+      </div></div>`;
+  }).join('');
+}
+function setHyg(k, v){ vracHyg[k] = vracHyg[k] === v ? undefined : v; renderHygForm(); }
+function setAllHyg(){ VRAC_HYG.forEach(h => vracHyg[h.k] = 'O'); renderHygForm(); }
+function hygSummary(h){
+  const o = h || {};
+  const n = VRAC_HYG.filter(x => o[x.k] === 'N').length;
+  const ok = VRAC_HYG.filter(x => o[x.k] === 'O').length;
+  return { n, ok, missing: VRAC_HYG.length - n - ok };
 }
 
 /* Recompression : une photo d'étiquette pèse 2–4 Mo brute, ~40 Ko une fois
@@ -5321,19 +5784,22 @@ function shrinkImage(file, maxSide, quality){
   });
 }
 
-document.getElementById('vrac-label-in').addEventListener('change', async function(e){
-  const file = e.target.files && e.target.files[0];
-  e.target.value = '';
+async function onVracPhotoInput(e){
+  const input = e.target, kind = input.dataset.kind || 'sac';
+  const file = input.files && input.files[0];
+  input.value = '';
   if(!file) return;
-  const st = document.getElementById('vrac-photo-st');
-  if(st) st.innerHTML = '<span class="spin"></span> Traitement de la photo…';
+  const st = document.getElementById('vrac-st-'+kind);
+  if(st){ st.style.color = ''; st.innerHTML = '<span class="spin"></span> Traitement…'; }
   try{
-    vracPhoto = await shrinkImage(file, 720, .62);
+    const data = await shrinkImage(file, 900, .66);
+    const at = new Date(file.lastModified && Date.now() - file.lastModified < 864e5 ? file.lastModified : Date.now()).toISOString();
+    vracPhotos[kind] = { ref:vracPhotos[kind]?.ref || null, data, at, changed:true };
     showVracPhoto();
-    if(st) st.textContent = `✅ Étiquette enregistrée (~${Math.max(1, Math.round(vracPhoto.length/1400))} Ko)`;
-    // L'étiquette porte le code-barres : on le lit si le champ est encore vide.
+    if(st) st.textContent = `✅ Photo du ${new Date(at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}`;
+    // L'étiquette du sac porte le code-barres : on le lit si le champ est encore vide.
     const gc = document.getElementById('vrac-gencod');
-    if(gc && !gc.value.trim() && BarcodeEngine.isAvailable()){
+    if(kind === 'sac' && gc && !gc.value.trim() && BarcodeEngine.isAvailable()){
       try{
         const code = await BarcodeEngine.decodeImageFile(file);
         if(code){ gc.value = code; prefillVracFromCatalogue(code); toast('🔖 Code-barres lu sur l\'étiquette'); }
@@ -5343,9 +5809,11 @@ document.getElementById('vrac-label-in').addEventListener('change', async functi
     console.warn('[Vrac photo]', err);
     if(st){ st.textContent = '❌ Photo illisible'; st.style.color = 'var(--r)'; }
   }
-});
+}
+document.getElementById('vrac-label-in').addEventListener('change', onVracPhotoInput);
+document.getElementById('vrac-silo-in').addEventListener('change', onVracPhotoInput);
 
-function saveVracEntry(){
+async function saveVracEntry(){
   const val = id => (document.getElementById(id)?.value || '').trim();
   const name   = val('vrac-name');
   const gencod = val('vrac-gencod').replace(/\s/g, '');
@@ -5365,16 +5833,33 @@ function saveVracEntry(){
     provenance: val('vrac-prov'),
     dateRayon:  val('vrac-date') || new Date().toISOString().slice(0,10),
     qty:        Math.max(1, parseInt(val('vrac-qty'), 10) || 1),
-    photo:      vracPhoto || null,
+    hyg:        Object.assign({}, vracHyg),
+    remarque:   val('vrac-rem'),
     store:      storeName || '',
     by:         session?.username || '?',
+    byName:     session?.name || '',
   };
+  const hs = hygSummary(data.hyg);
+  if(hs.n && !data.remarque){ toast('⚠️ Point non conforme : notez l\'action corrective dans Remarques'); document.getElementById('vrac-rem')?.focus(); return; }
+  const id = vracEditId || genId();
+  // Photos : seules les nouvelles (ou retirées) sont réenregistrées
+  for(const k of ['sac','silo']){
+    const ph = vracPhotos[k] || {}, f = VRAC_PH_FIELD[k];
+    if(ph.changed){
+      if(ph.ref) await dropVracPhoto(ph.ref);
+      data[f] = ph.data ? await storeVracPhoto(id + ':' + k, ph.data) : null;
+      data[f + 'At'] = ph.data ? ph.at : null;
+    } else {
+      data[f] = ph.ref || null;
+      data[f + 'At'] = ph.at || null;
+    }
+  }
   const backup = JSON.stringify(vracEntries);
   if(vracEditId){
     const e = vracEntries.find(x => x.id === vracEditId);
     if(e) Object.assign(e, data, { updatedAt: new Date().toISOString() });
   } else {
-    vracEntries.unshift(Object.assign({ id: genId(), createdAt: new Date().toISOString() }, data));
+    vracEntries.unshift(Object.assign({ id, createdAt: new Date().toISOString() }, data));
   }
   if(!saveVrac()){ vracEntries = JSON.parse(backup); return; }
   toast(vracEditId ? '✅ Fiche mise à jour' : `✅ ${data.name || data.gencod} → ${silo}`);
@@ -5438,13 +5923,16 @@ function vracCard(v, opts){
       ${catChip(catOfLine(v))}
       <span class="cat-chip" style="background:rgba(13,31,13,.06);color:var(--muted)">🗄 ${escapeHTML(v.silo || 'silo —')}</span>
       ${v.provenance ? `<span class="cat-chip" style="background:rgba(59,130,246,.13);color:#1d4ed8">🌍 ${escapeHTML(v.provenance)}</span>` : ''}
+      ${vracHygChip(v)}
     </div>
+    ${v.remarque ? `<div class="vr-meta" style="color:var(--r)">📝 ${escapeHTML(v.remarque)}</div>` : ''}
     <div class="vr-meta">
       📅 Mise en rayon <b>${fmtDate(v.dateRayon)}</b>${v.lot ? ` · 🏷 Lot <b>${escapeHTML(v.lot)}</b>` : ''}<br>
       ${escapeHTML(v.gencod || 'sans code-barres')} · 🏪 ${escapeHTML(v.store || '—')} · 👤 ${escapeHTML(v.by || '?')}
     </div>
     <div class="vr-acts">
-      ${v.photo ? `<button class="scan-link-btn" data-vid="${id}" onclick="openVracPhoto(this.dataset.vid)">🏷 Étiquette</button>` : ''}
+      ${v.photo ? `<button class="scan-link-btn" data-vid="${id}" onclick="openVracPhoto(this.dataset.vid,'sac')">🏷 Sac</button>` : ''}
+      ${v.photoSilo ? `<button class="scan-link-btn" data-vid="${id}" onclick="openVracPhoto(this.dataset.vid,'silo')">🗄 Silo</button>` : ''}
       ${o.compact ? '' : `
         <button class="scan-link-btn" data-vid="${id}" onclick="checkVracFrom(this.dataset.vid)">🔍 Traçabilité</button>
         <button class="scan-link-btn" data-vid="${id}" onclick="editVracEntry(this.dataset.vid)">✏️ Modifier</button>
@@ -5452,11 +5940,20 @@ function vracCard(v, opts){
     </div>
   </div>`;
 }
+function vracHygChip(v){
+  if(!v.hyg) return `<span class="cat-chip" style="background:rgba(13,31,13,.06);color:var(--muted)">🧽 Hygiène non renseignée</span>`;
+  const h = hygSummary(v.hyg);
+  if(h.n) return `<span class="cat-chip" style="background:rgba(224,60,60,.13);color:var(--r)">🧽 ${h.n} non conforme(s)</span>`;
+  if(h.missing) return `<span class="cat-chip" style="background:rgba(245,158,11,.15);color:#B45309">🧽 ${h.ok}/${VRAC_HYG.length} vérifiés</span>`;
+  return `<span class="cat-chip" style="background:rgba(18,168,118,.13);color:var(--gd)">🧽 Hygiène conforme</span>`;
+}
 function findVrac(id){ return vracEntries.find(v => String(v.id) === String(id)); }
-function openVracPhoto(id){
-  const v = findVrac(id); if(!v || !v.photo) return;
+async function openVracPhoto(id, kind){
+  const v = findVrac(id); if(!v) return;
+  const data = await vracPhotoData(v[VRAC_PH_FIELD[kind || 'sac']]);
+  if(!data){ toast('Photo introuvable sur cet appareil'); return; }
   const img = document.getElementById('photo-modal-img');
-  if(img) img.src = v.photo;
+  if(img) img.src = data;
   openModal('photo-modal');
 }
 function checkVracFrom(id){
@@ -5475,6 +5972,8 @@ function editVracEntry(id){
 }
 function deleteVracEntry(id){
   showConfirm('Supprimer cette fiche vrac ?', 'La traçabilité de cette mise en rayon sera définitivement perdue.', () => {
+    const gone = findVrac(id);
+    if(gone){ dropVracPhoto(gone.photo); dropVracPhoto(gone.photoSilo); }
     vracEntries = vracEntries.filter(v => String(v.id) !== String(id));
     saveVrac();
     renderVracList();
@@ -5516,18 +6015,279 @@ function renderVracHistory(){
 function exportVracCSV(){
   if(!vracEntries.length){ toast('Aucune fiche à exporter'); return; }
   const cols = ['dateRayon','name','gencod','silo','lot','provenance','ddm','qty','store','by','createdAt'];
-  const head = ['date_mise_en_rayon','produit','gencod','silo','lot','origine','ddm','nb_sacs','magasin','operateur','saisi_le'];
-  const rows = [head.join(';'), ...vracEntries.map(v => cols.map(c => {
-    let x = v[c] == null ? '' : v[c];
-    if(c === 'ddm') x = ddmLabel(x);
-    return `"${String(x).replace(/"/g,'""')}"`;
-  }).join(';'))];
+  const head = ['date_mise_en_rayon','produit','gencod','silo','lot','origine','ddm','nb_sacs','magasin','operateur','saisi_le',
+                ...VRAC_HYG.map(h => 'hygiene_' + h.k), 'remarques'];
+  const q = x => `"${String(x == null ? '' : x).replace(/"/g,'""')}"`;
+  const rows = [head.join(';'), ...vracEntries.map(v => [
+    ...cols.map(c => q(c === 'ddm' ? ddmLabel(v[c]) : v[c])),
+    ...VRAC_HYG.map(h => q(v.hyg ? (v.hyg[h.k] === 'O' ? 'oui' : v.hyg[h.k] === 'N' ? 'non' : '') : '')),
+    q(v.remarque)
+  ].join(';'))];
   const blob = new Blob(['﻿' + rows.join('\n')], { type:'text/csv;charset=utf-8' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href = url; a.download = `Vrac_tracabilite_${new Date().toISOString().slice(0,10)}.csv`; a.click();
   URL.revokeObjectURL(url);
   toast(T().csv_ok);
+}
+
+/* ── Cahier de suivi vrac (PDF) ───────────────────────────────────────────
+   Une page de synthèse puis une fiche par mise en rayon : produit, lot, DDM,
+   origine, contrôle hygiène du silo (Oui / Non), remarques et photos des
+   étiquettes (sac + silo). À envoyer au client ou à présenter en contrôle.
+   jsPDF est chargé à la demande (jsDelivr, version figée + SRI), puis mis en
+   cache par le service worker : la génération fonctionne ensuite hors ligne. */
+let _jsPdfP = null;
+function loadJsPDF(){
+  if(window.jspdf && window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+  if(!_jsPdfP) _jsPdfP = new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
+    s.integrity = 'sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk';
+    s.crossOrigin = 'anonymous';
+    s.onload  = () => window.jspdf && window.jspdf.jsPDF ? res(window.jspdf.jsPDF) : rej(new Error('jsPDF absent'));
+    s.onerror = () => { _jsPdfP = null; rej(new Error('Module PDF non téléchargé (connexion ?)')); };
+    document.head.appendChild(s);
+  });
+  return _jsPdfP;
+}
+
+function vracCahierList(){
+  const from = document.getElementById('vc-from')?.value || '';
+  const to   = document.getElementById('vc-to')?.value || '';
+  const st   = document.getElementById('vc-store')?.value || '';
+  return vracEntries.filter(v => {
+    const d = (v.dateRayon || v.createdAt || '').slice(0,10);
+    if(from && d < from) return false;
+    if(to && d > to) return false;
+    if(st && (v.store || '') !== st) return false;
+    return true;
+  }).sort((a,b) => String(a.dateRayon||'').localeCompare(String(b.dateRayon||'')) || String(a.createdAt||'').localeCompare(String(b.createdAt||'')));
+}
+function updateVracCahierInfo(){
+  const list = vracCahierList(), el = document.getElementById('vc-info'); if(!el) return;
+  const nc = list.filter(v => hygSummary(v.hyg).n).length;
+  el.textContent = list.length
+    ? `${list.length} mise(s) en rayon dans le cahier${nc ? ` · ${nc} avec non-conformité` : ''}`
+    : 'Aucune mise en rayon sur cette période';
+}
+function openVracCahier(){
+  const now = new Date(), iso = d => d.toISOString().slice(0,10);
+  const f = document.getElementById('vc-from'), t = document.getElementById('vc-to'), s = document.getElementById('vc-store');
+  if(f && !f.value) f.value = iso(new Date(now.getFullYear(), now.getMonth(), 1, 12));
+  if(t && !t.value) t.value = iso(now);
+  if(s){
+    const stores = [...new Set(vracEntries.map(v => v.store || '').filter(Boolean))].sort();
+    const cur = s.value;
+    s.innerHTML = `<option value="">Tous les magasins</option>` + stores.map(x => `<option value="${escapeHTMLAttr(x)}">${escapeHTML(x)}</option>`).join('');
+    s.value = stores.includes(cur) ? cur : (storeName && stores.includes(storeName) ? storeName : '');
+  }
+  [f, t, s].forEach(e => e && (e.onchange = updateVracCahierInfo));
+  updateVracCahierInfo();
+  openModal('vrac-cahier-modal');
+  loadJsPDF().catch(() => {});      // préchargement discret
+}
+
+async function buildVracCahierPDF(list, meta){
+  const JsPDF = await loadJsPDF();
+  const doc = new JsPDF({ unit:'mm', format:'a4' });
+  const W = 210, H = 297, M = 14, CW = W - 2*M;
+  const GREEN = [11,110,77], RED = [200,40,40], GREY = [100,110,105], LINE = [215,225,220];
+  const fmt = d => d ? new Date(d.length <= 10 ? d + 'T12:00:00' : d).toLocaleDateString('fr-FR') : '—';
+  const fmtDT = d => d ? new Date(d).toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+  const clean = x => String(x == null ? '' : x).replace(/[^\x20-\x7E -ÿŒœ–—’€]/g, '').trim();
+  let y = 0;
+
+  function header(){
+    doc.setFillColor(...GREEN); doc.rect(0, 0, W, 18, 'F');
+    doc.setTextColor(255); doc.setFont('helvetica','bold'); doc.setFontSize(13);
+    doc.text('Cahier de suivi vrac — traçabilité et hygiène', M, 11.5);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
+    doc.text(clean(meta.storeLabel), W - M, 8, { align:'right' });
+    doc.text(`Période du ${fmt(meta.from)} au ${fmt(meta.to)}`, W - M, 13, { align:'right' });
+    doc.setTextColor(0);
+    y = 26;
+  }
+  function newPage(){ doc.addPage(); header(); }
+  function ensure(h){ if(y + h > H - 16) newPage(); }
+
+  // ── Page 1 : synthèse ──
+  header();
+  const nNC = list.filter(v => hygSummary(v.hyg).n).length;
+  const nOK = list.filter(v => { const h = hygSummary(v.hyg); return v.hyg && !h.n && !h.missing; }).length;
+  const nPh = list.filter(v => v.photo || v.photoSilo).length;
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.text('Synthèse', M, y); y += 6;
+  doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
+  [
+    ['Magasin', meta.storeLabel],
+    ['Mises en rayon enregistrées', String(list.length)],
+    ['Contrôles hygiène entièrement conformes', String(nOK)],
+    ['Mises en rayon avec non-conformité', String(nNC)],
+    ['Fiches avec photo d\'étiquette', String(nPh)],
+    ['Document édité le', fmtDT(new Date().toISOString()) + (meta.by ? ' par ' + meta.by : '')]
+  ].forEach(([k, v]) => {
+    doc.setTextColor(...GREY); doc.text(k, M, y);
+    doc.setTextColor(0); doc.setFont('helvetica','bold'); doc.text(clean(v), M + 78, y);
+    doc.setFont('helvetica','normal'); y += 5.6;
+  });
+  y += 3;
+  // Tableau récapitulatif
+  const cols = [['Date', 18], ['Produit', 62], ['Silo', 20], ['Lot', 26], ['DDM', 16], ['Hygiène', 40]];
+  const tableHead = () => {
+    doc.setFillColor(235,245,240); doc.rect(M, y - 4, CW, 6.5, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+    let x = M + 1.5; cols.forEach(([c, w]) => { doc.text(c, x, y); x += w; });
+    doc.setFont('helvetica','normal'); y += 6;
+  };
+  tableHead();
+  list.forEach(v => {
+    if(y > H - 22){ newPage(); tableHead(); }
+    const h = hygSummary(v.hyg);
+    const hy = !v.hyg ? 'non renseigné' : h.n ? `${h.n} non conforme(s)` : h.missing ? `${h.ok}/${VRAC_HYG.length} vérifiés` : 'conforme';
+    const cells = [fmt(v.dateRayon), v.name || v.gencod || '—', v.silo || '—', v.lot || '—', ddmLabel(v.ddm) || '—', hy];
+    let x = M + 1.5;
+    cells.forEach((c, i) => {
+      const w = cols[i][1];
+      if(i === 5) doc.setTextColor(...(h.n ? RED : !v.hyg || h.missing ? GREY : GREEN));
+      doc.text(doc.splitTextToSize(clean(c), w - 2.5)[0] || '', x, y);
+      doc.setTextColor(0); x += w;
+    });
+    doc.setDrawColor(...LINE); doc.line(M, y + 1.8, M + CW, y + 1.8);
+    y += 5.6;
+  });
+
+  y += 8;
+  // ── Une fiche par mise en rayon ──
+  for(const v of list){
+    const phs = [await vracPhotoData(v.photo), await vracPhotoData(v.photoSilo)];
+    ensure(104);                                   // une fiche ne se coupe jamais en deux
+    const top = y;
+    // Titre
+    doc.setFillColor(242,248,245); doc.roundedRect(M, top - 4.5, CW, 8.5, 1.5, 1.5, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(10.5);
+    doc.text(doc.splitTextToSize(clean(v.name || v.gencod || 'Produit'), CW - 50)[0], M + 2.5, top + 1);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...GREY);
+    doc.text(`Mise en rayon du ${fmt(v.dateRayon)}`, W - M - 2.5, top + 1, { align:'right' });
+    doc.setTextColor(0);
+    y = top + 10;
+    // Colonne gauche : traçabilité
+    const L = M + 1, LW = 86;
+    const info = [
+      ['Code-barres', v.gencod], ['Silo', v.silo], ['N° de lot', v.lot], ['Origine', v.provenance],
+      ['DDM / DLC', ddmLabel(v.ddm)], ['Nombre de sacs', v.qty], ['Magasin', v.store],
+      ['Opérateur', v.byName || v.by], ['Saisi le', fmtDT(v.createdAt)]
+    ];
+    if(v.updatedAt) info.push(['Modifié le', fmtDT(v.updatedAt)]);
+    let yl = y;
+    doc.setFontSize(8.5);
+    info.forEach(([k, val]) => {
+      doc.setTextColor(...GREY); doc.text(k, L, yl);
+      doc.setTextColor(0); doc.text(doc.splitTextToSize(clean(val == null || val === '' ? '—' : val), LW - 30)[0], L + 29, yl);
+      yl += 4.5;
+    });
+    // Contrôle hygiène
+    yl += 2;
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.text('Contrôle hygiène du silo', L, yl); yl += 4.8;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.2);
+    VRAC_HYG.forEach(hq => {
+      const a = v.hyg ? v.hyg[hq.k] : undefined;
+      doc.setDrawColor(...LINE); doc.rect(L, yl - 2.9, 3.4, 3.4);
+      if(a === 'O'){ doc.setTextColor(...GREEN); doc.setFont('helvetica','bold'); doc.text('OUI', L + LW - 1, yl, { align:'right' }); doc.text('x', L + 0.75, yl - 0.1); }
+      else if(a === 'N'){ doc.setTextColor(...RED); doc.setFont('helvetica','bold'); doc.text('NON', L + LW - 1, yl, { align:'right' }); }
+      else { doc.setTextColor(...GREY); doc.text('—', L + LW - 1, yl, { align:'right' }); }
+      doc.setFont('helvetica','normal');
+      doc.setTextColor(a === 'N' ? RED[0] : 0, a === 'N' ? RED[1] : 0, a === 'N' ? RED[2] : 0);
+      doc.text(doc.splitTextToSize(clean(hq.l), LW - 16)[0], L + 5, yl);
+      doc.setTextColor(0);
+      yl += 4.4;
+    });
+    // Colonne droite : photos
+    const R = M + 92, PW = 42, PH = 56;
+    [['Étiquette du sac', phs[0], v.photoAt], ['Étiquette du silo', phs[1], v.photoSiloAt]].forEach(([lbl, data, at], i) => {
+      const px = R + i * (PW + 4), py = y - 2;
+      doc.setDrawColor(...LINE); doc.rect(px, py, PW, PH);
+      if(data){
+        try{
+          const pr = doc.getImageProperties(data);
+          const sc = Math.min((PW - 2) / pr.width, (PH - 2) / pr.height);
+          const w = pr.width * sc, h = pr.height * sc;
+          doc.addImage(data, 'JPEG', px + (PW - w) / 2, py + (PH - h) / 2, w, h);
+        }catch(e){ doc.setTextColor(...GREY); doc.text('photo illisible', px + PW/2, py + PH/2, { align:'center' }); }
+      } else {
+        doc.setTextColor(...GREY); doc.setFontSize(8); doc.text('pas de photo', px + PW/2, py + PH/2, { align:'center' });
+      }
+      doc.setTextColor(0); doc.setFontSize(8); doc.setFont('helvetica','bold');
+      doc.text(lbl, px, py + PH + 4);
+      doc.setFont('helvetica','normal'); doc.setTextColor(...GREY); doc.setFontSize(7.4);
+      if(data && at) doc.text('prise le ' + fmtDT(at), px, py + PH + 7.8);
+      doc.setTextColor(0);
+    });
+    // Remarques + visa
+    let yr = Math.max(yl, y + 66) + 1;
+    doc.setFontSize(8.5); doc.setFont('helvetica','bold'); doc.text('Remarques / action corrective :', M + 1, yr);
+    doc.setFont('helvetica','normal');
+    const rem = doc.splitTextToSize(clean(v.remarque) || '—', CW - 50);
+    if(v.remarque && hygSummary(v.hyg).n) doc.setTextColor(...RED);
+    doc.text(rem.slice(0, 3), M + 48, yr);
+    doc.setTextColor(0);
+    yr += Math.max(1, Math.min(3, rem.length)) * 4 + 1;
+    doc.setDrawColor(...LINE); doc.line(M, yr, M + CW, yr);
+    y = yr + 9;
+  }
+
+  // ── Visa final ──
+  ensure(30);
+  y += 2;
+  doc.setFont('helvetica','bold'); doc.setFontSize(9.5);
+  doc.text('Visa du responsable du magasin', M, y);
+  doc.text('Visa du contrôleur / client', M + CW/2 + 4, y);
+  doc.setDrawColor(...LINE); doc.rect(M, y + 2, CW/2 - 4, 20); doc.rect(M + CW/2 + 4, y + 2, CW/2 - 4, 20);
+
+  // ── Pieds de page ──
+  const n = doc.getNumberOfPages();
+  for(let i = 1; i <= n; i++){
+    doc.setPage(i);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...GREY);
+    doc.text('FreshControl · S2D COMMERCIAL — document généré à partir des saisies horodatées en magasin', M, H - 8);
+    doc.text(`Page ${i} / ${n}`, W - M, H - 8, { align:'right' });
+  }
+  return doc.output('blob');
+}
+
+async function generateVracCahier(){
+  const list = vracCahierList();
+  if(!list.length){ toast('Aucune mise en rayon sur cette période'); return; }
+  const btn = document.getElementById('vc-go');
+  const lbl = btn ? btn.innerHTML : '';
+  if(btn){ btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Création du PDF…'; }
+  try{
+    const st = document.getElementById('vc-store')?.value || '';
+    const meta = {
+      from: document.getElementById('vc-from')?.value || '',
+      to:   document.getElementById('vc-to')?.value || '',
+      storeLabel: st || [storeEnseigne, 'tous magasins'].filter(Boolean).join(' · '),
+      by: session?.name || ''
+    };
+    const blob = await buildVracCahierPDF(list, meta);
+    const slug = (st || 'magasins').normalize('NFD').replace(/[^\w]+/g, '_').replace(/^_|_$/g, '');
+    const filename = `Cahier_vrac_${slug}_${meta.from}_${meta.to}.pdf`;
+    let file = null;
+    try{ file = new File([blob], filename, { type:'application/pdf' }); }catch(e){}
+    if(file && navigator.canShare && navigator.canShare({ files:[file] })){
+      try{
+        await navigator.share({ files:[file], title:'Cahier de suivi vrac', text:`Cahier de suivi vrac — ${meta.storeLabel} — du ${meta.from} au ${meta.to}` });
+        toast('📘 Cahier envoyé');
+        return;
+      }catch(e){ if(e && e.name === 'AbortError') return; }
+    }
+    downloadBlob(blob, filename);
+    toast('📘 Cahier PDF téléchargé');
+  }catch(err){
+    console.warn('[Cahier vrac]', err);
+    toast('❌ ' + (err && err.message || 'PDF impossible'));
+  }finally{
+    if(btn){ btn.disabled = false; btn.innerHTML = lbl; }
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -6186,18 +6946,207 @@ function renderAlertes(){
 }
 
 /* ═══ PLANNING ════════════════════════════════════════════════════════════════ */
+/* Planning = la semaine de tournée + un compte-rendu par visite, rempli à la
+   voix (dictée du téléphone). Les passages réguliers restent dans
+   fc_planning ({ magasin: [0..6] }, 0 = lundi) ; les comptes-rendus vont
+   dans fc_visits. Tout reste sur l'appareil. */
+let visits = JSON.parse(localStorage.getItem('fc_visits') || '[]');
+let plSel  = null;            // date choisie dans la semaine (AAAA-MM-JJ)
+let visitEditId = null;
+let visitTasks  = [];
+const VISIT_TASKS = ['Contrôle DLC','Commande','Vrac','Relevé de stock','Mise en avant','Animation','Formation équipe'];
+
+const isoDay = d => { const x = new Date(d); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0,10); };
+function planStoreNames(){
+  return [...new Set([
+    ...getStores().map(s => s.name),
+    ...products.map(p => p.magasin),
+    ...Object.keys(planning || {}),
+    ...visits.map(v => v.store)
+  ].filter(Boolean))].sort((a,b) => a.localeCompare(b, 'fr'));
+}
+function weekDates(){
+  const now = new Date(); now.setHours(12,0,0,0);
+  const mon = new Date(now); mon.setDate(now.getDate() - (now.getDay() + 6) % 7);
+  return Array.from({ length:7 }, (_, i) => { const d = new Date(mon); d.setDate(mon.getDate() + i); return d; });
+}
+function plannedOn(dateIso){
+  const idx = (new Date(dateIso + 'T12:00:00').getDay() + 6) % 7;
+  return Object.keys(planning || {}).filter(s => Array.isArray(planning[s]) && planning[s].includes(idx));
+}
+
 function renderPlanning(){
-  const sNames=[...new Set(products.map(p=>p.magasin).filter(Boolean))];
-  const DAYS=T().days;
-  const el=document.getElementById('planning-list');
-  if(!sNames.length){el.innerHTML='<div class="empty">Aucun magasin</div>';return}
-  el.innerHTML=sNames.map(store=>{
-    const plan=planning[store]||[];
-    return`<div class="plan-store">
+  const DAYS = T().days, today = isoDay(new Date());
+  if(!plSel) plSel = today;
+  // Semaine
+  const wk = document.getElementById('pl-week');
+  if(wk) wk.innerHTML = weekDates().map((d, i) => {
+    const iso = isoDay(d), n = plannedOn(iso).length;
+    return `<button class="pl-day${iso===plSel?' on':''}${iso===today?' today':''}" onclick="plSel='${iso}';renderPlanning()">${escapeHTML(DAYS[i])}<b>${d.getDate()}</b><i>${n ? n + ' mag.' : ''}</i></button>`;
+  }).join('');
+  // Journée choisie : magasins prévus + comptes-rendus du jour
+  const dt = document.getElementById('pl-day-t');
+  if(dt) dt.textContent = plSel === today ? "Aujourd'hui" : new Date(plSel + 'T12:00:00').toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+  const dayStores = [...new Set([...plannedOn(plSel), ...visits.filter(v => v.date === plSel).map(v => v.store)])];
+  const day = document.getElementById('pl-day');
+  if(day) day.innerHTML = dayStores.length ? dayStores.map(st => {
+    const done = visits.find(v => v.date === plSel && v.store === st);
+    return `<div class="pl-card glass"><div><b>🏪 ${escapeHTML(st)}</b><small>${done ? escapeHTML((done.tasks || []).join(' · ') || 'Compte-rendu fait') : 'Passage prévu'}</small></div>` +
+      (done ? `<span class="pl-ok">✓ Fait</span>`
+            : `<button class="pl-go" data-store="${escapeHTMLAttr(st)}" onclick="openVisitForm({store:this.dataset.store,date:'${plSel}'})">🎤 Compte-rendu</button>`) + `</div>`;
+  }).join('') : `<div class="empty">Aucun passage prévu ce jour — organisez la semaine plus bas</div>`;
+  renderVisitList();
+  // Passages réguliers (cases jour par magasin)
+  const sNames = planStoreNames();
+  const el = document.getElementById('planning-list');
+  if(!el) return;
+  if(!sNames.length){ el.innerHTML = '<div class="empty">Aucun magasin — ajoutez-en dans Gestion › Magasins</div>'; return; }
+  el.innerHTML = sNames.map(store => {
+    const plan = planning[store] || [];
+    return `<div class="plan-store">
       <div style="font-size:14px;font-weight:900">🏪 ${escapeHTML(store)}</div>
       <div class="dg">${DAYS.map((d,i)=>`<div class="dc${plan.includes(i)?' on':''}" data-store="${escapeHTMLAttr(store)}" data-idx="${i}" onclick="togglePlan(this.dataset.store,Number(this.dataset.idx))">${escapeHTML(d)}</div>`).join('')}</div>
     </div>`;
   }).join('');
+}
+
+function renderVisitList(){
+  const el = document.getElementById('pl-visits'); if(!el) return;
+  if(!visits.length){ el.innerHTML = '<div class="empty">Aucun compte-rendu — touchez 🎤 pour dicter le premier</div>'; return; }
+  el.innerHTML = visits.slice(0, 15).map(v => {
+    const id = escapeHTMLAttr(String(v.id));
+    return `<div class="vs-card glass">
+      <div class="vs-hd"><span>🏪 ${escapeHTML(v.store || '—')}</span><small>${fmtDate(v.date)}</small></div>
+      ${(v.tasks || []).length ? `<div style="font-size:11px;font-weight:800;color:var(--gd);margin-top:2px">${escapeHTML(v.tasks.join(' · '))}</div>` : ''}
+      ${v.notes ? `<div class="vs-tx">${escapeHTML(v.notes)}</div>` : ''}
+      ${v.actions ? `<div class="vs-act">➜ ${escapeHTML(v.actions)}</div>` : ''}
+      ${v.next ? `<div style="font-size:11.5px;font-weight:700;color:var(--muted);margin-top:4px">Prochain passage : ${fmtDate(v.next)}</div>` : ''}
+      <div class="vs-btns">
+        <button class="scan-link-btn" data-id="${id}" onclick="shareVisit(this.dataset.id)">📤 Envoyer</button>
+        <button class="scan-link-btn" data-id="${id}" onclick="openVisitForm(findVisit(this.dataset.id))">✏️ Modifier</button>
+        <button class="scan-link-btn" data-id="${id}" onclick="deleteVisit(this.dataset.id)" style="color:var(--r)">🗑</button>
+      </div></div>`;
+  }).join('') + (visits.length > 15 ? `<div style="text-align:center;color:rgba(255,255,255,.75);font-size:12px;font-weight:700;padding:6px">… ${visits.length - 15} compte(s)-rendu(s) plus ancien(s)</div>` : '');
+}
+function findVisit(id){ return visits.find(v => String(v.id) === String(id)); }
+
+function openVisitForm(o){
+  o = o || {};
+  visitEditId = o.id || null;
+  visitTasks  = (o.tasks || []).slice();
+  const set = (id, v) => { const e = document.getElementById(id); if(e) e.value = v == null ? '' : v; };
+  set('vs-store',   o.store || (selStore ? selStore.name : ''));
+  set('vs-date',    o.date || plSel || isoDay(new Date()));
+  set('vs-notes',   o.notes || '');
+  set('vs-actions', o.actions || '');
+  set('vs-contact', o.contact || '');
+  set('vs-next',    o.next || '');
+  const dl = document.getElementById('vs-store-dl');
+  if(dl) dl.innerHTML = planStoreNames().map(n => `<option value="${escapeHTMLAttr(n)}">`).join('');
+  const tt = document.getElementById('vs-title'); if(tt) tt.textContent = visitEditId ? '✏️ Modifier le compte-rendu' : '🎤 Compte-rendu de visite';
+  const hint = document.getElementById('vs-hint');
+  if(hint) hint.textContent = speechAvailable()
+    ? 'Touchez 🎤, parlez, puis touchez à nouveau pour arrêter. Le texte reste modifiable.'
+    : 'Dictée : touchez le champ puis le micro 🎤 du clavier du téléphone.';
+  renderVisitTasks();
+  openModal('visit-modal');
+}
+function renderVisitTasks(){
+  const box = document.getElementById('vs-tasks'); if(!box) return;
+  box.innerHTML = VISIT_TASKS.map(t => `<button type="button" class="vs-task${visitTasks.includes(t)?' on':''}" data-t="${escapeHTMLAttr(t)}" onclick="toggleVisitTask(this.dataset.t)">${escapeHTML(t)}</button>`).join('');
+}
+function toggleVisitTask(t){
+  const i = visitTasks.indexOf(t);
+  if(i >= 0) visitTasks.splice(i, 1); else visitTasks.push(t);
+  renderVisitTasks();
+}
+function closeVisitForm(){ stopDictation(); closeModal('visit-modal'); }
+
+function saveVisit(andShare){
+  stopDictation();
+  const val = id => (document.getElementById(id)?.value || '').trim();
+  const store = val('vs-store');
+  if(!store){ toast('⚠️ Indiquez le magasin'); document.getElementById('vs-store')?.focus(); return; }
+  if(!val('vs-notes') && !val('vs-actions') && !visitTasks.length){ toast('⚠️ Dictez ou écrivez au moins un retour'); return; }
+  const data = { store, date: val('vs-date') || isoDay(new Date()), tasks: visitTasks.slice(),
+    notes: val('vs-notes'), actions: val('vs-actions'), contact: val('vs-contact'), next: val('vs-next'),
+    by: session?.name || session?.username || '' };
+  let id = visitEditId;
+  if(id){ const v = findVisit(id); if(v) Object.assign(v, data, { updatedAt: new Date().toISOString() }); }
+  else { id = genId(); visits.unshift(Object.assign({ id, createdAt: new Date().toISOString() }, data)); }
+  visits.sort((a,b) => String(b.date).localeCompare(String(a.date)) || String(b.createdAt).localeCompare(String(a.createdAt)));
+  save('fc_visits', visits);
+  closeModal('visit-modal');
+  toast('✅ Compte-rendu enregistré');
+  renderPlanning();
+  if(andShare) shareVisit(id);
+}
+function deleteVisit(id){
+  showConfirm('Supprimer ce compte-rendu ?', 'Il sera définitivement effacé de cet appareil.', () => {
+    visits = visits.filter(v => String(v.id) !== String(id));
+    save('fc_visits', visits); renderPlanning(); toast(T().deleted);
+  });
+}
+function visitText(v){
+  return [
+    `Compte-rendu de visite — ${v.store}`,
+    `Date : ${fmtDate(v.date)}${v.contact ? ' · Interlocuteur : ' + v.contact : ''}`,
+    (v.tasks || []).length ? `Réalisé : ${v.tasks.join(', ')}` : '',
+    '', v.notes ? 'Retour :\n' + v.notes : '',
+    v.actions ? '\nActions à suivre :\n' + v.actions : '',
+    v.next ? `\nProchain passage : ${fmtDate(v.next)}` : '',
+    '', `— ${v.by || 'FreshControl'}`
+  ].filter((x, i, a) => x !== '' || a[i-1] !== '').join('\n').trim();
+}
+async function shareVisit(id){
+  const v = findVisit(id); if(!v) return;
+  const text = visitText(v), title = `Visite ${v.store} — ${fmtDate(v.date)}`;
+  if(navigator.share){
+    try{ await navigator.share({ title, text }); return; }
+    catch(e){ if(e && e.name === 'AbortError') return; }
+  }
+  location.href = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(text)}`;
+}
+
+/* ── Dictée vocale ─────────────────────────────────────────────────────────
+   Reconnaissance vocale du navigateur (Chrome Android, Safari iOS). Le texte
+   dicté s'ajoute à la suite de ce qui est déjà écrit. Sans support, on ouvre
+   le clavier : son bouton micro fait la même chose. */
+let _rec = null, _recBtn = null;
+function speechAvailable(){ return !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
+function stopDictation(){ if(_rec){ try{ _rec.stop(); }catch(e){} } }
+function dictate(targetId, btn){
+  const ta = document.getElementById(targetId); if(!ta) return;
+  if(_rec){ const same = _recBtn === btn; stopDictation(); if(same) return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ ta.focus(); toast('🎤 Touchez le micro du clavier pour dicter'); return; }
+  const r = new SR();
+  r.lang = { fr:'fr-FR', en:'en-GB', es:'es-ES', zh:'zh-CN' }[lang] || 'fr-FR';
+  r.continuous = true; r.interimResults = true;
+  const base = ta.value.trim() ? ta.value.replace(/\s*$/, '') + ' ' : '';
+  let said = '';
+  r.onresult = e => {
+    let interim = '';
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      const tx = e.results[i][0].transcript;
+      if(e.results[i].isFinal) said += tx; else interim += tx;
+    }
+    let txt = (said + interim).replace(/^\s+/, '');
+    if(!base || /[.!?]\s$/.test(base)) txt = txt.charAt(0).toUpperCase() + txt.slice(1);
+    ta.value = base + txt;
+  };
+  r.onerror = e => {
+    if(e.error === 'not-allowed' || e.error === 'service-not-allowed') toast('🎤 Micro refusé — autorisez-le dans les réglages du navigateur');
+    else if(e.error === 'network') toast('🎤 La dictée a besoin du réseau — utilisez le micro du clavier');
+    else if(e.error !== 'no-speech' && e.error !== 'aborted') toast('🎤 Dictée interrompue');
+  };
+  r.onend = () => {
+    if(_recBtn){ _recBtn.classList.remove('rec'); _recBtn.textContent = '🎤'; }
+    _rec = null; _recBtn = null;
+  };
+  try{ r.start(); }catch(e){ toast('🎤 Dictée indisponible'); return; }
+  _rec = r; _recBtn = btn;
+  btn.classList.add('rec'); btn.textContent = '⏹';
 }
 function togglePlan(store,idx){
   if(!planning[store])planning[store]=[];

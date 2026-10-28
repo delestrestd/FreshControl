@@ -6,7 +6,10 @@ PWA de gestion des produits périmés en supermarché.
 - **Module Commande** : réappro par **scan continu** — chaque produit reconnu s'ajoute tout seul, quantités exprimées en **colis**, e-mail + historique local (voir plus bas).
 - Catalogue **multi-marques** synchronisé depuis Google Sheets **ou importé localement** (`.xlsx` / `.csv`, sans dépendance CDN ni envoi serveur).
 - Onglet **Catalogue** : consultation en lecture seule du catalogue agrégé (recherche instantanée nom / gencod / type / marque).
-- Alertes DLC, planning de tournées par magasin, rappels e-mail.
+- Écran d'accueil à 4 grandes icônes (Fresh, Gestion, Planning, Alertes), sans défilement ; Réglages sur la roue ⚙️.
+- **Vrac** : 2 photos (étiquette du sac + étiquette du silo), contrôle hygiène du silo Oui / Non, **cahier de suivi PDF** (traçabilité + hygiène + photos) à envoyer au client ou présenter en contrôle.
+- **Planning** : semaine de tournée + comptes-rendus de visite **dictés au micro**, envoyés par mail et modifiables ensuite.
+- Alertes DLC, rappels e-mail.
 - Mono-utilisateur : un seul compte administrateur (outil de terrain personnel).
 - Multilingue (FR / EN / ES / ZH).
 
@@ -104,7 +107,7 @@ La commande se valide par e-mail : texte regroupé par gamme (EAN, réf., PCB, c
 - Échappement HTML systématique sur toutes les valeurs interpolées dans les rendus.
 - Sub-Resource Integrity (SRI) verrouille la version de la CDN ZXing.
 - Content-Security-Policy stricte, X-Frame-Options DENY, HSTS preload.
-- Permissions-Policy : caméra et géolocalisation autorisées sur le même origin uniquement, micro / paiement / USB bloqués.
+- Permissions-Policy : caméra, géolocalisation et micro (dictée des comptes-rendus) autorisés sur le même origin uniquement, paiement / USB bloqués.
 
 ### Identifiant par défaut (application mono-utilisateur)
 
