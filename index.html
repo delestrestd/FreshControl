@@ -545,6 +545,7 @@ select.store-sel option{background:#0A6B47;color:#fff}
 .rf-l{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;margin-bottom:6px}
 .rf-i{width:100%;padding:13px 17px;min-height:46px;border-radius:var(--rr);background:rgba(255,255,255,.72);border:1.5px solid var(--bdr);font-size:14px;font-family:var(--font);font-weight:700;outline:none;color:var(--txt);box-shadow:var(--spec);transition:border-color .18s,box-shadow .18s,background .18s}
 .rf-i:hover:not(:focus):not([readonly]){background:rgba(255,255,255,.82)}
+.rf-i.ocr-fill{background:rgba(255,213,79,.32);border-color:rgba(230,160,0,.75)}
 .rf-i:focus{border-color:rgba(18,168,118,.65);background:rgba(255,255,255,.88);box-shadow:var(--spec),var(--foc)}
 .rf-i[readonly]{cursor:default}
 /* iOS Safari : input[type=date] s'attribue une largeur intrinseque native qui
@@ -2524,6 +2525,7 @@ function launchApp(){
 
 function rgpdYes(){
   document.getElementById('rgpd').classList.add('off');
+  setTimeout(vracDraftResume, 400);   // fiche vrac interrompue (page rechargée) → on la rouvre
   updateHdrSub();
   // Consentement donné (geste utilisateur) → démarrer la détection GPS du magasin
   startGPS();
@@ -5330,6 +5332,138 @@ const Ean = (function(){
   return { normalize, pattern, drawPdf, drawCanvas };
 })();
 
+/* ═══ DOCUMENTS : UNE COULEUR PAR TYPE ═══════════════════════════════════════
+   Chaque document a son bandeau de couleur (en-tête + liseré à gauche de
+   chaque page) pour le repérer d'un coup d'œil dans une pile de feuilles.
+   Tous les documents qui listent des produits portent le vrai code-barres
+   EAN dessiné, scannable à la douchette. */
+const DOC_KINDS = {
+  commande:    { c:[11,110,77],  n:'Bon de commande' },
+  precommande: { c:[25,103,190], n:'Bon de pré-commande' },
+  reprise:     { c:[196,52,40],  n:'Bon de reprise' },
+  vrac:        { c:[146,90,28],  n:'Cahier vrac' },
+  stock:       { c:[106,64,170], n:'Relevé de stock' },
+  alertes:     { c:[222,110,0],  n:'Produits à retirer' },
+  ruptures:    { c:[55,71,79],   n:'Relevé des ruptures' },
+};
+const docColor = k => (DOC_KINDS[k] || DOC_KINDS.commande).c;
+/* Liseré vertical de la couleur du document, sur toutes les pages */
+function pdfKindStripe(doc, kind, top){
+  const n = doc.getNumberOfPages(), H = 297;
+  for(let i = 1; i <= n; i++){ doc.setPage(i); doc.setFillColor(...docColor(kind)); doc.rect(0, top || 0, 4, H - (top || 0), 'F'); }
+}
+
+/* Document « liste de produits » : relevé de stock, produits à retirer,
+   ruptures. Une ligne par produit avec son code-barres. */
+async function buildListPdf(kind, meta, groups){
+  const JsPDF = await loadJsPDF();
+  const doc = new JsPDF({ unit:'mm', format:'a4' });
+  const W = 210, H = 297, M = 12, KC = docColor(kind), GREY = [100,110,105], LINE = [215,225,220];
+  const clean = x => String(x == null ? '' : x).replace(/[^\x20-\x7E -ÿŒœ–—’€]/g, '').trim();
+  const COL = { n:M, name:M+8, info:M+82, qty:M+126, bc:M+146 };
+  const ROW_H = 27, d = meta.date ? new Date(meta.date) : new Date();
+  let y = 0, num = 0;
+  function header(first){
+    doc.setFillColor(...KC); doc.rect(0, 0, W, 21, 'F');
+    let tx = M;
+    if(brandLogos.__client){ doc.setFillColor(255,255,255); doc.roundedRect(M, 3, 15, 15, 2, 2, 'F'); pdfBrandMark(doc, '__client', M + 1, 4, 13, true); tx = M + 18; }
+    doc.setTextColor(255); doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.text(clean(docClient()), tx, 10.5);
+    doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.text(clean(meta.title || DOC_KINDS[kind].n), tx, 16.5);
+    doc.setFontSize(9);
+    doc.text(clean(meta.store || 'Magasin non précisé'), W - M, 7.5, { align:'right' });
+    doc.text(d.toLocaleDateString('fr-FR') + ' à ' + d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }), W - M, 12.5, { align:'right' });
+    doc.setFont('helvetica','bold'); doc.text(clean(DOC_KINDS[kind].n.toUpperCase()), W - M, 17.5, { align:'right' });
+    doc.setTextColor(0); doc.setFont('helvetica','normal');
+    y = 28;
+    if(first){
+      doc.setFontSize(9.5);
+      [['Magasin', meta.store || '—'], ['Préparé par', meta.by || '—'], ['Total', meta.total || '—']].forEach(([k, v]) => {
+        doc.setTextColor(...GREY); doc.text(k, M, y);
+        doc.setTextColor(0); doc.setFont('helvetica','bold'); doc.text(clean(v), M + 28, y);
+        doc.setFont('helvetica','normal'); y += 5.2;
+      });
+      if(meta.intro){ doc.setFontSize(8.5); doc.setTextColor(...GREY); doc.text(clean(meta.intro), M, y + 1); doc.setTextColor(0); y += 6; }
+    }
+    doc.setFillColor(...KC.map(c => Math.round(c + (255 - c) * .88))); doc.rect(M, y - 4, W - 2*M, 7, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+    doc.text('N°', COL.n + 1, y); doc.text('Désignation', COL.name, y); doc.text(meta.infoHead || 'Détail', COL.info, y);
+    doc.text(meta.qtyHead || 'Qté', COL.qty, y); doc.text('Code-barres EAN', COL.bc + 4, y);
+    doc.setFont('helvetica','normal'); y += 5;
+  }
+  header(true);
+  groups.forEach(g => {
+    if(!g.rows.length) return;
+    if(g.title){
+      if(y + ROW_H + 9 > H - 14){ doc.addPage(); header(false); }
+      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...(g.color || KC));
+      doc.text(clean(g.title.toUpperCase()), M, y + 3.8); doc.setTextColor(0); doc.setFont('helvetica','normal');
+      y += 8;
+    }
+    g.rows.forEach(r => {
+      if(y + ROW_H > H - 14){ doc.addPage(); header(false); }
+      const top = y, mid = top + 9; num++;
+      doc.setFontSize(9); doc.setTextColor(...GREY); doc.text(String(num), COL.n + 1, mid);
+      doc.setTextColor(0); doc.setFont('helvetica','bold'); doc.setFontSize(10);
+      const nl = doc.splitTextToSize(clean(r.name || 'Produit sans nom'), COL.info - COL.name - 3).slice(0, 2);
+      doc.text(nl, COL.name, mid);
+      doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...GREY);
+      if(r.sub) doc.text(doc.splitTextToSize(clean(r.sub), COL.info - COL.name - 3).slice(0, 1), COL.name, mid + nl.length * 4.3);
+      doc.setTextColor(...(r.infoColor || [0,0,0])); doc.setFontSize(9);
+      doc.text(String(r.info || '').split('
+').flatMap(l => doc.splitTextToSize(clean(l), COL.qty - COL.info - 3)).slice(0, 3), COL.info, mid);
+      doc.setTextColor(0); doc.setFont('helvetica','bold'); doc.setFontSize(16);
+      doc.text(r.qty == null ? '—' : String(r.qty), COL.qty + 2, mid + 1.5);
+      doc.setFont('helvetica','normal');
+      if(!Ean.drawPdf(doc, r.gencod, COL.bc, top + 1, { mw:0.33, h:16 })){
+        doc.setFontSize(8.5); doc.setTextColor(...GREY);
+        doc.text(r.gencod ? ['EAN ' + clean(r.gencod), 'clé de contrôle fausse :', 'code non dessiné'] : 'Pas de code-barres', COL.bc + 4, mid - 3);
+        doc.setTextColor(0);
+      }
+      doc.setDrawColor(...LINE); doc.line(M, top + ROW_H - 2, W - M, top + ROW_H - 2);
+      y += ROW_H;
+    });
+  });
+  if(y + 12 > H - 14){ doc.addPage(); header(false); }
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.text('TOTAL : ' + clean(meta.total || ''), M, y + 5);
+  const n = doc.getNumberOfPages();
+  for(let i = 1; i <= n; i++){
+    doc.setPage(i); doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...GREY);
+    doc.text('Tempo · S2D COMMERCIAL — imprimer à 100 % (sans « ajuster à la page ») pour la lecture des codes-barres', M, H - 7);
+    doc.text(`Page ${i} / ${n}`, W - M, H - 7, { align:'right' });
+  }
+  pdfKindStripe(doc, kind, 21);
+  const slug = (meta.store || 'magasin').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w-]+/g,'_').replace(/^_|_$/g,'');
+  return { blob: doc.output('blob'), filename: `${meta.file || DOC_KINDS[kind].n.replace(/\s+/g, '_')}_${slug}_${isoDay(d)}.pdf` };
+}
+function buildStockPdf(lines, meta){
+  const q = lines.reduce((t, l) => t + (l.qty || 0), 0);
+  return buildListPdf('stock', { title:'Relevé de stock', store:meta.store, by:displayBy(meta.by), date:meta.when,
+    total:`${plural(lines.length,'référence','références')} · ${plural(q,'unité','unités')}`, infoHead:'Provenance', qtyHead:'Unités', file:'Releve_de_stock',
+    intro:'Scannez le code-barres de chaque ligne à la douchette.' },
+    [{ rows: lines.map(l => ({ name:l.name, sub:l.famille, info:l.provenance || '', qty:l.qty, gencod:l.gencod })) }]);
+}
+function buildAlertPdf(prods, meta){
+  const groups = [], stores = [...new Set(prods.map(p => p.magasin || 'Magasin non précisé'))];
+  stores.forEach(st => [['e','Périmés — à retirer immédiatement',[200,40,40]],['o','À retirer sous 2 jours',[222,110,0]]].forEach(([k, t, c]) => {
+    const g = prods.filter(p => (p.magasin || 'Magasin non précisé') === st && statusOf(p.dlc) === k);
+    if(g.length) groups.push({ title:(stores.length > 1 ? st + ' — ' : '') + t, color:c, rows:g.map(p => {
+      const dd = dDiff(p.dlc);
+      return { name:p.name, sub:p.famille || brandOfGencod(p.gencod) || '', gencod:p.gencod, qty:p.qty || 1, infoColor:c,
+        info:`DLC ${fmtDate(p.dlc)}\n${dd < 0 ? 'dépassée de ' + plural(-dd,'jour','jours') : dd === 0 ? "aujourd'hui" : 'dans ' + plural(dd,'jour','jours')}` };
+    }) });
+  }));
+  return buildListPdf('alertes', { title:'Produits à retirer du rayon', store:meta.store, by:meta.by, infoHead:'DLC', qtyHead:'Qté', file:'Produits_a_retirer',
+    total:plural(prods.length,'produit','produits'), intro:'Retirez chaque produit du rayon, scannez son code-barres pour la démarque.' }, groups);
+}
+function buildRupturePdf(rup, meta){
+  const byB = {}; rup.forEach(r => { const b = r.marque || 'Autres'; (byB[b] = byB[b] || []).push(r); });
+  return buildListPdf('ruptures', { title:'Relevé des ruptures en rayon', store:meta.store, by:meta.by, date:meta.date, infoHead:'Relevé', qtyHead:'',
+    file:'Ruptures', total:plural(rup.length,'rupture','ruptures'), intro:'Produits absents du rayon : scannez le code-barres pour réassortir.' },
+    Object.keys(byB).sort().map(b => ({ title:b, rows:byB[b].map(r => { const p = lookupGencod(r.gencod) || {};
+      return { name:r.name || p.nom || r.gencod, sub:[p.volume, p.ref ? 'Réf. ' + p.ref : ''].filter(Boolean).join(' · '), gencod:r.gencod, qty:null,
+        info:r.at ? new Date(r.at).toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : fmtDate(r.day) }; }) })));
+}
+
 /* ═══ BON DE COMMANDE PDF (codes-barres à scanner) ══════════════════════════
    Une ligne par produit : désignation, réf., PCB, colis (en grand), unités et
    le code-barres EAN du produit. On scanne la ligne à la douchette puis on
@@ -5348,7 +5482,7 @@ async function buildOrderPdf(record){
   let y = 0;
 
   function header(first){
-    doc.setFillColor(...GREEN); doc.rect(0, 0, W, 21, 'F');
+    doc.setFillColor(...docColor(record.kind === 'precommande' ? 'precommande' : 'commande')); doc.rect(0, 0, W, 21, 'F');
     let tx = M;
     if(brandLogos.__client){
       doc.setFillColor(255,255,255); doc.roundedRect(M, 3, 15, 15, 2, 2, 'F');
@@ -5433,6 +5567,7 @@ async function buildOrderPdf(record){
     doc.text('Tempo · S2D COMMERCIAL — imprimer à 100 % (sans « ajuster à la page ») pour la lecture des codes-barres', M, H - 7);
     doc.text(`Page ${i} / ${n}`, W - M, H - 7, { align:'right' });
   }
+  pdfKindStripe(doc, record.kind === 'precommande' ? 'precommande' : 'commande', 21);
   const store = (record.store || 'magasin').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w-]+/g,'_').replace(/^_|_$/g,'');
   return { blob: doc.output('blob'), filename: `${record.kind === 'precommande' ? 'Bon_de_pre-commande' : 'Bon_de_commande'}_${store}_${d.toISOString().slice(0,10)}.pdf` };
 }
@@ -5442,8 +5577,8 @@ async function exportOrderPdf(id){
   catch(e){ toast('❌ ' + (e && e.message || 'PDF impossible')); }
 }
 async function downloadOrderPdfFromEmail(){
-  if(!emailAttachOrder) return;
-  try{ const x = await buildOrderPdf(emailAttachOrder); downloadBlob(x.blob, x.filename); toast('📄 Bon de commande PDF téléchargé'); }
+  if(!emailAttach) return;
+  try{ const x = await emailAttach.pdf(); downloadBlob(x.blob, x.filename); toast('📄 PDF téléchargé (codes-barres)'); }
   catch(e){ toast('❌ ' + (e && e.message || 'PDF impossible')); }
 }
 
@@ -5468,7 +5603,9 @@ function openOrderEmail(subject, body, record){
   if(stag){ stag.style.display = 'inline-block'; stag.textContent = record && record.kind === 'precommande' ? '📝 Pré-commande' : '🛒 Commande'; }
   emailStore = null;
   emailAttachOrder = record || null;
-  setEmailAttachUI(!!record);
+  setEmailAttachUI(record ? { pdf: () => buildOrderPdf(record), xlsx: () => buildOrderXlsx(record),
+    t: record.kind === 'precommande' ? '📝 Envoyer la pré-commande' : '🛒 Envoyer la commande',
+    sub: 'Texte dans le mail + bon PDF avec codes-barres (à scanner) + tableau Excel joints' } : null);
   openModal('email-modal');
 }
 
@@ -5477,39 +5614,38 @@ function openOrderEmail(subject, body, record){
    du téléphone (Gmail, Outlook… avec le fichier joint) ; à défaut (PC),
    le fichier est téléchargé et le mail s'ouvre : il reste à le glisser. */
 let emailAttachOrder = null;
-function setEmailAttachUI(on){
+let emailAttach = null;   // { pdf: async () => {blob, filename}, xlsx: () => {blob, filename} | null, t, sub }
+function setEmailAttachUI(a){
+  emailAttach = a || null;
+  const on = !!a;
   const b = document.getElementById('em-share-btn'), d = document.getElementById('em-dl-btn'), pf = document.getElementById('em-pdf-btn');
-  if(b) b.style.display = on ? 'block' : 'none';
-  if(d) d.style.display = on ? 'block' : 'none';
-  if(pf) pf.style.display = on ? 'block' : 'none';
+  if(b){ b.style.display = on ? 'block' : 'none'; if(on) b.textContent = a.xlsx ? '📎 Envoyer avec le bon PDF (codes-barres) + Excel' : '📎 Envoyer avec le PDF (codes-barres)'; }
+  if(d) d.style.display = on && a.xlsx ? 'block' : 'none';
+  if(pf){ pf.style.display = on ? 'block' : 'none'; if(on) pf.textContent = '📄 Télécharger le PDF (codes-barres)'; }
   if(on) loadJsPDF().catch(() => {});   // préchargé : le PDF se crée sans délai au moment du partage
-  // Titre / bouton texte : version « commande » le temps de la modale, puis
-  // on restaure les libellés d'origine (traduits) pour les rappels DLC / stocks.
-  const swaps = [
-    ['em-t',        '🛒 Envoyer la commande'],
-    ['em-sub',      'Texte dans le mail + bon PDF avec codes-barres (à scanner) + tableau Excel joints'],
-    ['em-send-btn', '📧 Envoyer le texte seul (sans fichier)'],
-  ];
+  // Titre / bouton texte : version « document » le temps de la modale, puis
+  // on restaure les libellés d'origine (traduits).
+  const swaps = [['em-t', on && a.t], ['em-sub', on && a.sub], ['em-send-btn', on && '📧 Envoyer le texte seul (sans fichier)']];
   swaps.forEach(([id, txt]) => {
     const e = document.getElementById(id); if(!e) return;
-    if(on){ if(e.dataset.orig == null) e.dataset.orig = e.textContent; e.textContent = txt; }
+    if(txt){ if(e.dataset.orig == null) e.dataset.orig = e.textContent; e.textContent = txt; }
     else if(e.dataset.orig != null){ e.textContent = e.dataset.orig; delete e.dataset.orig; }
   });
   const s = document.getElementById('em-send-btn');
   if(s) s.className = on ? 'scan-reset-btn' : 'af-add';
 }
 async function shareOrderWithFile(){
-  if(!emailAttachOrder) return;
-  const { blob, filename } = buildOrderXlsx(emailAttachOrder);
+  const a = emailAttach; if(!a) return;
   let pdf = null;
-  try{ pdf = await buildOrderPdf(emailAttachOrder); }catch(e){ console.warn('PDF commande:', e); }
+  try{ pdf = await a.pdf(); }catch(e){ console.warn('PDF :', e); }
+  const x = a.xlsx ? a.xlsx() : null;
   const subj = document.getElementById('em-subj').value.trim();
   const body = document.getElementById('em-body').value.trim()
-    + (pdf ? '\n\nPièces jointes : bon de commande PDF (codes-barres à scanner) et tableau Excel.' : '');
+    + (pdf ? (x ? '\n\nPièces jointes : PDF (codes-barres à scanner) et tableau Excel.' : '\n\nPièce jointe : PDF avec les codes-barres à scanner.') : '');
   const files = [];
   try{
     if(pdf) files.push(new File([pdf.blob], pdf.filename, { type:'application/pdf' }));
-    files.push(new File([blob], filename, { type: blob.type }));
+    if(x) files.push(new File([x.blob], x.filename, { type: x.blob.type }));
   }catch(e){}
   let file = files.length ? files : null;
   if(file && navigator.canShare && !navigator.canShare({ files:file }) && pdf) file = [files[0]];   // repli : PDF seul
@@ -5524,14 +5660,14 @@ async function shareOrderWithFile(){
     }
   }
   if(pdf) downloadBlob(pdf.blob, pdf.filename);
-  downloadBlob(blob, filename);
-  toast(pdf ? '📎 PDF + Excel téléchargés — joignez-les au mail qui s\'ouvre' : '📎 Excel téléchargé — joignez-le au mail qui s\'ouvre');
+  if(x) downloadBlob(x.blob, x.filename);
+  toast(pdf ? '📎 PDF téléchargé — joignez-le au mail qui s\'ouvre' : '📎 Fichier téléchargé — joignez-le au mail qui s\'ouvre');
   sendMailto();
 }
 function downloadOrderFileFromEmail(){
-  if(!emailAttachOrder) return;
-  const x = buildOrderXlsx(emailAttachOrder); downloadBlob(x.blob, x.filename);
-  toast('📊 Bon de commande Excel téléchargé');
+  if(!emailAttach || !emailAttach.xlsx) return;
+  const x = emailAttach.xlsx(); downloadBlob(x.blob, x.filename);
+  toast('📊 Tableau Excel téléchargé');
 }
 
 /* Commande (passée par moi) ou pré-commande (bon envoyé au magasin, qui la
@@ -5766,14 +5902,7 @@ function loadOcr(){
         _ocrWorker = w; res(w);
       }catch(e){ _ocrP = null; rej(e); }
     };
-    if(window.Tesseract) return go();
-    const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
-    s.integrity = 'sha384-GJqSu7vueQ9qN0E9yLPb3Wtpd7OrgK8KmYzC8T1IysG1bcvxvIO4qtYR/D3A991F';
-    s.crossOrigin = 'anonymous';
-    s.onload = go;
-    s.onerror = () => { _ocrP = null; rej(new Error('Module de lecture non téléchargé (connexion ?)')); };
-    document.head.appendChild(s);
+    loadTesseractLib().then(go, e => { _ocrP = null; rej(e); });
   });
   return _ocrP;
 }
@@ -5969,14 +6098,16 @@ function buildStockText(lines, meta){
   return out.join('\n');
 }
 
-function openStockEmail(subject, body){
+function openStockEmail(subject, body, lines, meta){
   document.getElementById('em-to').value   = localStorage.getItem('fc_email') || emailResp || '';
   document.getElementById('em-subj').value = subject;
   document.getElementById('em-body').value = body;
   const stag = document.getElementById('em-store-tag');
   if(stag){ stag.style.display = 'inline-block'; stag.textContent = '📦 Stock'; }
   emailStore = null;
-  emailAttachOrder = null; setEmailAttachUI(false);   // pas de pièce jointe hors commande
+  emailAttachOrder = null;
+  setEmailAttachUI(lines && lines.length ? { pdf: () => buildStockPdf(lines, meta || {}), t:'📦 Envoyer le relevé de stock',
+    sub:'Texte dans le mail + relevé PDF avec codes-barres (à scanner) joint' } : null);
   openModal('email-modal');
 }
 
@@ -6051,7 +6182,8 @@ function emailCurrentStock(){
   const dateStr = new Date().toLocaleDateString(lang);
   openStockEmail(
     `[Tempo] Stock${storeName ? ' — '+storeName : ''} — ${dateStr}`,
-    buildStockText(currentStock, { date: dateStr, store: storeName || '', by: session?.username || '?' })
+    buildStockText(currentStock, { date: dateStr, store: storeName || '', by: session?.username || '?' }),
+    currentStock.slice(), { store: storeName || '', by: session?.username || '?', when: new Date() }
   );
 }
 
@@ -6120,7 +6252,8 @@ function emailStock(id){
   const dateStr = new Date(o.date).toLocaleDateString(lang);
   openStockEmail(
     `[Tempo] Relevé de stock${o.store ? ' — '+o.store : ''} — ${dateStr}`,
-    buildStockText(o.lines, { date: dateStr, store: o.store, by: o.by })
+    buildStockText(o.lines, { date: dateStr, store: o.store, by: o.by }),
+    o.lines, { store: o.store, by: o.by, when: o.date }
   );
   closeModal('stocks-modal');
 }
@@ -6198,12 +6331,13 @@ const MediaDB = (function(){
     });
     return dbp;
   }
+  const tmo = (pr, ms) => Promise.race([pr, new Promise((_, rej) => setTimeout(() => rej(new Error('IndexedDB ne répond pas')), ms))]);
   function run(mode, fn){
-    return db().then(d => new Promise((res, rej) => {
+    return tmo(db().then(d => new Promise((res, rej) => {
       const t = d.transaction('photos', mode), req = fn(t.objectStore('photos'));
       t.oncomplete = () => res(req ? req.result : undefined);
       t.onerror = t.onabort = () => rej(t.error);
-    }));
+    })), 6000).catch(e => { if(/ne répond pas/.test(e && e.message)) dbp = null; throw e; });
   }
   return {
     put: (k, v) => run('readwrite', st => st.put(v, k)),
@@ -6242,6 +6376,163 @@ async function dropVracPhoto(ref){
   if(moved) saveVrac();
 })();
 
+/* ── Brouillon de la fiche vrac ─────────────────────────────────────────────
+   Chaque saisie est gardée au fil de l'eau (champs dans localStorage, photos
+   dans IndexedDB). Si le téléphone recharge la page (appareil photo, appel,
+   batterie), la fiche revient telle quelle : rien n'est à retaper. */
+const VRAC_DRAFT_FIELDS = ['name','gencod','silo','ddm','date','lot','prov','qty','rem'];
+let vracDraftOn = false;
+function vracDraftSave(){
+  if(!vracDraftOn) return;
+  const f = {}; VRAC_DRAFT_FIELDS.forEach(k => f[k] = document.getElementById('vrac-' + k)?.value || '');
+  const ph = {}; ['sac','silo'].forEach(k => { const p = vracPhotos[k] || {}; ph[k] = { ref:p.ref || null, at:p.at || null, changed:!!p.changed, has:!!p.data }; });
+  try{ localStorage.setItem('fc_vrac_draft', JSON.stringify({ at:Date.now(), editId:vracEditId, f, hyg:vracHyg, ph })); }catch(e){}
+}
+function vracDraftClear(){
+  vracDraftOn = false;
+  try{ localStorage.removeItem('fc_vrac_draft'); }catch(e){}
+  ['sac','silo'].forEach(k => MediaDB.del('draft:' + k).catch(() => {}));
+}
+async function vracDraftResume(){
+  let d = null; try{ d = JSON.parse(localStorage.getItem('fc_vrac_draft') || 'null'); }catch(e){}
+  if(!d || Date.now() - d.at > 7 * 864e5) return false;
+  if(document.getElementById('vrac-form')?.style.display === 'block') return false;
+  if(curTab !== 'vrac') showTab('vrac');
+  if(vracMode !== 'add') setVracMode('add');
+  const base = d.editId ? (findVrac(d.editId) || {}) : {};
+  openVracForm(Object.assign({}, base, { id:d.editId || null, hyg:d.hyg || {}, _resume:true }));
+  VRAC_DRAFT_FIELDS.forEach(k => { const e = document.getElementById('vrac-' + k); if(e && d.f && d.f[k] != null) e.value = d.f[k]; });
+  for(const k of ['sac','silo']){
+    const p = (d.ph || {})[k] || {};
+    if(p.changed){
+      const data = p.has ? await MediaDB.get('draft:' + k).catch(() => null) : null;
+      vracPhotos[k] = { ref:p.ref, at:p.at, data:data || null, changed:true };
+    }
+  }
+  showVracPhoto();
+  vracDraftOn = true; vracDraftSave();
+  toast('📝 Fiche vrac en cours récupérée — rien n\'est perdu');
+  return true;
+}
+/* La fiche contient-elle une saisie non enregistrée ? */
+function vracFormDirty(){
+  if(document.getElementById('vrac-form')?.style.display !== 'block') return false;
+  if(['silo','ddm','lot','prov','rem'].some(k => (document.getElementById('vrac-' + k)?.value || '').trim())) return true;
+  return Object.values(vracHyg).some(Boolean) || ['sac','silo'].some(k => vracPhotos[k] && vracPhotos[k].changed);
+}
+
+/* ── Lecture de l'étiquette du sac (OCR texte) ──────────────────────────────
+   Photo de l'étiquette fournisseur → n° de lot, DDM, origine et code-barres
+   repérés et inscrits dans les cases encore vides (surlignées pour être
+   vérifiées). Lecture sur le téléphone, rien n'est envoyé. */
+let _ocrTxtP = null;
+function loadTesseractLib(){
+  if(window.Tesseract) return Promise.resolve();
+  if(!loadTesseractLib.p) loadTesseractLib.p = new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+    s.integrity = 'sha384-GJqSu7vueQ9qN0E9yLPb3Wtpd7OrgK8KmYzC8T1IysG1bcvxvIO4qtYR/D3A991F';
+    s.crossOrigin = 'anonymous';
+    s.onload = () => res();
+    s.onerror = () => { loadTesseractLib.p = null; rej(new Error('Module de lecture non téléchargé (connexion ?)')); };
+    document.head.appendChild(s);
+  });
+  return loadTesseractLib.p;
+}
+function loadOcrText(){
+  if(!_ocrTxtP) _ocrTxtP = loadTesseractLib()
+    .then(() => Tesseract.createWorker(['fra','eng'], 1, { workerBlobURL:true }))
+    .catch(e => { _ocrTxtP = null; throw e; });
+  return _ocrTxtP;
+}
+const VRAC_COUNTRIES = {
+  'chine':'Chine','china':'Chine','turquie':'Turquie','turkey':'Turquie','türkiye':'Turquie','espagne':'Espagne','spain':'Espagne',
+  'italie':'Italie','italy':'Italie','inde':'Inde','india':'Inde','etats-unis':'États-Unis','états-unis':'États-Unis','usa':'États-Unis',
+  'united states':'États-Unis','maroc':'Maroc','morocco':'Maroc','tunisie':'Tunisie','tunisia':'Tunisie','egypte':'Égypte','égypte':'Égypte',
+  'egypt':'Égypte','argentine':'Argentine','argentina':'Argentine','bresil':'Brésil','brésil':'Brésil','brazil':'Brésil','perou':'Pérou',
+  'pérou':'Pérou','peru':'Pérou','bolivie':'Bolivie','bolivia':'Bolivie','chili':'Chili','chile':'Chili','ouzbekistan':'Ouzbékistan',
+  'ouzbékistan':'Ouzbékistan','uzbekistan':'Ouzbékistan','iran':'Iran','grece':'Grèce','grèce':'Grèce','greece':'Grèce','portugal':'Portugal',
+  'allemagne':'Allemagne','germany':'Allemagne','pays-bas':'Pays-Bas','netherlands':'Pays-Bas','sri lanka':'Sri Lanka','vietnam':'Vietnam',
+  'viet nam':'Vietnam','thailande':'Thaïlande','thaïlande':'Thaïlande','thailand':'Thaïlande','philippines':'Philippines','mexique':'Mexique',
+  'mexico':'Mexique','canada':'Canada','australie':'Australie','australia':'Australie','afrique du sud':'Afrique du Sud','south africa':'Afrique du Sud',
+  'kazakhstan':'Kazakhstan','ukraine':'Ukraine','moldavie':'Moldavie','moldova':'Moldavie','roumanie':'Roumanie','romania':'Roumanie',
+  'bulgarie':'Bulgarie','bulgaria':'Bulgarie','hongrie':'Hongrie','hungary':'Hongrie','pologne':'Pologne','poland':'Pologne',
+  'burkina faso':'Burkina Faso','cote d\'ivoire':'Côte d\'Ivoire','côte d\'ivoire':'Côte d\'Ivoire','madagascar':'Madagascar',
+  'indonesie':'Indonésie','indonésie':'Indonésie','indonesia':'Indonésie','pakistan':'Pakistan','ouganda':'Ouganda','uganda':'Ouganda',
+  'paraguay':'Paraguay','ethiopie':'Éthiopie','éthiopie':'Éthiopie','ethiopia':'Éthiopie','togo':'Togo','senegal':'Sénégal','sénégal':'Sénégal',
+  'azerbaidjan':'Azerbaïdjan','azerbaïdjan':'Azerbaïdjan','georgie':'Géorgie','géorgie':'Géorgie','tadjikistan':'Tadjikistan','kirghizistan':'Kirghizistan',
+  'france':'France','belgique':'Belgique','autriche':'Autriche','austria':'Autriche','serbie':'Serbie','croatie':'Croatie','lituanie':'Lituanie',
+  'lettonie':'Lettonie','estonie':'Estonie','danemark':'Danemark','suede':'Suède','suède':'Suède','finlande':'Finlande','nicaragua':'Nicaragua',
+  'honduras':'Honduras','colombie':'Colombie','colombia':'Colombie','equateur':'Équateur','équateur':'Équateur','ecuador':'Équateur',
+  'kenya':'Kenya','tanzanie':'Tanzanie','tanzania':'Tanzanie','nigeria':'Nigeria','ghana':'Ghana','mali':'Mali','niger':'Niger','soudan':'Soudan'
+};
+const VRAC_MONTHS = { jan:1, janv:1, fev:2, fév:2, feb:2, mar:3, mars:3, avr:4, apr:4, mai:5, may:5, juin:6, jun:6, juil:7, jul:7,
+  aou:8, aoû:8, aug:8, sep:9, sept:9, oct:10, nov:11, dec:12, déc:12 };
+function vracParseLabel(text){
+  const all = String(text || '').replace(/[|]/g, 'I').replace(/[ \t]+/g, ' ');
+  const low = all.toLowerCase(), out = {};
+  const yNow = new Date().getFullYear();
+  const okDate = (m, y) => { y = y < 100 ? 2000 + y : y; return m >= 1 && m <= 12 && y >= yNow - 1 && y <= yNow + 10 ? String(m).padStart(2,'0') + '/' + y : null; };
+  // Toutes les dates du texte, avec leur position
+  const dates = [];
+  const push = (i, v) => { if(v) dates.push({ i, v }); };
+  for(const m of all.matchAll(/(\d{1,2})\s?[\/.\-]\s?(\d{1,2})\s?[\/.\-]\s?(\d{4}|\d{2})(?!\d)/g)) push(m.index, okDate(+m[2], +m[3]));
+  for(const m of all.matchAll(/(?<![\d\/.\-])(\d{1,2})\s?[\/.\-]\s?(\d{4})(?!\d)/g)) push(m.index, okDate(+m[1], +m[2]));
+  for(const m of low.matchAll(/\b(janv?|f[ée]v|feb|mars?|avr|apr|mai|may|juin|jun|juil|jul|ao[uû]|aug|sept?|oct|nov|d[ée]c)[a-zéû]*\.?\s+(\d{4})/g)) push(m.index, okDate(VRAC_MONTHS[m[1]] || 0, +m[2]));
+  if(dates.length){
+    const kw = low.search(/ddm|dluo|dlc|pr[ée]f[ée]rence|best before|\bbbd?\b|\bexp|use by|consommer|d\.d\.m/);
+    const after = kw >= 0 ? dates.filter(d => d.i >= kw).sort((a, b) => a.i - b.i)[0] : null;
+    out.ddm = (after || dates[0]).v;
+  }
+  // N° de lot (les dates ne sont pas des lots)
+  const lm = all.match(/(?:n[°ºo]\.?\s*(?:de\s*)?lot|lot\s*n[°ºo]\.?|\blot|batch(?:\s*n[°ºo]\.?)?|\bL\s?[:.])\s*[:.\-#]?\s*([A-Z0-9][A-Z0-9\-\/.]{2,18})/i);
+  if(lm && /\d/.test(lm[1]) && !/^\d{1,2}[\/.\-]\d{1,2}([\/.\-]\d{2,4})?$/.test(lm[1])) out.lot = lm[1].replace(/[.\-\/]+$/, '').toUpperCase();
+  // Origine : derrière le mot-clé, ramenée à un nom de pays connu si possible
+  const om = all.match(/(?:pays\s*d['’ ]?\s*origine|country of origin|origine|origin|provenance|made in|cultiv[ée]e? (?:en|au)|produit (?:de|en|au|d['’]))\s*[:.\-]?\s*([^\n,;]{2,40})/i);
+  const findCountry = s => { const t = _noAcc(s); let best = null;
+    Object.keys(VRAC_COUNTRIES).forEach(k => { const i = t.search(new RegExp('\\b' + _noAcc(k).replace(/[-\s]/g, '[-\\s]') + '\\b')); if(i >= 0 && (!best || i < best.i)) best = { i, v:VRAC_COUNTRIES[k] }; });
+    return best ? best.v : null; };
+  if(om){
+    const c = findCountry(om[1]);
+    if(c) out.prov = c;
+    else if(/non[\s-]*ue|non[\s-]*eu/i.test(om[1])) out.prov = /\bue\b.*non|non.*\bue\b\s*\/\s*ue/i.test(om[1]) ? 'UE / non UE' : 'Non UE';
+    else if(/\b(ue|eu|union europ)/i.test(om[1])) out.prov = 'UE';
+  }
+  if(!out.prov){
+    const ag = low.match(/agriculture\s+(ue\s*\/\s*non[\s-]*ue|non[\s-]*ue|ue)\b/);
+    if(ag) out.prov = /\//.test(ag[1]) ? 'UE / non UE' : /non/.test(ag[1]) ? 'Non UE' : 'UE';
+  }
+  // Code-barres en chiffres (si l'image du code n'a pas été décodée)
+  const pc = ocrPickCode(all);
+  if(pc.code && Ean.normalize(pc.code) === pc.code) out.ean = pc.code;   // un vrai EAN, pas une réf. ou un n° de lot
+  return out;
+}
+async function vracOcrLabel(file){
+  const st = document.getElementById('vrac-st-sac');
+  const note = h => { if(st) st.innerHTML = h; };
+  const prev = st ? st.innerHTML : '';
+  note(prev + `<br><span class="spin"></span> ${_ocrTxtP ? 'Lecture de l\'étiquette…' : 'Lecture de l\'étiquette (1re fois : téléchargement ~10 Mo)…'}`);
+  try{
+    const [w, cv] = await Promise.all([loadOcrText(), ocrPrepare(file)]);
+    const { data } = await w.recognize(cv);
+    const r = vracParseLabel(data.text || '');
+    const filled = [];
+    const fill = (id, v, lbl) => { const e = document.getElementById(id); if(!e || !v || e.value.trim()) return; e.value = v; e.classList.add('ocr-fill'); filled.push(lbl); };
+    const gc = document.getElementById('vrac-gencod');
+    if(r.ean && gc && !gc.value.trim()){ fill('vrac-gencod', r.ean, 'code-barres'); prefillVracFromCatalogue(r.ean); }
+    fill('vrac-lot',  r.lot,  'n° de lot');
+    fill('vrac-ddm',  r.ddm,  'DDM');
+    fill('vrac-prov', r.prov, 'origine');
+    note(prev + '<br>' + (filled.length
+      ? `✨ Rempli depuis l'étiquette : <b>${filled.join(', ')}</b> — vérifiez les cases surlignées`
+      : '🔎 Rien de lisible sur l\'étiquette (lot, DDM, origine) — complétez à la main'));
+    vracDraftSave();
+  }catch(err){
+    console.warn('[OCR étiquette]', err);
+    note(prev + '<br>⚠️ Lecture de l\'étiquette impossible (' + escapeHTML(err && err.message || 'erreur') + ') — complétez à la main');
+  }
+}
+
 function saveVrac(){
   for(let i = 0; i < 15; i++){
     try{ localStorage.setItem('fc_vrac', JSON.stringify(vracEntries)); return true; }
@@ -6265,6 +6556,7 @@ function renderVrac(){
   showStoreBadge();
   fillVracDatalists();
   renderVracList();
+  vracDraftResume();
 }
 
 function setVracMode(m){
@@ -6296,6 +6588,7 @@ async function startVracScan(){
   try{
     await BarcodeEngine.startLiveScan(document.getElementById('vrac-video'), (code) => {
       if(!vracScanning) return;
+      stopVracScan();          // caméra libérée : la fiche n'est plus réinitialisée par un 2e passage du code
       onVracDecode(code);
     });
     const tb = document.getElementById('vrac-torch');
@@ -6342,6 +6635,10 @@ function vracManualEntry(){ onVracDecode(''); }
 function onVracDecode(ean){
   const code = String(ean || '').replace(/\s/g, '');
   if(vracMode === 'check'){ vracCheck(code); return; }
+  if(vracFormDirty()){
+    showConfirm('Remplacer la fiche en cours ?', 'La mise en rayon en cours n\'est pas enregistrée : elle sera perdue.', () => openVracForm({ gencod: code }));
+    return;
+  }
   openVracForm({ gencod: code });
 }
 
@@ -6430,17 +6727,21 @@ function openVracForm(opts){
   const c  = document.getElementById('vrac-check'); if(c) c.style.display = 'none';
   if(f) f.scrollIntoView({ behavior:'smooth', block:'nearest' });
   if(!o.gencod && !o.name){ const n = document.getElementById('vrac-name'); if(n) n.focus(); }
+  document.querySelectorAll('#vrac-form .ocr-fill').forEach(e => e.classList.remove('ocr-fill'));
+  if(!o._resume){ vracDraftOn = true; vracDraftSave(); }
 }
 function hideVracForm(){
   const f = document.getElementById('vrac-form'); if(f) f.style.display = 'none';
 }
 function cancelVracForm(){
+  vracDraftClear();
   vracEditId = null; vracPhotos = { sac:{}, silo:{} }; vracHyg = {};
   hideVracForm();
 }
 function vracQtyStep(d){
   const i = document.getElementById('vrac-qty'); if(!i) return;
   i.value = Math.max(1, (parseInt(i.value, 10) || 1) + d);
+  vracDraftSave();
 }
 function showVracPhoto(){
   ['sac','silo'].forEach(k => {
@@ -6453,6 +6754,7 @@ function showVracPhoto(){
 function clearVracPhoto(kind){
   vracPhotos[kind] = { ref:vracPhotos[kind]?.ref || null, data:null, at:null, changed:true };
   showVracPhoto();
+  MediaDB.del('draft:' + kind).catch(() => {}); vracDraftSave();
   const st = document.getElementById('vrac-st-'+kind); if(st) st.textContent = '';
 }
 
@@ -6469,8 +6771,8 @@ function renderHygForm(){
       </div></div>`;
   }).join('');
 }
-function setHyg(k, v){ vracHyg[k] = vracHyg[k] === v ? undefined : v; renderHygForm(); }
-function setAllHyg(){ VRAC_HYG.forEach(h => vracHyg[h.k] = 'O'); renderHygForm(); }
+function setHyg(k, v){ vracHyg[k] = vracHyg[k] === v ? undefined : v; renderHygForm(); vracDraftSave(); }
+function setAllHyg(){ VRAC_HYG.forEach(h => vracHyg[h.k] = 'O'); renderHygForm(); vracDraftSave(); }
 function hygSummary(h){
   const o = h || {};
   const n = VRAC_HYG.filter(x => o[x.k] === 'N').length;
@@ -6512,6 +6814,7 @@ async function onVracPhotoInput(e){
     const at = new Date(file.lastModified && Date.now() - file.lastModified < 864e5 ? file.lastModified : Date.now()).toISOString();
     vracPhotos[kind] = { ref:vracPhotos[kind]?.ref || null, data, at, changed:true };
     showVracPhoto();
+    MediaDB.put('draft:' + kind, data).catch(() => {}); vracDraftSave();   // gardée même si la page se recharge
     if(st) st.textContent = `✅ Photo du ${new Date(at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}`;
     // L'étiquette du sac porte le code-barres : on le lit si le champ est encore vide.
     const gc = document.getElementById('vrac-gencod');
@@ -6521,12 +6824,17 @@ async function onVracPhotoInput(e){
         if(code){ gc.value = code; prefillVracFromCatalogue(code); toast('🔖 Code-barres lu sur l\'étiquette'); }
       }catch(_){ /* pas de code lisible sur la photo : sans conséquence */ }
     }
+    if(kind === 'sac') vracOcrLabel(file);   // lot, DDM, origine lus sur l'étiquette
   }catch(err){
     console.warn('[Vrac photo]', err);
     if(st){ st.textContent = '❌ Photo illisible'; st.style.color = 'var(--r)'; }
   }
 }
 document.getElementById('vrac-label-in').addEventListener('change', onVracPhotoInput);
+['input','change'].forEach(ev => document.getElementById('vrac-form').addEventListener(ev, e => {
+  if(e.target && e.target.classList) e.target.classList.remove('ocr-fill');
+  vracDraftSave();
+}));
 document.getElementById('vrac-silo-in').addEventListener('change', onVracPhotoInput);
 
 async function saveVracEntry(){
@@ -6578,12 +6886,19 @@ async function saveVracEntry(){
     vracEntries.unshift(Object.assign({ id, createdAt: new Date().toISOString() }, data));
   }
   if(!saveVrac()){ vracEntries = JSON.parse(backup); return; }
-  toast(vracEditId ? '✅ Fiche mise à jour' : `✅ ${data.name || data.gencod} → ${silo}`);
+  // Relecture : on vérifie que la fiche est bien dans la mémoire du téléphone
+  let stored = false;
+  try{ stored = JSON.parse(localStorage.getItem('fc_vrac') || '[]').some(x => String(x.id) === String(id)); }catch(e){}
+  if(!stored){ toast('⚠️ La fiche n\'a pas pu être écrite sur le téléphone — réessayez'); return; }
+  toast(vracEditId ? '✅ Fiche mise à jour et rangée dans le cahier' : `✅ ${data.name || data.gencod} → ${silo} · rangée dans le cahier`);
+  const saved = findVrac(id);
   cancelVracForm();
   fillVracDatalists();
   renderVracList();
   if(document.getElementById('vrac-modal').classList.contains('on')) renderVracHistory();
   refreshFolderIfOpen();
+  // On montre tout de suite la page du cahier de ce produit, pour contrôle
+  if(saved){ openVracBook(); vbKey = vracKey(saved); renderVracBook(); }
 }
 
 /* ── Vérification de provenance (scan → historique du produit) ───────────── */
@@ -6820,7 +7135,7 @@ async function buildVracCahierPDF(list, meta){
   let y = 0;
 
   function header(){
-    doc.setFillColor(...GREEN); doc.rect(0, 0, W, 18, 'F');
+    doc.setFillColor(...docColor('vrac')); doc.rect(0, 0, W, 18, 'F');
     doc.setTextColor(255); doc.setFont('helvetica','bold'); doc.setFontSize(13);
     doc.text(meta.single ? 'Fiche de mise en rayon vrac — traçabilité et hygiène' : 'Cahier de suivi vrac — traçabilité et hygiène', M, 11.5);
     doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
@@ -6975,6 +7290,7 @@ async function buildVracCahierPDF(list, meta){
     doc.text('Tempo · S2D COMMERCIAL — document généré à partir des saisies horodatées en magasin', M, H - 8);
     doc.text(`Page ${i} / ${n}`, W - M, H - 8, { align:'right' });
   }
+  pdfKindStripe(doc, 'vrac', 18);
   return doc.output('blob');
 }
 
@@ -7141,7 +7457,7 @@ async function buildReprisePdf(rec, lines){
   const money = n => n == null ? '—' : n.toFixed(2).replace('.', ',') + ' EUR';
   let y = 0;
   function header(first){
-    doc.setFillColor(...GREEN); doc.rect(0, 0, W, 21, 'F');
+    doc.setFillColor(...docColor('reprise')); doc.rect(0, 0, W, 21, 'F');
     let tx = M;
     if(brandLogos.__client){ doc.setFillColor(255,255,255); doc.roundedRect(M, 3, 15, 15, 2, 2, 'F'); pdfBrandMark(doc, '__client', M + 1, 4, 13, true); tx = M + 18; }
     doc.setTextColor(255); doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.text(clean(docClient()), tx, 10.5);
@@ -7194,6 +7510,7 @@ async function buildReprisePdf(rec, lines){
   const n = doc.getNumberOfPages();
   for(let i = 1; i <= n; i++){ doc.setPage(i); doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...GREY);
     doc.text('Tempo · S2D COMMERCIAL — valeurs au tarif HT chargé sur l\'appareil', M, H - 7); doc.text(`Page ${i} / ${n}`, W - M, H - 7, { align:'right' }); }
+  pdfKindStripe(doc, 'reprise', 21);
   const slug = (rec.store || 'magasin').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w-]+/g,'_').replace(/^_|_$/g,'');
   return { blob: doc.output('blob'), filename: `Bon_de_reprise_${slug}_${d.toISOString().slice(0,10)}.pdf` };
 }
@@ -8534,6 +8851,9 @@ async function shareVisit(id){
   for(const [f, nm] of [['photoAvant','Rayon_avant.jpg'],['photoApres','Rayon_apres.jpg']]){
     const d = v[f] ? await vracPhotoData(v[f]) : null; if(d) try{ files.push(dataUrlToFile(d, nm)); }catch(e){}
   }
+  const rup = ruptures.filter(r => r.day === v.date && (r.store || '') === (v.store || ''));
+  let rpdf = null;
+  if(rup.length){ try{ rpdf = await buildRupturePdf(rup, { store:v.store, by:displayBy(v.by), date:v.date + 'T12:00:00' }); files.unshift(new File([rpdf.blob], rpdf.filename, { type:'application/pdf' })); }catch(e){ console.warn('PDF ruptures :', e); } }
   if(navigator.share){
     try{
       if(files.length && navigator.canShare && navigator.canShare({ files })) await navigator.share({ title, text, files });
@@ -8541,6 +8861,7 @@ async function shareVisit(id){
       return;
     }catch(e){ if(e && e.name === 'AbortError') return; }
   }
+  if(rpdf){ downloadBlob(rpdf.blob, rpdf.filename); toast('📎 Relevé des ruptures PDF téléchargé — joignez-le au mail'); }
   location.href = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(text)}`;
 }
 
@@ -8828,7 +9149,9 @@ function openEmailModal(store){
   document.getElementById('em-body').value=lines.join('\n');
   const stag=document.getElementById('em-store-tag');
   stag.style.display='inline-block';stag.textContent=store?'🏪 '+store:'🌐 Tous magasins';
-  emailAttachOrder = null; setEmailAttachUI(false);   // pas de pièce jointe hors commande
+  emailAttachOrder = null;
+  setEmailAttachUI(prods.length ? { pdf: () => buildAlertPdf(prods, { store:storeName, by:session?.name || '' }), t:'⏰ Envoyer les produits à retirer',
+    sub:'Texte dans le mail + liste PDF avec codes-barres (à scanner) jointe' } : null);
   openModal('email-modal');
 }
 /* Produits à retirer : groupés par magasin, puis « périmés » / « sous 2 jours » */
