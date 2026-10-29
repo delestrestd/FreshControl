@@ -5409,8 +5409,7 @@ async function buildListPdf(kind, meta, groups){
       doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...GREY);
       if(r.sub) doc.text(doc.splitTextToSize(clean(r.sub), COL.info - COL.name - 3).slice(0, 1), COL.name, mid + nl.length * 4.3);
       doc.setTextColor(...(r.infoColor || [0,0,0])); doc.setFontSize(9);
-      doc.text(String(r.info || '').split('
-').flatMap(l => doc.splitTextToSize(clean(l), COL.qty - COL.info - 3)).slice(0, 3), COL.info, mid);
+      doc.text(String(r.info || '').split(/\n/).flatMap(l => doc.splitTextToSize(clean(l), COL.qty - COL.info - 3)).slice(0, 3), COL.info, mid);
       doc.setTextColor(0); doc.setFont('helvetica','bold'); doc.setFontSize(16);
       doc.text(r.qty == null ? '—' : String(r.qty), COL.qty + 2, mid + 1.5);
       doc.setFont('helvetica','normal');
