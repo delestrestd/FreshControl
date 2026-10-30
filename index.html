@@ -280,6 +280,10 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .vb-photos figure{margin:0}
 .vb-photos img,.vb-nophoto{width:100%;height:150px;object-fit:contain;border-radius:10px;background:rgba(0,0,0,.05);cursor:zoom-in;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);font-weight:700}
 .vb-photos figcaption{font-size:11px;font-weight:800;color:var(--muted);margin-top:4px}
+#pp-body{background:rgba(0,0,0,.06);border-radius:12px;padding:10px!important;margin-top:12px}
+#pp-body canvas{display:block;width:100%;height:auto;background:#fff;border-radius:4px;box-shadow:0 2px 10px rgba(0,0,0,.18);margin:0 auto 10px}
+#pp-body .pp-n{font-size:11px;font-weight:800;color:var(--muted);text-align:center;margin:-4px 0 12px}
+#pp-body .pp-wait{text-align:center;font-size:13px;font-weight:800;color:var(--muted);padding:40px 10px}
 @media (max-width:420px){.vb-kv{grid-template-columns:auto 1fr}}
 #qty-modal{z-index:800}   /* la fenêtre quantité passe devant le navigateur par marque */
 /* ── Marques : navigateur + chiffres ───────────────────────────────── */
@@ -1249,7 +1253,10 @@ html.rot-lock-on #rot-lock{display:flex}
     </div>
     <input class="rf-i" id="vb-search" placeholder="🔍 Produit ou code-barres…" oninput="renderVracBook()" style="margin:12px 0 0">
     <div id="vb-body"></div>
-    <button class="rfsave" id="vb-send" onclick="sendVracBookPdf()" style="margin:10px 0 4px">📤 Envoyer tout le cahier (PDF)</button>
+    <div id="vb-acts" style="display:flex;gap:8px;margin:10px 0 4px;flex:none;overflow:visible;padding-top:0">
+      <button class="rfsave" id="vb-prev" onclick="sendVracBookPdf(true)" style="margin:0;flex:0 0 auto;width:auto;padding-left:16px;padding-right:16px;background:rgba(255,255,255,.95);color:var(--gd);border:1.5px solid rgba(18,168,118,.4)">👁 Aperçu</button>
+      <button class="rfsave" id="vb-send" onclick="sendVracBookPdf()" style="margin:0;flex:1">📤 Envoyer tout le cahier (PDF)</button>
+    </div>
   </div>
 </div>
 
@@ -1271,19 +1278,33 @@ html.rot-lock-on #rot-lock{display:flex}
     </div>
     <div class="rf-f"><div class="rf-l">Magasin</div><select class="rf-i" id="vc-store"></select></div>
     <div id="vc-info" style="font-size:12px;font-weight:800;color:var(--gd);margin:4px 2px 12px"></div>
+    <button class="rfsave" id="vc-prev" onclick="generateVracCahier(true)" style="margin:0 0 8px;background:rgba(255,255,255,.95);color:var(--gd);border:1.5px solid rgba(18,168,118,.4)">👁 Aperçu du PDF</button>
     <button class="rfsave" id="vc-go" onclick="generateVracCahier()">📄 Générer et envoyer le PDF</button>
     <button class="rfcancel" onclick="closeModal('vrac-cahier-modal')">Fermer</button>
   </div>
 </div>
 
 <!-- ═══ PHOTO D'ÉTIQUETTE PLEIN ÉCRAN ═════════════════════════════════ -->
-<div id="photo-modal" class="modal-bg full" onclick="closeModal('photo-modal')">
+<div id="photo-modal" class="modal-bg full" onclick="closeModal('photo-modal')" style="z-index:760">
   <div class="modal-sh">
     <div class="mhd-row" style="margin-bottom:12px">
       <div class="mhd-t">🏷 Étiquette</div>
       <button class="mcl" onclick="closeModal('photo-modal')" aria-label="Fermer">✕</button>
     </div>
     <div><img id="photo-modal-img" alt="Étiquette" style="width:100%;border-radius:14px"></div>
+  </div>
+</div>
+
+<!-- ═══ APERÇU D'UN DOCUMENT PDF (avant envoi) ═════════════════════════ -->
+<div id="pdf-preview-modal" class="modal-bg full">
+  <div class="modal-sh">
+    <div class="mhd-row" style="margin-bottom:0">
+      <div class="mhd-t" id="pp-title" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">👁 Aperçu</div>
+      <span style="font-size:11px;font-weight:800;color:var(--muted);flex-shrink:0">touchez une page pour l'agrandir</span>
+      <button class="mcl" onclick="closePdfPreview()" aria-label="Fermer">✕</button>
+    </div>
+    <div id="pp-body"></div>
+    <button class="rfsave" id="pp-send" onclick="sendPdfPreview()" style="margin:10px 0 4px">📤 Envoyer ce PDF</button>
   </div>
 </div>
 
@@ -6501,13 +6522,41 @@ function vracParseLabel(text){
     const ag = low.match(/agriculture\s+(ue\s*\/\s*non[\s-]*ue|non[\s-]*ue|ue)\b/);
     if(ag) out.prov = /\//.test(ag[1]) ? 'UE / non UE' : /non/.test(ag[1]) ? 'Non UE' : 'UE';
   }
-  // Code-barres en chiffres (si l'image du code n'a pas été décodée)
+  // N° du silo (étiquette du silo en rayon)
+  const sm = all.match(/\bsilo\s*(?:n[°ºo]\.?\s*)?[:#\-]?\s*([A-Z]?\d{1,3}[A-Z]?)\b/i);
+  if(sm) out.silo = 'Silo ' + sm[1].toUpperCase();
+  // Code-barres en chiffres (si l'image du code n'a pas été décodée) ;
+  // une réf. fournisseur connue du catalogue donne aussi le bon EAN
   const pc = ocrPickCode(all);
-  if(pc.code && Ean.normalize(pc.code) === pc.code) out.ean = pc.code;   // un vrai EAN, pas une réf. ou un n° de lot
+  if(pc.prod && pc.prod.gencod) out.ean = String(pc.prod.gencod);
+  else if(pc.code && Ean.normalize(pc.code) === pc.code) out.ean = pc.code;   // un vrai EAN, pas un n° de lot
+  // Nom du produit : produit vrac déjà saisi ou produit du catalogue dont les mots figurent sur l'étiquette
+  if(!out.ean){ const nm = vracGuessName(all); if(nm) out.name = nm; }
   return out;
 }
-async function vracOcrLabel(file){
-  const st = document.getElementById('vrac-st-sac');
+/* Cherche le produit dont le nom se retrouve le mieux dans le texte lu
+   (au moins 2 mots significatifs, 3 sur 4 présents) */
+function vracGuessName(text){
+  const t = ' ' + _noAcc(text).toLowerCase().replace(/[^a-z0-9]+/g, ' ') + ' ';
+  const cands = [...vracEntries.map(v => ({ nom:v.name, gencod:v.gencod, w:1.1 })), ...catalogue.map(p => ({ nom:p.nom, gencod:p.gencod, w:1 }))];
+  let best = null;
+  cands.forEach(c => {
+    const words = [...new Set(_noAcc(c.nom || '').toLowerCase().split(/[^a-z0-9]+/).filter(w => w.length >= 4 && !/^\d+$/.test(w)))];
+    if(words.length < 2) return;
+    const hit = words.filter(w => t.includes(' ' + w)).length, sc = hit / words.length * c.w;
+    if(hit >= 2 && hit / words.length >= .75 && (!best || sc > best.sc || (sc === best.sc && hit > best.hit))) best = { sc, hit, c };
+  });
+  return best ? best.c : null;
+}
+/* Dernière mise en rayon du même produit (silo et origine sont souvent les mêmes) */
+function vracLastFor(gencod){
+  const g = String(gencod || '').replace(/\s/g, '');
+  if(!g) return null;
+  return vracEntries.filter(v => v.gencod === g && String(v.id) !== String(vracEditId))
+    .sort((a, b) => String(b.dateRayon || b.createdAt || '').localeCompare(String(a.dateRayon || a.createdAt || '')))[0] || null;
+}
+async function vracOcrLabel(file, kind){
+  const st = document.getElementById('vrac-st-' + (kind || 'sac'));
   const note = h => { if(st) st.innerHTML = h; };
   const prev = st ? st.innerHTML : '';
   note(prev + `<br><span class="spin"></span> ${_ocrTxtP ? 'Lecture de l\'étiquette…' : 'Lecture de l\'étiquette (1re fois : téléchargement ~10 Mo)…'}`);
@@ -6515,15 +6564,24 @@ async function vracOcrLabel(file){
     const [w, cv] = await Promise.all([loadOcrText(), ocrPrepare(file)]);
     const { data } = await w.recognize(cv);
     const r = vracParseLabel(data.text || '');
-    const filled = [];
-    const fill = (id, v, lbl) => { const e = document.getElementById(id); if(!e || !v || e.value.trim()) return; e.value = v; e.classList.add('ocr-fill'); filled.push(lbl); };
-    const gc = document.getElementById('vrac-gencod');
-    if(r.ean && gc && !gc.value.trim()){ fill('vrac-gencod', r.ean, 'code-barres'); prefillVracFromCatalogue(r.ean); }
+    const filled = [], hist = [];
+    const fill = (id, v, lbl, to) => { const e = document.getElementById(id); if(!e || !v || e.value.trim()) return; e.value = v; e.classList.add('ocr-fill'); (to || filled).push(lbl); };
+    fill('vrac-gencod', r.ean || (r.name && r.name.gencod), 'code-barres');
+    const g = (document.getElementById('vrac-gencod')?.value || '').replace(/\s/g, '');
+    const ref = g ? lookupGencod(g) : null;
+    fill('vrac-name', (ref && ref.nom) || (r.name && r.name.nom), 'produit');
+    fill('vrac-silo', r.silo, 'silo');
     fill('vrac-lot',  r.lot,  'n° de lot');
     fill('vrac-ddm',  r.ddm,  'DDM');
     fill('vrac-prov', r.prov, 'origine');
-    note(prev + '<br>' + (filled.length
-      ? `✨ Rempli depuis l'étiquette : <b>${filled.join(', ')}</b> — vérifiez les cases surlignées`
+    // Ce que l'étiquette ne dit pas : repris de la dernière mise en rayon du même produit
+    const last = vracLastFor(g);
+    if(last){ fill('vrac-silo', last.silo, 'silo', hist); fill('vrac-prov', last.provenance, 'origine', hist); }
+    note(prev + '<br>' + (filled.length || hist.length
+      ? (filled.length ? `✨ Lu sur l'étiquette : <b>${filled.join(', ')}</b>` : '')
+        + (hist.length ? `${filled.length ? '<br>' : ''}↩️ Repris de la dernière mise en rayon : <b>${hist.join(', ')}</b>` : '')
+        + ' — vérifiez les cases surlignées'
+      : Object.keys(r).length ? '✔️ Étiquette lue : les cases étaient déjà remplies'
       : '🔎 Rien de lisible sur l\'étiquette (lot, DDM, origine) — complétez à la main'));
     vracDraftSave();
   }catch(err){
@@ -6691,7 +6749,7 @@ function fillVracDatalists(){
 function prefillVracFromCatalogue(gencod){
   const ref = gencod ? lookupGencod(gencod) : null;
   const n = document.getElementById('vrac-name');
-  if(ref && n && !n.value.trim()) n.value = ref.nom || '';
+  if(ref && n && !n.value.trim() && ref.nom){ n.value = ref.nom; n.classList.add('ocr-fill'); }
 }
 function openVracForm(opts){
   const o = opts || {};
@@ -6820,10 +6878,10 @@ async function onVracPhotoInput(e){
     if(kind === 'sac' && gc && !gc.value.trim() && BarcodeEngine.isAvailable()){
       try{
         const code = await BarcodeEngine.decodeImageFile(file);
-        if(code){ gc.value = code; prefillVracFromCatalogue(code); toast('🔖 Code-barres lu sur l\'étiquette'); }
+        if(code){ gc.value = code; gc.classList.add('ocr-fill'); prefillVracFromCatalogue(code); toast('🔖 Code-barres lu sur l\'étiquette'); }
       }catch(_){ /* pas de code lisible sur la photo : sans conséquence */ }
     }
-    if(kind === 'sac') vracOcrLabel(file);   // lot, DDM, origine lus sur l'étiquette
+    vracOcrLabel(file, kind);   // lot, DDM, origine lus sur l'étiquette (sac ou silo), cases vides seulement
   }catch(err){
     console.warn('[Vrac photo]', err);
     if(st){ st.textContent = '❌ Photo illisible'; st.style.color = 'var(--r)'; }
@@ -7892,7 +7950,7 @@ function openVracBook(){
 }
 function renderVracBook(){
   const body = document.getElementById('vb-body'), title = document.getElementById('vb-title');
-  const back = document.getElementById('vb-back'), send = document.getElementById('vb-send');
+  const back = document.getElementById('vb-back'), send = document.getElementById('vb-acts');
   if(!body) return;
   const groups = vracGroups(vracEntries);
   const g = vbKey ? groups.find(x => x.k === vbKey) : null;
@@ -7900,7 +7958,7 @@ function renderVracBook(){
     vbKey = null;
     if(title) title.textContent = '📖 Cahier de suivi vrac';
     if(back) back.style.display = 'none';
-    if(send) send.style.display = vracEntries.length ? 'block' : 'none';
+    if(send) send.style.display = vracEntries.length ? 'flex' : 'none';
     const q = _noAcc(document.getElementById('vb-search')?.value || '');
     const list = groups.filter(x => !q || _noAcc(x.name + ' ' + x.gencod).includes(q));
     const sb = document.getElementById('vb-search'); if(sb) sb.style.display = '';
@@ -7913,7 +7971,7 @@ function renderVracBook(){
   const sb = document.getElementById('vb-search'); if(sb) sb.style.display = 'none';
   if(title) title.textContent = '📖 ' + g.name;
   if(back) back.style.display = 'inline-flex';
-  if(send) send.style.display = 'block';
+  if(send) send.style.display = 'flex';
   body.innerHTML = `<div class="vb-head">
       ${eanSvg(g.gencod) || `<div class="vb-noean">${escapeHTML(g.gencod || 'Pas de code-barres')}</div>`}
       <div class="vb-stats"><b>${plural(g.arr.length,'mise en rayon','mises en rayon')}</b><span>du ${fmtDate(g.arr[g.arr.length-1].dateRayon)} au ${fmtDate(g.arr[0].dateRayon)}</span>
@@ -7923,7 +7981,8 @@ function renderVracBook(){
       const h = v.hyg || {};
       return `<div class="vb-page">
         <div class="vb-date" style="display:flex;justify-content:space-between;align-items:center;gap:8px">Mise en rayon du ${fmtDate(v.dateRayon)}
-          <button class="scan-link-btn" data-vid="${escapeHTMLAttr(String(v.id))}" onclick="sendVracFichePdf(this.dataset.vid,this)" style="flex-shrink:0;padding:6px 11px">📤 Envoyer cette fiche</button></div>
+          <button class="scan-link-btn" data-vid="${escapeHTMLAttr(String(v.id))}" onclick="sendVracFichePdf(this.dataset.vid,this,true)" style="flex-shrink:0;padding:6px 11px;margin-left:auto">👁 Aperçu</button>
+          <button class="scan-link-btn" data-vid="${escapeHTMLAttr(String(v.id))}" onclick="sendVracFichePdf(this.dataset.vid,this)" style="flex-shrink:0;padding:6px 11px">📤 Envoyer</button></div>
         <div class="vb-kv">
           <span>Silo</span><b>${escapeHTML(v.silo || '—')}</b><span>N° de lot</span><b>${escapeHTML(v.lot || '—')}</b>
           <span>DDM / DLC</span><b>${escapeHTML(ddmLabel(v.ddm) || '—')}</b><span>Origine</span><b>${escapeHTML(v.provenance || '—')}</b>
@@ -7944,33 +8003,116 @@ function renderVracBook(){
   body.scrollTop = 0;
 }
 function vbBack(){ vbKey = null; renderVracBook(); }
-/* « Envoyer tout le cahier » : toutes les mises en rayon de tous les produits */
-async function sendVracBookPdf(){
-  if(!vracEntries.length) return;
-  const btn = document.getElementById('vb-send'), lbl = btn ? btn.innerHTML : '';
-  if(btn){ btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Création du PDF…'; }
+/* Les trois documents du cahier vrac : { blob, filename, text } prêts à
+   envoyer ou à afficher en aperçu */
+async function vracBookDoc(){
+  const list = vracEntries.slice().sort(vracCahierOrder);
+  const dates = list.map(v => v.dateRayon || '').filter(Boolean).sort();
+  const stores = [...new Set(list.map(v => v.store).filter(Boolean))];
+  const meta = { from: dates[0] || '', to: dates[dates.length-1] || '',
+    storeLabel: stores.join(', ') || 'Magasin', by: session?.name || '' };
+  return { blob: await buildVracCahierPDF(list, meta), filename: `Cahier_vrac_complet_${isoDay(new Date())}.pdf`,
+    text: `Cahier de suivi vrac complet — ${meta.storeLabel}`, title: 'Cahier vrac complet' };
+}
+async function vracFicheDoc(id){
+  const v = findVrac(id); if(!v) throw new Error('Fiche introuvable');
+  const blob = await buildVracCahierPDF([v], { from: v.dateRayon, to: v.dateRayon, storeLabel: v.store || 'Magasin', by: session?.name || '', single: true });
+  const slug = (v.name || v.gencod || 'produit').normalize('NFD').replace(/[^\w]+/g, '_').replace(/^_|_$/g, '').slice(0, 40);
+  return { blob, filename: `Fiche_vrac_${slug}_${v.dateRayon || ''}.pdf`,
+    text: `Fiche de mise en rayon vrac — ${v.name || v.gencod} — ${fmtDate(v.dateRayon)}`, title: `Fiche ${v.name || v.gencod} · ${fmtDate(v.dateRayon)}` };
+}
+async function vracPeriodDoc(){
+  const list = vracCahierList();
+  if(!list.length) throw new Error('Aucune mise en rayon sur cette période');
+  const st = document.getElementById('vc-store')?.value || '';
+  const meta = {
+    from: document.getElementById('vc-from')?.value || '',
+    to:   document.getElementById('vc-to')?.value || '',
+    storeLabel: st || [storeEnseigne, 'tous magasins'].filter(Boolean).join(' · '),
+    by: session?.name || ''
+  };
+  const slug = (st || 'magasins').normalize('NFD').replace(/[^\w]+/g, '_').replace(/^_|_$/g, '');
+  return { blob: await buildVracCahierPDF(list, meta), filename: `Cahier_vrac_${slug}_${meta.from}_${meta.to}.pdf`,
+    text: `Cahier de suivi vrac — ${meta.storeLabel} — du ${meta.from} au ${meta.to}`, title: `Cahier vrac · ${fmtDate(meta.from)} → ${fmtDate(meta.to)}` };
+}
+/* Bouton occupé pendant la création du PDF, puis envoi ou aperçu */
+async function vracDocRun(btn, make, preview){
+  const lbl = btn ? btn.innerHTML : '';
+  if(btn){ btn.disabled = true; btn.innerHTML = '<span class="spin"></span>' + (btn.offsetWidth > 120 ? ' Création du PDF…' : ''); }
   try{
-    const list = vracEntries.slice().sort(vracCahierOrder);
-    const dates = list.map(v => v.dateRayon || '').filter(Boolean).sort();
-    const stores = [...new Set(list.map(v => v.store).filter(Boolean))];
-    const meta = { from: dates[0] || '', to: dates[dates.length-1] || '',
-      storeLabel: stores.join(', ') || 'Magasin', by: session?.name || '' };
-    const blob = await buildVracCahierPDF(list, meta);
-    await shareVracPdf(blob, `Cahier_vrac_complet_${isoDay(new Date())}.pdf`, `Cahier de suivi vrac complet — ${meta.storeLabel}`);
-  }catch(err){ toast('❌ ' + (err && err.message || 'PDF impossible')); }
+    const d = await make();
+    if(preview) await openPdfPreview(d);
+    else await shareVracPdf(d.blob, d.filename, d.text);
+  }catch(err){ console.warn('[Cahier vrac]', err); toast('❌ ' + (err && err.message || 'PDF impossible')); }
   finally{ if(btn){ btn.disabled = false; btn.innerHTML = lbl; } }
 }
+/* « Envoyer tout le cahier » : toutes les mises en rayon de tous les produits */
+function sendVracBookPdf(preview){
+  if(!vracEntries.length) return;
+  return vracDocRun(document.getElementById(preview ? 'vb-prev' : 'vb-send'), vracBookDoc, preview);
+}
 /* « Envoyer cette fiche » : une seule mise en rayon, sans page de synthèse */
-async function sendVracFichePdf(id, btn){
-  const v = findVrac(id); if(!v) return;
-  const lbl = btn ? btn.innerHTML : '';
-  if(btn){ btn.disabled = true; btn.innerHTML = '<span class="spin"></span>'; }
+function sendVracFichePdf(id, btn, preview){ return vracDocRun(btn, () => vracFicheDoc(id), preview); }
+
+/* ── Aperçu d'un PDF avant envoi ─────────────────────────────────────────
+   Les pages sont dessinées en images sur le téléphone (pdf.js chargé à la
+   demande, version figée + SRI, puis gardé hors ligne par le service worker) :
+   on voit le document tel qu'il partira, sans quitter l'appli. */
+let _pdfJsP = null, _ppDoc = null;
+function loadPdfJs(){
+  if(!_pdfJsP) _pdfJsP = (async () => {
+    const base = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/';
+    if(!window.pdfjsLib) await new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = base + 'pdf.min.js';
+      s.integrity = 'sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e';
+      s.crossOrigin = 'anonymous';
+      s.onload = () => window.pdfjsLib ? res() : rej(new Error('Module d\'aperçu absent'));
+      s.onerror = () => rej(new Error('Module d\'aperçu non téléchargé (connexion ?)'));
+      document.head.appendChild(s);
+    });
+    // Le moteur tourne dans un worker : chargé en blob (la CSP n'autorise que 'self' et blob:)
+    const r = await fetch(base + 'pdf.worker.min.js', { integrity:'sha384-SnzOobpRMLXZ52iJvZm/C0fYw0OQemTXzTjIsdsfMcrCtCEe9qgzxTd3RSklO5x2' });
+    if(!r.ok) throw new Error('Module d\'aperçu non téléchargé (connexion ?)');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([await r.text()], { type:'text/javascript' }));
+    return pdfjsLib;
+  })().catch(e => { _pdfJsP = null; throw e; });
+  return _pdfJsP;
+}
+async function openPdfPreview(d){
+  _ppDoc = d;
+  const body = document.getElementById('pp-body'), title = document.getElementById('pp-title');
+  if(title) title.textContent = '👁 ' + (d.title || 'Aperçu');
+  body.innerHTML = `<div class="pp-wait"><span class="spin"></span> ${_pdfJsP ? 'Préparation de l\'aperçu…' : 'Préparation de l\'aperçu (1re fois : téléchargement ~1,4 Mo)…'}</div>`;
+  openModal('pdf-preview-modal');
   try{
-    const blob = await buildVracCahierPDF([v], { from: v.dateRayon, to: v.dateRayon, storeLabel: v.store || 'Magasin', by: session?.name || '', single: true });
-    const slug = (v.name || v.gencod || 'produit').normalize('NFD').replace(/[^\w]+/g, '_').replace(/^_|_$/g, '').slice(0, 40);
-    await shareVracPdf(blob, `Fiche_vrac_${slug}_${v.dateRayon || ''}.pdf`, `Fiche de mise en rayon vrac — ${v.name || v.gencod} — ${fmtDate(v.dateRayon)}`);
-  }catch(err){ toast('❌ ' + (err && err.message || 'PDF impossible')); }
-  finally{ if(btn){ btn.disabled = false; btn.innerHTML = lbl; } }
+    const lib = await loadPdfJs();
+    const pdf = await lib.getDocument({ data: new Uint8Array(await d.blob.arrayBuffer()), isEvalSupported:false }).promise;
+    if(_ppDoc !== d) return;                        // aperçu fermé ou remplacé entre-temps
+    body.innerHTML = '';
+    const scale = Math.min(2, Math.max(1.2, (body.clientWidth || 360) * (window.devicePixelRatio || 1) / 595));
+    for(let i = 1; i <= pdf.numPages; i++){
+      const page = await pdf.getPage(i), vp = page.getViewport({ scale });
+      const cv = document.createElement('canvas');
+      cv.width = Math.round(vp.width); cv.height = Math.round(vp.height);
+      cv.style.cursor = 'zoom-in';
+      cv.onclick = () => { const img = document.getElementById('photo-modal-img'); if(img){ img.src = cv.toDataURL('image/png'); openModal('photo-modal'); } };   // page en grand, zoom au doigt
+      body.appendChild(cv);
+      if(pdf.numPages > 1){ const n = document.createElement('div'); n.className = 'pp-n'; n.textContent = `Page ${i} / ${pdf.numPages}`; body.appendChild(n); }
+      await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+      if(_ppDoc !== d) return;
+    }
+    pdf.destroy();
+  }catch(err){
+    console.warn('[Aperçu PDF]', err);
+    if(_ppDoc === d) body.innerHTML = `<div class="pp-wait">⚠️ Aperçu impossible (${escapeHTML(err && err.message || 'erreur')}).<br>Le PDF reste disponible : touchez « Envoyer ce PDF ».</div>`;
+  }
+}
+function closePdfPreview(){ _ppDoc = null; closeModal('pdf-preview-modal'); const b = document.getElementById('pp-body'); if(b) b.innerHTML = ''; }
+async function sendPdfPreview(){
+  const d = _ppDoc; if(!d) return;
+  try{ await shareVracPdf(d.blob, d.filename, d.text); }
+  catch(err){ toast('❌ ' + (err && err.message || 'Envoi impossible')); }
 }
 async function shareVracPdf(blob, filename, text){
   let file = null;
@@ -7983,30 +8125,9 @@ async function shareVracPdf(blob, filename, text){
   toast('📘 Cahier PDF téléchargé');
 }
 
-async function generateVracCahier(){
-  const list = vracCahierList();
-  if(!list.length){ toast('Aucune mise en rayon sur cette période'); return; }
-  const btn = document.getElementById('vc-go');
-  const lbl = btn ? btn.innerHTML : '';
-  if(btn){ btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Création du PDF…'; }
-  try{
-    const st = document.getElementById('vc-store')?.value || '';
-    const meta = {
-      from: document.getElementById('vc-from')?.value || '',
-      to:   document.getElementById('vc-to')?.value || '',
-      storeLabel: st || [storeEnseigne, 'tous magasins'].filter(Boolean).join(' · '),
-      by: session?.name || ''
-    };
-    const blob = await buildVracCahierPDF(list, meta);
-    const slug = (st || 'magasins').normalize('NFD').replace(/[^\w]+/g, '_').replace(/^_|_$/g, '');
-    const filename = `Cahier_vrac_${slug}_${meta.from}_${meta.to}.pdf`;
-    await shareVracPdf(blob, filename, `Cahier de suivi vrac — ${meta.storeLabel} — du ${meta.from} au ${meta.to}`);
-  }catch(err){
-    console.warn('[Cahier vrac]', err);
-    toast('❌ ' + (err && err.message || 'PDF impossible'));
-  }finally{
-    if(btn){ btn.disabled = false; btn.innerHTML = lbl; }
-  }
+function generateVracCahier(preview){
+  if(!vracCahierList().length){ toast('Aucune mise en rayon sur cette période'); return; }
+  return vracDocRun(document.getElementById(preview ? 'vc-prev' : 'vc-go'), vracPeriodDoc, preview);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

@@ -21,8 +21,8 @@
 - **Fresh** : scan des dates (DLC), alertes, démarque (bouton ♻, onglet Démarque), bon de reprise PDF.
 - **Commande / pré-commande** : scan continu, navigateur par marque, mode rupture, contrôle du prix (prix chargés localement), bon PDF à codes-barres + Excel.
 - **Catalogue intégré** : 1 272 produits (876 alimentaire + 396 non-alimentaire), rangés univers → marque → gamme ; 14 logos de marques (`brand/marques/`).
-- **OCR** (Tesseract.js 5.1.1, local) : 🔢 lecture des chiffres d'une étiquette prix ; **lecture de l'étiquette du sac vrac** (lot, DDM, origine, EAN remplis automatiquement, cases surlignées).
-- **Vrac** : fiche de mise en rayon (2 photos sac/silo, hygiène 9 points), **brouillon sauvegardé en continu et restauré après rechargement**, cahier virtuel par produit (ouvert après chaque enregistrement), historique, cahier / fiche PDF.
+- **OCR** (Tesseract.js 5.1.1, local) : 🔢 lecture des chiffres d'une étiquette prix ; **lecture des étiquettes vrac (sac et silo)** : code-barres, produit, silo, lot, DDM, origine remplis automatiquement (cases vides seulement, surlignées) ; silo / origine manquants repris de la dernière mise en rayon du produit.
+- **Vrac** : fiche de mise en rayon (2 photos sac/silo, hygiène 9 points), **brouillon sauvegardé en continu et restauré après rechargement**, cahier virtuel par produit (ouvert après chaque enregistrement), historique, cahier / fiche PDF avec **👁 Aperçu** dans l'appli avant envoi (pdf.js 3.11.174 chargé à la demande, worker en blob).
 - **Planning** : semaine, comptes-rendus dictés, photos avant/après, fiche magasin (contacts, jours de commande / livraison).
 - **Statistiques** complètes, bandeau Gestion 30 j, écran Par marque.
 - **Documents** : chaque type a sa couleur de bandeau + liseré (commande vert, pré-commande bleu, reprise rouge, vrac marron, stock violet, produits à retirer orange, ruptures ardoise) et **tous les documents listant des produits portent le vrai code-barres EAN dessiné** (module `Ean`, `buildListPdf`).
@@ -60,6 +60,7 @@
 
 | PR | Objet | Commit merge |
 |---|---|---|
+| #50 | Aperçu PDF du cahier vrac, lecture des étiquettes sac + silo (produit, silo, historique) | — |
 | #48 | Hotfix : saut de ligne qui cassait le script | `6d86f14` |
 | #47 | Vrac sans perte (scan stoppé, brouillon), lecture de l'étiquette, codes-barres + couleurs sur tous les documents | `a56ca60` |
 | #46 | Statistiques complètes, Gestion 30 j, Par marque, logos Jom Bao / Gusti Amo | `e26a3b2` |
