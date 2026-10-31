@@ -54,6 +54,16 @@ self.addEventListener('fetch', event => {
       event.respondWith(staleWhileRevalidate(event, req, url.pathname));
       return;
     }
+    // Vignettes produits : la liste se rafraîchit, chaque photo est gardée dès son
+    // premier affichage (hors ligne ensuite). Photo remplacée → changer CACHE.
+    if (url.pathname === '/produits/index.json') {
+      event.respondWith(staleWhileRevalidate(event, req, url.pathname));
+      return;
+    }
+    if (url.pathname.startsWith('/produits/')) {
+      event.respondWith(cacheFirst(req));
+      return;
+    }
     return;   // /api et le reste : réseau direct
   }
 
