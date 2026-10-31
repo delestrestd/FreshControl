@@ -1,6 +1,6 @@
 # État du projet — note de reprise
 
-> Dernière mise à jour : **2026-10-29**. Document de travail interne (état des lieux + reste à faire + pièges connus). À relire au début de chaque reprise.
+> Dernière mise à jour : **2026-10-31**. Document de travail interne (état des lieux + reste à faire + pièges connus). À relire au début de chaque reprise.
 
 ## En un coup d'œil
 
@@ -8,7 +8,7 @@
 |---|---|
 | **Application** | **Tempo** (renommée le 2026-10-28) — outil terrain GMS de S2D COMMERCIAL ; le module des dates garde le nom « Fresh Control » |
 | **Prod** | https://fresh-control.vercel.app |
-| **Commit déployé** | `6d86f14` (merge PR #48) |
+| **Commit déployé** | `e7670c6` (merge PR #51) |
 | **Branche** | `main` (non protégée sur GitHub) |
 | **Stack** | `index.html` unique (HTML+CSS+JS inline), PWA, zero-build, Vercel |
 | **Stockage** | `localStorage` (données) + IndexedDB `fc_media` (photos) ; tout reste sur le téléphone |
@@ -34,7 +34,7 @@
 
 ## Reste à faire
 
-- [ ] **Tests terrain par Stéphane** : fiche vrac sur un vrai sac (lecture de l'étiquette, sauvegarde), dictée réelle, OCR sur étiquette électronique, partage PDF/Excel, douchette sur bon imprimé à 100 %.
+- [ ] **Tests terrain par Stéphane** : fiche vrac sur un vrai sac (lecture de l'étiquette, sauvegarde), dictée réelle, OCR sur étiquette électronique, partage PDF/Excel, douchette sur bon imprimé à 100 % ; **PR #51** : alertes à l'arrivée en magasin (GPS), fiche magasin modifiable, Maps / Waze, dossier en PDF, sous-catégories, lisibilité des stats, vignettes.
 - [ ] **Assortiment + taux de présence** : il faut la liste de base (plans de vente PDF ou liste par magasin).
 - [ ] **Modes iPad / PC** (Réglages › Affichage, téléphone par défaut).
 - [ ] **Avec serveur** (Supabase UE proposé) : gestion des utilisateurs (4 rôles, validée), rapport de la semaine, reformulation de la dictée.
@@ -74,8 +74,8 @@
 
 | PR | Objet | Commit merge |
 |---|---|---|
-| #51 | Stats lisibles, fiche magasin modifiable (renommage avec historique), Google Maps / Waze, dossier magasin en documents PDF, sous-catégories par marque, alertes Fresh à l'arrivée en magasin, vignettes produits (écran + documents) | — |
-| #50 | Aperçu PDF du cahier vrac, lecture des étiquettes sac + silo (produit, silo, historique) | — |
+| #51 | Stats lisibles, fiche magasin modifiable (renommage avec historique), Google Maps / Waze, dossier magasin en documents PDF, sous-catégories par marque, alertes Fresh à l'arrivée en magasin, vignettes produits (écran + documents) | `e7670c6` |
+| #50 | Aperçu PDF du cahier vrac, lecture des étiquettes sac + silo (produit, silo, historique) | `b4302fa` |
 | #48 | Hotfix : saut de ligne qui cassait le script | `6d86f14` |
 | #47 | Vrac sans perte (scan stoppé, brouillon), lecture de l'étiquette, codes-barres + couleurs sur tous les documents | `a56ca60` |
 | #46 | Statistiques complètes, Gestion 30 j, Par marque, logos Jom Bao / Gusti Amo | `e26a3b2` |
