@@ -15,8 +15,8 @@
    En cas de problème grave en production : remplacer ce fichier par une
    version qui fait self.registration.unregister() et vide les caches. */
 
-const CACHE = 'fc-shell-v1';
-const SHELL = ['/', '/manifest.json', '/icons/icon-192.svg', '/icons/icon-512.svg', '/icons/icon-maskable.svg', '/brand/s2d-monogramme.svg',
+const CACHE = 'fc-shell-v2';   // v2 : nouvelles icônes Tempo
+const SHELL = ['/', '/manifest.json', '/icons/icon-192.svg', '/icons/icon-512.svg', '/icons/icon-maskable.svg', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/icon-maskable.png', '/icons/apple-touch-icon.png', '/brand/s2d-monogramme.svg',
   ...['lea-nature','jardin-bio','joyce','karelea','good-moov','naturasens','biosens','kiva','sobio-etic','biovie','dentavie','floressance','jom-bao','gusti-amo-bio'].map(n => '/brand/marques/' + n + '.png')];
 const CDN_HOSTS = ['cdn.jsdelivr.net', 'fonts.googleapis.com', 'fonts.gstatic.com'];
 
