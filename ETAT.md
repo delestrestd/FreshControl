@@ -24,7 +24,10 @@
 - **OCR** (Tesseract.js 5.1.1, local) : 🔢 lecture des chiffres d'une étiquette prix ; **lecture des étiquettes vrac (sac et silo)** : code-barres, produit, silo, lot, DDM, origine remplis automatiquement (cases vides seulement, surlignées) ; silo / origine manquants repris de la dernière mise en rayon du produit.
 - **Vrac** : fiche de mise en rayon (2 photos sac/silo, hygiène 9 points), **brouillon sauvegardé en continu et restauré après rechargement**, cahier virtuel par produit (ouvert après chaque enregistrement), historique, cahier / fiche PDF avec **👁 Aperçu** dans l'appli avant envoi (pdf.js 3.11.174 chargé à la demande, worker en blob).
 - **Planning** : semaine, comptes-rendus dictés, photos avant/après, fiche magasin (contacts, jours de commande / livraison).
-- **Statistiques** complètes, bandeau Gestion 30 j, écran Par marque.
+- **Statistiques** : « En bref » en phrases, 4 grandes cases avec tendance, taux détaillés repliés ; bandeau Gestion 30 j, écran Par marque avec **sous-catégories** (familles).
+- **Magasins** : fiche entièrement modifiable (nom, adresse, position, contacts, jours) ; renommer = tout l'historique suit (`renameStoreEverywhere`) ; itinéraire **Google Maps ou Waze** ; **dossier magasin = documents PDF** (commandes, stocks, vrac, ruptures, reprises, dates) ouverts en aperçu.
+- **Alertes Fresh à l'arrivée** : magasin reconnu par le GPS (appli ouverte ou rouverte) → alertes urgentes de ce magasin, une fois par magasin et par jour (`arrivalAlert`, `fc_arrival_seen`).
+- **Vignettes produits** : `produits/<EAN>.jpg` + `produits/index.json` (1 245 / 1 272), module `ProdImg`, sur l'écran et sur tous les documents ; gardées hors ligne par `sw.js`. Régénérer : `FreshControl_Catalogues/_outils/extraire_vignettes_pdf.py`.
 - **Documents** : chaque type a sa couleur de bandeau + liseré (commande vert, pré-commande bleu, reprise rouge, vrac marron, stock violet, produits à retirer orange, ruptures ardoise) et **tous les documents listant des produits portent le vrai code-barres EAN dessiné** (module `Ean`, `buildListPdf`).
 - **Langues** FR/EN/ES/ZH (dictionnaire `TRD`) ; textes juridiques restés en français.
 - **Sécurité** : mots de passe PBKDF2-SHA-256 + sel, CSP stricte (jsDelivr seul CDN script), `api/scan.js` désactivé par défaut.
@@ -38,6 +41,17 @@
 - [ ] Traduction des mentions légales / charte RGPD (à faire à part, relecture juriste).
 - [ ] Logo Biothentic (si fourni ; affiché en toutes lettres en attendant).
 - [ ] Avertissement console bénin au démarrage : `[Catalogue] Seed echec … catalogueRefIdx before initialization` (le catalogue se charge quand même au 2e essai) — à nettoyer.
+
+## Idée à relancer : implantation de rayon à l'instant T (RTX Spark)
+
+> Proposée par Stéphane le 2026-10-31. **En attente** du RTX Spark — ne pas lancer sans son feu vert.
+
+- **But** : devant le rayon, au moment de préparer une implantation ou une réimplantation, prendre le rayon en photo → les produits sont reconnus → une implantation est proposée selon l'espace octroyé (et les ventes). Tout se fait sur le moment, pas d'historique de photos à constituer.
+- **Fait (étape 1)** : vignette de chaque produit par EAN (`produits/<EAN>.jpg`), extraite des PDF fournisseurs (`FreshControl_Catalogues/_outils/extraire_vignettes_pdf.py`), affichée dans l'appli et sur les documents.
+- **À faire (étape 2)** : dimensions de chaque produit (largeur × hauteur × profondeur) → fiche logistique à demander au fournisseur. Indispensable pour calculer ce qui tient sur une étagère.
+- **À faire (étape 3)** : sur le Spark (traitement local) : reconnaissance des produits sur la photo (modèle de vision + comparaison aux photos produits), comptage des faces et des trous, puis calcul de l'implantation (place, ventes Tempo, blocs marque, gammes en colonnes, meilleures ventes à hauteur des yeux) → plan PDF à codes-barres. Mesures du rayon (longueur, étagères, hauteurs) à saisir sur place.
+- **À demander au fournisseur** : banque d'images **HD** des produits (les vignettes des PDF suffisent pour l'appli, pas pour la reconnaissance).
+- **Précaution** : photos de rayon traitées en local, visages des clients floutés.
 
 ## Pièges connus (à ne pas réapprendre)
 
@@ -60,6 +74,7 @@
 
 | PR | Objet | Commit merge |
 |---|---|---|
+| #51 | Stats lisibles, fiche magasin modifiable (renommage avec historique), Google Maps / Waze, dossier magasin en documents PDF, sous-catégories par marque, alertes Fresh à l'arrivée en magasin, vignettes produits (écran + documents) | — |
 | #50 | Aperçu PDF du cahier vrac, lecture des étiquettes sac + silo (produit, silo, historique) | — |
 | #48 | Hotfix : saut de ligne qui cassait le script | `6d86f14` |
 | #47 | Vrac sans perte (scan stoppé, brouillon), lecture de l'étiquette, codes-barres + couleurs sur tous les documents | `a56ca60` |

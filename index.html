@@ -303,12 +303,20 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .bd-tile small{font-size:11px;font-weight:700;color:var(--muted);line-height:1.3}
 .bd-chips{display:flex;gap:6px;overflow-x:auto;padding:10px 0 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .bd-chips::-webkit-scrollbar{display:none}
+.bd-fams{flex-wrap:wrap;overflow:visible;padding-top:4px}
+.bd-fams button{padding:6px 10px;font-size:12px}
+.bd-fams button small{opacity:.7;font-weight:800}
+.bd-sublbl{font-size:10.5px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin:10px 2px 0}
+.bd-subs{font-size:11px;font-weight:700;color:var(--gd);line-height:1.35}
+.bd-subs i{font-style:normal;color:var(--muted)}
 .bd-chips button{flex-shrink:0;border:1.5px solid var(--bdr);background:rgba(255,255,255,.8);border-radius:var(--rr);padding:7px 12px;font-family:var(--font);font-size:12.5px;font-weight:800;color:var(--muted);cursor:pointer}
 .bd-chips button.on{background:rgba(18,168,118,.92);border-color:transparent;color:#fff}
 .bd-count{font-size:11.5px;font-weight:800;color:var(--muted);margin:6px 2px}
 .bd-fam{font-size:10.5px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:var(--gd);margin:12px 2px 5px}
 .bd-row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.85);border:1px solid var(--bdr);border-radius:12px;padding:9px 10px;margin-bottom:6px}
 .bd-row>div{flex:1;min-width:0}
+.pimg{width:46px;height:46px;flex-shrink:0;object-fit:contain;background:#fff;border-radius:9px;border:1px solid rgba(0,0,0,.06)}
+.pimg-ic{width:100%;height:100%;border:none;border-radius:inherit}
 .bd-row b{display:block;font-size:13px;font-weight:800;line-height:1.3}
 .bd-row small{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-top:2px}
 .bd-add{flex-shrink:0;min-width:46px;height:40px;border-radius:12px;border:none;background:rgba(18,168,118,.92);color:#fff;font-size:20px;font-weight:900;font-family:var(--font);cursor:pointer}
@@ -330,6 +338,19 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .rupt-toggle.on{background:rgba(224,60,60,.92);color:#fff;border-style:solid;border-color:transparent}
 .rupt-tag{display:inline-block;background:rgba(224,60,60,.13);color:var(--r);border-radius:var(--rr);padding:1px 7px;font-size:10px;font-weight:900;margin-left:4px}
 .sf-actions{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.fd-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.fd-tabs button{border:1.5px solid var(--bdr);background:rgba(255,255,255,.7);border-radius:100px;padding:7px 12px;font-size:12.5px;font-weight:800;color:var(--txt);cursor:pointer;font-family:var(--font)}
+.fd-tabs button small{color:var(--muted);font-weight:800;margin-left:2px}
+.fd-tabs button.on{background:var(--gd);border-color:var(--gd);color:#fff}
+.fd-tabs button.on small{color:rgba(255,255,255,.8)}
+.fd-file{display:flex;align-items:center;gap:11px;padding:11px 10px;border:1px solid rgba(0,0,0,.07);border-radius:13px;margin-bottom:8px;background:rgba(255,255,255,.6);cursor:pointer;transition:opacity .2s}
+.fd-file.busy{opacity:.5;pointer-events:none}
+.fd-ico{font-size:24px;flex-shrink:0;width:30px;text-align:center}
+.fd-tx{flex:1;min-width:0}
+.fd-tx b{display:block;font-size:13.5px;font-weight:900;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fd-tx small{display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-top:2px}
+.fd-open{flex-shrink:0;font-size:11px;font-weight:900;color:var(--gd);background:rgba(18,168,118,.12);border-radius:8px;padding:5px 8px}
+.fd-del{flex-shrink:0;border:1px solid rgba(224,60,60,.25);background:rgba(224,60,60,.08);color:var(--r);border-radius:9px;width:32px;height:32px;cursor:pointer;font-size:13px}
 .sf-act{display:inline-flex;align-items:center;gap:5px;padding:9px 12px;border-radius:var(--rr);background:rgba(18,168,118,.92);color:#fff;font-size:13px;font-weight:800;text-decoration:none}
 .sf-sec{font-size:11px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin:12px 2px 6px}
 .vs-thumbs{display:flex;gap:6px;margin-top:6px}
@@ -359,6 +380,33 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .st-chart{width:100%;height:auto;display:block}
 .st-chart text{font-size:8px;font-weight:700;fill:#5d6b64}
 .st-empty{font-size:12px;font-weight:700;color:var(--muted);text-align:center;padding:8px}
+.st-brief{padding:12px 14px}
+.st-brief .st-bt{font-size:11px;font-weight:900;letter-spacing:.6px;text-transform:uppercase;color:var(--gd);margin-bottom:6px}
+.st-brief p{margin:0;padding:6px 0;font-size:13.5px;font-weight:600;line-height:1.45;color:var(--txt);border-bottom:1px solid rgba(0,0,0,.05)}
+.st-brief p:last-child{border-bottom:none}
+.st-brief b{font-weight:900}
+.st-brief .ok,.st-sv .ok{color:#0B6E4D;font-weight:800}.st-brief .ko,.st-sv .ko{color:var(--r);font-weight:800}
+.st-tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.st-tile{background:rgba(255,255,255,.85);border:1px solid var(--bdr);border-radius:16px;padding:12px;text-align:left}
+.st-tile .st-ti{font-size:20px}
+.st-tile b{display:block;font-size:26px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--txt);margin-top:2px;line-height:1.1}
+.st-tile span{display:block;font-size:12px;font-weight:800;color:var(--muted)}
+.st-tile em{display:inline-block;font-style:normal;font-size:12px;font-weight:900;margin-top:5px;padding:2px 7px;border-radius:7px}
+.st-tile.warn b{color:#C2410C}
+.st-tr-up{color:#0B6E4D;background:rgba(18,168,118,.13)}.st-tr-dn{color:var(--r);background:rgba(224,60,60,.1)}.st-tr-n{color:var(--muted);background:rgba(0,0,0,.05)}
+.st-note{font-size:11px;font-weight:700;color:var(--muted);margin:6px 2px 0}
+.st-card .st-note{color:var(--muted)}
+.st-store{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.06);cursor:pointer}
+.st-store:last-of-type{border-bottom:none}
+.st-sn{flex:1;min-width:0}.st-sn b{display:block;font-size:13.5px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.st-sn small{font-size:11px;font-weight:700;color:var(--muted)}
+.st-sv{display:flex;gap:8px;flex-shrink:0;font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.st-store>i{font-style:normal;color:var(--muted);font-size:16px}
+.st-line small{display:block;font-size:10.5px;font-weight:700;color:var(--muted)}
+.st-chart .st-bv{font-size:8.5px;font-weight:900;fill:#24312b}
+.st-more{margin-top:14px}
+.st-more summary{cursor:pointer;font-size:12.5px;font-weight:900;color:var(--gd);padding:8px 2px;list-style:none}
+.st-more summary::-webkit-details-marker{display:none}
+.st-more[open] summary{margin-bottom:6px}
 .st-tab{padding:4px 10px;overflow-x:auto}
 .st-th,.st-tr{display:grid;grid-template-columns:minmax(90px,1.8fr) repeat(5,minmax(44px,1fr));gap:4px;align-items:center;font-size:11.5px;font-weight:800;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.05)}
 .st-th{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.4px}
@@ -1198,6 +1246,19 @@ html.rot-lock-on #rot-lock{display:flex}
       <button class="mcl" onclick="closeModal('store-fiche-modal')" aria-label="Fermer">✕</button>
     </div>
     <div class="sf-actions" id="sf-actions"></div>
+    <div class="sf-sec">Magasin</div>
+    <div class="rf-f"><div class="rf-l">Nom du magasin *</div><input class="rf-i" id="sf-name" placeholder="Ex : Carrefour Aubagne"></div>
+    <div class="rf-f"><div class="rf-l">Adresse</div>
+      <div style="display:flex;gap:8px"><input class="rf-i" id="sf-addr" placeholder="Rue, ville" style="flex:1">
+        <button class="scan-link-btn" id="sf-geo-btn" onclick="geocodeInto('sf-addr','sf-geo-btn','sf-geo-results','pickGeoFiche')" style="padding:10px 13px;white-space:nowrap">🔍 Trouver</button></div>
+    </div>
+    <div id="sf-geo-results"></div>
+    <div class="rf-row">
+      <div class="rf-f"><div class="rf-l">Latitude</div><input class="rf-i" id="sf-lat" type="number" step="0.00001" inputmode="decimal"></div>
+      <div class="rf-f"><div class="rf-l">Longitude</div><input class="rf-i" id="sf-lng" type="number" step="0.00001" inputmode="decimal"></div>
+      <div class="rf-f" style="max-width:85px"><div class="rf-l">Rayon (m)</div><input class="rf-i" id="sf-rad" type="number" inputmode="numeric" placeholder="500"></div>
+    </div>
+    <button class="scan-link-btn" onclick="fillMyPosition('sf-lat','sf-lng')" style="width:100%;margin:-2px 0 6px;padding:10px">📍 Je suis dans ce magasin : prendre ma position</button>
     <div class="sf-sec">Contact 1</div>
     <div class="rf-row"><div class="rf-f"><div class="rf-l">Nom</div><input class="rf-i" id="sf-c1n" placeholder="Julie Martin"></div><div class="rf-f"><div class="rf-l">Fonction</div><input class="rf-i" id="sf-c1r" placeholder="Chef de rayon épicerie"></div></div>
     <div class="rf-row"><div class="rf-f"><div class="rf-l">Téléphone</div><input class="rf-i" id="sf-c1t" type="tel" inputmode="tel" placeholder="06 12 34 56 78"></div><div class="rf-f"><div class="rf-l">E-mail</div><input class="rf-i" id="sf-c1m" type="email" placeholder="julie@magasin.fr"></div></div>
@@ -1209,8 +1270,9 @@ html.rot-lock-on #rot-lock{display:flex}
     <div class="rf-row"><div class="rf-f"><div class="rf-l">Jour de livraison</div><select class="rf-i" id="sf-jliv"><option value="">—</option><option value="0">Lundi</option><option value="1">Mardi</option><option value="2">Mercredi</option><option value="3">Jeudi</option><option value="4">Vendredi</option><option value="5">Samedi</option><option value="6">Dimanche</option></select></div><div class="rf-f"><div class="rf-l">Heure</div><input class="rf-i" id="sf-hliv" type="time"></div></div>
     <div class="rf-f"><div class="rf-l">N° client fournisseur</div><input class="rf-i" id="sf-client" placeholder="Ex : 412 557"></div>
     <div class="rf-f"><div class="rf-l">Notes</div><textarea class="rf-i" id="sf-notes" rows="2" placeholder="Quai 2, badge à l'accueil…" style="resize:vertical"></textarea></div>
-    <button class="rfsave" onclick="saveStoreFiche()">💾 Enregistrer la fiche</button>
-    <button class="rfcancel" onclick="closeModal('store-fiche-modal')">Fermer</button>
+    <button class="rfsave" onclick="saveStoreFiche()">💾 Enregistrer les modifications</button>
+    <button class="rfcancel" onclick="closeModal('store-fiche-modal')">Fermer sans enregistrer</button>
+    <button class="rfcancel" onclick="confirmDeleteStoreModal(ficheStoreId)" style="color:var(--r);border-color:rgba(224,60,60,.3)">🗑 Supprimer ce magasin</button>
   </div>
 </div>
 
@@ -2595,6 +2657,11 @@ function startGPS(manual){
   );
 }
 function stopGPS(){ if(gpsWid!==null){ navigator.geolocation.clearWatch(gpsWid); gpsWid=null; } }
+// Appli rouverte (téléphone sorti de la poche en arrivant au magasin) : position relue tout de suite
+document.addEventListener('visibilitychange', ()=>{
+  if(document.hidden || gpsWid===null || !navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(p=>applyGpsFix(p.coords.latitude,p.coords.longitude,p.coords.accuracy), ()=>{}, { enableHighAccuracy:false, timeout:15000, maximumAge:0 });
+});
 function relocateGPS(){ stopGPS(); gps=null; gpsState='locating'; renderStoreBars(); startGPS(true); }
 
 /* Une position arrive → activer automatiquement le magasin où l'on se trouve. */
@@ -2607,6 +2674,7 @@ function applyGpsFix(lat,lng,acc){
     if(!selStore || selStore.id!==found.id) setActiveStore(found,{toastIt:true});
     else renderStoreBars();
     if(_startupPending) resolveStartup(found.name);   // popup démarrage ciblé sur le magasin détecté
+    else arrivalAlert(found.name);                    // arrivée dans un magasin, appli déjà ouverte
   }else{
     gpsState='nomatch';       // on est ailleurs qu'un magasin connu
     renderStoreBars();
@@ -3280,7 +3348,7 @@ function renderDashboard(){
     const ico={e:'💀',o:'⚠️',w:'⏰',k:'✅'}[s];
     const sid=escapeHTMLAttr(String(p.id));
     return`<div class="pc s-${s}" id="pc-${sid}" data-pid="${sid}">
-      <div class="pc-ic">${ico}</div>
+      <div class="pc-ic">${ProdImg.has(p.gencod) ? ProdImg.tag(p.gencod, 'pimg pimg-ic') : ico}</div>
       <div class="pc-in">
         <div class="pc-nm">${escapeHTML(p.name||'—')}${(p.qty||1)>1?` <span class="qty-badge">×${p.qty}</span>`:''}</div>
         <div class="pc-sb" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${catChip(catOfLine(p))}<span>${escapeHTML(p.type||'')} · ${escapeHTML(p.magasin||'')} · DLC: ${fmtDate(p.dlc)}</span></div>
@@ -4968,9 +5036,9 @@ function qmSearch(){
     return;
   }
   box.innerHTML = items.map(p => `
-    <button type="button" class="qm-sugg-it" data-g="${escapeHTMLAttr(p.gencod)}" onclick="qmPick(this.dataset.g)">
+    <button type="button" class="qm-sugg-it" data-g="${escapeHTMLAttr(p.gencod)}" onclick="qmPick(this.dataset.g)" style="flex-direction:row;align-items:center;gap:9px">${ProdImg.tag(p.gencod)}<span style="display:flex;flex-direction:column;gap:2px;min-width:0">
       <span class="qm-sugg-n">${escapeHTML(p.nom||'(sans nom)')}</span>
-      <span class="qm-sugg-m">EAN ${escapeHTML(p.gencod)}${p.ref?' · Réf. '+escapeHTML(p.ref):''}${p.volume?' · '+escapeHTML(p.volume):''}</span>
+      <span class="qm-sugg-m">EAN ${escapeHTML(p.gencod)}${p.ref?' · Réf. '+escapeHTML(p.ref):''}${p.volume?' · '+escapeHTML(p.volume):''}</span></span>
     </button>`).join('') +
     (total > items.length ? `<div class="qm-sugg-empty">… ${total - items.length} autre(s) — tapez quelques chiffres de plus</div>` : '');
 }
@@ -5085,7 +5153,7 @@ function renderOrderLines(){
   el.innerHTML = currentOrder.map((l,i)=>{
     const flash = (l.gencod||l.name) === lastAddedKey ? ' flash' : '';
     return `
-    <div class="ord-line${flash}">
+    <div class="ord-line${flash}">${ProdImg.tag(l.gencod)}
       <div style="flex:1;min-width:0">
         <input class="ord-name-in" value="${escapeHTML(l.name||'')}" placeholder="Nom (optionnel)" onchange="setOrderName(${i},this.value)" aria-label="Nom du produit">
         <div style="font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.rupture?'<span class="rupt-tag">rupture</span> ':''}${escapeHTML(l.gencod||'sans gencod')}${orderLineInfo(l).ref?' · Réf. '+escapeHTML(orderLineInfo(l).ref):''}${l.famille?' · '+escapeHTML(l.famille):''}</div>
@@ -5358,6 +5426,53 @@ const Ean = (function(){
    chaque page) pour le repérer d'un coup d'œil dans une pile de feuilles.
    Tous les documents qui listent des produits portent le vrai code-barres
    EAN dessiné, scannable à la douchette. */
+/* ═══ VIGNETTES PRODUITS ═════════════════════════════════════════════════════
+   Une petite photo par produit, rangée sous son code-barres : produits/<EAN>.jpg
+   (extraites des PDF fournisseurs par FreshControl_Catalogues/_outils/
+   extraire_vignettes_pdf.py). La liste des EAN qui ont une photo est dans
+   produits/index.json, chargée une fois. Les photos sont gardées hors ligne
+   par le service worker au fil de leur affichage. */
+const ProdImg = (function(){
+  let set = null, loading = null;
+  const data = new Map();                    // EAN → dataURL (pour les PDF)
+  function load(){
+    if(set) return Promise.resolve(set);
+    if(!loading) loading = fetch('produits/index.json').then(r => r.ok ? r.json() : []).catch(() => [])
+      .then(a => { set = new Set(Array.isArray(a) ? a : []); if(set.size) refreshVisible(); return set; });
+    return loading;
+  }
+  const key = g => String(g || '').replace(/\s/g, '');
+  const has = g => !!(set && set.has(key(g)));
+  const url = g => has(g) ? 'produits/' + key(g) + '.jpg' : '';
+  /* Balise <img> pour les listes (rien si pas de photo) */
+  const tag = (g, cls) => has(g) ? `<img class="${cls || 'pimg'}" src="${url(g)}" alt="" loading="lazy" decoding="async">` : '';
+  /* Écran déjà affiché avant le chargement de la liste : on le redessine */
+  function refreshVisible(){ try{ if(document.getElementById('brand-modal')?.classList.contains('on')) renderBrandBrowser(); renderCurrentTab(); }catch(e){} }
+  /* Photos en dataURL pour les PDF (jsPDF ne lit pas les URL) */
+  async function forPdf(gencods){
+    await load();
+    const todo = [...new Set(gencods.map(key))].filter(g => has(g) && !data.has(g));
+    await Promise.all(todo.map(async g => {
+      try{
+        const b = await (await fetch(url(g))).blob();
+        data.set(g, await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).replace(/^data:[^;,]*;/, 'data:image/jpeg;')); fr.onerror = rej; fr.readAsDataURL(b); }));
+      }catch(e){ /* photo indisponible (hors ligne, jamais affichée) : le document se fait sans */ }
+    }));
+    return data;
+  }
+  /* Dessine la vignette dans un carré de s mm (proportions gardées) ; true si dessinée */
+  function drawPdf(doc, g, x, y, s){
+    const d = data.get(key(g)); if(!d) return false;
+    try{
+      const p = doc.getImageProperties(d), k = Math.min(s / p.width, s / p.height), w = p.width * k, h = p.height * k;
+      doc.addImage(d, 'JPEG', x + (s - w) / 2, y + (s - h) / 2, w, h);
+      return true;
+    }catch(e){ return false; }
+  }
+  return { load, has, url, tag, forPdf, drawPdf };
+})();
+ProdImg.load();
+
 const DOC_KINDS = {
   commande:    { c:[11,110,77],  n:'Bon de commande' },
   precommande: { c:[25,103,190], n:'Bon de pré-commande' },
@@ -5381,8 +5496,9 @@ async function buildListPdf(kind, meta, groups){
   const doc = new JsPDF({ unit:'mm', format:'a4' });
   const W = 210, H = 297, M = 12, KC = docColor(kind), GREY = [100,110,105], LINE = [215,225,220];
   const clean = x => String(x == null ? '' : x).replace(/[^\x20-\x7E -ÿŒœ–—’€]/g, '').trim();
-  const COL = { n:M, name:M+8, info:M+82, qty:M+126, bc:M+146 };
+  const COL = { n:M, img:M+6, name:M+24, info:M+82, qty:M+126, bc:M+146 };
   const ROW_H = 27, d = meta.date ? new Date(meta.date) : new Date();
+  await ProdImg.forPdf(groups.flatMap(g => g.rows.map(r => r.gencod)));
   let y = 0, num = 0;
   function header(first){
     doc.setFillColor(...KC); doc.rect(0, 0, W, 21, 'F');
@@ -5424,6 +5540,7 @@ async function buildListPdf(kind, meta, groups){
       if(y + ROW_H > H - 14){ doc.addPage(); header(false); }
       const top = y, mid = top + 9; num++;
       doc.setFontSize(9); doc.setTextColor(...GREY); doc.text(String(num), COL.n + 1, mid);
+      ProdImg.drawPdf(doc, r.gencod, COL.img, top + 1.5, 16);
       doc.setTextColor(0); doc.setFont('helvetica','bold'); doc.setFontSize(10);
       const nl = doc.splitTextToSize(clean(r.name || 'Produit sans nom'), COL.info - COL.name - 3).slice(0, 2);
       doc.text(nl, COL.name, mid);
@@ -5497,8 +5614,9 @@ async function buildOrderPdf(record){
   const d = new Date(record.date);
   const by = displayBy(record.by);
   const clean = x => String(x == null ? '' : x).replace(/[^\x20-\x7E -ÿŒœ–—’€]/g, '').trim();
-  const COL = { n:M, name:M+8, ref:M+84, pcb:M+104, colis:M+116, units:M+134, bc:M+146 };
+  const COL = { n:M, img:M+6, name:M+24, ref:M+84, pcb:M+104, colis:M+116, units:M+134, bc:M+146 };
   const ROW_H = 29;
+  await ProdImg.forPdf(rows.map(r => r.gencod));
   let y = 0;
 
   function header(first){
@@ -5556,8 +5674,9 @@ async function buildOrderPdf(record){
     }
     const top = y, mid = top + 9;
     doc.setFontSize(9); doc.setTextColor(...GREY); doc.text(String(i + 1), COL.n + 1, mid);
+    ProdImg.drawPdf(doc, r.gencod, COL.img, top + 1.5, 16);
     doc.setTextColor(0); doc.setFont('helvetica','bold'); doc.setFontSize(10);
-    const nameLines = doc.splitTextToSize(clean(r.name), COL.ref - COL.name - 3).slice(0, 2);
+    const nameLines = doc.splitTextToSize(clean(r.name), COL.ref - COL.name - 3).slice(0, 3);
     doc.text(nameLines, COL.name, mid);
     doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...GREY);
     doc.text(clean([r.volume, r.fam].filter(Boolean).join(' · ')), COL.name, mid + nameLines.length * 4.3);
@@ -6080,7 +6199,7 @@ function renderStockLines(){
   el.innerHTML = currentStock.map((l,i)=>{
     const flash = (l.gencod||l.name) === lastAddedStkKey ? ' flash' : '';
     return `
-    <div class="ord-line${flash}">
+    <div class="ord-line${flash}">${ProdImg.tag(l.gencod)}
       <div style="flex:1;min-width:0">
         <input class="ord-name-in" value="${escapeHTMLAttr(l.name||'')}" placeholder="Nom (optionnel)" onchange="setStockName(${i},this.value)" aria-label="Nom du produit">
         <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:3px">
@@ -7252,6 +7371,7 @@ async function buildVracCahierPDF(list, meta){
   y += 8;
   }
   // ── Une fiche par mise en rayon ──
+  await ProdImg.forPdf(list.map(v => v.gencod));
   for(const v of list){
     const phs = [await vracPhotoData(v.photo), await vracPhotoData(v.photoSilo)];
     ensure(124);                                   // une fiche ne se coupe jamais en deux
@@ -7274,7 +7394,8 @@ async function buildVracCahierPDF(list, meta){
     if(v.updatedAt) info.push(['Modifié le', fmtDT(v.updatedAt)]);
     let yl = y;
     // Code-barres du produit (scannable à la douchette, quelle que soit la marque)
-    if(Ean.normalize(v.gencod)){ Ean.drawPdf(doc, v.gencod, L - 1, yl - 3, { mw:0.33, h:14 }); yl += 23; }
+    if(Ean.normalize(v.gencod)){ Ean.drawPdf(doc, v.gencod, L - 1, yl - 3, { mw:0.33, h:14 }); ProdImg.drawPdf(doc, v.gencod, L + 52, yl - 3, 18); yl += 23; }
+    else if(ProdImg.drawPdf(doc, v.gencod, L, yl - 3, 18)) yl += 21;
     doc.setFontSize(8.5);
     info.forEach(([k, val]) => {
       doc.setTextColor(...GREY); doc.text(k, L, yl);
@@ -7510,7 +7631,8 @@ async function buildReprisePdf(rec, lines){
   const clean = x => String(x == null ? '' : x).replace(/[^\x20-\x7E -ÿŒœ–—’€]/g, '').trim();
   const st = getStores().find(s => s.name === rec.store), fiche = (st && st.fiche) || {};
   const d = new Date(rec.date), ROW_H = 27;
-  const COL = { name:M, dlc:M+76, q:M+96, pu:M+110, val:M+128, bc:M+146 };
+  const COL = { img:M, name:M+18, dlc:M+76, q:M+96, pu:M+110, val:M+128, bc:M+146 };
+  await ProdImg.forPdf(lines.map(l => l.gencod));
   const money = n => n == null ? '—' : n.toFixed(2).replace('.', ',') + ' EUR';
   let y = 0;
   function header(first){
@@ -7548,8 +7670,9 @@ async function buildReprisePdf(rec, lines){
       doc.setTextColor(0); doc.setFont('helvetica','normal'); y += 8;
     }
     const top = y, mid = top + 9;
+    ProdImg.drawPdf(doc, l.gencod, COL.img, top + 1.5, 16);
     doc.setFont('helvetica','bold'); doc.setFontSize(9.5);
-    const nl = doc.splitTextToSize(clean(l.name || l.gencod), COL.dlc - COL.name - 3).slice(0, 2); doc.text(nl, COL.name, mid);
+    const nl = doc.splitTextToSize(clean(l.name || l.gencod), COL.dlc - COL.name - 3).slice(0, 3); doc.text(nl, COL.name, mid);
     doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
     doc.text(fmtDate(l.dlc), COL.dlc, mid); doc.text(String(l.q), COL.q + 2, mid);
     doc.text(l.tarif != null ? l.tarif.toFixed(2).replace('.', ',') : '—', COL.pu, mid);
@@ -7616,30 +7739,75 @@ function openStoreFiche(id){
   const set = (k, v) => { const e = document.getElementById('sf-' + k); if(e) e.value = v == null ? '' : v; };
   ['c1n','c1r','c1t','c1m','c2n','c2r','c2t','c2m','hcmd','hliv','client','notes'].forEach(k => set(k, f[k]));
   set('jcmd', f.jcmd ?? ''); set('jliv', f.jliv ?? '');
+  set('name', s.name); set('addr', s.ville || ''); set('rad', s.r || 500);
+  set('lat', Number.isFinite(s.lat) ? s.lat.toFixed(5) : ''); set('lng', Number.isFinite(s.lng) ? s.lng.toFixed(5) : '');
+  const gr = document.getElementById('sf-geo-results'); if(gr) gr.innerHTML = '';
   document.getElementById('sf-title').textContent = '📇 ' + s.name;
   renderFicheActions(s);
   openModal('store-fiche-modal');
 }
+/* Itinéraire : Google Maps ou Waze, au choix (selon le pays, l'un ou l'autre est plus pratique) */
+function routeLinks(s){
+  if(!s) return '';
+  const has = Number.isFinite(s.lat) && Number.isFinite(s.lng), q = encodeURIComponent([s.name, s.ville].filter(Boolean).join(', '));
+  if(!has && !s.ville) return '';
+  const g = has ? `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}` : `https://www.google.com/maps/dir/?api=1&destination=${q}`;
+  const w = has ? `https://waze.com/ul?ll=${s.lat},${s.lng}&navigate=yes` : `https://waze.com/ul?q=${q}&navigate=yes`;
+  return `<a class="sf-act" target="_blank" rel="noopener" href="${g}">🗺 Google Maps</a><a class="sf-act" target="_blank" rel="noopener" href="${w}" style="background:#33CCFF;color:#0B2D3A">🚗 Waze</a>`;
+}
 function renderFicheActions(s){
   const f = s.fiche || {}, box = document.getElementById('sf-actions'); if(!box) return;
   const a = [];
+  const active = selStore && selStore.id === s.id;
+  a.push(active ? `<span class="sf-act" style="background:rgba(18,168,118,.16);color:var(--gd)">✓ Magasin actif</span>`
+                : `<button class="sf-act" style="border:none;cursor:pointer;font-family:var(--font)" data-sid="${escapeHTMLAttr(s.id)}" onclick="selectStoreFromModal(this.dataset.sid);renderFicheActions(getStores().find(x=>x.id===this.dataset.sid))">📍 Activer ce magasin</button>`);
+  a.push(routeLinks(s));
   [['c1n','c1t','c1m'],['c2n','c2t','c2m']].forEach(([n,t,m]) => {
     if(f[t]) a.push(`<a class="sf-act" href="tel:${escapeHTMLAttr(f[t].replace(/[^\d+]/g,''))}">📞 ${escapeHTML(f[n] || 'Appeler')}</a>`);
     if(f[m]) a.push(`<a class="sf-act" href="mailto:${escapeHTMLAttr(f[m])}">✉️ ${escapeHTML(f[n] || 'Écrire')}</a>`);
   });
-  if(Number.isFinite(s.lat) && Number.isFinite(s.lng)) a.push(`<a class="sf-act" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}">🧭 Itinéraire</a>`);
-  box.innerHTML = a.join('');
-  box.style.display = a.length ? 'flex' : 'none';
+  a.push(`<button class="sf-act" style="border:none;cursor:pointer;font-family:var(--font);background:#5D4037" data-sid="${escapeHTMLAttr(s.id)}" onclick="closeModal('store-fiche-modal');closeModal('stores-modal');openModal('folders-modal');openStoreFolder(this.dataset.sid)">📁 Documents</button>`);
+  box.innerHTML = a.filter(Boolean).join('');
+  box.style.display = 'flex';
+}
+function pickGeoFiche(lat, lon){
+  document.getElementById('sf-lat').value = parseFloat(lat).toFixed(5);
+  document.getElementById('sf-lng').value = parseFloat(lon).toFixed(5);
+  document.querySelectorAll('#sf-geo-results .geo-r').forEach(el => { el.style.borderColor = (el.dataset.lat === lat && el.dataset.lon === lon) ? 'rgba(18,168,118,.8)' : ''; });
+  toast('📍 Position choisie — pensez à enregistrer');
+}
+/* Un magasin renommé : toutes les données rangées sous l'ancien nom suivent
+   (commandes, stocks, dates, vrac, visites, ruptures, prix, reprises, planning) */
+function renameStoreEverywhere(from, to){
+  if(!from || from === to) return;
+  const fix = (arr, key, sk) => { let n = 0; arr.forEach(x => { if(x && x[key] === from){ x[key] = to; n++; } }); if(n) localStorage.setItem(sk, JSON.stringify(arr)); };
+  fix(orders, 'store', 'fc_orders'); fix(stockRecords, 'store', 'fc_stocks'); fix(vracEntries, 'store', 'fc_vrac');
+  fix(products, 'magasin', 'fc_products'); fix(archive, 'magasin', 'fc_archive'); fix(visits, 'store', 'fc_visits');
+  fix(ruptures, 'store', 'fc_ruptures'); fix(priceChecks, 'store', 'fc_pricechecks'); fix(reprises, 'store', 'fc_reprises');
+  if(planning && planning[from] !== undefined && planning[to] === undefined){ planning[to] = planning[from]; delete planning[from]; save('fc_planning', planning); }
+  const base = loadStockBaseAll();
+  if(base[from] !== undefined && base[to] === undefined){ base[to] = base[from]; delete base[from]; localStorage.setItem('fc_stock_base', JSON.stringify(base)); }
 }
 function saveStoreFiche(){
   const list = getStores(), s = list.find(x => x.id === ficheStoreId); if(!s) return;
   const val = k => (document.getElementById('sf-' + k)?.value || '').trim();
+  const name = val('name');
+  if(!name){ toast('❌ Le nom du magasin est obligatoire'); return; }
+  if(list.some(x => x.id !== s.id && x.name.toLowerCase() === name.toLowerCase())){ toast('❌ Un autre magasin porte déjà ce nom'); return; }
+  const lat = parseFloat(val('lat')), lng = parseFloat(val('lng'));
+  if((val('lat') || val('lng')) && !(Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180)){ toast('❌ Position GPS incorrecte'); return; }
+  const old = s.name;
+  s.name = name; s.ville = val('addr'); s.r = parseInt(val('rad'), 10) || 500;
+  s.lat = Number.isFinite(lat) ? lat : null; s.lng = Number.isFinite(lng) ? lng : null;
   s.fiche = {};
   ['c1n','c1r','c1t','c1m','c2n','c2r','c2t','c2m','hcmd','hliv','client','notes','jcmd','jliv'].forEach(k => { const v = val(k); if(v !== '') s.fiche[k] = v; });
-  saveStores(list);
-  if(selStore && selStore.id === s.id) selStore = s;
+  saveStores(list); stores = list;
+  renameStoreEverywhere(old, name);
+  if(selStore && selStore.id === s.id) setActiveStore(s);
+  document.getElementById('sf-title').textContent = '📇 ' + s.name;
   renderFicheActions(s);
-  toast('✅ Fiche magasin enregistrée');
+  toast(old !== name ? `✅ Magasin renommé « ${name} » — son historique a suivi` : '✅ Fiche magasin enregistrée');
+  refreshStoreSel(); renderStoreBars();
   if(document.getElementById('stores-modal')?.classList.contains('on')) renderStoresModal();
   renderCurrentTab();
 }
@@ -7787,14 +7955,21 @@ function pdfBrandMark(doc, name, x, y, size, square){
 document.getElementById('logo-in').addEventListener('change', onLogoFile);
 
 /* ── Navigateur par marque (fenêtre plein écran) ───────────────────────── */
-let bdState = { mode:'view', univ:'Alimentaire', marque:null, gamme:null };
+let bdState = { mode:'view', univ:'Alimentaire', marque:null, gamme:null, fam:null };
+/* Sous-catégorie lisible : « VAISSELLE MAINS » → « Vaisselle mains » */
+const famLabel = f => { const t = String(f || '').toLowerCase(); return t.charAt(0).toUpperCase() + t.slice(1); };
+/* Sous-catégories (familles) d'une marque, de la plus fournie à la moins fournie */
+function brandFamilies(marque, gamme){
+  const c = {}; catalogue.forEach(p => { if((p.marque || 'Autres') === marque && (!gamme || (p.gamme || '') === gamme) && p.famille) c[p.famille] = (c[p.famille] || 0) + 1; });
+  return Object.entries(c).sort((a, b) => b[1] - a[1]);
+}
 function openBrandBrowser(mode){
-  bdState = { mode: mode || 'view', univ: bdState.univ || 'Alimentaire', marque:null, gamme:null };
+  bdState = { mode: mode || 'view', univ: bdState.univ || 'Alimentaire', marque:null, gamme:null, fam:null };
   const q = document.getElementById('bd-search'); if(q) q.value = '';
   openModal('brand-modal');
   renderBrandBrowser();
 }
-function bdSet(k, v){ bdState[k] = v; if(k === 'marque' || k === 'univ') bdState.gamme = null; if(k === 'univ') bdState.marque = null; renderBrandBrowser(); }
+function bdSet(k, v){ bdState[k] = v; if(k !== 'fam') bdState.fam = null; if(k === 'marque' || k === 'univ') bdState.gamme = null; if(k === 'univ') bdState.marque = null; renderBrandBrowser(); const b = document.getElementById('bd-body'); if(b && k !== 'fam') b.scrollTop = 0; }
 function renderBrandBrowser(){
   const body = document.getElementById('bd-body'), title = document.getElementById('bd-title'), back = document.getElementById('bd-back');
   if(!body) return;
@@ -7809,13 +7984,14 @@ function renderBrandBrowser(){
     const brands = Object.entries(tree[bdState.univ] || {}).sort((a,b) => b[1].n - a[1].n);
     body.innerHTML = `<div class="seg bd-univ">${univs.map(u => `<button class="${u===bdState.univ?'on':''}" onclick="bdSet('univ','${escapeHTMLAttr(u)}')">${u==='Alimentaire'?'🥫 ':u==='Non alimentaire'?'🧴 ':''}${escapeHTML(u)}</button>`).join('')}</div>
       <div class="bd-grid">${brands.map(([m, b]) => `<button class="bd-tile" data-m="${escapeHTMLAttr(m)}" onclick="bdSet('marque',this.dataset.m)">
-        ${brandLogos[m] ? `<span class="bd-tlogo"><img src="${brandLogos[m]}" alt="${escapeHTMLAttr(m)}"></span>` : `<span class="bd-word" style="color:${(BRAND_STYLE[m] || ['#455A64'])[0]}">${escapeHTML(m)}</span>`}<small>${b.n} produits${Object.keys(b.gammes).length ? ' · ' + escapeHTML(Object.keys(b.gammes).slice(0,3).join(', ')) : ''}</small></button>`).join('')}</div>`;
+        ${brandLogos[m] ? `<span class="bd-tlogo"><img src="${brandLogos[m]}" alt="${escapeHTMLAttr(m)}"></span>` : `<span class="bd-word" style="color:${(BRAND_STYLE[m] || ['#455A64'])[0]}">${escapeHTML(m)}</span>`}<small>${b.n} produits</small><span class="bd-subs">${(() => { const f = brandFamilies(m); return escapeHTML(f.slice(0, 4).map(x => famLabel(x[0])).join(' · ')) + (f.length > 4 ? ` <i>+${f.length - 4}</i>` : ''); })()}</span></button>`).join('')}</div>`;
     return;
   }
   // Niveau 2 : produits d'une marque (filtre gamme) ou résultats de recherche
   let rows = catalogue;
   if(bdState.marque) rows = rows.filter(p => (p.marque || 'Autres') === bdState.marque);
   if(bdState.gamme)  rows = rows.filter(p => (p.gamme || '') === bdState.gamme);
+  if(bdState.fam)    rows = rows.filter(p => (p.famille || '') === bdState.fam);
   if(q) rows = rows.filter(p => _noAcc([p.nom, p.gencod, p.ref, p.famille, p.marque, p.gamme].join(' ')).includes(q));
   rows = rows.slice().sort((a,b) => (a.gamme||'').localeCompare(b.gamme||'') || (a.famille||'').localeCompare(b.famille||'') || (a.nom||'').localeCompare(b.nom||''));
   if(title) title.textContent = bdState.marque ? bdState.marque : '🔍 Recherche';
@@ -7825,17 +8001,19 @@ function renderBrandBrowser(){
   if(bdState.mode === 'stocks') currentStock.forEach(l => { if(l.gencod) inOrder[l.gencod] = (inOrder[l.gencod] || 0) + l.qty; });
   const CAP = 250;
   let fam = null;
+  const fams = bdState.marque ? brandFamilies(bdState.marque, bdState.gamme) : [];
   body.innerHTML = bl + (gammes.length > 1 ? `<div class="bd-chips"><button class="${!bdState.gamme?'on':''}" onclick="bdSet('gamme',null)">Toutes (${(tree[bdState.univ]||{})[bdState.marque]?.n||''})</button>${gammes.map(g => `<button class="${g===bdState.gamme?'on':''}" data-g="${escapeHTMLAttr(g)}" onclick="bdSet('gamme',this.dataset.g)">${escapeHTML(g)}</button>`).join('')}</div>` : '')
+    + (fams.length > 1 ? `<div class="bd-sublbl">Sous-catégories</div><div class="bd-chips bd-fams"><button class="${!bdState.fam?'on':''}" onclick="bdSet('fam',null)">Tout</button>${fams.map(([f, n]) => `<button class="${f===bdState.fam?'on':''}" data-f="${escapeHTMLAttr(f)}" onclick="bdSet('fam',this.dataset.f)">${escapeHTML(famLabel(f))} <small>${n}</small></button>`).join('')}</div>` : '')
     + `<div class="bd-count">${rows.length} produit${rows.length>1?'s':''}${rows.length > CAP ? ' — affinez avec la recherche' : ''}</div>`
     + rows.slice(0, CAP).map(p => {
-      const head = (p.famille && p.famille !== fam) ? `<div class="bd-fam">${escapeHTML(fam = p.famille)}</div>` : '';
+      const head = (p.famille && p.famille !== fam && !bdState.fam) ? `<div class="bd-fam">${escapeHTML(fam = p.famille)}</div>` : '';
       const n = inOrder[p.gencod];
-      return head + `<div class="bd-row"><div><b>${escapeHTML(p.nom || p.gencod)}</b><small>${escapeHTML([p.volume, p.pcb ? 'PCB ' + p.pcb : '', p.ref ? 'Réf. ' + p.ref : ''].filter(Boolean).join(' · '))}${!bdState.marque ? ' · ' + escapeHTML(p.marque || '') : ''}</small></div>`
+      return head + `<div class="bd-row">${ProdImg.tag(p.gencod)}<div><b>${escapeHTML(p.nom || p.gencod)}</b><small>${escapeHTML([p.volume, p.pcb ? 'PCB ' + p.pcb : '', p.ref ? 'Réf. ' + p.ref : ''].filter(Boolean).join(' · '))}${!bdState.marque ? ' · ' + escapeHTML(p.marque || '') : ''}</small></div>`
         + (bdState.mode === 'view' ? `<span class="bd-ean">${escapeHTML(p.gencod || '')}</span>`
           : `<button class="bd-add${n?' in':''}" data-g="${escapeHTMLAttr(p.gencod)}" onclick="bdAdd(this.dataset.g)">${n ? '✓ ' + n : '＋'}</button>`) + `</div>`;
     }).join('');
 }
-function bdBack(){ if(bdState.gamme){ bdState.gamme = null; } else bdState.marque = null; renderBrandBrowser(); }
+function bdBack(){ if(bdState.fam) bdState.fam = null; else if(bdState.gamme){ bdState.gamme = null; } else bdState.marque = null; renderBrandBrowser(); }
 function bdAdd(gencod){
   const prod = lookupGencod(gencod); if(!prod) return;
   openQtyPopup(prodQtyCtx(bdState.mode === 'stocks' ? 'stocks' : 'commande', prod));
@@ -8470,75 +8648,80 @@ function renderFolders(){
     </div>`;
   }).join('');
 }
+/* Dossier d'un magasin : ses documents, comme dans un classeur. Chaque ligne
+   est un fichier (bon de commande, relevé de stock, fiche vrac…) qui s'ouvre
+   en aperçu PDF, d'où on l'envoie. Pas de liste de produits à rallonge. */
+let _folderDocs = [];
 function openStoreFolder(sid){
   const s=getStores().find(x=>x.id===sid); if(!s) return;
   _folderSid=sid;
   const name=s.name;
   const t=document.getElementById('folders-title'); if(t) t.textContent='📁 '+name;
   const el=document.getElementById('folders-body'); if(!el) return;
-  const cmds=orders.filter(o=>o.store===name);
-  const stks=stockRecords.filter(r=>r.store===name);
-  const scans=archive.filter(a=>a.magasin===name);
-  const enCours=products.filter(p=>p.magasin===name);
+  const day = d => d ? new Date(d).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' }) : '—';
+  const docs = [];
+  const add = (sec, o) => docs.push(Object.assign({ sec }, o));
+  // Commandes et pré-commandes
+  orders.filter(o => o.store === name).forEach(o => {
+    const q = (o.lines || []).reduce((t, l) => t + (Number(l.qty) || 0), 0), pre = o.kind === 'precommande';
+    add('cmd', { ico: pre ? '📝' : '🛒', t: orderDocTitle(o), d: o.date, sub: `${plural((o.lines || []).length, 'référence', 'références')} · ${plural(q, 'colis', 'colis')}`,
+      make: async () => { const x = await buildOrderPdf(o); return { blob: x.blob, filename: x.filename, text: `${orderDocTitle(o)} — ${name} — ${day(o.date)}`, title: `${orderDocTitle(o)} · ${day(o.date)}` }; },
+      del: `deleteOrder('${escapeHTMLAttr(o.id)}')` });
+  });
+  // Relevés de stock
+  stockRecords.filter(r => r.store === name).forEach(r => {
+    const q = (r.lines || []).reduce((t, l) => t + (Number(l.qty) || 0), 0);
+    add('stk', { ico: '📦', t: 'Relevé de stock', d: r.date, sub: `${plural((r.lines || []).length, 'référence', 'références')} · ${plural(q, 'unité', 'unités')}`,
+      make: async () => { const x = await buildStockPdf(r.lines || [], { store: name, by: r.by, when: r.date }); return { blob: x.blob, filename: x.filename, text: `Relevé de stock — ${name} — ${day(r.date)}`, title: `Relevé de stock · ${day(r.date)}` }; },
+      del: `deleteStock('${escapeHTMLAttr(r.id)}')` });
+  });
+  // Vrac : le cahier du magasin puis chaque fiche de mise en rayon
+  const vrs = vracEntries.filter(v => v.store === name).sort((a, b) => String(b.dateRayon || '').localeCompare(String(a.dateRayon || '')));
+  if(vrs.length){
+    const nc = vrs.filter(v => hygSummary(v.hyg).n).length;
+    add('vrac', { ico: '📘', t: 'Cahier de suivi vrac du magasin', d: vrs[0].dateRayon, sub: `${plural(vrs.length, 'mise en rayon', 'mises en rayon')}${nc ? ' · ' + plural(nc, 'non-conformité', 'non-conformités') : ''}`,
+      make: async () => { const list = vrs.slice().sort(vracCahierOrder), ds = list.map(v => v.dateRayon || '').filter(Boolean).sort();
+        return { blob: await buildVracCahierPDF(list, { from: ds[0] || '', to: ds[ds.length - 1] || '', storeLabel: name, by: session?.name || '' }),
+          filename: `Cahier_vrac_${name.normalize('NFD').replace(/[^\w]+/g, '_')}_${isoDay(new Date())}.pdf`, text: `Cahier de suivi vrac — ${name}`, title: `Cahier vrac · ${name}` }; } });
+    vrs.forEach(v => add('vrac', { ico: '🌰', t: 'Fiche vrac — ' + (v.name || v.gencod || 'produit'), d: v.dateRayon, sub: [v.silo, v.lot ? 'Lot ' + v.lot : '', hygSummary(v.hyg).n ? '⚠ non-conformité' : ''].filter(Boolean).join(' · '),
+      make: () => vracFicheDoc(v.id), del: `deleteVracEntry('${escapeHTMLAttr(String(v.id))}')` }));
+  }
+  // Ruptures : un relevé par jour
+  const rDays = {}; ruptures.filter(r => (r.store || '') === name).forEach(r => (rDays[r.day] = rDays[r.day] || []).push(r));
+  Object.keys(rDays).forEach(dk => add('rup', { ico: '🕳', t: 'Relevé des ruptures', d: dk + 'T12:00:00', sub: plural(rDays[dk].length, 'rupture', 'ruptures'),
+    make: async () => { const x = await buildRupturePdf(rDays[dk], { store: name, by: session?.name || '', date: dk + 'T12:00:00' }); return { blob: x.blob, filename: x.filename, text: `Relevé des ruptures — ${name} — ${fmtDate(dk)}`, title: `Ruptures · ${fmtDate(dk)}` }; } }));
+  // Bons de reprise (démarque)
+  reprises.filter(r => r.store === name).forEach(rec => add('rep', { ico: '♻️', t: 'Bon de reprise', d: rec.date, sub: `${plural(rec.ids.length, 'ligne', 'lignes')}${rec.total ? ' · ' + euro(rec.total) : ''}`,
+    make: async () => { const lines = archive.filter(x => x.repriseId === rec.id).map(x => { const pr = priceOf(x.gencod), tarif = x.tarif != null ? x.tarif : (pr ? pr.tarif : null), q = x.qty || 1; return { ...x, q, tarif, val: tarif != null ? q * tarif : null, marque: brandOfGencod(x.gencod) || 'Hors catalogue' }; });
+      const x = await buildReprisePdf(rec, lines); return { blob: x.blob, filename: x.filename, text: `Bon de reprise — ${name} — ${day(rec.date)}`, title: `Bon de reprise · ${day(rec.date)}` }; } }));
+  // Dates : produits à retirer maintenant
+  const alerts = products.filter(p => p.magasin === name && ['e', 'o'].includes(statusOf(p.dlc)));
+  if(alerts.length) add('dlc', { ico: '⏰', t: 'Produits à retirer (dates)', d: new Date().toISOString(), sub: plural(alerts.length, 'produit', 'produits') + ' périmés ou sous 2 jours',
+    make: async () => { const x = await buildAlertPdf(alerts, { store: name, by: session?.name || '' }); return { blob: x.blob, filename: x.filename, text: `Produits à retirer — ${name}`, title: 'Produits à retirer' }; } });
 
-  const cmdRows = cmds.length ? cmds.slice(0,50).map(o=>{
-    const q=o.lines.reduce((s,l)=>s+l.qty,0);
-    return `<div style="display:flex;align-items:flex-start;gap:8px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12px">
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:800">🛒 ${escapeHTML(new Date(o.date).toLocaleString(lang))} <span class="pbadge bk" style="font-size:9px">${o.lines.length} réf · ${q}</span></div>
-        <div style="color:var(--muted);font-weight:600;font-size:11px;margin-top:2px">${o.lines.map(l=>escapeHTML(l.name||l.gencod||'—')+' ×'+l.qty).join(', ')}</div>
-      </div>
-      <button class="scan-link-btn" data-oid="${escapeHTMLAttr(o.id)}" onclick="deleteOrder(this.dataset.oid)" style="color:var(--r);flex-shrink:0;padding:6px 10px" title="Supprimer cette commande" aria-label="Supprimer">🗑</button>
-    </div>`;
-  }).join('') : '<div class="empty" style="padding:8px 0">Aucune commande</div>';
-
-  const stkRows = stks.length ? stks.slice(0,50).map(r=>{
-    const q=r.lines.reduce((s,l)=>s+l.qty,0);
-    return `<div style="display:flex;align-items:flex-start;gap:8px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12px">
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:800">📦 ${escapeHTML(new Date(r.date).toLocaleString(lang))} <span class="pbadge bk" style="font-size:9px">${r.lines.length} réf · ${q} u.</span></div>
-        <div style="color:var(--muted);font-weight:600;font-size:11px;margin-top:2px">${r.lines.map(l=>escapeHTML(l.name||l.gencod||'—')+' ×'+l.qty+(l.provenance?' ('+escapeHTML(l.provenance)+')':'')).join(', ')}</div>
-      </div>
-      <button class="scan-link-btn" data-oid="${escapeHTMLAttr(r.id)}" onclick="deleteStock(this.dataset.oid)" style="color:var(--r);flex-shrink:0;padding:6px 10px" title="Supprimer ce relevé" aria-label="Supprimer">🗑</button>
-    </div>`;
-  }).join('') : '<div class="empty" style="padding:8px 0">Aucun relevé de stock</div>';
-
-  const scanRows = (scans.length||enCours.length) ? (
-    enCours.slice(0,30).map(p=>`<div style="padding:8px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12px">
-      <span style="font-weight:800">🌿 ${escapeHTML(p.name||p.gencod||'—')}</span>
-      <span class="pbadge bo" style="font-size:9px">en cours</span>
-      <span style="color:var(--muted);font-size:11px"> · DLC ${fmtDate(p.dlc)}</span></div>`).join('')
-    + scans.slice(0,50).map(a=>{
-      const abs=a.note==='Absent';
-      return `<div style="padding:8px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12px">
-        <span style="font-weight:800">🌿 ${escapeHTML(a.name||a.gencod||'—')}</span>
-        <span class="pbadge ${abs?'bo':'bk'}" style="font-size:9px">${abs?'∅ absent':'✓ traité'}</span>
-        <span style="color:var(--muted);font-size:11px"> · DLC ${fmtDate(a.dlc)} · ${escapeHTML(a.archivedBy||'?')} · ${a.archivedAt?new Date(a.archivedAt).toLocaleDateString(lang):''}</span></div>`;
-    }).join('')
-  ) : '<div class="empty" style="padding:8px 0">Aucun scan</div>';
-
-  const section=(icon,title,count,rows)=>`
-    <div style="margin-bottom:16px">
-      <div style="font-size:12px;font-weight:900;color:var(--gd);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">${icon} ${title} <span style="color:var(--muted)">(${count})</span></div>
-      ${rows}
-    </div>`;
-
-  const vrs = vracEntries.filter(v=>v.store===name);
-  const vracRows = vrs.length ? vrs.slice(0,50).map(v=>`
-    <div style="display:flex;align-items:flex-start;gap:8px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12px">
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:800">🌰 ${escapeHTML(v.name||v.gencod||'—')} <span class="pbadge bk" style="font-size:9px">🗄 ${escapeHTML(v.silo||'—')}</span></div>
-        <div style="color:var(--muted);font-weight:600;font-size:11px;margin-top:2px">Rayon ${fmtDate(v.dateRayon)}${v.ddm?' · DDM '+ddmLabel(v.ddm):''}${v.lot?' · Lot '+escapeHTML(v.lot):''}${v.provenance?' · '+escapeHTML(v.provenance):''}</div>
-      </div>
-      <button class="scan-link-btn" data-vid="${escapeHTMLAttr(v.id)}" onclick="deleteVracEntry(this.dataset.vid)" style="color:var(--r);flex-shrink:0;padding:6px 10px" title="Supprimer cette fiche" aria-label="Supprimer">🗑</button>
-    </div>`).join('') : '<div class="empty" style="padding:8px 0">Aucune fiche vrac</div>';
-
+  _folderDocs = docs;
+  const SECS = [['cmd', '🛒 Commandes'], ['stk', '📦 Stocks'], ['vrac', '🌰 Vrac'], ['rup', '🕳 Ruptures'], ['rep', '♻️ Reprises'], ['dlc', '⏰ Dates']];
+  const counts = Object.fromEntries(SECS.map(([k]) => [k, docs.filter(x => x.sec === k).length]));
+  const cur = SECS.some(([k]) => k === openStoreFolder.sec && counts[k]) ? openStoreFolder.sec : (SECS.find(([k]) => counts[k]) || ['cmd'])[0];
+  openStoreFolder.sec = cur;
+  const list = docs.map((x, i) => [x, i]).filter(([x]) => x.sec === cur).sort((a, b) => String(b[0].d || '').localeCompare(String(a[0].d || '')));
   el.innerHTML =
-    `<button class="scan-link-btn" onclick="renderFolders()" style="margin-bottom:14px">‹ Tous les magasins</button>`
-    + section('📋','Commandes',cmds.length,cmdRows)
-    + section('📦','Stocks',stks.length,stkRows)
-    + section('🌰','Vrac (traçabilité)',vrs.length,vracRows)
-    + section('🌿','Fresh / Scan',scans.length+enCours.length,scanRows);
+    `<button class="scan-link-btn" onclick="renderFolders()" style="margin-bottom:12px">‹ Tous les magasins</button>`
+    + (docs.length ? `<div class="fd-tabs">${SECS.filter(([k]) => counts[k]).map(([k, l]) => `<button class="${k === cur ? 'on' : ''}" onclick="openStoreFolder.sec='${k}';openStoreFolder('${escapeHTMLAttr(sid)}')">${l} <small>${counts[k]}</small></button>`).join('')}</div>`
+      + list.map(([x, i]) => `<div class="fd-file" onclick="openFolderDoc(${i}, this)">
+          <div class="fd-ico">${x.ico}</div>
+          <div class="fd-tx"><b>${escapeHTML(x.t)}</b><small>${day(x.d)}${x.sub ? ' · ' + escapeHTML(x.sub) : ''}</small></div>
+          <span class="fd-open">PDF ›</span>
+          ${x.del ? `<button class="fd-del" onclick="event.stopPropagation();${x.del}" title="Supprimer" aria-label="Supprimer">🗑</button>` : ''}
+        </div>`).join('')
+      : '<div class="empty">Aucun document pour ce magasin pour l\'instant.<br>Les bons de commande, relevés de stock, fiches vrac et relevés de ruptures s\'y rangent automatiquement.</div>');
+}
+async function openFolderDoc(i, row){
+  const x = _folderDocs[i]; if(!x) return;
+  if(row){ if(row.classList.contains('busy')) return; row.classList.add('busy'); }
+  try{ await openPdfPreview(await x.make()); }
+  catch(err){ console.warn('[Dossier]', err); toast('❌ ' + (err && err.message || 'PDF impossible')); }
+  finally{ if(row) row.classList.remove('busy'); }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -8639,7 +8822,7 @@ function renderStoresModal(){
     el.innerHTML='<div style="font-size:13px;color:var(--muted);padding:6px 0;font-weight:600;text-align:center">Aucun magasin — ajoutez-en un ci-dessous.<br>Le GPS détectera ensuite où vous êtes automatiquement.</div>';
     return;
   }
-  const hint='<div style="font-size:11.5px;color:var(--gd);font-weight:700;background:rgba(18,168,118,.09);border:1px solid rgba(18,168,118,.22);border-radius:10px;padding:8px 11px;margin-bottom:11px">👉 Touchez « Activer » pour choisir le magasin à la main (repli quand le GPS / le réseau ne détecte rien).</div>';
+  const hint='<div style="font-size:11.5px;color:var(--gd);font-weight:700;background:rgba(18,168,118,.09);border:1px solid rgba(18,168,118,.22);border-radius:10px;padding:8px 11px;margin-bottom:11px">👉 Touchez un magasin pour ouvrir sa fiche : tout s’y modifie (nom, adresse, position, contacts, jours de commande). « Activer » le choisit à la main quand le GPS ne le détecte pas.</div>';
   el.innerHTML=hint+list.map(s=>{
     const active=selStore&&selStore.id===s.id;
     const coord=Number.isFinite(s.lat)&&Number.isFinite(s.lng);
@@ -8647,20 +8830,16 @@ function renderStoresModal(){
       ? '<span style="flex-shrink:0;align-self:center;background:rgba(18,168,118,.16);color:var(--gd);border:1px solid rgba(18,168,118,.34);border-radius:100px;padding:5px 11px;font-size:11px;font-weight:900;white-space:nowrap">✓ Actif</span>'
       : `<button data-sid="${escapeHTMLAttr(s.id)}" onclick="selectStoreFromModal(this.dataset.sid)" style="flex-shrink:0;align-self:center;background:rgba(18,168,118,.1);color:var(--gd);border:1px solid rgba(18,168,118,.3);border-radius:100px;padding:6px 13px;font-size:11px;font-weight:900;cursor:pointer;font-family:var(--font);white-space:nowrap">Activer</button>`;
     return `<div style="display:flex;align-items:flex-start;gap:8px;padding:11px 0;border-bottom:1px solid rgba(0,0,0,.05)">
-      <div data-sid="${escapeHTMLAttr(s.id)}" onclick="selectStoreFromModal(this.dataset.sid)" style="flex:1;min-width:0;cursor:pointer;display:flex;align-items:flex-start;gap:10px">
+      <div data-sid="${escapeHTMLAttr(s.id)}" onclick="openStoreFiche(this.dataset.sid)" style="flex:1;min-width:0;cursor:pointer;display:flex;align-items:flex-start;gap:10px">
         <div style="font-size:24px;flex-shrink:0;margin-top:2px">${active?'📍':'🏪'}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:14px;font-weight:800;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(s.name)}${active?' <span style="color:var(--gd);font-size:10px;font-weight:900;letter-spacing:.5px">· ACTIF</span>':''}</div>
           ${s.ville?`<div style="font-size:11px;color:var(--muted);margin-top:2px;font-weight:600">📍 ${escapeHTML(s.ville)}</div>`:''}
-          <div style="font-size:11px;color:var(--muted);margin-top:1px;font-weight:600">${coord?`${s.lat.toFixed(4)}, ${s.lng.toFixed(4)} · rayon ${s.r||500}m`:'⚠ sans position GPS — non détectable'}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:1px;font-weight:600">${coord?'📡 détecté par GPS dans un rayon de '+(s.r||500)+' m':'⚠ sans position GPS — ouvrez la fiche pour l\'ajouter'}</div>
+          <div style="font-size:11px;color:var(--gd);margin-top:3px;font-weight:800">✏️ Voir / modifier la fiche ›</div>
         </div>
       </div>
-      <button data-sid="${escapeHTMLAttr(s.id)}" onclick="openStoreFiche(this.dataset.sid)" title="Fiche magasin" aria-label="Fiche magasin"
-        style="border:1px solid rgba(18,168,118,.3);background:rgba(18,168,118,.1);border-radius:9px;width:34px;height:32px;cursor:pointer;font-size:15px;flex-shrink:0;align-self:center">📇</button>
       ${chip}
-      <button data-sid="${escapeHTMLAttr(s.id)}" onclick="confirmDeleteStoreModal(this.dataset.sid)"
-        style="border:1px solid rgba(224,60,60,.28);background:rgba(224,60,60,.1);color:var(--r);
-               border-radius:9px;width:32px;height:32px;cursor:pointer;font-size:14px;flex-shrink:0;align-self:center">🗑</button>
     </div>`;
   }).join('');
 }
@@ -8674,7 +8853,7 @@ function selectStoreFromModal(id){
 function confirmDeleteStoreModal(id){
   const s=getStores().find(x=>x.id===id);if(!s)return;
   showConfirm(`Supprimer "${s.name}" ?`,'Les produits déjà scannés gardent le nom du magasin.',()=>{
-    removeStore(id);
+    removeStore(id); closeModal('store-fiche-modal');
     renderStoresModal(); renderStoreBars(); renderAdmin();
     toast(T().deleted);
   });
@@ -9221,12 +9400,24 @@ function checkStartup(){
   clearTimeout(_startupTimer);
   _startupTimer=setTimeout(()=>resolveStartup(null), 6000);                   // repli si GPS lent/absent
 }
+/* Arrivée dans un magasin reconnu par le GPS (appli ouverte ou rouverte) :
+   ses alertes Fresh urgentes s'affichent, une fois par magasin et par jour. */
+function arrivalSeen(){ try{ return JSON.parse(localStorage.getItem('fc_arrival_seen')||'{}'); }catch(e){ return {}; } }
+function markArrival(storeName){ const m=arrivalSeen(), d=isoDay(new Date()); Object.keys(m).forEach(k=>{ if(m[k]!==d) delete m[k]; }); m[storeName]=d; localStorage.setItem('fc_arrival_seen', JSON.stringify(m)); }
+function arrivalAlert(storeName){
+  if(!session || !storeName || localStorage.getItem('fc_popup')==='0') return;
+  if(arrivalSeen()[storeName]===isoDay(new Date())) return;
+  if(document.querySelector('.modal-bg.on')) return;                     // une fenêtre est ouverte : on réessaiera à la prochaine position
+  if(!products.some(p=>(p.magasin||'—')===storeName && ['e','o'].includes(statusOf(p.dlc)))){ markArrival(storeName); return; }
+  _startupPending=true; resolveStartup(storeName);
+}
 function resolveStartup(storeName){
   if(!_startupPending) return;
   _startupPending=false; clearTimeout(_startupTimer);
   let urgent=products.filter(p=>{const s=statusOf(p.dlc);return s==='e'||s==='o'});
   let scoped=false;
   if(storeName){
+    markArrival(storeName);
     const forStore=urgent.filter(p=>(p.magasin||'—')===storeName);
     if(!forStore.length) return;   // magasin détecté sans alerte urgente → pas de popup (rien d'urgent ici)
     urgent=forStore; scoped=true;
@@ -9394,9 +9585,10 @@ function renderStats(){
   const lines = O.reduce((t, o) => t + (o.lines || []).length, 0);
   const kpi = (v, l, cls, dl) => `<div class="stk${cls ? ' ' + cls : ''}"><b>${v}</b><span>${l}</span>${dl || ''}</div>`;
   const bars = (key, fmt, color) => {
-    const max = Math.max(1, ...buckets.map(b => b[key])), W = 300, H = 96, bw = W / buckets.length;
+    const max = Math.max(1, ...buckets.map(b => b[key])) * 1.12, W = 300, H = 96, bw = W / buckets.length;
     return `<svg viewBox="0 0 ${W} ${H + 16}" class="st-chart" role="img">${buckets.map((b, i) => { const h = Math.round(b[key] / max * H);
       return `<rect x="${i * bw + 2}" y="${H - h}" width="${bw - 4}" height="${Math.max(h, b[key] ? 2 : 0)}" rx="2" fill="${color}"><title>${b.l} : ${fmt(b[key])}</title></rect>`
+        + (b[key] ? `<text x="${i * bw + bw / 2}" y="${Math.max(8, H - h - 2)}" text-anchor="middle" class="st-bv">${key === 'd' ? Math.round(b[key]) : b[key]}</text>` : '')
         + (i % Math.ceil(buckets.length / 7) === 0 ? `<text x="${i * bw + bw / 2}" y="${H + 12}" text-anchor="middle">${b.l}</text>` : ''); }).join('')}</svg>`;
   };
   const stBar = () => { const tot = st.e + st.o + st.w + st.k || 1, seg = (n, c) => n ? `<i style="width:${n / tot * 100}%;background:${c}"></i>` : '';
@@ -9404,48 +9596,69 @@ function renderStats(){
       <div class="st-leg"><span><i style="background:#E04545"></i>${st.e} périmés (${pc(st.e)})</span><span><i style="background:#F59E0B"></i>${st.o} ≤ 2 j (${pc(st.o)})</span><span><i style="background:#EAB308"></i>${st.w} ≤ 7 j (${pc(st.w)})</span><span><i style="background:#12A876"></i>${st.k} OK (${pc(st.k)})</span></div>`; };
   const pc = n => { const t = st.e + st.o + st.w + st.k; return t ? Math.round(n / t * 100) + ' %' : '0 %'; };
 
+  // Tendance en clair : flèche + mot, couleur selon que la hausse est bonne ou non
+  const trend = (cur, prev, goodUp) => {
+    if(!prev && !cur) return '';
+    if(!prev) return `<em class="st-tr-n">nouveau</em>`;
+    const d = Math.round((cur - prev) / prev * 100);
+    if(Math.abs(d) < 1) return `<em class="st-tr-n">→ stable</em>`;
+    const good = goodUp ? d > 0 : d < 0;
+    return `<em class="${good ? 'st-tr-up' : 'st-tr-dn'}">${d > 0 ? '↗ +' : '↘ '}${d} %</em>`;
+  };
+  const perLbl = stDays === 365 ? '12 derniers mois' : `${stDays} derniers jours`;
+  const prevLbl = stDays === 365 ? 'aux 12 mois d\'avant' : `aux ${stDays} jours d'avant`;
+  const tile = (ico, v, l, tr, cls, tap) => `<div class="st-tile${cls ? ' ' + cls : ''}"${tap ? ` onclick="${tap}" style="cursor:pointer"` : ''}><div class="st-ti">${ico}</div><b>${v}</b><span>${l}</span>${tr || ''}</div>`;
+  const toRemove = st.e + st.o;
+  const taux = ordVal ? dmVal / ordVal * 100 : null;
+  // « En bref » : des phrases, pas des sigles
+  const brief = [];
+  brief.push(V.length ? `🏪 <b>${plural(V.length, 'visite', 'visites')}</b>${stStore ? '' : ` dans ${plural(new Set(V.map(v => v.store)).size, 'magasin', 'magasins')}`}.` : '🏪 Aucune visite enregistrée.');
+  brief.push(O.length ? `🛒 <b>${plural(colis, 'colis commandé', 'colis commandés')}</b> en ${plural(O.length, 'commande', 'commandes')}${pColis ? `, contre ${pColis} la période d'avant (<span class="${colis >= pColis ? 'ok' : 'ko'}">${colis >= pColis ? 'en hausse' : 'en baisse'}</span>)` : ''}.` : '🛒 Aucune commande sur la période.');
+  if(RU.length || pRU.length) brief.push(`🕳 <b>${plural(RU.length, 'rupture relevée', 'ruptures relevées')}</b>${pRU.length ? (RU.length <= pRU.length ? ' — <span class="ok">en baisse</span>' : ' — <span class="ko">en hausse</span>') : ''}.`);
+  if(DM.length) brief.push(`♻️ Démarque : <b>${dmVal ? euro(dmVal) : plural(DM.length, 'produit', 'produits')}</b>${taux != null ? `, soit ${taux.toFixed(1).replace('.', ',')} % de ce qui a été commandé` : ''}.`);
+  brief.push(toRemove ? `⏰ <b class="ko">${plural(toRemove, 'produit à retirer', 'produits à retirer')}</b> du rayon maintenant (périmés ou sous 2 jours).` : '⏰ Aucun produit à retirer en ce moment.');
+  if(PC.length) brief.push(`🏷 Prix : <b>${pct(PC.length - gaps.length, PC.length)}</b> justes sur ${plural(PC.length, 'contrôle', 'contrôles')}.`);
+  if(VR.length) brief.push(`🌰 Vrac : <b>${plural(VR.length, 'mise en rayon', 'mises en rayon')}</b>, hygiène conforme ${hygDone.length ? 'à ' + pct(hygOk.length, hygDone.length) : '(non renseignée)'}.`);
+  const nothing = !V.length && !O.length && !RU.length && !DM.length && !P.length && !PC.length && !VR.length;
+
   el.innerHTML = `
-    <div class="seg">${[[7,'7 j'],[30,'30 j'],[90,'90 j'],[365,'12 mois']].map(([d,l]) => `<button class="${d===stDays?'on':''}" onclick="stDays=${d};renderStats()">${l}</button>`).join('')}</div>
-    <select class="rf-i" style="margin:8px 0 12px" onchange="stStore=this.value;renderStats()"><option value="">Tous les magasins</option>${storesAll.map(s => `<option ${s===stStore?'selected':''} value="${escapeHTMLAttr(s)}">${escapeHTML(s)}</option>`).join('')}</select>
-    <div class="st-grid">
-      ${kpi(V.length, 'visites', '', delta(V.length, pV.length, true))}
-      ${kpi(colis, `colis · ${O.length} cde(s)`, '', delta(colis, pColis, true))}
-      ${kpi(RU.length, 'ruptures relevées', RU.length ? 'bad' : '', delta(RU.length, pRU.length, false))}
-      ${kpi(dmVal ? euro(dmVal) : DM.length + ' u.', 'démarque', DM.length ? 'bad' : '', delta(dmVal || DM.length, pDmVal || pDM.length, false))}
-      ${kpi(pct(PC.length - gaps.length, PC.length), `prix conformes (${PC.length} contrôles)`)}
-      ${kpi(pct(hygOk.length, hygDone.length), 'hygiène vrac conforme')}
+    <div class="seg">${[[7,'7 jours'],[30,'30 jours'],[90,'3 mois'],[365,'12 mois']].map(([d,l]) => `<button class="${d===stDays?'on':''}" onclick="stDays=${d};renderStats()">${l}</button>`).join('')}</div>
+    <select class="rf-i" style="margin:8px 0 12px" onchange="stStore=this.value;renderStats()"><option value="">🏪 Tous les magasins</option>${storesAll.map(s => `<option ${s===stStore?'selected':''} value="${escapeHTMLAttr(s)}">${escapeHTML(s)}</option>`).join('')}</select>
+    ${nothing ? '<div class="st-card st-empty" style="padding:24px 12px">Pas encore de données sur cette période.<br>Les chiffres apparaîtront au fil des visites, commandes et relevés.</div>' : `
+    <div class="st-card st-brief"><div class="st-bt">En bref · ${perLbl}${stStore ? ' · ' + escapeHTML(stStore) : ''}</div>${brief.map(x => `<p>${x}</p>`).join('')}</div>
+    <div class="st-tiles">
+      ${tile('🏪', V.length, 'visites', trend(V.length, pV.length, true))}
+      ${tile('🛒', colis, 'colis commandés', trend(colis, pColis, true))}
+      ${tile('🕳', RU.length, 'ruptures', trend(RU.length, pRU.length, false), RU.length ? 'warn' : '')}
+      ${tile('♻️', dmVal ? euro(dmVal) : DM.length, dmVal ? 'de démarque' : 'produits démarqués', trend(dmVal || DM.length, pDmVal || pDM.length, false), DM.length ? 'warn' : '')}
     </div>
-    <div class="st-sec">Taux</div>
+    <div class="st-note">Les flèches comparent ${prevLbl}. Vert = bonne nouvelle, rouge = à surveiller.</div>
+    ${P.length ? `<div class="st-sec">⏰ Dates suivies en ce moment</div>
+    <div class="st-card">${stBar()}</div>` : ''}
+    ${colis ? `<div class="st-sec">🛒 Colis commandés ${byMonth ? 'par mois' : 'par semaine'}</div>
+    <div class="st-card">${bars('c', n => n + ' colis', '#1E88E5')}</div>` : ''}
+    ${dmVal ? `<div class="st-sec">♻️ Démarque ${byMonth ? 'par mois' : 'par semaine'}</div>
+    <div class="st-card">${bars('d', n => euro(n), '#7C3AED')}</div>` : ''}
+    ${!stStore && Object.keys(SM).length > 1 ? `<div class="st-sec">🏪 Magasin par magasin</div>
+    <div class="st-card">${Object.entries(SM).sort((x,y) => y[1].col - x[1].col || y[1].vis - x[1].vis).map(([sn, r]) => `<div class="st-store" data-s="${escapeHTMLAttr(sn)}" onclick="stStore=this.dataset.s;renderStats()">
+      <div class="st-sn"><b>${escapeHTML(sn)}</b><small>${r.last ? 'vu le ' + fmtDate(r.last) : 'pas de visite'}</small></div>
+      <div class="st-sv"><span title="visites">🏪 ${r.vis}</span><span title="colis">🛒 ${r.col}</span><span class="${r.rup ? 'ko' : ''}" title="ruptures">🕳 ${r.rup}</span>${r.al ? `<span class="ko" title="à retirer">⏰ ${r.al}</span>` : ''}</div>
+      <i>›</i></div>`).join('')}
+      <div class="st-note" style="margin:6px 0 0">Touchez un magasin pour voir ses chiffres.</div></div>` : ''}
+    ${Object.keys(BM).length ? `<div class="st-sec">🏷 Colis par marque</div><div class="st-card">${(() => { const mx = Math.max(...Object.values(BM)); return Object.entries(BM).sort((a,b) => b[1]-a[1]).map(([m, q]) => `<div class="st-hb"><span>${escapeHTML(m)}</span><i style="width:${q / mx * 100}%"></i><b>${q}<span class="st-pc">${pct(q, colis)}</span></b></div>`).join(''); })()}</div>` : ''}
+    ${Object.keys(TOP).length ? `<div class="st-sec">⭐ Les plus commandés</div><div class="st-card">${Object.values(TOP).sort((a,b) => b.q - a.q).slice(0, 5).map((x, i) => `<div class="st-line"><span>${i+1}. ${escapeHTML(x.n || '')}</span><b>${x.q} colis</b></div>`).join('')}</div>` : ''}
+    <details class="st-more"><summary>📐 Chiffres détaillés (taux, ratios)</summary>
     <div class="st-card">
-      <div class="st-line"><span>Taux de démarque (démarque ÷ valeur commandée)</span><b class="${dmVal && ordVal && dmVal / ordVal > .03 ? 'bad' : ''}">${ordVal ? (dmVal / ordVal * 100).toFixed(1).replace('.', ',') + ' %' : '—'}</b></div>
-      <div class="st-line"><span>Valeur commandée (tarif HT)</span><b>${ordVal ? euro(ordVal) : '—'}</b></div>
-      <div class="st-line"><span>Ruptures pour 100 lignes commandées</span><b>${lines ? (RU.length / lines * 100).toFixed(0) : '—'}</b></div>
-      <div class="st-line"><span>Part de pré-commandes</span><b>${pct(O.filter(o => o.kind === 'precommande').length, O.length)}</b></div>
+      <div class="st-line"><span>Taux de démarque<small>démarque ÷ valeur commandée</small></span><b class="${taux > 3 ? 'bad' : ''}">${taux != null ? taux.toFixed(1).replace('.', ',') + ' %' : '—'}</b></div>
+      <div class="st-line"><span>Valeur commandée<small>au tarif HT</small></span><b>${ordVal ? euro(ordVal) : '—'}</b></div>
       <div class="st-line"><span>Colis par visite</span><b>${V.length ? (colis / V.length).toFixed(1).replace('.', ',') : '—'}</b></div>
-      <div class="st-line"><span>Mises en rayon vrac avec non-conformité</span><b>${pct(VR.filter(v => hygSummary(v.hyg).n).length, VR.length)}</b></div>
-    </div>
-    <div class="st-sec">Dates suivies maintenant</div>
-    <div class="st-card">${stBar()}<div class="st-line"><span>Produits traités sur la période</span><b>${treated}</b></div><div class="st-line"><span>Part retirée en démarque</span><b>${treated ? lossRate.toFixed(0) + ' %' : '—'}</b></div><div class="st-line"><span>Part à retirer maintenant (périmés + ≤ 2 j)</span><b class="${st.e + st.o ? 'bad' : ''}">${pc(st.e + st.o)}</b></div></div>
-    <div class="st-sec">Colis commandés ${byMonth ? 'par mois' : 'par semaine'}</div>
-    <div class="st-card">${bars('c', n => n + ' colis', '#1E88E5')}</div>
-    <div class="st-sec">Démarque ${byMonth ? 'par mois' : 'par semaine'}</div>
-    <div class="st-card">${dmVal ? bars('d', n => euro(n), '#7C3AED') : '<div class="st-empty">Aucune démarque chiffrée sur la période</div>'}</div>
-    <div class="st-sec">Par magasin</div>
-    <div class="st-card">${Object.entries(SM).sort((x,y) => y[1].col - x[1].col || y[1].vis - x[1].vis).map(([sn, r]) => `<div class="st-sm"><b>${escapeHTML(sn)}</b>${r.last ? `<small>dernière visite ${fmtDate(r.last)}</small>` : ''}
-      <div class="row"><div><b>${r.vis}</b><span>visites · ${pct(r.vis, V.length)}</span></div><div><b>${r.col}</b><span>colis · ${pct(r.col, colis)}</span></div>
-      <div class="${r.rup?'bad':''}"><b>${r.rup}</b><span>ruptures · ${pct(r.rup, RU.length)}</span></div><div class="${r.dm?'bad':''}"><b>${r.dm ? euro(r.dm) : '—'}</b><span>démarque · ${pct(r.dm, dmVal)}</span></div></div>
-      ${r.al ? `<small class="bad">⚠ ${r.al} produit(s) à retirer maintenant</small>` : ''}</div>`).join('') || '<div class="st-empty">Aucune donnée</div>'}</div>
-    ${Object.keys(BM).length ? `<div class="st-sec">Colis par marque</div><div class="st-card">${(() => { const mx = Math.max(...Object.values(BM)); return Object.entries(BM).sort((a,b) => b[1]-a[1]).map(([m, q]) => `<div class="st-hb"><span>${escapeHTML(m)}</span><i style="width:${q / mx * 100}%"></i><b>${q}<span class="st-pc">${pct(q, colis)}</span></b></div>`).join(''); })()}</div>` : ''}
-    ${Object.keys(TOP).length ? `<div class="st-sec">Produits les plus commandés</div><div class="st-card">${Object.values(TOP).sort((a,b) => b.q - a.q).slice(0, 8).map((x, i) => `<div class="st-line"><span>${i+1}. ${escapeHTML(x.n || '')}</span><b>${x.q} colis<span class="st-pc">${pct(x.q, colis)}</span></b></div>`).join('')}</div>` : ''}
-    <div class="st-sec">Commandes et vrac</div>
-    <div class="st-card">
-      <div class="st-line"><span>Commandes passées</span><b>${O.filter(o => o.kind !== 'precommande').length}</b></div>
-      <div class="st-line"><span>Pré-commandes envoyées aux magasins</span><b>${O.filter(o => o.kind === 'precommande').length}</b></div>
-      <div class="st-line"><span>Mises en rayon vrac</span><b>${VR.length}</b></div>
-      <div class="st-line"><span>Non-conformités hygiène</span><b class="${VR.filter(v => hygSummary(v.hyg).n).length ? 'bad' : ''}">${VR.filter(v => hygSummary(v.hyg).n).length}</b></div>
-      <div class="st-line"><span>Écart de prix moyen</span><b>${gaps.length ? euro(gaps.reduce((t, c) => t + (c.shelf - c.pmc), 0) / gaps.length) : '—'}</b></div>
-    </div>
-    ${Object.keys(user).length ? `<div class="st-sec">Produits traités par personne</div><div class="st-card">${Object.entries(user).sort((a,b) => b[1]-a[1]).map(([u, n]) => `<div class="st-line"><span>👤 ${escapeHTML(u)}</span><b>${n}</b></div>`).join('')}</div>` : ''}
+      <div class="st-line"><span>Ruptures pour 100 lignes commandées</span><b>${lines ? (RU.length / lines * 100).toFixed(0) : '—'}</b></div>
+      <div class="st-line"><span>Commandes / pré-commandes</span><b>${O.filter(o => o.kind !== 'precommande').length} / ${O.filter(o => o.kind === 'precommande').length}</b></div>
+      <div class="st-line"><span>Produits Fresh traités<small>dont part démarquée</small></span><b>${treated}${treated ? ' · ' + lossRate.toFixed(0) + ' %' : ''}</b></div>
+      <div class="st-line"><span>Prix contrôlés<small>écart moyen quand il y en a un</small></span><b>${PC.length}${gaps.length ? ' · ' + euro(gaps.reduce((t, c) => t + (c.shelf - c.pmc), 0) / gaps.length) : ''}</b></div>
+      <div class="st-line"><span>Vrac : non-conformités hygiène</span><b class="${VR.filter(v => hygSummary(v.hyg).n).length ? 'bad' : ''}">${VR.filter(v => hygSummary(v.hyg).n).length} / ${VR.length}</b></div>
+      ${Object.entries(user).sort((a,b) => b[1]-a[1]).map(([u, n]) => `<div class="st-line"><span>👤 Produits traités par ${escapeHTML(u)}</span><b>${n}</b></div>`).join('')}
+    </div></details>`}
     <button class="fresh-scan-btn" style="margin-top:14px" onclick="shareStats()">📤 Partager le résumé</button>`;
   window._statsText = [
     `Statistiques Tempo — ${stDays === 365 ? '12 mois' : stDays + ' jours'} — ${stStore || 'tous magasins'}`, MAIL_SEP,
