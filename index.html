@@ -15,6 +15,8 @@
 <meta http-equiv="Expires" content="0">
 <title>Tempo</title>
 <link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <!-- ZXing — lecture code-barres locale. Chargé de façon asynchrone, SRI verrouillé. -->
 <script>
@@ -250,8 +252,8 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .hyg-b{display:flex;gap:4px;flex-shrink:0}
 .hyg-b button{min-width:46px;height:34px;border-radius:10px;border:1.5px solid var(--bdr);background:rgba(255,255,255,.7);font-family:var(--font);font-size:12.5px;font-weight:900;color:var(--muted);cursor:pointer}
 .hyg-b button.on-o{background:rgba(18,168,118,.92);border-color:transparent;color:#fff}
-.hyg-b button.on-n{background:rgba(224,60,60,.9);border-color:transparent;color:#fff}
-.hyg-row.is-n .hyg-l{color:var(--r)}
+.hyg-b button.on-n{background:rgba(217,119,6,.92);border-color:transparent;color:#fff}
+.hyg-row.is-n .hyg-l{color:#B45309}
 .hyg-all{width:100%;margin:6px 0 8px;padding:10px;border-radius:var(--rr);border:1.5px solid rgba(18,168,118,.35);background:rgba(18,168,118,.1);color:var(--gd);font-family:var(--font);font-size:13px;font-weight:900;cursor:pointer}
 /* ── Cahier vrac virtuel ─────────────────────────────────────────── */
 .vb-prod{width:100%;display:flex;align-items:center;gap:10px;text-align:left;border:1px solid var(--bdr);background:rgba(255,255,255,.7);border-radius:14px;padding:11px 12px;margin-bottom:8px;font-family:var(--font);cursor:pointer;color:var(--txt)}
@@ -259,7 +261,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .vb-prod b{display:block;font-size:14px;font-weight:900}
 .vb-prod small{display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-top:2px}
 .vb-chip{flex-shrink:0;font-size:11px;font-weight:900;border-radius:var(--rr);padding:4px 9px}
-.vb-chip.ok{background:rgba(18,168,118,.14);color:var(--gd)}.vb-chip.nc{background:rgba(224,60,60,.13);color:var(--r)}
+.vb-chip.ok{background:rgba(18,168,118,.14);color:var(--gd)}.vb-chip.nc{background:rgba(245,158,11,.16);color:#B45309}
 .vb-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#fff;border-radius:14px;padding:12px;margin-bottom:12px;border:1px solid var(--bdr)}
 .vb-ean{width:190px;max-width:100%;height:auto;display:block}
 .vb-noean{font-size:13px;font-weight:800;color:var(--muted)}
@@ -353,6 +355,28 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;
 .fd-del{flex-shrink:0;border:1px solid rgba(224,60,60,.25);background:rgba(224,60,60,.08);color:var(--r);border-radius:9px;width:32px;height:32px;cursor:pointer;font-size:13px}
 .sf-act{display:inline-flex;align-items:center;gap:5px;padding:9px 12px;border-radius:var(--rr);background:rgba(18,168,118,.92);color:#fff;font-size:13px;font-weight:800;text-decoration:none}
 .sf-sec{font-size:11px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin:12px 2px 6px}
+.sf-ct{position:relative;padding:10px 10px 2px;margin-bottom:8px;border-radius:14px;border:1px solid rgba(0,0,0,.08);background:rgba(255,255,255,.5)}
+.sf-ct-x{position:absolute;top:6px;right:6px;width:28px;height:28px;border:none;border-radius:50%;background:rgba(224,60,60,.1);color:var(--r);font-weight:900;cursor:pointer}
+/* Destinataires (puces) + carnet d'adresses */
+#book-modal{z-index:870}
+.em-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.em-chips:empty{display:none}
+.em-chip{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:6px 6px 6px 11px;border-radius:999px;background:rgba(18,168,118,.14);color:var(--gd);font-size:12.5px;font-weight:800}
+.em-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.em-chip button{width:22px;height:22px;flex-shrink:0;border:none;border-radius:50%;background:rgba(0,0,0,.08);color:inherit;font-weight:900;cursor:pointer}
+.bk-form{padding:10px;margin:8px 0;border-radius:14px;border:1px solid rgba(18,168,118,.3);background:rgba(18,168,118,.06)}
+.bk-row{display:flex;align-items:center;gap:8px;padding:10px 2px;border-bottom:1px solid rgba(0,0,0,.06)}
+.bk-row>div{flex:1;min-width:0}
+.bk-row b{display:block;font-size:13.5px}
+.bk-row small{display:block;font-size:11.5px;color:var(--muted);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bk-row button{border:none;border-radius:10px;padding:8px 10px;background:rgba(0,0,0,.06);font-size:14px;cursor:pointer}
+.bk-row button.bk-add{background:rgba(18,168,118,.9);color:#fff;font-weight:800;font-size:12.5px;font-family:var(--font)}
+/* Statistiques : recherche + enseignes */
+.st-ens{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.st-ens button{padding:6px 11px;border-radius:999px;border:1px solid rgba(0,0,0,.1);background:rgba(255,255,255,.6);font-family:var(--font);font-size:12px;font-weight:800;color:var(--txt);cursor:pointer}
+.st-ens button.on{background:var(--gd);border-color:transparent;color:#fff}
+.st-ens button small{opacity:.7}
+.st-fsum{font-size:11.5px;color:var(--muted);font-weight:700;margin:2px 2px 10px}
 .vs-thumbs{display:flex;gap:6px;margin-top:6px}
 .vs-thumbs img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--bdr)}
 /* ── Statistiques ──────────────────────────────────────────────────── */
@@ -1018,7 +1042,15 @@ html.rot-lock-on #rot-lock{display:flex}
     <div class="mhd-row" style="margin-bottom:4px"><div class="mhd-t" id="em-t">📧 Envoyer un rappel</div><button class="mcl" onclick="closeModal('email-modal')" aria-label="Fermer">✕</button></div>
     <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:14px" id="em-sub">Rappel e-mail des produits urgents</div>
     <div id="em-store-tag" style="display:none;background:rgba(18,168,118,.14);color:var(--gd);border-radius:var(--rr);padding:4px 12px;font-size:11px;font-weight:900;margin-bottom:13px;border:1px solid rgba(18,168,118,.2)"></div>
-    <div class="rf-f"><div class="rf-l" id="em-l-to">Destinataire(s)</div><input class="rf-i" id="em-to" type="email" placeholder="responsable@bunga.corp"></div>
+    <div class="rf-f"><div class="rf-l" id="em-l-to">Destinataire(s)</div>
+      <input type="hidden" id="em-to">
+      <div class="em-chips" id="em-chips"></div>
+      <div style="display:flex;gap:8px">
+        <input class="rf-i" id="em-find" type="search" autocomplete="off" placeholder="🔍 Nom, magasin, fonction… ou prenom.nom@exemple.fr" style="flex:1" oninput="emFind()" onfocus="emFind()" onkeydown="emFindKey(event)" onblur="setTimeout(emFindHide,250)">
+        <button class="scan-link-btn" onclick="openBook(true)" style="padding:10px 12px;white-space:nowrap" title="Carnet d'adresses">📒</button>
+      </div>
+      <div id="em-sugg"></div>
+    </div>
     <div class="rf-f"><div class="rf-l" id="em-l-subj">Objet</div><input class="rf-i" id="em-subj"></div>
     <div class="rf-f"><div class="rf-l" id="em-l-body">Corps du message</div><textarea class="em-ta" id="em-body"></textarea></div>
     <button class="af-add" style="width:100%;margin-top:14px;display:none" id="em-share-btn" onclick="shareOrderWithFile()">📎 Envoyer avec le bon PDF (codes-barres) + Excel</button>
@@ -1026,6 +1058,23 @@ html.rot-lock-on #rot-lock{display:flex}
     <button class="scan-reset-btn" style="width:100%;margin-top:8px;display:none" id="em-dl-btn" onclick="downloadOrderFileFromEmail()">📊 Télécharger seulement l'Excel</button>
     <button class="af-add" style="width:100%;margin-top:14px" id="em-send-btn" onclick="sendMailto()">📧 Envoyer par mail</button>
     <button class="rfcancel" onclick="closeModal('email-modal')" id="em-cancel">Annuler</button>
+  </div>
+</div>
+
+<!-- ═══ CARNET D'ADRESSES ═════════════════════════════════════════════ -->
+<div id="book-modal" class="modal-bg">
+  <div class="modal-sh">
+    <div class="mhd-row" style="margin-bottom:8px"><div class="mhd-t">📒 Carnet d’adresses</div><button class="mcl" onclick="closeModal('book-modal')" aria-label="Fermer">✕</button></div>
+    <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:10px">Chef de secteur, direction, fournisseur… Les contacts des fiches magasin y sont aussi, automatiquement.</div>
+    <input class="rf-i" id="bk-q" type="search" autocomplete="off" placeholder="🔍 Chercher (nom, fonction, société, magasin, e-mail)" oninput="renderBook()">
+    <button class="af-add" style="width:100%;margin:10px 0 4px" onclick="bookEdit('')">➕ Nouveau contact</button>
+    <div id="bk-form" style="display:none" class="bk-form">
+      <div class="rf-row"><div class="rf-f"><div class="rf-l">Nom *</div><input class="rf-i" id="bk-n" placeholder="Prénom Nom"></div><div class="rf-f"><div class="rf-l">Fonction</div><input class="rf-i" id="bk-r" placeholder="Chef de secteur"></div></div>
+      <div class="rf-f"><div class="rf-l">Société / service</div><input class="rf-i" id="bk-o" placeholder="Ex : S2D COMMERCIAL, Léa Nature"></div>
+      <div class="rf-row"><div class="rf-f"><div class="rf-l">E-mail</div><input class="rf-i" id="bk-m" type="email" placeholder="prenom.nom@exemple.fr"></div><div class="rf-f"><div class="rf-l">Téléphone</div><input class="rf-i" id="bk-t" type="tel" inputmode="tel" placeholder="06 00 00 00 00"></div></div>
+      <div style="display:flex;gap:8px"><button class="af-add" style="flex:1" onclick="bookSave()">💾 Enregistrer</button><button class="scan-reset-btn" style="flex:1" onclick="bookEditClose()">Annuler</button></div>
+    </div>
+    <div id="bk-list"></div>
   </div>
 </div>
 
@@ -1182,6 +1231,8 @@ html.rot-lock-on #rot-lock{display:flex}
 <div id="stocks-modal" class="modal-bg">
   <div class="modal-sh">
     <div class="mhd-row" style="margin-bottom:14px"><div class="mhd-t">🗂 Historique des stocks</div><button class="mcl" onclick="closeModal('stocks-modal')" aria-label="Fermer">✕</button></div>
+    <input class="rf-i" id="stk-h-q" type="search" autocomplete="off" placeholder="🔍 Magasin, enseigne, produit…" oninput="stkHStore='';renderStocksHistory()">
+    <div class="st-ens" id="stk-h-stores"></div>
     <div id="stocks-list"></div>
   </div>
 </div>
@@ -1248,6 +1299,7 @@ html.rot-lock-on #rot-lock{display:flex}
     <div class="sf-actions" id="sf-actions"></div>
     <div class="sf-sec">Magasin</div>
     <div class="rf-f"><div class="rf-l">Nom du magasin *</div><input class="rf-i" id="sf-name" placeholder="Ex : Carrefour Aubagne"></div>
+    <div class="rf-f"><div class="rf-l">Enseigne</div><input class="rf-i" id="sf-ens" list="ens-list" placeholder="Trouvée d’après le nom si vide"><datalist id="ens-list"></datalist></div>
     <div class="rf-f"><div class="rf-l">Adresse</div>
       <div style="display:flex;gap:8px"><input class="rf-i" id="sf-addr" placeholder="Rue, ville" style="flex:1">
         <button class="scan-link-btn" id="sf-geo-btn" onclick="geocodeInto('sf-addr','sf-geo-btn','sf-geo-results','pickGeoFiche')" style="padding:10px 13px;white-space:nowrap">🔍 Trouver</button></div>
@@ -1259,12 +1311,9 @@ html.rot-lock-on #rot-lock{display:flex}
       <div class="rf-f" style="max-width:85px"><div class="rf-l">Rayon (m)</div><input class="rf-i" id="sf-rad" type="number" inputmode="numeric" placeholder="500"></div>
     </div>
     <button class="scan-link-btn" onclick="fillMyPosition('sf-lat','sf-lng')" style="width:100%;margin:-2px 0 6px;padding:10px">📍 Je suis dans ce magasin : prendre ma position</button>
-    <div class="sf-sec">Contact 1</div>
-    <div class="rf-row"><div class="rf-f"><div class="rf-l">Nom</div><input class="rf-i" id="sf-c1n" placeholder="Julie Martin"></div><div class="rf-f"><div class="rf-l">Fonction</div><input class="rf-i" id="sf-c1r" placeholder="Chef de rayon épicerie"></div></div>
-    <div class="rf-row"><div class="rf-f"><div class="rf-l">Téléphone</div><input class="rf-i" id="sf-c1t" type="tel" inputmode="tel" placeholder="06 12 34 56 78"></div><div class="rf-f"><div class="rf-l">E-mail</div><input class="rf-i" id="sf-c1m" type="email" placeholder="julie@magasin.fr"></div></div>
-    <div class="sf-sec">Contact 2</div>
-    <div class="rf-row"><div class="rf-f"><div class="rf-l">Nom</div><input class="rf-i" id="sf-c2n" placeholder="M. Durand"></div><div class="rf-f"><div class="rf-l">Fonction</div><input class="rf-i" id="sf-c2r" placeholder="Directeur"></div></div>
-    <div class="rf-row"><div class="rf-f"><div class="rf-l">Téléphone</div><input class="rf-i" id="sf-c2t" type="tel" inputmode="tel"></div><div class="rf-f"><div class="rf-l">E-mail</div><input class="rf-i" id="sf-c2m" type="email"></div></div>
+    <div class="sf-sec">Contacts du magasin</div>
+    <div id="sf-contacts"></div>
+    <button class="scan-link-btn" onclick="sfAddContact()" style="width:100%;margin:2px 0 6px;padding:10px">➕ Ajouter un contact</button>
     <div class="sf-sec">Commande et livraison</div>
     <div class="rf-row"><div class="rf-f"><div class="rf-l">Jour de commande</div><select class="rf-i" id="sf-jcmd"><option value="">—</option><option value="0">Lundi</option><option value="1">Mardi</option><option value="2">Mercredi</option><option value="3">Jeudi</option><option value="4">Vendredi</option><option value="5">Samedi</option><option value="6">Dimanche</option></select></div><div class="rf-f"><div class="rf-l">Avant</div><input class="rf-i" id="sf-hcmd" type="time"></div></div>
     <div class="rf-row"><div class="rf-f"><div class="rf-l">Jour de livraison</div><select class="rf-i" id="sf-jliv"><option value="">—</option><option value="0">Lundi</option><option value="1">Mardi</option><option value="2">Mercredi</option><option value="3">Jeudi</option><option value="4">Vendredi</option><option value="5">Samedi</option><option value="6">Dimanche</option></select></div><div class="rf-f"><div class="rf-l">Heure</div><input class="rf-i" id="sf-hliv" type="time"></div></div>
@@ -1846,10 +1895,10 @@ html.rot-lock-on #rot-lock{display:flex}
 
       <!-- Liste du relevé de stock en cours -->
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 2px 10px;flex-wrap:wrap">
-        <div style="font-size:14px;font-weight:900;color:#fff">📦 Stock en cours <span id="stk-count" style="opacity:.85;font-weight:700"></span></div>
+        <div style="font-size:14px;font-weight:900;color:#fff">📦 Stock en cours <span id="stk-count" style="opacity:.85;font-weight:700"></span><span id="stk-store" style="display:block;font-size:11.5px;opacity:.85;font-weight:700;margin-top:2px"></span></div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button class="scan-link-btn" onclick="openCatsView('stocks')" style="background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.32)">📊 Catégories</button>
-          <button class="scan-link-btn" onclick="openModal('stocks-modal');renderStocksHistory()" style="background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.32)">🗂 Historique</button>
+          <button class="scan-link-btn" onclick="openStocksHistory()" style="background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.32)">🗂 Historique</button>
         </div>
       </div>
       <div id="stock-lines"></div>
@@ -1944,8 +1993,9 @@ html.rot-lock-on #rot-lock{display:flex}
           </div>
         </div>
         <div class="rf-f">
-          <div class="rf-l">Contrôle hygiène du silo</div>
-          <button type="button" class="hyg-all" onclick="setAllHyg()">✓ Tout est conforme</button>
+          <div class="rf-l">Points vérifiés au remplissage</div>
+          <div style="font-size:11.5px;color:var(--muted);font-weight:600;margin:-2px 0 6px">Vous notez ce que vous constatez. Seuls les services d’hygiène jugent de la conformité.</div>
+          <button type="button" class="hyg-all" onclick="setAllHyg()">✓ Rien à signaler</button>
           <div class="hyg-box" id="vrac-hyg"></div>
         </div>
         <div class="rf-f"><div class="rf-l">Remarques / action corrective</div>
@@ -2018,6 +2068,7 @@ html.rot-lock-on #rot-lock{display:flex}
         <div class="rg-it" onclick="backupData()"><div class="rg-ic">💾</div>Sauvegarder mes données</div>
         <div class="rg-it" onclick="document.getElementById('restore-in').click()"><div class="rg-ic">📂</div>Restaurer une sauvegarde</div>
         <div class="rg-it" onclick="toolCSV()"><div class="rg-ic">📥</div>Exporter CSV</div>
+        <div class="rg-it" onclick="openBook(false)"><div class="rg-ic">📒</div>Carnet d’adresses</div>
         <div class="rg-it" onclick="openLogos()"><div class="rg-ic">🏷️</div>En-tête et logos des documents</div>
         <div class="rg-it" onclick="document.getElementById('price-in').click()"><div class="rg-ic">💶</div><div>Charger les prix (tarif + PMC)<div id="rg-prices-st" style="font-size:11.5px;color:var(--muted);font-weight:700">Aucun prix chargé</div><div style="font-size:11px;color:var(--muted);font-weight:600">Restent sur ce téléphone, jamais publiés</div></div></div>
         <input type="file" id="price-in" accept=".xlsx,.csv" multiple style="display:none" onchange="importPriceFiles(this)">
@@ -2147,7 +2198,7 @@ html.rot-lock-on #rot-lock{display:flex}
 
         <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:14px 0 8px">📧 E-mails alertes & rapports</div>
         <div class="rf-f"><div class="rf-l">Responsable magasin</div><input class="rf-i" id="adm-email-resp" type="email" placeholder="responsable@enseigne.fr"></div>
-        <div class="rf-f"><div class="rf-l">Direction / Finances</div><input class="rf-i" id="adm-email-finance" type="email" placeholder="direction@bunga.corp"></div>
+        <div class="rf-f"><div class="rf-l">Direction / Finances</div><input class="rf-i" id="adm-email-finance" type="email" placeholder="prenom.nom@exemple.fr"></div>
 
         <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:14px 0 8px">🔗 Backend Google Apps Script</div>
         <div class="rf-f">
@@ -2920,7 +2971,7 @@ function renderGestion(){
     const best = Object.entries(c.K).sort((a, b) => b[1].colis - a[1].colis)[0];
     if(best && best[1].colis) hs.marques = { st: `${best[0]} : ${Math.round(best[1].colis / t.colis * 100)} % des colis` };
     const vr = vracEntries.filter(v => Date.now() - new Date(v.dateRayon || v.createdAt).getTime() < 30 * 864e5), vd = vr.filter(v => v.hyg && !hygSummary(v.hyg).missing);
-    if(vd.length) hs.vrac = { st: `${vr.length} mises en rayon · ${Math.round(vd.filter(v => !hygSummary(v.hyg).n).length / vd.length * 100)} % hygiène OK` };
+    if(vd.length) hs.vrac = { st: `${vr.length} mises en rayon · ${Math.round(vd.filter(v => !hygSummary(v.hyg).n).length / vd.length * 100)} % sans rien à signaler` };
   }catch(e){}
   renderTiles('gs-grid', GESTION_TILES, hs);
 }
@@ -3609,6 +3660,13 @@ function lookupCode(code){
    taper la fin du code (« 22421 ») suffit. Chiffres : dès 4 ; texte : dès 2 lettres
    (tous les mots doivent figurer dans le nom, accents ignorés).
    Classement : exact > début du gencod/réf > fin du gencod > ailleurs. */
+/* Recherche par mots, dans le nom ET la marque, la gamme, la famille, le format :
+   « biovie spray » trouve les sprays Biovie. Pluriel toléré (sprays → spray). */
+const _qWords = q => _noAcc(q).split(/[\s,;]+/).filter(Boolean).map(w => w.length > 3 ? w.replace(/s$/, '') : w);
+function prodMatch(p, words){
+  const hay = _noAcc([p.nom, p.marque, p.gamme, p.famille, p.volume, p.ref, p.gencod].join(' '));
+  return words.every(w => hay.includes(w));
+}
 function searchCatalogue(query, limit){
   const q = String(query||'').trim();
   const max = limit || 8;
@@ -3627,11 +3685,12 @@ function searchCatalogue(query, limit){
       if(s) scored.push([s, p]);
     }
   } else {
-    const words = _noAcc(q).toLowerCase().split(/\s+/).filter(Boolean);
+    const words = _qWords(q);
     if(!words.length || q.length < 2) return { items: [], total: 0 };
     for(const p of catalogue){
-      const n = _noAcc(p.nom||'').toLowerCase();
-      if(words.every(w => n.includes(w))) scored.push([n.startsWith(words[0]) ? 50 : 30, p]);
+      if(!prodMatch(p, words)) continue;
+      const n = _noAcc(p.nom || '');
+      scored.push([n.startsWith(words[0]) ? 50 : words.every(w => n.includes(w)) ? 40 : 30, p]);
     }
   }
   scored.sort((a,b) => b[0]-a[0] || String(a[1].nom).localeCompare(String(b[1].nom)));
@@ -3915,14 +3974,7 @@ function filterCatalogueView(){
   }
   const q = (document.getElementById('cat-view-search')?.value || '').trim().toLowerCase();
   let rows = catalogue;
-  if(q){
-    rows = catalogue.filter(p =>
-      (p.nom||'').toLowerCase().includes(q) ||
-      (p.gencod||'').toLowerCase().includes(q) ||
-      String(p.ref||'').includes(q) ||
-      (p.famille||'').toLowerCase().includes(q) ||
-      (p.marque||'').toLowerCase().includes(q));
-  }
+  if(q){ const words = _qWords(q); rows = catalogue.filter(p => prodMatch(p, words)); }
   const brandCount = new Set(catalogue.map(p=>p.marque)).size;
   if(statEl){
     statEl.textContent = q
@@ -5025,7 +5077,7 @@ function openQtyPopup(ctx){
 function qmSearch(){
   const box = document.getElementById('qm-sugg');
   const q = document.getElementById('qm-search').value;
-  const { items, total } = searchCatalogue(q, 6);
+  const { items, total } = searchCatalogue(q, 60);
   const digits = q.replace(/\s/g,'');
   if(!q.trim()){ box.innerHTML = ''; return; }
   if(!items.length){
@@ -5040,7 +5092,7 @@ function qmSearch(){
       <span class="qm-sugg-n">${escapeHTML(p.nom||'(sans nom)')}</span>
       <span class="qm-sugg-m">EAN ${escapeHTML(p.gencod)}${p.ref?' · Réf. '+escapeHTML(p.ref):''}${p.volume?' · '+escapeHTML(p.volume):''}</span></span>
     </button>`).join('') +
-    (total > items.length ? `<div class="qm-sugg-empty">… ${total - items.length} autre(s) — tapez quelques chiffres de plus</div>` : '');
+    (total > items.length ? `<div class="qm-sugg-empty">… ${total - items.length} autre(s) — précisez la recherche (un mot de plus)</div>` : total > 6 ? `<div class="qm-sugg-empty">${total} produits — faites défiler la liste</div>` : '');
 }
 
 /* Choix d'une suggestion → la popup bascule sur ce produit du catalogue. */
@@ -5734,8 +5786,8 @@ function exportOrderXlsx(id){
 
 function openOrderEmail(subject, body, record){
   const st = record && record.kind === 'precommande' ? getStores().find(s => s.name === record.store) : null;
-  const stMail = st && st.fiche ? (st.fiche.c1m || st.fiche.c2m || '') : '';
-  document.getElementById('em-to').value   = stMail || localStorage.getItem('fc_email') || emailResp || '';
+  const stMail = st ? storeMails(st).join(', ') : '';
+  emSetTo(stMail || localStorage.getItem('fc_email') || emailResp || '');
   document.getElementById('em-subj').value = subject;
   document.getElementById('em-body').value = body;
   const stag = document.getElementById('em-store-tag');
@@ -5775,6 +5827,10 @@ function setEmailAttachUI(a){
 }
 async function shareOrderWithFile(){
   const a = emailAttach; if(!a) return;
+  // Le partage avec fichier ne transmet pas le destinataire : adresses copiées, à coller dans « À »
+  emFlush();
+  const to = document.getElementById('em-to').value.trim();
+  if(to){ bookRemember(to); try{ navigator.clipboard.writeText(to).catch(() => {}); toast('📋 Adresse(s) copiée(s) : collez-les dans « À » du mail'); }catch(e){} }
   let pdf = null;
   try{ pdf = await a.pdf(); }catch(e){ console.warn('PDF :', e); }
   const x = a.xlsx ? a.xlsx() : null;
@@ -5818,7 +5874,7 @@ function setOrderKind(k){
   orderKind = k;
   document.querySelectorAll('#ord-kind button').forEach(b => b.classList.toggle('on', b.dataset.k === k));
   const h = document.getElementById('ord-kind-hint'), v = document.getElementById('ord-validate');
-  const fiche = selStore && selStore.fiche, mail = fiche && (fiche.c1m || fiche.c2m);
+  const mail = selStore ? storeMails(selStore).join(', ') : '';
   if(h) h.textContent = k === 'precommande'
     ? `Le bon (PDF à codes-barres + Excel) part au magasin, qui passera la commande lui-même${mail ? ' — destinataire : ' + mail : ' — ajoutez l’e-mail du magasin dans sa fiche 📇'}.`
     : '';
@@ -6188,6 +6244,8 @@ function renderStockLines(){
   const footer = document.getElementById('stk-footer');
   const count  = document.getElementById('stk-count');
   if(!el) return;
+  const sl = document.getElementById('stk-store');
+  if(sl) sl.textContent = storeName ? '🏪 Magasin : ' + storeName + ' (changer : bandeau du haut)' : '🏪 Aucun magasin choisi : touchez « Choisir » en haut';
   if(!currentStock.length){
     el.innerHTML = '<div class="empty">Aucun article — scannez un produit pour commencer</div>';
     if(footer) footer.style.display = 'none';
@@ -6238,7 +6296,7 @@ function buildStockText(lines, meta){
 }
 
 function openStockEmail(subject, body, lines, meta){
-  document.getElementById('em-to').value   = localStorage.getItem('fc_email') || emailResp || '';
+  emSetTo(localStorage.getItem('fc_email') || emailResp || '');
   document.getElementById('em-subj').value = subject;
   document.getElementById('em-body').value = body;
   const stag = document.getElementById('em-store-tag');
@@ -6350,11 +6408,26 @@ function exportStockCSV(lines){
 
 /* Historique des relevés de stock (modale) */
 function findStock(id){ return stockRecords.find(o => o.id === id); }
+/* Historique : un magasin à la fois (le magasin actif d'abord), ou recherche libre */
+let stkHStore = null;
+function openStocksHistory(){
+  stkHStore = storeName && stockRecords.some(o => o.store === storeName) ? storeName : '';
+  const q = document.getElementById('stk-h-q'); if(q) q.value = '';
+  openModal('stocks-modal'); renderStocksHistory();
+}
 function renderStocksHistory(){
   const el = document.getElementById('stocks-list');
   if(!el) return;
   if(!stockRecords.length){ el.innerHTML = '<div class="empty">Aucun relevé de stock enregistré</div>'; return; }
-  el.innerHTML = stockRecords.slice(0,100).map(o => {
+  const cnt = {}; stockRecords.forEach(o => { const k = o.store || '—'; cnt[k] = (cnt[k] || 0) + 1; });
+  const chips = document.getElementById('stk-h-stores');
+  if(chips) chips.innerHTML = Object.keys(cnt).length > 1 ? `<button class="${!stkHStore ? 'on' : ''}" onclick="stkHStore='';renderStocksHistory()">Tous <small>${stockRecords.length}</small></button>`
+    + Object.entries(cnt).sort((a, b) => a[0].localeCompare(b[0])).map(([k, n]) => `<button class="${k === stkHStore ? 'on' : ''}" data-s="${escapeHTMLAttr(k)}" onclick="stkHStore=this.dataset.s;renderStocksHistory()">🏪 ${escapeHTML(k)} <small>${n}</small></button>`).join('') : '';
+  const words = _qWords(document.getElementById('stk-h-q')?.value || '');
+  const list = stockRecords.filter(o => (!stkHStore || (o.store || '—') === stkHStore)
+    && (!words.length || words.every(w => _noAcc([o.store, enseigneOf(o.store || ''), o.by, o.ref, ...o.lines.map(l => l.name + ' ' + (l.gencod || ''))].join(' ')).includes(w))));
+  if(!list.length){ el.innerHTML = '<div class="empty">Aucun relevé ne correspond</div>'; return; }
+  el.innerHTML = list.slice(0,100).map(o => {
     const totalQty = o.lines.reduce((s,l)=>s+l.qty, 0);
     return `<div style="padding:11px 0;border-bottom:1px solid rgba(0,0,0,.06)">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
@@ -6450,7 +6523,7 @@ const VRAC_HYG = [
   { k:'sec',      l:'Silo sec avant remplissage' },
   { k:'nuisibles',l:'Aucune trace de nuisibles ou d\'insectes' },
   { k:'sac',      l:'Sac fournisseur intact' },
-  { k:'produit',  l:'Produit conforme (aspect, odeur, sans corps étranger)' },
+  { k:'produit',  l:'Produit d’aspect et d’odeur normaux, sans corps étranger' },
   { k:'ustensiles', l:'Pelle et ustensiles propres' },
   { k:'etiquette',l:'Étiquette du silo à jour (lot, DDM, allergènes)' }
 ];
@@ -7040,7 +7113,7 @@ async function saveVracEntry(){
     byName:     session?.name || '',
   };
   const hs = hygSummary(data.hyg);
-  if(hs.n && !data.remarque){ toast('⚠️ Point non conforme : notez l\'action corrective dans Remarques'); document.getElementById('vrac-rem')?.focus(); return; }
+  if(hs.n && !data.remarque){ toast('⚠️ Point signalé : notez ce que vous avez constaté ou fait dans Remarques'); document.getElementById('vrac-rem')?.focus(); return; }
   const id = vracEditId || genId();
   // Photos : seules les nouvelles (ou retirées) sont réenregistrées
   for(const k of ['sac','silo']){
@@ -7150,9 +7223,9 @@ function vracCard(v, opts){
 function vracHygChip(v){
   if(!v.hyg) return `<span class="cat-chip" style="background:rgba(13,31,13,.06);color:var(--muted)">🧽 Hygiène non renseignée</span>`;
   const h = hygSummary(v.hyg);
-  if(h.n) return `<span class="cat-chip" style="background:rgba(224,60,60,.13);color:var(--r)">🧽 ${h.n} non conforme(s)</span>`;
+  if(h.n) return `<span class="cat-chip" style="background:rgba(245,158,11,.16);color:#B45309">🧽 ${plural(h.n, 'point signalé', 'points signalés')}</span>`;
   if(h.missing) return `<span class="cat-chip" style="background:rgba(245,158,11,.15);color:#B45309">🧽 ${h.ok}/${VRAC_HYG.length} vérifiés</span>`;
-  return `<span class="cat-chip" style="background:rgba(18,168,118,.13);color:var(--gd)">🧽 Hygiène conforme</span>`;
+  return `<span class="cat-chip" style="background:rgba(18,168,118,.13);color:var(--gd)">🧽 Rien à signaler</span>`;
 }
 function findVrac(id){ return vracEntries.find(v => String(v.id) === String(id)); }
 async function openVracPhoto(id, kind){
@@ -7280,7 +7353,7 @@ function updateVracCahierInfo(){
   const list = vracCahierList(), el = document.getElementById('vc-info'); if(!el) return;
   const nc = list.filter(v => hygSummary(v.hyg).n).length;
   el.textContent = list.length
-    ? `${list.length} mise(s) en rayon dans le cahier${nc ? ` · ${nc} avec non-conformité` : ''}`
+    ? `${list.length} mise(s) en rayon dans le cahier${nc ? ` · ${nc} avec un point signalé` : ''}`
     : 'Aucune mise en rayon sur cette période';
 }
 function openVracCahier(){
@@ -7334,10 +7407,11 @@ async function buildVracCahierPDF(list, meta){
   [
     ['Magasin', meta.storeLabel],
     ['Mises en rayon enregistrées', String(list.length)],
-    ['Contrôles hygiène entièrement conformes', String(nOK)],
-    ['Mises en rayon avec non-conformité', String(nNC)],
+    ['Remplissages sans rien à signaler', String(nOK)],
+    ['Remplissages avec un point signalé', String(nNC)],
     ['Fiches avec photo d\'étiquette', String(nPh)],
-    ['Document édité le', fmtDT(new Date().toISOString()) + (meta.by ? ' par ' + meta.by : '')]
+    ['Document édité le', fmtDT(new Date().toISOString()) + (meta.by ? ' par ' + meta.by : '')],
+    ['Nature du document', 'Constats terrain, sans valeur de contrôle officiel']
   ].forEach(([k, v]) => {
     doc.setTextColor(...GREY); doc.text(k, M, y);
     doc.setTextColor(0); doc.setFont('helvetica','bold'); doc.text(clean(v), M + 78, y);
@@ -7345,7 +7419,7 @@ async function buildVracCahierPDF(list, meta){
   });
   y += 3;
   // Tableau récapitulatif
-  const cols = [['Date', 18], ['Produit', 62], ['Silo', 20], ['Lot', 26], ['DDM', 16], ['Hygiène', 40]];
+  const cols = [['Date', 18], ['Produit', 62], ['Silo', 20], ['Lot', 26], ['DDM', 16], ['Constats', 40]];
   const tableHead = () => {
     doc.setFillColor(235,245,240); doc.rect(M, y - 4, CW, 6.5, 'F');
     doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
@@ -7356,12 +7430,12 @@ async function buildVracCahierPDF(list, meta){
   list.forEach(v => {
     if(y > H - 22){ newPage(); tableHead(); }
     const h = hygSummary(v.hyg);
-    const hy = !v.hyg ? 'non renseigné' : h.n ? `${h.n} non conforme(s)` : h.missing ? `${h.ok}/${VRAC_HYG.length} vérifiés` : 'conforme';
+    const hy = !v.hyg ? 'non renseigné' : h.n ? plural(h.n, 'point signalé', 'points signalés') : h.missing ? `${h.ok}/${VRAC_HYG.length} vérifiés` : 'rien à signaler';
     const cells = [fmt(v.dateRayon), v.name || v.gencod || '—', v.silo || '—', v.lot || '—', ddmLabel(v.ddm) || '—', hy];
     let x = M + 1.5;
     cells.forEach((c, i) => {
       const w = cols[i][1];
-      if(i === 5) doc.setTextColor(...(h.n ? RED : !v.hyg || h.missing ? GREY : GREEN));
+      if(i === 5) doc.setTextColor(...(h.n ? [180,83,9] : !v.hyg || h.missing ? GREY : GREEN));
       doc.text(doc.splitTextToSize(clean(c), w - 2.5)[0] || '', x, y);
       doc.setTextColor(0); x += w;
     });
@@ -7404,16 +7478,16 @@ async function buildVracCahierPDF(list, meta){
     });
     // Contrôle hygiène
     yl += 2;
-    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.text('Contrôle hygiène du silo', L, yl); yl += 4.8;
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.text('Points vérifiés au remplissage', L, yl); yl += 4.8;
     doc.setFont('helvetica','normal'); doc.setFontSize(8.2);
     VRAC_HYG.forEach(hq => {
       const a = v.hyg ? v.hyg[hq.k] : undefined;
       doc.setDrawColor(...LINE); doc.rect(L, yl - 2.9, 3.4, 3.4);
       if(a === 'O'){ doc.setTextColor(...GREEN); doc.setFont('helvetica','bold'); doc.text('OUI', L + LW - 1, yl, { align:'right' }); doc.text('x', L + 0.75, yl - 0.1); }
-      else if(a === 'N'){ doc.setTextColor(...RED); doc.setFont('helvetica','bold'); doc.text('NON', L + LW - 1, yl, { align:'right' }); }
+      else if(a === 'N'){ doc.setTextColor(180,83,9); doc.setFont('helvetica','bold'); doc.text('NON', L + LW - 1, yl, { align:'right' }); }
       else { doc.setTextColor(...GREY); doc.text('—', L + LW - 1, yl, { align:'right' }); }
       doc.setFont('helvetica','normal');
-      doc.setTextColor(a === 'N' ? RED[0] : 0, a === 'N' ? RED[1] : 0, a === 'N' ? RED[2] : 0);
+      doc.setTextColor(...(a === 'N' ? [180,83,9] : [0,0,0]));
       doc.text(doc.splitTextToSize(clean(hq.l), LW - 16)[0], L + 5, yl);
       doc.setTextColor(0);
       yl += 4.4;
@@ -7444,7 +7518,7 @@ async function buildVracCahierPDF(list, meta){
     doc.setFontSize(8.5); doc.setFont('helvetica','bold'); doc.text('Remarques / action corrective :', M + 1, yr);
     doc.setFont('helvetica','normal');
     const rem = doc.splitTextToSize(clean(v.remarque) || '—', CW - 50);
-    if(v.remarque && hygSummary(v.hyg).n) doc.setTextColor(...RED);
+    if(v.remarque && hygSummary(v.hyg).n) doc.setTextColor(180,83,9);
     doc.text(rem.slice(0, 3), M + 48, yr);
     doc.setTextColor(0);
     yr += Math.max(1, Math.min(3, rem.length)) * 4 + 1;
@@ -7737,7 +7811,9 @@ function openStoreFiche(id){
   ficheStoreId = id;
   const f = s.fiche || {};
   const set = (k, v) => { const e = document.getElementById('sf-' + k); if(e) e.value = v == null ? '' : v; };
-  ['c1n','c1r','c1t','c1m','c2n','c2r','c2t','c2m','hcmd','hliv','client','notes'].forEach(k => set(k, f[k]));
+  ['ens','hcmd','hliv','client','notes'].forEach(k => set(k, f[k]));
+  renderSfContacts(ficheContacts(f));
+  const dl = document.getElementById('ens-list'); if(dl) dl.innerHTML = ENSEIGNES.map(e => `<option value="${escapeHTMLAttr(e[0])}">`).join('');
   set('jcmd', f.jcmd ?? ''); set('jliv', f.jliv ?? '');
   set('name', s.name); set('addr', s.ville || ''); set('rad', s.r || 500);
   set('lat', Number.isFinite(s.lat) ? s.lat.toFixed(5) : ''); set('lng', Number.isFinite(s.lng) ? s.lng.toFixed(5) : '');
@@ -7762,9 +7838,9 @@ function renderFicheActions(s){
   a.push(active ? `<span class="sf-act" style="background:rgba(18,168,118,.16);color:var(--gd)">✓ Magasin actif</span>`
                 : `<button class="sf-act" style="border:none;cursor:pointer;font-family:var(--font)" data-sid="${escapeHTMLAttr(s.id)}" onclick="selectStoreFromModal(this.dataset.sid);renderFicheActions(getStores().find(x=>x.id===this.dataset.sid))">📍 Activer ce magasin</button>`);
   a.push(routeLinks(s));
-  [['c1n','c1t','c1m'],['c2n','c2t','c2m']].forEach(([n,t,m]) => {
-    if(f[t]) a.push(`<a class="sf-act" href="tel:${escapeHTMLAttr(f[t].replace(/[^\d+]/g,''))}">📞 ${escapeHTML(f[n] || 'Appeler')}</a>`);
-    if(f[m]) a.push(`<a class="sf-act" href="mailto:${escapeHTMLAttr(f[m])}">✉️ ${escapeHTML(f[n] || 'Écrire')}</a>`);
+  ficheContacts(f).forEach(c => {
+    if(c.t) a.push(`<a class="sf-act" href="tel:${escapeHTMLAttr(c.t.replace(/[^\d+]/g,''))}">📞 ${escapeHTML(c.n || 'Appeler')}</a>`);
+    if(c.m) a.push(`<a class="sf-act" href="mailto:${escapeHTMLAttr(c.m)}">✉️ ${escapeHTML(c.n || 'Écrire')}</a>`);
   });
   a.push(`<button class="sf-act" style="border:none;cursor:pointer;font-family:var(--font);background:#5D4037" data-sid="${escapeHTMLAttr(s.id)}" onclick="closeModal('store-fiche-modal');closeModal('stores-modal');openModal('folders-modal');openStoreFolder(this.dataset.sid)">📁 Documents</button>`);
   box.innerHTML = a.filter(Boolean).join('');
@@ -7800,7 +7876,8 @@ function saveStoreFiche(){
   s.name = name; s.ville = val('addr'); s.r = parseInt(val('rad'), 10) || 500;
   s.lat = Number.isFinite(lat) ? lat : null; s.lng = Number.isFinite(lng) ? lng : null;
   s.fiche = {};
-  ['c1n','c1r','c1t','c1m','c2n','c2r','c2t','c2m','hcmd','hliv','client','notes','jcmd','jliv'].forEach(k => { const v = val(k); if(v !== '') s.fiche[k] = v; });
+  ['ens','hcmd','hliv','client','notes','jcmd','jliv'].forEach(k => { const v = val(k); if(v !== '') s.fiche[k] = v; });
+  const cts = readSfContacts(); if(cts.length) s.fiche.contacts = cts;
   saveStores(list); stores = list;
   renameStoreEverywhere(old, name);
   if(selStore && selStore.id === s.id) setActiveStore(s);
@@ -7811,6 +7888,173 @@ function saveStoreFiche(){
   if(document.getElementById('stores-modal')?.classList.contains('on')) renderStoresModal();
   renderCurrentTab();
 }
+/* Contacts d'une fiche : autant qu'il en faut (fiche.contacts). Les anciennes
+   fiches à 2 contacts fixes (c1n…c2m) sont relues telles quelles. */
+function ficheContacts(f){
+  f = f || {};
+  if(Array.isArray(f.contacts)) return f.contacts;
+  return [1, 2].map(i => ({ n: f['c'+i+'n'] || '', r: f['c'+i+'r'] || '', t: f['c'+i+'t'] || '', m: f['c'+i+'m'] || '' }))
+    .filter(c => c.n || c.r || c.t || c.m);
+}
+const storeMails = s => ficheContacts(s && s.fiche).map(c => c.m).filter(Boolean).slice(0, 1);
+function sfContactRow(c){
+  c = c || {};
+  const v = k => escapeHTMLAttr(c[k] || '');
+  return `<div class="sf-ct"><button type="button" class="sf-ct-x" onclick="this.closest('.sf-ct').remove()" aria-label="Retirer ce contact">✕</button>
+    <div class="rf-row"><div class="rf-f"><div class="rf-l">Nom</div><input class="rf-i" data-k="n" value="${v('n')}" placeholder="Prénom Nom"></div><div class="rf-f" style="margin-right:26px"><div class="rf-l">Fonction</div><input class="rf-i" data-k="r" value="${v('r')}" placeholder="Chef de rayon, directeur…"></div></div>
+    <div class="rf-row"><div class="rf-f"><div class="rf-l">Téléphone</div><input class="rf-i" data-k="t" value="${v('t')}" type="tel" inputmode="tel" placeholder="06 00 00 00 00"></div><div class="rf-f"><div class="rf-l">E-mail</div><input class="rf-i" data-k="m" value="${v('m')}" type="email" placeholder="prenom.nom@exemple.fr"></div></div></div>`;
+}
+function renderSfContacts(list){
+  const box = document.getElementById('sf-contacts'); if(!box) return;
+  box.innerHTML = (list && list.length ? list : [{}]).map(sfContactRow).join('');
+}
+function sfAddContact(){
+  const box = document.getElementById('sf-contacts'); if(!box) return;
+  box.insertAdjacentHTML('beforeend', sfContactRow({}));
+  box.lastElementChild.querySelector('input')?.focus();
+}
+function readSfContacts(){
+  return [...document.querySelectorAll('#sf-contacts .sf-ct')].map(r => {
+    const o = {}; r.querySelectorAll('[data-k]').forEach(i => { const v = i.value.trim(); if(v) o[i.dataset.k] = v; }); return o;
+  }).filter(o => Object.keys(o).length);
+}
+
+/* Enseigne d'un magasin : celle de sa fiche, sinon reconnue dans son nom */
+const ENSEIGNES = [
+  ['Carrefour Market', 'carrefour market'], ['Carrefour City', 'carrefour city'], ['Carrefour Contact', 'carrefour contact'], ['Carrefour Express', 'carrefour express'], ['Carrefour', 'carrefour'],
+  ['E.Leclerc', 'leclerc'], ['Intermarché', 'intermarche', 'itm'], ['Super U', 'super u'], ['Hyper U', 'hyper u'], ['U Express', 'u express'], ['Auchan', 'auchan'],
+  ['Géant Casino', 'geant'], ['Casino', 'casino'], ['Monoprix', 'monoprix'], ['Franprix', 'franprix'], ['Cora', 'cora'], ['Match', 'match'], ['Spar', 'spar'], ['Vival', 'vival'],
+  ['Lidl', 'lidl'], ['Aldi', 'aldi'], ['Netto', 'netto'], ['Biocoop', 'biocoop'], ['Naturalia', 'naturalia'], ['La Vie Claire', 'la vie claire'], ['Grand Frais', 'grand frais']
+];
+const _ensNorm = t => _noAcc(t).replace(/[^a-z0-9]+/g, ' ').trim();
+function enseigneOf(name){
+  const s = getStores().find(x => x.name === name);
+  if(s && s.fiche && s.fiche.ens) return s.fiche.ens;
+  const n = ' ' + _ensNorm(name) + ' ';
+  const hit = ENSEIGNES.find(e => e.slice(1).some(k => n.includes(' ' + k + ' ')));
+  if(hit) return hit[0];
+  const w = String(name || '').trim().split(/\s+/)[0] || '';
+  return w ? w.charAt(0).toUpperCase() + w.slice(1) : '';
+}
+
+/* ═══ CARNET D'ADRESSES ══════════════════════════════════════════════════════
+   fc_contacts : chef de secteur, direction, fournisseurs… (saisis ici ou
+   retenus à l'envoi d'un mail). Les contacts des fiches magasin s'y ajoutent
+   à la lecture, sans être recopiés. */
+let book = JSON.parse(localStorage.getItem('fc_contacts') || '[]');
+const saveBook = () => save('fc_contacts', book);
+const isMail = m => /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(m || '');
+function allContacts(){
+  const out = book.map(c => ({ ...c, src: 'book' }));
+  const seen = new Set(out.map(c => (c.m || '').toLowerCase()).filter(Boolean));
+  getStores().forEach(s => ficheContacts(s.fiche).forEach(c => {
+    const k = (c.m || '').toLowerCase();
+    if(k && seen.has(k)) return;
+    if(k) seen.add(k);
+    out.push({ ...c, o: s.name, src: 'store', sid: s.id });
+  }));
+  return out;
+}
+function searchContacts(q, onlyMail){
+  const words = _noAcc(q || '').split(/\s+/).filter(Boolean);
+  return allContacts().filter(c => (!onlyMail || c.m) && words.every(w => _noAcc([c.n, c.r, c.o, c.m].join(' ')).includes(w)))
+    .sort((a, b) => (b.used || '').localeCompare(a.used || '') || (a.n || a.m || '').localeCompare(b.n || b.m || ''));
+}
+/* Adresses envoyées : retenues (date d'usage) pour remonter en tête de la recherche */
+function bookRemember(raw){
+  const now = new Date().toISOString(), known = allContacts();
+  emSplit(raw).forEach(m => {
+    const b = book.find(c => (c.m || '').toLowerCase() === m.toLowerCase());
+    if(b){ b.used = now; return; }
+    if(known.some(c => (c.m || '').toLowerCase() === m.toLowerCase())) return;
+    book.push({ id: genId(), n: '', m, used: now });
+  });
+  saveBook();
+}
+let bookPick = false;   // ouvert depuis un mail : bouton « Ajouter » sur chaque contact
+function openBook(pick){
+  bookPick = !!pick;
+  const q = document.getElementById('bk-q'); if(q) q.value = '';
+  bookEditClose(); renderBook(); openModal('book-modal');
+}
+function renderBook(){
+  const box = document.getElementById('bk-list'); if(!box) return;
+  const list = searchContacts(document.getElementById('bk-q')?.value || '', false);
+  box.innerHTML = list.length ? list.map(c => {
+    const sub = [c.r, c.o, c.m, c.t].filter(Boolean).join(' · ');
+    const add = bookPick && c.m ? `<button class="bk-add" data-m="${escapeHTMLAttr(c.m)}" onclick="emAdd(this.dataset.m);this.textContent='✓ Ajouté'">✉️ Ajouter</button>` : '';
+    const edit = c.src === 'book'
+      ? `<button data-id="${escapeHTMLAttr(c.id)}" onclick="bookEdit(this.dataset.id)" aria-label="Modifier">✏️</button><button data-id="${escapeHTMLAttr(c.id)}" onclick="bookDel(this.dataset.id)" aria-label="Supprimer">🗑</button>`
+      : `<button data-sid="${escapeHTMLAttr(c.sid)}" onclick="closeModal('book-modal');openStoreFiche(this.dataset.sid)" title="Modifier dans la fiche magasin">🏪</button>`;
+    return `<div class="bk-row"><div><b>${escapeHTML(c.n || c.m || 'Sans nom')}</b><small>${escapeHTML(sub)}</small></div>${add}${edit}</div>`;
+  }).join('') : `<div class="empty" style="color:var(--muted)">${allContacts().length ? 'Aucun contact ne correspond' : 'Carnet vide : ajoutez votre chef de secteur, votre direction…'}</div>`;
+}
+let bookEditId = '';
+function bookEdit(id){
+  bookEditId = id || '';
+  const c = book.find(x => x.id === id) || {};
+  [['n','n'],['r','r'],['o','o'],['m','m'],['t','t']].forEach(([f, k]) => { const e = document.getElementById('bk-' + f); if(e) e.value = c[k] || ''; });
+  document.getElementById('bk-form').style.display = 'block';
+  document.getElementById('bk-n').focus();
+}
+function bookEditClose(){ bookEditId = ''; const f = document.getElementById('bk-form'); if(f) f.style.display = 'none'; }
+function bookSave(){
+  const v = k => (document.getElementById('bk-' + k)?.value || '').trim();
+  const c = { n: v('n'), r: v('r'), o: v('o'), m: v('m'), t: v('t') };
+  if(!c.n && !c.m){ toast('❌ Indiquez au moins un nom ou un e-mail'); return; }
+  if(c.m && !isMail(c.m)){ toast('❌ Adresse e-mail incorrecte'); return; }
+  const old = book.find(x => x.id === bookEditId) || (c.m && book.find(x => (x.m || '').toLowerCase() === c.m.toLowerCase()));
+  if(old) Object.assign(old, c); else book.push({ id: genId(), ...c });
+  saveBook(); bookEditClose(); renderBook(); toast('✅ Contact enregistré');
+}
+function bookDel(id){
+  const c = book.find(x => x.id === id); if(!c) return;
+  showConfirm('Supprimer ce contact ?', c.n || c.m || '', () => { book = book.filter(x => x.id !== id); saveBook(); renderBook(); });
+}
+
+/* Destinataires du mail : puces + recherche dans le carnet (#em-to garde la liste) */
+const emSplit = raw => [...new Set(String(raw || '').split(/[\s,;]+/).filter(isMail))];
+function emSetTo(raw){
+  document.getElementById('em-to').value = emSplit(raw).join(', ');
+  const f = document.getElementById('em-find'); if(f) f.value = '';
+  emFindHide(); emRenderChips();
+}
+function emRenderChips(){
+  const box = document.getElementById('em-chips'); if(!box) return;
+  const known = allContacts();
+  box.innerHTML = emSplit(document.getElementById('em-to').value).map((m, i) => {
+    const c = known.find(x => (x.m || '').toLowerCase() === m.toLowerCase());
+    return `<span class="em-chip" title="${escapeHTMLAttr(m)}"><span>${escapeHTML(c && c.n ? c.n : m)}</span><button type="button" onclick="emDel(${i})" aria-label="Retirer">✕</button></span>`;
+  }).join('');
+}
+function emAdd(m){
+  const to = document.getElementById('em-to'), list = emSplit(to.value);
+  if(isMail(m) && !list.some(x => x.toLowerCase() === m.toLowerCase())) list.push(m);
+  to.value = list.join(', ');
+  const f = document.getElementById('em-find'); if(f) f.value = '';
+  emFindHide(); emRenderChips();
+}
+function emDel(i){ const to = document.getElementById('em-to'), list = emSplit(to.value); list.splice(i, 1); to.value = list.join(', '); emRenderChips(); }
+/* Adresse tapée mais pas validée : on la garde quand même à l'envoi */
+function emFlush(){ const f = document.getElementById('em-find'); if(f && isMail(f.value.trim())) emAdd(f.value.trim()); }
+function emFind(){
+  const f = document.getElementById('em-find'), box = document.getElementById('em-sugg'); if(!f || !box) return;
+  const q = f.value.trim(), have = emSplit(document.getElementById('em-to').value).map(x => x.toLowerCase());
+  const list = searchContacts(q, true).filter(c => !have.includes(c.m.toLowerCase())).slice(0, 6);
+  const typed = isMail(q) && !list.some(c => c.m.toLowerCase() === q.toLowerCase())
+    ? `<button type="button" class="qm-sugg-it" data-m="${escapeHTMLAttr(q)}" onmousedown="event.preventDefault()" onclick="emAdd(this.dataset.m)"><span class="qm-sugg-n">➕ ${escapeHTML(q)}</span><span class="qm-sugg-m">Ajouter cette adresse</span></button>` : '';
+  box.innerHTML = typed + list.map(c => `<button type="button" class="qm-sugg-it" data-m="${escapeHTMLAttr(c.m)}" onmousedown="event.preventDefault()" onclick="emAdd(this.dataset.m)">
+      <span class="qm-sugg-n">${escapeHTML(c.n || c.m)}</span><span class="qm-sugg-m">${escapeHTML([c.r, c.o, c.n ? c.m : ''].filter(Boolean).join(' · '))}</span></button>`).join('');
+}
+function emFindHide(){ const box = document.getElementById('em-sugg'); if(box) box.innerHTML = ''; }
+function emFindKey(e){
+  if(e.key !== 'Enter' && e.key !== ',' && e.key !== ';') return;
+  const v = e.target.value.trim(); if(!v) return;
+  e.preventDefault();
+  if(isMail(v)){ emAdd(v); return; }
+  const first = searchContacts(v, true)[0]; if(first) emAdd(first.m);
+}
+
 /* Magasins dont c'est le jour de commande aujourd'hui */
 function storesOrderDayToday(){
   const idx = String((new Date().getDay() + 6) % 7);
@@ -7992,7 +8236,7 @@ function renderBrandBrowser(){
   if(bdState.marque) rows = rows.filter(p => (p.marque || 'Autres') === bdState.marque);
   if(bdState.gamme)  rows = rows.filter(p => (p.gamme || '') === bdState.gamme);
   if(bdState.fam)    rows = rows.filter(p => (p.famille || '') === bdState.fam);
-  if(q) rows = rows.filter(p => _noAcc([p.nom, p.gencod, p.ref, p.famille, p.marque, p.gamme].join(' ')).includes(q));
+  if(q){ const words = _qWords(q); rows = rows.filter(p => prodMatch(p, words)); }
   rows = rows.slice().sort((a,b) => (a.gamme||'').localeCompare(b.gamme||'') || (a.famille||'').localeCompare(b.famille||'') || (a.nom||'').localeCompare(b.nom||''));
   if(title) title.textContent = bdState.marque ? bdState.marque : '🔍 Recherche';
   const bl = bdState.marque && brandLogos[bdState.marque] ? `<div class="bd-tlogo" style="margin:10px 0 0">${'<img src="' + brandLogos[bdState.marque] + '" alt="">'}</div>` : '';
@@ -8142,7 +8386,7 @@ function renderVracBook(){
     const sb = document.getElementById('vb-search'); if(sb) sb.style.display = '';
     body.innerHTML = (list.length ? list.map(x => `<button class="vb-prod" data-k="${escapeHTMLAttr(x.k)}" onclick="vbKey=this.dataset.k;renderVracBook()">
           <div><b>${escapeHTML(x.name)}</b><small>${escapeHTML(x.gencod || 'sans code-barres')} · ${plural(x.arr.length,'mise en rayon','mises en rayon')} · dernière le ${fmtDate(x.last)}</small></div>
-          <span class="vb-chip ${x.nc ? 'nc' : 'ok'}">${x.nc ? plural(x.nc,'non-conformité','non-conformités') : 'Conforme'}</span></button>`).join('')
+          <span class="vb-chip ${x.nc ? 'nc' : 'ok'}">${x.nc ? plural(x.nc,'point signalé','points signalés') : 'Rien à signaler'}</span></button>`).join('')
         : `<div class="empty" style="color:var(--muted)">${vracEntries.length ? 'Aucun produit ne correspond' : 'Aucune mise en rayon enregistrée'}</div>`);
     return;
   }
@@ -8153,7 +8397,7 @@ function renderVracBook(){
   body.innerHTML = `<div class="vb-head">
       ${eanSvg(g.gencod) || `<div class="vb-noean">${escapeHTML(g.gencod || 'Pas de code-barres')}</div>`}
       <div class="vb-stats"><b>${plural(g.arr.length,'mise en rayon','mises en rayon')}</b><span>du ${fmtDate(g.arr[g.arr.length-1].dateRayon)} au ${fmtDate(g.arr[0].dateRayon)}</span>
-      <span class="vb-chip ${g.nc ? 'nc' : 'ok'}">${g.nc ? plural(g.nc,'non-conformité','non-conformités') : 'Hygiène conforme'}</span></div>
+      <span class="vb-chip ${g.nc ? 'nc' : 'ok'}">${g.nc ? plural(g.nc,'point signalé','points signalés') : 'Rien à signaler'}</span></div>
     </div>`
     + g.arr.map(v => {
       const h = v.hyg || {};
@@ -8167,7 +8411,7 @@ function renderVracBook(){
           <span>Sacs</span><b>${v.qty || 1}</b><span>Magasin</span><b>${escapeHTML(v.store || '—')}</b>
           <span>Opérateur</span><b>${escapeHTML(v.byName || displayBy(v.by) || '—')}</b><span>Saisi le</span><b>${v.createdAt ? new Date(v.createdAt).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—'}</b>
         </div>
-        <div class="vb-sec">Contrôle hygiène du silo</div>
+        <div class="vb-sec">Points vérifiés au remplissage</div>
         <div class="vb-hyg">${VRAC_HYG.map(x => `<div class="${h[x.k]==='N'?'n':''}"><span>${escapeHTML(x.l)}</span><b class="${h[x.k]==='O'?'o':h[x.k]==='N'?'n':''}">${h[x.k]==='O'?'OUI':h[x.k]==='N'?'NON':'—'}</b></div>`).join('')}</div>
         ${v.remarque ? `<div class="vb-rem"><b>Action corrective :</b> ${escapeHTML(v.remarque)}</div>` : ''}
         <div class="vb-photos">
@@ -8679,11 +8923,11 @@ function openStoreFolder(sid){
   const vrs = vracEntries.filter(v => v.store === name).sort((a, b) => String(b.dateRayon || '').localeCompare(String(a.dateRayon || '')));
   if(vrs.length){
     const nc = vrs.filter(v => hygSummary(v.hyg).n).length;
-    add('vrac', { ico: '📘', t: 'Cahier de suivi vrac du magasin', d: vrs[0].dateRayon, sub: `${plural(vrs.length, 'mise en rayon', 'mises en rayon')}${nc ? ' · ' + plural(nc, 'non-conformité', 'non-conformités') : ''}`,
+    add('vrac', { ico: '📘', t: 'Cahier de suivi vrac du magasin', d: vrs[0].dateRayon, sub: `${plural(vrs.length, 'mise en rayon', 'mises en rayon')}${nc ? ' · ' + plural(nc, 'point signalé', 'points signalés') : ''}`,
       make: async () => { const list = vrs.slice().sort(vracCahierOrder), ds = list.map(v => v.dateRayon || '').filter(Boolean).sort();
         return { blob: await buildVracCahierPDF(list, { from: ds[0] || '', to: ds[ds.length - 1] || '', storeLabel: name, by: session?.name || '' }),
           filename: `Cahier_vrac_${name.normalize('NFD').replace(/[^\w]+/g, '_')}_${isoDay(new Date())}.pdf`, text: `Cahier de suivi vrac — ${name}`, title: `Cahier vrac · ${name}` }; } });
-    vrs.forEach(v => add('vrac', { ico: '🌰', t: 'Fiche vrac — ' + (v.name || v.gencod || 'produit'), d: v.dateRayon, sub: [v.silo, v.lot ? 'Lot ' + v.lot : '', hygSummary(v.hyg).n ? '⚠ non-conformité' : ''].filter(Boolean).join(' · '),
+    vrs.forEach(v => add('vrac', { ico: '🌰', t: 'Fiche vrac — ' + (v.name || v.gencod || 'produit'), d: v.dateRayon, sub: [v.silo, v.lot ? 'Lot ' + v.lot : '', hygSummary(v.hyg).n ? '⚠ point signalé' : ''].filter(Boolean).join(' · '),
       make: () => vracFicheDoc(v.id), del: `deleteVracEntry('${escapeHTMLAttr(String(v.id))}')` }));
   }
   // Ruptures : un relevé par jour
@@ -9455,7 +9699,7 @@ function openEmailModal(store){
   const storeName=store||'Tous magasins';
   const subj=(t.email_subj||'[Tempo] Urgents').replace('{{store}}',storeName).replace('{{date}}',now);
   const lines=buildAlertText(prods,{store:storeName,date:now,by:session?.name||''});
-  document.getElementById('em-to').value=defTo;
+  emSetTo(defTo);
   document.getElementById('em-subj').value=subj;
   document.getElementById('em-body').value=lines.join('\n');
   const stag=document.getElementById('em-store-tag');
@@ -9490,7 +9734,9 @@ function buildAlertText(prods, meta){
   return out;
 }
 function sendMailto(){
+  emFlush();
   const toRaw=document.getElementById('em-to').value.trim();
+  bookRemember(toRaw);
   if(!toRaw){ toast(T().fill_all); return; }
   const to=encodeURIComponent(toRaw);
   const s=encodeURIComponent(document.getElementById('em-subj').value.trim());
@@ -9519,12 +9765,25 @@ function renderArchive(){
    commandes / pré-commandes, ruptures, démarque, contrôle des prix, vrac,
    dates suivies ; évolution dans le temps, détail par magasin et par marque,
    résumé texte à partager. Tout est calculé sur l'appareil. */
-let stDays = 30, stStore = '';
+let stDays = 30, stStore = '', stQ = '', stEns = '', _stT = null;
+/* Recherche par mot-clé (nom, ville, enseigne) : on redessine après la frappe en gardant le curseur */
+function stSearch(v){
+  stQ = v; stStore = '';
+  clearTimeout(_stT);
+  _stT = setTimeout(() => { renderStats(); const i = document.getElementById('st-q'); if(i){ i.focus(); try{ i.setSelectionRange(v.length, v.length); }catch(e){} } }, 250);
+}
 function renderStats(){
   const el = document.getElementById('stats-body'); if(!el) return;
   const since = Date.now() - stDays * 864e5;
   const inP = d => { const t = new Date(d).getTime(); return t >= since && t <= Date.now() + 864e5; };
-  const okS = s => !stStore || (s || '') === stStore;
+  const storesAll = [...new Set([...getStores().map(s => s.name), ...orders.map(o => o.store), ...visits.map(v => v.store), ...products.map(p => p.magasin)].filter(Boolean))].sort();
+  const ensAll = {}; storesAll.forEach(n => { const e = enseigneOf(n); if(e) ensAll[e] = (ensAll[e] || 0) + 1; });
+  const stWords = _noAcc(stQ).split(/\s+/).filter(Boolean);
+  const stMatch = n => { const s = getStores().find(x => x.name === n), hay = _noAcc([n, s && s.ville, enseigneOf(n)].join(' '));
+    return (!stEns || enseigneOf(n) === stEns) && stWords.every(w => hay.includes(w)); };
+  const stSel = stStore ? new Set([stStore]) : (stEns || stWords.length) ? new Set(storesAll.filter(stMatch)) : null;
+  const okS = s => !stSel || stSel.has(s || '');
+  const stLabel = stStore || [stEns, stQ.trim() && `« ${stQ.trim()} »`].filter(Boolean).join(' · ');
   const O = orders.filter(o => inP(o.date) && okS(o.store));
   const V = visits.filter(v => inP(v.date) && okS(v.store));
   const RU = ruptures.filter(r => inP(r.at) && okS(r.store));
@@ -9541,7 +9800,6 @@ function renderStats(){
   const st = { e:0, o:0, w:0, k:0 }; P.forEach(p => st[statusOf(p.dlc)] += (p.qty || 1));
   const treated = A.filter(a => a.note !== 'Absent').reduce((t, a) => t + (a.qty || 1), 0);
   const lossRate = treated ? DM.reduce((t, a) => t + (a.qty || 1), 0) / treated * 100 : 0;
-  const storesAll = [...new Set([...getStores().map(s => s.name), ...orders.map(o => o.store), ...visits.map(v => v.store), ...products.map(p => p.magasin)].filter(Boolean))].sort();
 
   // Évolution : semaines (≤ 90 j) ou mois (12 mois)
   const byMonth = stDays > 90, buckets = [];
@@ -9612,20 +9870,22 @@ function renderStats(){
   const taux = ordVal ? dmVal / ordVal * 100 : null;
   // « En bref » : des phrases, pas des sigles
   const brief = [];
-  brief.push(V.length ? `🏪 <b>${plural(V.length, 'visite', 'visites')}</b>${stStore ? '' : ` dans ${plural(new Set(V.map(v => v.store)).size, 'magasin', 'magasins')}`}.` : '🏪 Aucune visite enregistrée.');
+  brief.push(V.length ? `🏪 <b>${plural(V.length, 'visite', 'visites')}</b>${new Set(V.map(v => v.store)).size > 1 ? ` dans ${plural(new Set(V.map(v => v.store)).size, 'magasin', 'magasins')}` : ''}.` : '🏪 Aucune visite enregistrée.');
   brief.push(O.length ? `🛒 <b>${plural(colis, 'colis commandé', 'colis commandés')}</b> en ${plural(O.length, 'commande', 'commandes')}${pColis ? `, contre ${pColis} la période d'avant (<span class="${colis >= pColis ? 'ok' : 'ko'}">${colis >= pColis ? 'en hausse' : 'en baisse'}</span>)` : ''}.` : '🛒 Aucune commande sur la période.');
   if(RU.length || pRU.length) brief.push(`🕳 <b>${plural(RU.length, 'rupture relevée', 'ruptures relevées')}</b>${pRU.length ? (RU.length <= pRU.length ? ' — <span class="ok">en baisse</span>' : ' — <span class="ko">en hausse</span>') : ''}.`);
   if(DM.length) brief.push(`♻️ Démarque : <b>${dmVal ? euro(dmVal) : plural(DM.length, 'produit', 'produits')}</b>${taux != null ? `, soit ${taux.toFixed(1).replace('.', ',')} % de ce qui a été commandé` : ''}.`);
   brief.push(toRemove ? `⏰ <b class="ko">${plural(toRemove, 'produit à retirer', 'produits à retirer')}</b> du rayon maintenant (périmés ou sous 2 jours).` : '⏰ Aucun produit à retirer en ce moment.');
   if(PC.length) brief.push(`🏷 Prix : <b>${pct(PC.length - gaps.length, PC.length)}</b> justes sur ${plural(PC.length, 'contrôle', 'contrôles')}.`);
-  if(VR.length) brief.push(`🌰 Vrac : <b>${plural(VR.length, 'mise en rayon', 'mises en rayon')}</b>, hygiène conforme ${hygDone.length ? 'à ' + pct(hygOk.length, hygDone.length) : '(non renseignée)'}.`);
+  if(VR.length) brief.push(`🌰 Vrac : <b>${plural(VR.length, 'mise en rayon', 'mises en rayon')}</b>, ${hygDone.length ? (hygDone.length - hygOk.length ? plural(hygDone.length - hygOk.length, 'remplissage avec un point signalé', 'remplissages avec un point signalé') : 'rien à signaler au remplissage') : 'points de remplissage non renseignés'}.`);
   const nothing = !V.length && !O.length && !RU.length && !DM.length && !P.length && !PC.length && !VR.length;
 
   el.innerHTML = `
     <div class="seg">${[[7,'7 jours'],[30,'30 jours'],[90,'3 mois'],[365,'12 mois']].map(([d,l]) => `<button class="${d===stDays?'on':''}" onclick="stDays=${d};renderStats()">${l}</button>`).join('')}</div>
-    <select class="rf-i" style="margin:8px 0 12px" onchange="stStore=this.value;renderStats()"><option value="">🏪 Tous les magasins</option>${storesAll.map(s => `<option ${s===stStore?'selected':''} value="${escapeHTMLAttr(s)}">${escapeHTML(s)}</option>`).join('')}</select>
+    <input class="rf-i" id="st-q" type="search" autocomplete="off" style="margin-top:8px" placeholder="🔍 Magasin, ville ou mot-clé…" value="${escapeHTMLAttr(stQ)}" oninput="stSearch(this.value)">
+    ${Object.keys(ensAll).length > 1 ? `<div class="st-ens"><button class="${!stEns ? 'on' : ''}" onclick="stEns='';stStore='';renderStats()">Toutes les enseignes</button>${Object.entries(ensAll).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([e, n]) => `<button class="${e === stEns ? 'on' : ''}" data-e="${escapeHTMLAttr(e)}" onclick="stEns=stEns===this.dataset.e?'':this.dataset.e;stStore='';renderStats()">${escapeHTML(e)} <small>${n}</small></button>`).join('')}</div>` : ''}
+    <div class="st-fsum">${stStore ? `🏪 <b>${escapeHTML(stStore)}</b> · <a href="#" onclick="stStore='';renderStats();return false">voir tous les magasins</a>` : stSel ? `${plural(stSel.size, 'magasin correspond', 'magasins correspondent')}${stSel.size ? ' : ' + escapeHTML([...stSel].slice(0, 4).join(', ')) + (stSel.size > 4 ? '…' : '') : ''} · <a href="#" onclick="stQ='';stEns='';renderStats();return false">effacer</a>` : `Tous les magasins (${storesAll.length})`}</div>
     ${nothing ? '<div class="st-card st-empty" style="padding:24px 12px">Pas encore de données sur cette période.<br>Les chiffres apparaîtront au fil des visites, commandes et relevés.</div>' : `
-    <div class="st-card st-brief"><div class="st-bt">En bref · ${perLbl}${stStore ? ' · ' + escapeHTML(stStore) : ''}</div>${brief.map(x => `<p>${x}</p>`).join('')}</div>
+    <div class="st-card st-brief"><div class="st-bt">En bref · ${perLbl}${stLabel ? ' · ' + escapeHTML(stLabel) : ''}</div>${brief.map(x => `<p>${x}</p>`).join('')}</div>
     <div class="st-tiles">
       ${tile('🏪', V.length, 'visites', trend(V.length, pV.length, true))}
       ${tile('🛒', colis, 'colis commandés', trend(colis, pColis, true))}
@@ -9656,17 +9916,17 @@ function renderStats(){
       <div class="st-line"><span>Commandes / pré-commandes</span><b>${O.filter(o => o.kind !== 'precommande').length} / ${O.filter(o => o.kind === 'precommande').length}</b></div>
       <div class="st-line"><span>Produits Fresh traités<small>dont part démarquée</small></span><b>${treated}${treated ? ' · ' + lossRate.toFixed(0) + ' %' : ''}</b></div>
       <div class="st-line"><span>Prix contrôlés<small>écart moyen quand il y en a un</small></span><b>${PC.length}${gaps.length ? ' · ' + euro(gaps.reduce((t, c) => t + (c.shelf - c.pmc), 0) / gaps.length) : ''}</b></div>
-      <div class="st-line"><span>Vrac : non-conformités hygiène</span><b class="${VR.filter(v => hygSummary(v.hyg).n).length ? 'bad' : ''}">${VR.filter(v => hygSummary(v.hyg).n).length} / ${VR.length}</b></div>
+      <div class="st-line"><span>Vrac : remplissages avec un point signalé</span><b class="${VR.filter(v => hygSummary(v.hyg).n).length ? 'bad' : ''}">${VR.filter(v => hygSummary(v.hyg).n).length} / ${VR.length}</b></div>
       ${Object.entries(user).sort((a,b) => b[1]-a[1]).map(([u, n]) => `<div class="st-line"><span>👤 Produits traités par ${escapeHTML(u)}</span><b>${n}</b></div>`).join('')}
     </div></details>`}
     <button class="fresh-scan-btn" style="margin-top:14px" onclick="shareStats()">📤 Partager le résumé</button>`;
   window._statsText = [
-    `Statistiques Tempo — ${stDays === 365 ? '12 mois' : stDays + ' jours'} — ${stStore || 'tous magasins'}`, MAIL_SEP,
+    `Statistiques Tempo — ${stDays === 365 ? '12 mois' : stDays + ' jours'} — ${stLabel || 'tous magasins'}`, MAIL_SEP,
     `Visites : ${V.length}`, `Commandes : ${O.length} (${colis} colis)`, `Ruptures relevées : ${RU.length}`,
     `Démarque : ${dmVal ? euro(dmVal) : DM.length + ' unités'}`, `Écarts de prix : ${gaps.length} sur ${PC.length} contrôles`,
-    `Hygiène vrac conforme : ${hygDone.length ? Math.round(hygOk.length / hygDone.length * 100) + ' %' : '—'}`,
+    `Vrac : ${hygDone.length - hygOk.length} remplissage(s) avec un point signalé sur ${hygDone.length}`,
     `Dates suivies : ${st.e} périmés, ${st.o} sous 2 jours, ${st.w} sous 7 jours`,
-    `Taux de démarque : ${ordVal ? (dmVal / ordVal * 100).toFixed(1).replace('.', ',') + ' %' : '—'} · Prix conformes : ${pct(PC.length - gaps.length, PC.length)} · Hygiène vrac : ${pct(hygOk.length, hygDone.length)}`,
+    `Taux de démarque : ${ordVal ? (dmVal / ordVal * 100).toFixed(1).replace('.', ',') + ' %' : '—'} · Prix conformes : ${pct(PC.length - gaps.length, PC.length)}`,
     `Évolution vs période précédente : colis ${pColis ? ((colis - pColis) / pColis * 100).toFixed(0) + ' %' : '—'}, ruptures ${pRU.length ? ((RU.length - pRU.length) / pRU.length * 100).toFixed(0) + ' %' : '—'}, démarque ${pDmVal ? ((dmVal - pDmVal) / pDmVal * 100).toFixed(0) + ' %' : '—'}`, '',
     'Par magasin :', ...Object.entries(SM).map(([s, r]) => `• ${s} : ${r.vis} visite(s), ${r.col} colis, ${r.rup} rupture(s), démarque ${r.dm ? euro(r.dm) : '—'}`),
     ...mailFoot()
