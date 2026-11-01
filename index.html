@@ -1693,6 +1693,7 @@ html.rot-lock-on #rot-lock{display:flex}
         <div><div class="hm-hello-t" id="hm-hi">Bonjour</div><div class="hm-hello-s" id="hm-date"></div></div>
         <button class="hm-store" id="hm-store" onclick="openStoresManager()">🏪</button>
       </div>
+      <div id="sync-warn" role="alert" onclick="Sync.open()" style="display:none;margin:0 0 12px;padding:12px 14px;border-radius:14px;font-size:13px;font-weight:800;line-height:1.4;cursor:pointer;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.18)"></div>
       <div class="hm-sum">
         <button onclick="openFresh('e')"><b id="hm-e" style="color:#FFB4B4">0</b><span id="hm-l-e">Périmés</span></button>
         <button onclick="openFresh('o')"><b id="hm-o" style="color:#FFD27A">0</b><span id="hm-l-o">Critiques ≤2j</span></button>
@@ -10901,6 +10902,17 @@ const Sync = (function(){
     if(inn) inn.style.display = auth ? 'none' : 'block';
     const em = document.getElementById('sy-who'); if(em && auth) em.textContent = auth.email;
     const adm = document.getElementById('sy-adm'); if(adm) adm.style.display = auth && member && member.role === 'admin' && member.status === 'active' ? 'block' : 'none';
+    // Alerte sur l'accueil : données non sauvegardées sur le serveur (supprimer l'icône ou perdre le téléphone = tout perdre)
+    const w = document.getElementById('sync-warn');
+    if(w){
+      const old = auth && (!lastAt || Date.now() - lastAt > 24 * 3600e3) && !busy;
+      const blocked = auth && member && member.status !== 'active';
+      w.style.display = !auth || old || blocked ? 'block' : 'none';
+      w.style.background = !auth ? '#C62828' : '#D9822B';
+      w.innerHTML = !auth ? '⚠️ Rien n’est sauvegardé : vos données sont sur cet appareil seulement. <u>Touchez ici</u> pour vous connecter avec votre e-mail.'
+        : blocked ? '⚠️ ' + escapeHTML(lastErr || 'Compte pas encore validé : vos données ne sont pas sauvegardées.')
+        : '⚠️ Pas de sauvegarde ' + (lastAt ? 'depuis le ' + fmtDT(lastAt) : 'encore') + '. Ouvrez Tempo avec du réseau pour envoyer vos données.';
+    }
   }
   async function signIn(create){
     const email = (document.getElementById('sy-mail').value || '').trim().toLowerCase();
