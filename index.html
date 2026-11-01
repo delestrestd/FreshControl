@@ -995,6 +995,7 @@ html.rot-lock-on #rot-lock{display:flex}
     <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:12px;padding:12px 14px;margin-bottom:10px">
       <div style="font-size:12px;font-weight:900;color:#1E40AF;margin-bottom:5px">💾 Stockage & destinataires</div>
       <p style="font-size:12px;color:var(--muted);line-height:1.65;font-weight:600"><strong>Stockage principal :</strong> localStorage du navigateur, sur votre appareil. Les données ne quittent pas l'appareil sans action de votre part.<br>
+      <strong>Synchronisation entre appareils</strong> (si vous l'activez dans Réglages) : vos données de travail et photos sont copiées sur un serveur privé Supabase situé en France (Paris), accessible uniquement avec votre compte. Les prix (tarif, PMC) n'y sont jamais envoyés.<br>
       <strong>Services tiers chargés à l'ouverture</strong> (sans transfert de données métier) : jsDelivr (CDN du décodeur ZXing), Google Fonts, OpenStreetMap/Nominatim (uniquement lors d'une recherche d'adresse).<br>
       <strong>Backend optionnel</strong> (si configuré par l'administrateur de votre magasin) : Google Sheets / Google Apps Script pour la synchronisation du catalogue et l'envoi d'alertes e-mail. Dans ce cas, les destinataires sont les services Google et les adresses e-mail que vous saisissez.<br>
       <strong>Hébergement</strong> : Vercel Inc.</p>
@@ -1075,6 +1076,31 @@ html.rot-lock-on #rot-lock{display:flex}
       <div style="display:flex;gap:8px"><button class="af-add" style="flex:1" onclick="bookSave()">💾 Enregistrer</button><button class="scan-reset-btn" style="flex:1" onclick="bookEditClose()">Annuler</button></div>
     </div>
     <div id="bk-list"></div>
+  </div>
+</div>
+
+<div id="sync-modal" class="modal-bg">
+  <div class="modal-sh">
+    <div class="mhd-row" style="margin-bottom:8px"><div class="mhd-t">☁️ Synchronisation</div><button class="mcl" onclick="closeModal('sync-modal')" aria-label="Fermer">✕</button></div>
+    <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:10px">Retrouvez vos magasins, commandes, stocks, vrac, dates et photos sur le téléphone, le PC et l’iPad. Serveur privé en France (Paris). L’appli marche toujours sans réseau : les changements partent dès le retour de la connexion. Les prix (tarif, PMC) restent sur chaque appareil.</div>
+    <div id="sy-st" style="font-size:13px;font-weight:800;margin-bottom:12px"></div>
+    <div id="sy-in">
+      <div class="rf-f"><div class="rf-l">E-mail</div><input class="rf-i" id="sy-mail" type="email" autocomplete="username" placeholder="prenom.nom@exemple.fr"></div>
+      <div class="rf-f"><div class="rf-l">Mot de passe (8 caractères minimum)</div><input class="rf-i" id="sy-pw" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+      <div style="display:flex;gap:8px;margin-top:6px"><button class="af-add" style="flex:1" onclick="Sync.signIn(false)">Se connecter</button><button class="scan-reset-btn" style="flex:1" onclick="Sync.signIn(true)">Créer mon compte</button></div>
+      <div id="sy-msg" style="font-size:12.5px;font-weight:700;margin-top:10px;line-height:1.5"></div>
+      <div style="font-size:11.5px;color:var(--muted);font-weight:600;margin-top:8px">Première fois : « Créer mon compte » sur le téléphone qui a vos données, confirmez l’e-mail, puis « Se connecter ». Sur le PC ensuite, uniquement « Se connecter » avec les mêmes identifiants.</div>
+    </div>
+    <div id="sy-out" style="display:none">
+      <button class="af-add" style="width:100%;margin-bottom:8px" onclick="Sync.run()">🔄 Synchroniser maintenant</button>
+      <button class="scan-reset-btn" style="width:100%" onclick="Sync.signOut()">Arrêter sur cet appareil (<span id="sy-who"></span>)</button>
+      <div id="sy-adm" style="display:none;margin-top:18px">
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px"><div style="font-weight:900;font-size:15px;flex:1">👥 Utilisateurs</div><button class="scan-link-btn" style="padding:6px 10px" onclick="Sync.loadUsers()">↻</button></div>
+        <div id="sy-adm-n" style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:8px"></div>
+        <div style="font-size:11.5px;color:var(--muted);font-weight:600;margin-bottom:10px">Une personne crée son compte dans Réglages › Synchronisation, puis attend votre validation. Chacun ne voit que ses propres données.</div>
+        <div id="sy-users"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1541,7 +1567,7 @@ html.rot-lock-on #rot-lock{display:flex}
       </ul>
 
       <p style="margin:0 0 6px;font-weight:800">4.3. Stockage et destinataires</p>
-      <p style="margin:0 0 6px;color:var(--muted)">Par défaut, l'ensemble des données saisies est stocké <strong>localement dans le navigateur</strong> (localStorage / sessionStorage) de l'Utilisateur. Aucune base de données centralisée n'est mise en œuvre par l'Application elle-même.</p>
+      <p style="margin:0 0 6px;color:var(--muted)">Par défaut, l'ensemble des données saisies est stocké <strong>localement dans le navigateur</strong> (localStorage / sessionStorage) de l'Utilisateur. Si l'Utilisateur active la synchronisation entre appareils, ses données de travail (magasins, commandes, stocks, vrac, dates, visites, contacts) et photos sont également enregistrées sur un serveur <strong>Supabase</strong> (Supabase Inc., sous-traitant au sens de l'article 28 du RGPD), hébergé dans l'Union européenne (AWS, Paris, eu-west-3), dans un espace accessible au seul compte de l'Utilisateur. Les prix d'achat et prix conseillés n'y sont jamais transmis.</p>
       <p style="margin:0 0 6px;color:var(--muted)">Les services tiers chargés à l'ouverture, sans transfert de données métier, sont :</p>
       <ul style="margin:0 0 6px 18px;color:var(--muted);padding-left:0">
         <li><strong>jsDelivr</strong> (Cloudflare / Fastly) — chargement de la bibliothèque ZXing pour le décodage local des codes-barres.</li>
@@ -1553,6 +1579,7 @@ html.rot-lock-on #rot-lock{display:flex}
       <p style="margin:0 0 6px;font-weight:800">4.4. Durées de conservation</p>
       <ul style="margin:0 0 12px 18px;color:var(--muted);padding-left:0">
         <li>Données stockées localement : conservées tant que l'Utilisateur ne les supprime pas (bouton « Réinitialiser » de l'Application ou nettoyage des données du navigateur).</li>
+        <li>Données synchronisées (si activé) : conservées tant que le compte de synchronisation existe ; supprimées sur simple demande à l'éditeur.</li>
         <li>Géolocalisation : non conservée — utilisée uniquement pour la durée de la session.</li>
         <li>Comptes utilisateurs : conservés tant que l'administrateur ne les supprime pas.</li>
         <li>Données envoyées vers Google Sheets / Google Apps Script (si activé) : régies par les durées propres de l'administrateur du compte Google.</li>
@@ -2068,6 +2095,7 @@ html.rot-lock-on #rot-lock{display:flex}
         <div class="rg-it" onclick="backupData()"><div class="rg-ic">💾</div>Sauvegarder mes données</div>
         <div class="rg-it" onclick="document.getElementById('restore-in').click()"><div class="rg-ic">📂</div>Restaurer une sauvegarde</div>
         <div class="rg-it" onclick="toolCSV()"><div class="rg-ic">📥</div>Exporter CSV</div>
+        <div class="rg-it" onclick="Sync.open()"><div class="rg-ic">☁️</div><div>Synchronisation entre appareils<div id="rg-sync-st" style="font-size:11.5px;color:var(--muted);font-weight:700">Non connecté</div></div></div>
         <div class="rg-it" onclick="openBook(false)"><div class="rg-ic">📒</div>Carnet d’adresses</div>
         <div class="rg-it" onclick="openLogos()"><div class="rg-ic">🏷️</div>En-tête et logos des documents</div>
         <div class="rg-it" onclick="document.getElementById('price-in').click()"><div class="rg-ic">💶</div><div>Charger les prix (tarif + PMC)<div id="rg-prices-st" style="font-size:11.5px;color:var(--muted);font-weight:700">Aucun prix chargé</div><div style="font-size:11px;color:var(--muted);font-weight:600">Restent sur ce téléphone, jamais publiés</div></div></div>
@@ -9992,7 +10020,7 @@ function openModal(id){document.getElementById(id).classList.add('on')}
 function closeModal(id){document.getElementById(id).classList.remove('on')}
 /* Date de dernière révision rédactionnelle de cette page (ISO).
    À mettre à jour à chaque modification substantielle du contenu. */
-const LEGAL_NOTICE_LAST_UPDATE = '2026-05-05';
+const LEGAL_NOTICE_LAST_UPDATE = '2026-11-01';
 function openLegalNotice(){
   const dt = document.getElementById('legal-update-date');
   if(dt){
@@ -10517,6 +10545,387 @@ new MutationObserver(muts => {
 function trApply(){ if(lang !== 'fr') _trOn = true; if(_trOn) trDom(document.body); }
 
 trApply();
+
+/* ═══ SYNCHRONISATION ENTRE APPAREILS (Supabase, Paris) ═══════════════════════
+   Le stockage local reste la référence : l'appli marche hors réseau, puis
+   chaque clé de données est fusionnée avec le serveur (table kv, une ligne
+   par clé et par compte). Fusion « à trois » : on garde, par appareil, la
+   dernière version synchronisée (la base) ; ce qui a changé ici et ce qui a
+   changé ailleurs se combinent, fiche par fiche (champ id), au lieu que le
+   dernier appareil écrase l'autre. Les prix (tarif, PMC, relevés de prix)
+   ne partent jamais sur le serveur. Les photos (IndexedDB) vont dans un
+   dossier privé du compte.
+   Données reçues d'un autre appareil : appliquées puis rechargement si l'on
+   est sur l'écran de connexion, sinon bandeau « Actualiser » (l'appli garde
+   ses données en mémoire, une saisie en cours n'est jamais interrompue). */
+const SB_URL = 'https://zoyfjvmqfzqiahemviiu.supabase.co';
+const SB_KEY = 'sb_publishable_HZQciUfctRqqApBPslG1mw_CywunzN8';
+const SYNC_KEYS = ['fc_stores','fc_products','fc_orders','fc_archive','fc_vrac','fc_stock_base','fc_stocks',
+  'fc_ruptures','fc_reprises','fc_planning','fc_visits','fc_contacts','fc_email','fc_email_resp','fc_email_fin',
+  'fc_doc_client','fc_store_enseigne','fc_store_region','fc_store_emoji','fc_gas_url'];
+const Sync = (function(){
+  let auth = null, busy = false, again = false, timer = null, pending = [], lastErr = '', lastAt = 0, member = null;
+  try{ auth = JSON.parse(localStorage.getItem('fc_sync_auth') || 'null'); }catch(e){}
+  try{ lastAt = +localStorage.getItem('fc_sync_at') || 0; }catch(e){}
+  const dev = localStorage.getItem('fc_sync_dev') || (() => { const d = genId(); localStorage.setItem('fc_sync_dev', d); return d; })();
+  const devName = /iPad/.test(navigator.userAgent) ? 'iPad' : /iPhone/.test(navigator.userAgent) ? 'iPhone'
+    : /Android/.test(navigator.userAgent) ? 'Android' : 'PC';
+
+  /* Base (dernière version synchronisée par clé) : IndexedDB, car elle double
+     le volume des données et localStorage est limité à 5 Mo. */
+  let bdb = null;
+  function baseDB(){
+    if(!bdb) bdb = new Promise((res, rej) => {
+      const r = indexedDB.open('fc_sync', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('base');
+      r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+    });
+    return bdb;
+  }
+  const baseOp = (mode, fn) => baseDB().then(d => new Promise((res, rej) => {
+    const t = d.transaction('base', mode), q = fn(t.objectStore('base'));
+    t.oncomplete = () => res(q ? q.result : undefined); t.onerror = t.onabort = () => rej(t.error);
+  }));
+  const baseAll = () => baseDB().then(d => new Promise((res, rej) => {
+    const out = {}, r = d.transaction('base').objectStore('base').openCursor();
+    r.onsuccess = () => { const c = r.result; if(c){ out[c.key] = c.value; c.continue(); } else res(out); };
+    r.onerror = () => rej(r.error);
+  }));
+
+  /* ── Fusion ── */
+  const js = x => JSON.stringify(x);
+  const eq = (a, b) => js(a) === js(b);
+  const isObj = x => x && typeof x === 'object' && !Array.isArray(x);
+  // pref 'r' : appareil jamais synchronisé → en cas de doute, le serveur gagne
+  function mergeVal(B, L, R, pref){
+    if(eq(L, R)) return L;
+    if(B !== undefined && eq(B, L)) return R;
+    if(B !== undefined && eq(B, R)) return L;
+    if(Array.isArray(L) && Array.isArray(R)) return mergeArr(Array.isArray(B) ? B : [], L, R, pref);
+    if(isObj(L) && isObj(R)) return mergeObj(isObj(B) ? B : {}, L, R, pref);
+    return pref === 'r' ? R : L;
+  }
+  function mergeObj(B, L, R, pref){
+    const out = {};
+    new Set([...Object.keys(L), ...Object.keys(R)]).forEach(k => {
+      const inB = k in B, inL = k in L, inR = k in R;
+      if(inL && inR) out[k] = mergeVal(inB ? B[k] : undefined, L[k], R[k], pref);
+      else if(inL){ if(!(inB && eq(B[k], L[k]))) out[k] = L[k]; }        // absent ailleurs : supprimé là-bas si inchangé ici
+      else { if(!(inB && eq(B[k], R[k]))) out[k] = R[k]; }
+    });
+    return out;
+  }
+  function idsOf(arr){
+    const seen = {};
+    return arr.map(x => {
+      const b = isObj(x) && x.id != null ? 'i:' + x.id : 's:' + js(x);
+      seen[b] = (seen[b] || 0) + 1;
+      return b + '#' + seen[b];
+    });
+  }
+  function mergeArr(B, L, R, pref){
+    const bi = idsOf(B), li = idsOf(L), ri = idsOf(R);
+    const Bm = new Map(bi.map((id, i) => [id, B[i]])), Lm = new Map(li.map((id, i) => [id, L[i]])), Rm = new Map(ri.map((id, i) => [id, R[i]]));
+    const outIds = [], outV = new Map();
+    li.forEach((id, i) => {
+      const x = L[i];
+      if(Rm.has(id)){ outIds.push(id); outV.set(id, mergeVal(Bm.get(id), x, Rm.get(id), pref)); }
+      else if(!(Bm.has(id) && eq(Bm.get(id), x))){ outIds.push(id); outV.set(id, x); }   // sinon supprimé ailleurs
+    });
+    ri.forEach((id, i) => {
+      if(Lm.has(id)) return;
+      const y = R[i];
+      if(Bm.has(id) && eq(Bm.get(id), y)) return;                                         // supprimé ici
+      let pos = 0;                                                                        // juste après son voisin côté serveur
+      for(let j = i - 1; j >= 0; j--){ const p = outIds.indexOf(ri[j]); if(p >= 0){ pos = p + 1; break; } }
+      outIds.splice(pos, 0, id); outV.set(id, y);
+    });
+    return outIds.map(id => outV.get(id));
+  }
+  function parse(s){ if(s == null) return undefined; try{ return JSON.parse(s); }catch(e){ return s; } }
+  function merge3(b, l, r){
+    if(l === r) return l;
+    if(l == null) return r;
+    if(r == null) return l;
+    if(b != null && b === l) return r;
+    if(b != null && b === r) return l;
+    const pref = b == null ? 'r' : 'l';
+    const B = parse(b), L = parse(l), R = parse(r);
+    if(typeof L !== 'object' || typeof R !== 'object' || L === null || R === null) return pref === 'r' ? r : l;
+    return js(mergeVal(B, L, R, pref));
+  }
+
+  /* ── Réseau ── */
+  async function api(path, opt = {}, retry = true){
+    const h = Object.assign({ apikey: SB_KEY }, opt.headers || {});
+    if(auth && auth.at) h.Authorization = 'Bearer ' + auth.at;
+    const r = await fetch(SB_URL + path, Object.assign({}, opt, { headers: h }));
+    if(r.status === 401 && retry && auth && auth.rt){ await refresh(); return api(path, opt, false); }
+    return r;
+  }
+  async function authCall(path, body){
+    const r = await fetch(SB_URL + '/auth/v1/' + path, { method: 'POST', headers: { apikey: SB_KEY, 'Content-Type': 'application/json' }, body: js(body) });
+    const j = await r.json().catch(() => ({}));
+    if(!r.ok) throw new Error(authMsg(j));
+    return j;
+  }
+  function authMsg(j){
+    const m = (j && (j.msg || j.error_description || j.message || j.error)) || 'Erreur';
+    if(/invalid login|invalid_grant|credentials/i.test(m)) return 'E-mail ou mot de passe incorrect';
+    if(/not confirmed/i.test(m)) return 'Adresse pas encore confirmée : touchez le lien reçu par e-mail';
+    if(/already registered|already been registered/i.test(m)) return 'Ce compte existe déjà : connectez-vous';
+    if(/password.*(6|characters|short)/i.test(m)) return 'Mot de passe trop court (8 caractères minimum)';
+    if(/rate limit|too many/i.test(m)) return 'Trop de tentatives, réessayez dans quelques minutes';
+    return m;
+  }
+  function keep(j){
+    auth = { at: j.access_token, rt: j.refresh_token, exp: Date.now() + (j.expires_in || 3600) * 1000,
+             email: (j.user && j.user.email) || (auth && auth.email) || '', uid: (j.user && j.user.id) || (auth && auth.uid) };
+    localStorage.setItem('fc_sync_auth', js(auth));
+  }
+  let _rf = null;
+  function refresh(){
+    if(!_rf) _rf = authCall('token?grant_type=refresh_token', { refresh_token: auth.rt }).then(keep)
+      .catch(e => { if(/incorrect|invalid|not found|revoked/i.test(e.message)){ auth = null; localStorage.removeItem('fc_sync_auth'); } throw e; })
+      .finally(() => { _rf = null; });
+    return _rf;
+  }
+  async function fresh(){ if(auth && auth.exp - Date.now() < 120000) await refresh(); }
+  async function put(k, v, rev){
+    const r = await api('/rest/v1/rpc/kv_put', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: js({ p_k: k, p_v: v, p_rev: rev, p_device: devName }) });
+    if(!r.ok) throw new Error('Envoi refusé (' + r.status + ')');
+    return +(await r.json());
+  }
+
+  /* ── Photos : IndexedDB fc_media ↔ dossier privé media/<compte>/ ── */
+  const b64 = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const unb64 = s => decodeURIComponent(escape(atob(s.replace(/-/g, '+').replace(/_/g, '/'))));
+  // Clés des photos sans les charger (il peut y en avoir des centaines de Mo)
+  const mediaKeys = () => new Promise((res, rej) => {
+    const r = indexedDB.open('fc_media', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('photos');
+    r.onerror = () => rej(r.error);
+    r.onsuccess = () => { const q = r.result.transaction('photos').objectStore('photos').getAllKeys(); q.onsuccess = () => res(q.result.map(String)); q.onerror = () => rej(q.error); };
+  });
+  const sentMap = () => { try{ return JSON.parse(localStorage.getItem('fc_sync_media') || '{}'); }catch(e){ return {}; } };
+  // Photo enregistrée ou remplacée ici → à renvoyer
+  const _mput = MediaDB.put;
+  MediaDB.put = (k, v) => _mput(k, v).then(x => { const m = sentMap(); if(m[k]){ delete m[k]; localStorage.setItem('fc_sync_media', js(m)); } if(!String(k).startsWith('draft:')) schedule(); return x; });
+  async function syncMedia(){
+    const sent = sentMap(), keys = await mediaKeys().catch(() => []), have = new Set(keys);
+    for(const k of keys){
+      if(k.startsWith('draft:') || sent[k]) continue;
+      const v = await MediaDB.get(k).catch(() => null);
+      if(typeof v !== 'string') continue;
+      const r = await api('/storage/v1/object/media/' + auth.uid + '/' + b64(k), { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=UTF-8', 'x-upsert': 'true' }, body: v });
+      if(!r.ok) throw new Error('Photo non envoyée (' + r.status + ')');
+      sent[k] = 1; localStorage.setItem('fc_sync_media', js(sent));
+    }
+    let got = 0;
+    for(let off = 0; ; off += 1000){
+      const r = await api('/storage/v1/object/list/media', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: js({ prefix: auth.uid + '/', limit: 1000, offset: off }) });
+      if(!r.ok) break;
+      const list = await r.json();
+      for(const o of list){
+        let k; try{ k = unb64(o.name); }catch(e){ continue; }
+        if(have.has(k)) continue;
+        const g = await api('/storage/v1/object/authenticated/media/' + auth.uid + '/' + o.name);
+        if(!g.ok) continue;
+        await _mput(k, await g.text()); sent[k] = 1; got++;
+      }
+      if(list.length < 1000) break;
+    }
+    localStorage.setItem('fc_sync_media', js(sent));
+    return got;
+  }
+
+  /* ── Synchronisation ── */
+  let _set = null;      // écriture locale sans relancer la synchro
+  function canApply(){ return !session; }
+  async function run(apply){
+    if(!auth){ status(); return; }
+    if(busy){ again = true; return; }
+    if(!navigator.onLine){ lastErr = 'Hors connexion : envoi au retour du réseau'; status(); return; }
+    busy = true; status();
+    try{
+      await fresh();
+      const mr = await api('/rest/v1/members?select=status,role&user_id=eq.' + auth.uid);
+      const ms = mr.ok ? await mr.json() : [];
+      member = ms[0] || null;
+      if(member && member.role === 'admin' && document.getElementById('sync-modal').classList.contains('on')) loadUsers();
+      if(!member || member.status !== 'active'){ lastErr = member && member.status === 'blocked' ? 'Compte bloqué' : 'Compte en attente de validation par l’administrateur'; return; }
+      const lr = await api('/rest/v1/kv?select=k,rev');
+      if(!lr.ok) throw new Error('Serveur injoignable (' + lr.status + ')');
+      const revs = {}; (await lr.json()).forEach(x => { revs[x.k] = +x.rev; });
+      const base = await baseAll();
+      const need = SYNC_KEYS.filter(k => revs[k] && revs[k] !== (base[k] && base[k].rev));
+      const vals = {};
+      if(need.length){
+        const vr = await api('/rest/v1/kv?select=k,v,rev&k=in.(' + need.join(',') + ')');
+        if(!vr.ok) throw new Error('Lecture impossible (' + vr.status + ')');
+        (await vr.json()).forEach(x => { vals[x.k] = x; });
+      }
+      pending = []; let conflict = false;
+      for(const k of SYNC_KEYS){
+        const b = base[k], bv = b ? b.v : null, brev = b ? b.rev : 0;
+        const rrev = revs[k] || 0, rv = rrev === brev ? bv : (vals[k] ? vals[k].v : null);
+        const lv = localStorage.getItem(k);
+        if(lv == null && rv == null) continue;
+        const mv = merge3(bv, lv, rv);
+        let nrev = rrev;
+        if(mv !== rv && mv != null){
+          nrev = await put(k, mv, rrev);
+          if(nrev < 0){ conflict = true; continue; }          // écrit ailleurs entre-temps : on refait un tour
+        }
+        if(mv === lv) await baseOp('readwrite', st => st.put({ v: mv, rev: nrev }, k));
+        else pending.push({ k, v: mv, rev: nrev });
+      }
+      if(conflict) again = true;
+      const gotPh = await syncMedia().catch(e => { console.warn('[Sync] photos', e); return 0; });
+      lastErr = ''; lastAt = Date.now(); localStorage.setItem('fc_sync_at', String(lastAt));
+      if(pending.length && (apply || canApply())) return applyPending();
+      if(pending.length || gotPh) showBar();
+    }catch(e){
+      lastErr = e.message || String(e); console.warn('[Sync]', e);
+    }finally{
+      busy = false; status();
+      if(again){ again = false; setTimeout(() => run(false), 1500); }
+    }
+  }
+  async function applyPending(){
+    for(const p of pending){
+      _set(p.k, p.v);
+      await baseOp('readwrite', st => st.put({ v: p.v, rev: p.rev }, p.k));
+    }
+    pending = [];
+    // Sécurité anti-boucle : au plus 3 rechargements par minute
+    const n = JSON.parse(sessionStorage.getItem('fc_sync_rl') || '[]').filter(t => Date.now() - t < 60000);
+    if(n.length >= 3) return;
+    n.push(Date.now()); sessionStorage.setItem('fc_sync_rl', js(n));
+    location.reload();
+  }
+  function showBar(){
+    if(document.getElementById('sync-bar')) return;
+    const bar = document.createElement('div');
+    bar.id = 'sync-bar'; bar.setAttribute('role', 'status');
+    bar.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:9998;display:flex;align-items:center;gap:10px;'
+      + 'padding:12px max(14px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px));'
+      + 'background:#1E40AF;color:#fff;font:700 13px var(--font,system-ui);box-shadow:0 -6px 20px rgba(0,0,0,.25)';
+    bar.innerHTML = '<span style="flex:1">☁️ Nouveautés reçues de vos autres appareils</span>'
+      + '<button type="button" style="border:0;border-radius:10px;padding:9px 14px;font:900 13px var(--font,system-ui);background:#fff;color:#1E40AF;cursor:pointer">Actualiser</button>'
+      + '<button type="button" aria-label="Plus tard" style="border:0;background:none;color:#fff;font-size:18px;cursor:pointer;padding:4px 6px">✕</button>';
+    const [ok, later] = bar.querySelectorAll('button');
+    ok.onclick = () => { bar.remove(); pending.length ? applyPending() : location.reload(); };
+    later.onclick = () => bar.remove();
+    document.body.appendChild(bar);
+  }
+  function schedule(ms){ if(!auth) return; clearTimeout(timer); timer = setTimeout(() => run(false), ms == null ? 4000 : ms); }
+
+  // Toute écriture d'une clé synchronisée relance un envoi (regroupé, 4 s après)
+  const rawSet = Storage.prototype.setItem, rawDel = Storage.prototype.removeItem;
+  _set = (k, v) => rawSet.call(localStorage, k, v);
+  Storage.prototype.setItem = function(k, v){ rawSet.call(this, k, v); if(this === localStorage && SYNC_KEYS.includes(k)) schedule(); };
+  Storage.prototype.removeItem = function(k){ rawDel.call(this, k); if(this === localStorage && SYNC_KEYS.includes(k)) schedule(); };
+
+  const fmtDT = d => new Date(d).toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  /* ── Accès (administrateur) : valider, bloquer, changer le rôle ── */
+  const ROLES = { admin: 'Administrateur S2D', commercial: 'Commercial', magasin: 'Responsable magasin', employe: 'Employé' };
+  const ST = { pending: ['En attente', '#B45309'], active: ['Actif', '#0A6B47'], blocked: ['Bloqué', '#B91C1C'] };
+  let users = [];
+  async function loadUsers(){
+    const box = document.getElementById('sy-users'); if(!box) return;
+    const r = await api('/rest/v1/members?select=user_id,email,role,status,created_at&order=created_at.desc');
+    if(!r.ok){ box.innerHTML = '<div style="color:var(--muted);font-size:12px">Liste indisponible</div>'; return; }
+    users = await r.json(); renderUsers();
+  }
+  function renderUsers(){
+    const box = document.getElementById('sy-users'); if(!box) return;
+    const order = { pending: 0, active: 1, blocked: 2 };
+    const list = users.slice().sort((a, b) => order[a.status] - order[b.status]);
+    const n = users.filter(u => u.status === 'pending').length;
+    document.getElementById('sy-adm-n').textContent = n ? n + ' demande' + (n > 1 ? 's' : '') + ' en attente' : 'Aucune demande en attente';
+    box.innerHTML = list.map(u => {
+      const me = u.user_id === auth.uid, [stl, stc] = ST[u.status] || [u.status, 'var(--muted)'];
+      const opts = Object.keys(ROLES).map(k => `<option value="${k}"${k === u.role ? ' selected' : ''}>${ROLES[k]}</option>`).join('');
+      return `<div class="glass" style="border-radius:14px;padding:10px 12px;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px"><div style="flex:1;min-width:0;font-weight:800;font-size:13px;overflow:hidden;text-overflow:ellipsis">${escapeHTML(u.email)}${me ? ' (vous)' : ''}</div>
+        <span style="font-size:11px;font-weight:900;color:${stc};background:${stc}1f;border-radius:100px;padding:2px 9px">${stl}</span></div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;margin:2px 0 ${me ? 0 : 8}px">Inscrit le ${fmtDT(u.created_at)}${me ? ' · ' + ROLES[u.role] : ''}</div>
+        ${me ? '' : `<div style="display:flex;gap:6px;flex-wrap:wrap">
+          <select class="rf-i" style="flex:1;min-width:150px;padding:8px" onchange="Sync.setUser('${u.user_id}',{role:this.value})">${opts}</select>
+          ${u.status !== 'active' ? `<button class="af-add" style="padding:8px 12px" onclick="Sync.setUser('${u.user_id}',{status:'active'})">✓ Valider</button>` : ''}
+          ${u.status !== 'blocked' ? `<button class="scan-reset-btn" style="padding:8px 12px;color:#B91C1C" onclick="Sync.setUser('${u.user_id}',{status:'blocked'})">⛔ Bloquer</button>` : ''}
+        </div>`}
+      </div>`;
+    }).join('') || '<div style="color:var(--muted);font-size:12px">Aucun utilisateur</div>';
+  }
+  async function setUser(uid, patch){
+    if(patch.status === 'blocked' && !confirm('Bloquer cet accès ? La personne ne pourra plus synchroniser ses données.')) return renderUsers();
+    try{
+      await fresh();
+      const r = await api('/rest/v1/members?user_id=eq.' + uid, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: js(patch) });
+      if(!r.ok) throw new Error('Modification refusée (' + r.status + ')');
+      toast(patch.status === 'active' ? '✅ Accès validé' : patch.status === 'blocked' ? '⛔ Accès bloqué' : '✅ Rôle modifié');
+    }catch(e){ toast('⚠️ ' + e.message); }
+    loadUsers();
+  }
+
+  /* ── Écran Réglages › Synchronisation ── */
+  function ago(t){
+    if(!t) return 'jamais';
+    const s = Math.round((Date.now() - t) / 1000);
+    return s < 60 ? 'à l’instant' : s < 3600 ? 'il y a ' + Math.round(s / 60) + ' min' : fmtDT(t);
+  }
+  function status(){
+    const line = !auth ? 'Non connecté · données sur cet appareil seulement'
+      : busy ? '🔄 Synchronisation…'
+      : lastErr ? '⚠️ ' + lastErr
+      : '✓ ' + auth.email + ' · ' + ago(lastAt);
+    const a = document.getElementById('rg-sync-st'); if(a) a.textContent = line;
+    const b = document.getElementById('sy-st'); if(b) b.textContent = line;
+    const out = document.getElementById('sy-out'), inn = document.getElementById('sy-in');
+    if(out) out.style.display = auth ? 'block' : 'none';
+    if(inn) inn.style.display = auth ? 'none' : 'block';
+    const em = document.getElementById('sy-who'); if(em && auth) em.textContent = auth.email;
+    const adm = document.getElementById('sy-adm'); if(adm) adm.style.display = auth && member && member.role === 'admin' && member.status === 'active' ? 'block' : 'none';
+  }
+  async function signIn(create){
+    const email = (document.getElementById('sy-mail').value || '').trim().toLowerCase();
+    const pw = document.getElementById('sy-pw').value || '';
+    const msg = document.getElementById('sy-msg');
+    if(!isMail(email)){ msg.textContent = 'Adresse e-mail invalide'; return; }
+    if(pw.length < 8){ msg.textContent = 'Mot de passe : 8 caractères minimum'; return; }
+    msg.textContent = '…';
+    try{
+      if(create){
+        const j = await authCall('signup', { email, password: pw });
+        if(!j.access_token){ msg.textContent = '📩 Compte créé. Touchez le lien reçu par e-mail pour confirmer l’adresse, puis revenez ici et touchez « Se connecter ».'; return; }
+        keep(j);
+      } else keep(await authCall('token?grant_type=password', { email, password: pw }));
+      document.getElementById('sy-pw').value = ''; msg.textContent = '';
+      status(); await run(false);
+      if(!lastErr) toast('☁️ Synchronisation activée');
+    }catch(e){ msg.textContent = '⚠️ ' + e.message; }
+  }
+  function signOut(){
+    if(!confirm('Arrêter la synchronisation sur cet appareil ? Les données restent sur l’appareil et sur le serveur.')) return;
+    const a = auth; auth = null; localStorage.removeItem('fc_sync_auth');
+    if(a) fetch(SB_URL + '/auth/v1/logout', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + a.at } }).catch(() => {});
+    baseOp('readwrite', st => st.clear()).catch(() => {});
+    localStorage.removeItem('fc_sync_media');
+    status();
+  }
+  async function open(){ status(); openModal('sync-modal'); if(member && member.role === 'admin') loadUsers(); }
+
+  // Au démarrage, au retour au premier plan, au retour du réseau, et toutes les 2 min à l'écran
+  if(auth) setTimeout(() => run(false), 800);
+  document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') schedule(500); else if(auth && !busy) run(false); });
+  window.addEventListener('online', () => schedule(500));
+  setInterval(() => { if(document.visibilityState === 'visible') schedule(0); }, 2 * 60 * 1000);
+  document.addEventListener('DOMContentLoaded', status);
+
+  return { run: () => run(true), open, signIn, signOut, status, setUser, loadUsers, _merge3: merge3 };
+})();
 
 /* Cache hors-ligne (sw.js) : ouverture instantanée + utilisation sans réseau.
    Remplace l'ancien kill-switch : le SW revérifie la page à chaque ouverture
