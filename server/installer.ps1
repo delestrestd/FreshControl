@@ -18,6 +18,7 @@ if (-not (Test-Path "$dest\config.json")) {
   $cfg | ConvertTo-Json | Out-File "$dest\config.json" -Encoding utf8
 }
 $node = (Get-Command node).Source
+& $node "$PSScriptRoot\publier-app.js"   # copie de l'appli servie par le serveur
 & $node "$dest\tempo-server.js" --admin $AdminEmail $AdminPassword
 
 # Démarrage automatique (relancé s'il s'arrête)
