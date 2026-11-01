@@ -14,7 +14,7 @@ const { DatabaseSync } = require('node:sqlite');
 
 /* ── Configuration ── */
 let cfg = {};
-try{ cfg = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8')); }catch(e){}
+try{ cfg = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8').replace(/^﻿/, '')); }catch(e){}
 const PORT = +(process.env.PORT || cfg.port || 8787);
 const DATA_DIR = process.env.DATA_DIR || cfg.dataDir || 'D:\\TEMPO-SERVEUR\\data';
 const LAKE_DIR = process.env.LAKE_DIR || cfg.lakeDir || '';
@@ -81,6 +81,8 @@ function cors(req, res){
     res.setHeader('Access-Control-Allow-Headers', 'apikey, authorization, content-type, x-upsert, prefer');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
     res.setHeader('Access-Control-Max-Age', '86400');
+    // Chrome : site public → adresse Tailscale (réseau privé) sur un appareil du tailnet
+    if(req.headers['access-control-request-private-network']) res.setHeader('Access-Control-Allow-Private-Network', 'true');
   }
 }
 function send(res, code, body, type){
@@ -316,6 +318,35 @@ setInterval(() => { if(LAKE_DIR && now() - lastLake.at > 24 * 3600e3) snapshot()
 // Ménage : sessions expirées
 setInterval(() => q('DELETE FROM sessions WHERE expires_at<?').run(now()), 3600e3);
 
+/* ── L'appli elle-même (copie publiée par publier-app.js dans APP_DIR) ──
+   Même adresse que l'API : pas de blocage « réseau local » de Chrome sur les appareils du tailnet. */
+const APP_DIR = process.env.APP_DIR || cfg.appDir || path.join(path.dirname(DATA_DIR), 'app');
+const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8',
+  '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.ico': 'image/x-icon',
+  '.css': 'text/css; charset=utf-8', '.txt': 'text/plain; charset=utf-8', '.webmanifest': 'application/manifest+json' };
+let appHeaders = null;      // en-têtes de sécurité repris de vercel.json (CSP, etc.)
+function headersFor(p){
+  if(!appHeaders){ appHeaders = []; try{ appHeaders = JSON.parse(fs.readFileSync(path.join(APP_DIR, 'vercel.json'), 'utf8').replace(/^﻿/, '')).headers || []; }catch(e){} }
+  const out = {};
+  // vercel.json n'utilise que « /(.*) » (tout) et des chemins exacts
+  for(const h of appHeaders) if(h.source === '/(.*)' || h.source === p) for(const x of h.headers) out[x.key] = x.value;
+  return out;
+}
+function serveStatic(req, res, url){
+  if(req.method !== 'GET' && req.method !== 'HEAD') return send(res, 405, { msg: 'Méthode non permise' });
+  let p = decodeURIComponent(url.pathname); if(p === '/') p = '/index.html';
+  const f = path.normalize(path.join(APP_DIR, p));
+  if(!f.startsWith(path.normalize(APP_DIR + path.sep)) || /[\\/]\./.test(p)) return send(res, 404, { msg: 'Introuvable' });
+  let st; try{ st = fs.statSync(f); }catch(e){}
+  if(!st || !st.isFile()) return send(res, 404, { msg: 'Introuvable' });
+  const h = Object.assign({ 'Content-Type': MIME[path.extname(f).toLowerCase()] || 'application/octet-stream', 'Content-Length': st.size,
+    'Cache-Control': /\.(html|js|json)$/.test(f) ? 'no-cache' : 'public, max-age=3600' }, headersFor(p === '/index.html' ? '/' : p));
+  if(p === '/index.html') Object.assign(h, headersFor('/index.html'));
+  res.writeHead(200, h);
+  if(req.method === 'HEAD') return res.end();
+  fs.createReadStream(f).pipe(res);
+}
+
 /* ── Serveur ── */
 const ADMIN_HTML = path.join(__dirname, 'admin.html');
 const server = http.createServer(async (req, res) => {
@@ -329,8 +360,8 @@ const server = http.createServer(async (req, res) => {
     }
     if(url.pathname.startsWith('/admin/api/')) return await adminRoutes(req, res, url);
     if(url.pathname === '/health') return send(res, 200, { ok: true, users: countUsers() });
-    if(url.pathname === '/') { res.writeHead(302, { Location: '/admin' }); return res.end(); }
-    return await appRoutes(req, res, url);
+    if(/^\/(auth|rest|storage)\/v1\//.test(url.pathname)) return await appRoutes(req, res, url);
+    return serveStatic(req, res, url);
   }catch(e){
     console.error(new Date().toISOString(), e);
     if(!res.headersSent) send(res, 500, { msg: 'Erreur serveur' });
