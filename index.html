@@ -1085,8 +1085,8 @@ html.rot-lock-on #rot-lock{display:flex}
     <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:10px">Retrouvez vos magasins, commandes, stocks, vrac, dates et photos sur le téléphone, le PC et l’iPad. Serveur privé en France (Paris). L’appli marche toujours sans réseau : les changements partent dès le retour de la connexion. Les prix (tarif, PMC) restent sur chaque appareil.</div>
     <div id="sy-st" style="font-size:13px;font-weight:800;margin-bottom:12px"></div>
     <div id="sy-in">
-      <div class="rf-f"><div class="rf-l">E-mail</div><input class="rf-i" id="sy-mail" type="email" autocomplete="username" placeholder="prenom.nom@exemple.fr"></div>
-      <div class="rf-f"><div class="rf-l">Mot de passe (8 caractères minimum)</div><input class="rf-i" id="sy-pw" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+      <div class="rf-f"><div class="rf-l">E-mail</div><input class="rf-i" id="sy-mail" type="email" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="prenom.nom@exemple.fr"></div>
+      <div class="rf-f"><div class="rf-l">Mot de passe (8 caractères minimum)</div><input class="rf-i" id="sy-pw" type="password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="••••••••"></div>
       <div style="display:flex;gap:8px;margin-top:6px"><button class="af-add" style="flex:1" onclick="Sync.signIn(false)">Se connecter</button><button class="scan-reset-btn" style="flex:1" onclick="Sync.signIn(true)">Créer mon compte</button></div>
       <div id="sy-msg" style="font-size:12.5px;font-weight:700;margin-top:10px;line-height:1.5"></div>
       <div style="font-size:11.5px;color:var(--muted);font-weight:600;margin-top:8px">Première fois : « Créer mon compte » sur le téléphone qui a vos données, confirmez l’e-mail, puis « Se connecter ». Sur le PC ensuite, uniquement « Se connecter » avec les mêmes identifiants.</div>
@@ -2592,8 +2592,13 @@ async function doLogin(){
   const err=document.getElementById('l-err');
   const t=T();
   if(!u||!p){err.textContent=t.l_err_empty;return}
-  const candidate=users.find(x=>x.username===u);
-  const ok = candidate ? await verifyPassword(p, candidate.password) : false;
+  let candidate=users.find(x=>x.username===u);
+  let ok = candidate ? await verifyPassword(p, candidate.password) : false;
+  // E-mail + mot de passe de synchronisation : ouvre la session admin de l'appareil et active la synchro
+  if(!ok && u.includes('@')){
+    err.textContent='…';
+    if(await Sync.login(u, p)){ candidate = users.find(x=>x.role==='admin') || users[0]; ok = !!candidate; }
+  }
   if(!ok){
     err.textContent=t.l_err_wrong;
     ['li-u','li-p'].forEach(id=>{const el=document.getElementById(id);el.classList.add('err');setTimeout(()=>el.classList.remove('err'),380)});
@@ -2604,7 +2609,7 @@ async function doLogin(){
     candidate.password = await hashPassword(p);
     save('fc_users', users);
   }
-  session={username:u,name:candidate.name,role:candidate.role,loginTime:Date.now()};
+  session={username:candidate.username,name:candidate.name,role:candidate.role,loginTime:Date.now()};
   sessionStorage.setItem('fc_session',JSON.stringify(session));
   err.textContent='';
   document.getElementById('li-p').value='';
@@ -10907,6 +10912,13 @@ const Sync = (function(){
       if(!lastErr) toast('☁️ Synchronisation activée');
     }catch(e){ msg.textContent = '⚠️ ' + e.message; }
   }
+  // Connexion depuis l'écran d'accueil (e-mail + mot de passe de synchro) : true si le serveur accepte
+  async function login(email, pw){
+    try{ keep(await authCall('token?grant_type=password', { email: email.trim().toLowerCase(), password: pw })); }
+    catch(e){ return false; }
+    status(); setTimeout(() => run(false), 300);
+    return true;
+  }
   function signOut(){
     if(!confirm('Arrêter la synchronisation sur cet appareil ? Les données restent sur l’appareil et sur le serveur.')) return;
     const a = auth; auth = null; localStorage.removeItem('fc_sync_auth');
@@ -10924,9 +10936,27 @@ const Sync = (function(){
   setInterval(() => { if(document.visibilityState === 'visible') schedule(0); }, 2 * 60 * 1000);
   document.addEventListener('DOMContentLoaded', status);
 
-  return { run: () => run(true), open, signIn, signOut, status, setUser, loadUsers, _merge3: merge3 };
+  return { run: () => run(true), open, signIn, login, signOut, status, setUser, loadUsers, _merge3: merge3 };
 })();
 
+/* Œil « afficher le mot de passe » ajouté à chaque champ mot de passe */
+(function(){
+  function addEye(inp){
+    if(inp.dataset.eye) return; inp.dataset.eye='1';
+    const w=document.createElement('span'), mb=getComputedStyle(inp).marginBottom;
+    w.style.cssText='position:relative;display:block;margin-bottom:'+mb;
+    inp.parentNode.insertBefore(w,inp); w.appendChild(inp);
+    inp.style.marginBottom='0'; inp.style.paddingRight='52px';
+    const b=document.createElement('button');
+    b.type='button'; b.textContent='👁'; b.setAttribute('aria-label','Afficher le mot de passe');
+    b.style.cssText='position:absolute;right:4px;top:50%;transform:translateY(-50%);width:44px;height:44px;border:0;background:none;font-size:20px;cursor:pointer;opacity:.75;padding:0';
+    b.onclick=function(){ const show=inp.type==='password'; inp.type=show?'text':'password'; b.textContent=show?'🙈':'👁'; b.setAttribute('aria-label',show?'Masquer le mot de passe':'Afficher le mot de passe'); inp.focus(); };
+    w.appendChild(b);
+  }
+  function scan(){ document.querySelectorAll('input[type="password"]').forEach(addEye); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',scan); else scan();
+  new MutationObserver(scan).observe(document.documentElement,{childList:true,subtree:true});
+})();
 /* Cache hors-ligne (sw.js) : ouverture instantanée + utilisation sans réseau.
    Remplace l'ancien kill-switch : le SW revérifie la page à chaque ouverture
    et prévient quand une nouvelle version est en cache (message 'fc-update').
