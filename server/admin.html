@@ -79,16 +79,17 @@ async function boot(){
   const s = await call('/admin/api/setup').catch(() => ({ empty: false }));
   $('#app').innerHTML = `<div class="card center">
     <h2>${s.empty ? 'Créer le compte administrateur' : 'Connexion administrateur'}</h2>
-    <input id="em" type="email" placeholder="E-mail" autocomplete="username" autocapitalize="none">
+    <input id="em" type="${s.empty ? 'email' : 'text'}" placeholder="${s.empty ? 'E-mail' : 'Identifiant (admin ou e-mail)'}" value="${s.empty ? '' : 'admin'}" autocomplete="username" autocapitalize="none">
     <input id="pw" type="password" placeholder="Mot de passe" autocomplete="${s.empty ? 'new-password' : 'current-password'}">
     <label class="row" style="margin-bottom:10px;font-size:13px"><input type="checkbox" id="show" style="min-height:0"> Afficher le mot de passe</label>
-    <button id="go">${s.empty ? 'Créer' : 'Se connecter'}</button><div class="msg err" id="m"></div></div>`;
+    <button id="go">${s.empty ? 'Créer' : 'Se connecter'}</button><div class="msg err" id="m"></div>
+    ${s.empty ? '' : '<div class="meta">Sur ce PC (http://localhost:8787/admin) : <b>admin / admin</b>. Depuis un autre appareil : admin + votre mot de passe.</div>'}</div>`;
   $('#show').onchange = e => { $('#pw').type = e.target.checked ? 'text' : 'password'; };
   const go = async () => {
     $('#m').textContent = '…';
     try{
-      const body = JSON.stringify({ email: $('#em').value.trim(), password: $('#pw').value });
-      const j = s.empty ? await call('/admin/api/setup', { method: 'POST', body }) : await call('/auth/v1/token?grant_type=password', { method: 'POST', body });
+      const j = s.empty ? await call('/admin/api/setup', { method: 'POST', body: JSON.stringify({ email: $('#em').value.trim(), password: $('#pw').value }) })
+        : await call('/admin/api/login', { method: 'POST', body: JSON.stringify({ user: $('#em').value.trim(), password: $('#pw').value }) });
       tokenA = j.access_token; email = j.user.email;
       sessionStorage.setItem('adm_at', tokenA); sessionStorage.setItem('adm_em', email);
       boot();
