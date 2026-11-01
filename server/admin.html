@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Tempo · Accès</title>
+<style>
+:root{--g:#0A6B47;--g2:#12925F;--bg:#F3F7F5;--card:#fff;--tx:#14231C;--mu:#5E7268;--bd:#DCE6E1;--red:#C93A3A;--or:#D9822B;--font:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#0E1613;--card:#16211C;--tx:#E6F0EB;--mu:#9AB0A5;--bd:#26362E}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 var(--font)}
+header{background:var(--g);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;margin:0;flex:1}
+header small{opacity:.85;font-weight:600}
+main{max-width:1100px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:14px}
+h2{font-size:15px;margin:0 0 12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+input,select,button{font:inherit}
+input,select{padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx);min-height:42px}
+button{padding:9px 14px;border:0;border-radius:10px;background:var(--g);color:#fff;font-weight:700;cursor:pointer;min-height:40px}
+button.ghost{background:transparent;color:var(--tx);border:1.5px solid var(--bd)}
+button.red{background:var(--red)}
+button:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row>input{flex:1;min-width:160px}
+.tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.tabs button{background:var(--card);color:var(--tx);border:1.5px solid var(--bd)}
+.tabs button.on{background:var(--g);color:#fff;border-color:var(--g)}
+.user{border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:10px}
+.user .top{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.user .em{font-weight:800;flex:1;min-width:200px;word-break:break-all}
+.pill{font-size:12px;font-weight:800;padding:3px 10px;border-radius:99px;display:inline-block}
+.p-active{background:#DDF3E8;color:#0A6B47}.p-pending{background:#FCEBD3;color:#8A4B0F}.p-blocked{background:#F8DADA;color:#8E1F1F}
+.meta{color:var(--mu);font-size:13px;margin-top:6px}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.acts button{min-height:36px;padding:7px 11px;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:7px 6px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:top}
+th{color:var(--mu)}
+.msg{font-weight:700;margin-top:10px;min-height:1.2em}
+.err{color:var(--red)}.ok{color:var(--g2)}
+.center{max-width:380px;margin:40px auto}
+.center input{width:100%;margin-bottom:10px}
+.center button{width:100%}
+.stat{display:flex;gap:10px;flex-wrap:wrap}
+.stat div{flex:1;min-width:130px;background:var(--bg);border-radius:10px;padding:10px}
+.stat b{display:block;font-size:22px}
+</style>
+</head>
+<body>
+<header><h1>Tempo · Gestion des accès</h1><small id="who"></small><button class="ghost" id="out" style="display:none;color:#fff;border-color:rgba(255,255,255,.5)">Se déconnecter</button></header>
+<main id="app"></main>
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const dt = t => t ? new Date(t).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) : '—';
+const size = n => n > 1048576 ? (n / 1048576).toFixed(1) + ' Mo' : Math.max(1, Math.round(n / 1024)) + ' Ko';
+const ROLE_FR = { admin: 'Administrateur', commercial: 'Commercial', magasin: 'Magasin', employe: 'Employé' };
+const ST_FR = { active: 'Actif', pending: 'En attente', blocked: 'Bloqué' };
+let tokenA = sessionStorage.getItem('adm_at') || '', email = sessionStorage.getItem('adm_em') || '', tab = 'users', data = null;
+
+async function call(path, opt = {}){
+  const h = Object.assign({ 'Content-Type': 'application/json' }, opt.headers || {});
+  if(tokenA) h.Authorization = 'Bearer ' + tokenA;
+  const r = await fetch(path, Object.assign({}, opt, { headers: h }));
+  if(r.status === 401 && path.startsWith('/admin/api/') && path !== '/admin/api/setup'){ logout(); throw new Error('Session expirée'); }
+  const txt = await r.text(); let j = null; try{ j = txt ? JSON.parse(txt) : null; }catch(e){}
+  if(!r.ok) throw new Error((j && (j.msg || j.error)) || ('Erreur ' + r.status));
+  return j;
+}
+function logout(){ tokenA = ''; sessionStorage.removeItem('adm_at'); sessionStorage.removeItem('adm_em'); boot(); }
+$('#out').onclick = logout;
+
+async function boot(){
+  $('#out').style.display = tokenA ? '' : 'none'; $('#who').textContent = tokenA ? email : '';
+  if(tokenA) return load();
+  const s = await call('/admin/api/setup').catch(() => ({ empty: false }));
+  $('#app').innerHTML = `<div class="card center">
+    <h2>${s.empty ? 'Créer le compte administrateur' : 'Connexion administrateur'}</h2>
+    <input id="em" type="email" placeholder="E-mail" autocomplete="username" autocapitalize="none">
+    <input id="pw" type="password" placeholder="Mot de passe" autocomplete="${s.empty ? 'new-password' : 'current-password'}">
+    <label class="row" style="margin-bottom:10px;font-size:13px"><input type="checkbox" id="show" style="min-height:0"> Afficher le mot de passe</label>
+    <button id="go">${s.empty ? 'Créer' : 'Se connecter'}</button><div class="msg err" id="m"></div></div>`;
+  $('#show').onchange = e => { $('#pw').type = e.target.checked ? 'text' : 'password'; };
+  const go = async () => {
+    $('#m').textContent = '…';
+    try{
+      const body = JSON.stringify({ email: $('#em').value.trim(), password: $('#pw').value });
+      const j = s.empty ? await call('/admin/api/setup', { method: 'POST', body }) : await call('/auth/v1/token?grant_type=password', { method: 'POST', body });
+      tokenA = j.access_token; email = j.user.email;
+      sessionStorage.setItem('adm_at', tokenA); sessionStorage.setItem('adm_em', email);
+      boot();
+    }catch(e){ $('#m').textContent = /invalid/i.test(e.message) ? 'E-mail ou mot de passe incorrect' : e.message; }
+  };
+  $('#go').onclick = go; $('#pw').onkeydown = e => { if(e.key === 'Enter') go(); };
+}
+
+async function load(){
+  try{ data = await call('/admin/api/overview'); }catch(e){ $('#app').innerHTML = `<div class="card err">${esc(e.message)}</div>`; return; }
+  render();
+}
+function render(){
+  const u = data.users, act = u.filter(x => x.status === 'active').length, pend = u.filter(x => x.status === 'pending').length;
+  let h = `<div class="card stat">
+    <div><b>${u.length}</b>comptes</div><div><b>${act}</b>actifs</div><div><b style="color:var(--or)">${pend}</b>en attente</div>
+    <div><b style="font-size:14px;padding-top:6px" class="${data.lake.ok ? 'ok' : 'err'}">${esc(data.lake.msg)}</b>NAS ${data.lake.at ? '· ' + dt(data.lake.at) : ''}</div></div>
+  <div class="tabs"><button data-t="users" class="${tab === 'users' ? 'on' : ''}">Comptes</button><button data-t="new" class="${tab === 'new' ? 'on' : ''}">+ Nouveau compte</button><button data-t="audit" class="${tab === 'audit' ? 'on' : ''}">Journal</button><button data-t="lake" class="${tab === 'lake' ? 'on' : ''}">NAS</button></div>`;
+  if(tab === 'users') h += `<div class="card"><h2>Comptes et droits</h2>${u.map(userCard).join('') || 'Aucun compte'}</div>`;
+  if(tab === 'new') h += `<div class="card"><h2>Créer un compte</h2>
+    <div class="row" style="margin-bottom:8px"><input id="n-name" placeholder="Nom (facultatif)"><input id="n-em" type="email" placeholder="E-mail" autocapitalize="none"></div>
+    <div class="row"><input id="n-pw" type="text" placeholder="Mot de passe (8 caractères min.)" autocomplete="off">
+    <select id="n-role">${data.roles.map(r => `<option value="${r}" ${r === 'commercial' ? 'selected' : ''}>${ROLE_FR[r]}</option>`).join('')}</select>
+    <button id="n-go">Créer</button></div><div class="meta">Le compte est actif tout de suite. Donnez l’e-mail et le mot de passe à la personne : elle se connecte sur le premier écran de Tempo.</div><div class="msg" id="n-m"></div></div>`;
+  if(tab === 'audit') h += `<div class="card"><h2>Journal des accès et actions</h2><div id="aud">Chargement…</div></div>`;
+  if(tab === 'lake') h += `<div class="card"><h2>Copie vers le NAS</h2><div class="meta">Dossier : <b>${esc(data.lake.dir || 'non configuré')}</b><br>Copie automatique une fois par jour (base complète, données lisibles par compte, photos).</div>
+    <div class="acts"><button id="lk">Copier maintenant</button></div><div class="msg" id="lk-m"></div></div>`;
+  $('#app').innerHTML = h;
+  document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => { tab = b.dataset.t; render(); });
+  document.querySelectorAll('[data-a]').forEach(b => b.onclick = () => action(b.dataset.a, b.dataset.id));
+  document.querySelectorAll('select[data-role]').forEach(s => s.onchange = () => patch(s.dataset.role, { role: s.value }));
+  if(tab === 'new') $('#n-go').onclick = createUser;
+  if(tab === 'audit') loadAudit();
+  if(tab === 'lake') $('#lk').onclick = async () => { $('#lk-m').textContent = '…'; try{ const r = await call('/admin/api/lake', { method: 'POST' }); $('#lk-m').className = 'msg ok'; $('#lk-m').textContent = r.msg; }catch(e){ $('#lk-m').className = 'msg err'; $('#lk-m').textContent = e.message; } };
+}
+function userCard(x){
+  const self = x.id === data.me;
+  const dev = x.sessions.map(s => `${esc(devName(s.ua))} · ${dt(s.seen)}`).join('<br>') || 'Aucun appareil connecté';
+  return `<div class="user"><div class="top">
+    <div class="em">${esc(x.name ? x.name + ' · ' : '')}${esc(x.email)}${self ? ' <span class="pill p-active">vous</span>' : ''}</div>
+    <span class="pill p-${x.status}">${ST_FR[x.status]}</span>
+    <select data-role="${x.id}" ${self ? 'disabled' : ''}>${data.roles.map(r => `<option value="${r}" ${r === x.role ? 'selected' : ''}>${ROLE_FR[r]}</option>`).join('')}</select></div>
+    <div class="meta">Créé le ${dt(x.created_at)} · dernière connexion ${dt(x.last_login)} · dernière synchro ${dt(x.lastSync)}${x.lastDevice ? ' (' + esc(x.lastDevice) + ')' : ''} · ${x.keys} fiches, ${x.photos} photos, ${size(x.size)}</div>
+    <div class="meta"><b>Appareils :</b><br>${dev}</div>
+    <div class="acts">
+      ${x.status !== 'active' ? `<button data-a="activate" data-id="${x.id}">✓ Valider</button>` : ''}
+      ${x.status !== 'blocked' && !self ? `<button class="ghost" data-a="block" data-id="${x.id}">⛔ Bloquer</button>` : ''}
+      <button class="ghost" data-a="pw" data-id="${x.id}">🔑 Nouveau mot de passe</button>
+      ${!self ? `<button class="ghost" data-a="kick" data-id="${x.id}">Déconnecter ses appareils</button>` : ''}
+      <button class="ghost" data-a="export" data-id="${x.id}">⬇ Exporter ses données</button>
+      ${!self ? `<button class="red" data-a="del" data-id="${x.id}">Supprimer</button>` : ''}
+    </div></div>`;
+}
+function devName(ua){
+  ua = ua || '';
+  return /iPhone/.test(ua) ? 'iPhone' : /iPad/.test(ua) ? 'iPad' : /Android/.test(ua) ? 'Android' : /Windows/.test(ua) ? 'PC Windows' : /Mac/.test(ua) ? 'Mac' : 'Appareil';
+}
+async function patch(id, body){ try{ await call('/admin/api/users/' + id, { method: 'PATCH', body: JSON.stringify(body) }); await load(); }catch(e){ alert(e.message); load(); } }
+async function action(a, id){
+  const x = data.users.find(y => y.id === id);
+  try{
+    if(a === 'activate') return patch(id, { status: 'active' });
+    if(a === 'block'){ if(confirm('Bloquer ' + x.email + ' ? Ses appareils sont déconnectés.')) return patch(id, { status: 'blocked' }); return; }
+    if(a === 'pw'){
+      const pw = prompt('Nouveau mot de passe pour ' + x.email + ' (8 caractères minimum) :'); if(!pw) return;
+      await call('/admin/api/users/' + id + '/password', { method: 'POST', body: JSON.stringify({ password: pw }) });
+      alert('Mot de passe changé : ' + pw); return load();
+    }
+    if(a === 'kick'){ if(!confirm('Déconnecter tous les appareils de ' + x.email + ' ?')) return; await call('/admin/api/users/' + id + '/sessions', { method: 'DELETE' }); return load(); }
+    if(a === 'export'){
+      const r = await fetch('/admin/api/users/' + id + '/export', { headers: { Authorization: 'Bearer ' + tokenA } });
+      if(!r.ok) throw new Error('Export impossible');
+      const url = URL.createObjectURL(await r.blob()), l = document.createElement('a');
+      l.href = url; l.download = 'tempo-' + x.email + '.json'; l.click(); setTimeout(() => URL.revokeObjectURL(url), 5000); return;
+    }
+    if(a === 'del'){
+      if(prompt('Supprimer ' + x.email + ' ET toutes ses données sur le serveur ? Tapez SUPPRIMER pour confirmer.') !== 'SUPPRIMER') return;
+      await call('/admin/api/users/' + id, { method: 'DELETE' }); return load();
+    }
+  }catch(e){ alert(e.message); }
+}
+async function createUser(){
+  const m = $('#n-m'); m.className = 'msg'; m.textContent = '…';
+  try{
+    await call('/admin/api/users', { method: 'POST', body: JSON.stringify({ name: $('#n-name').value.trim(), email: $('#n-em').value.trim(), password: $('#n-pw').value, role: $('#n-role').value }) });
+    m.className = 'msg ok'; m.textContent = 'Compte créé : ' + $('#n-em').value.trim() + ' / ' + $('#n-pw').value;
+    data = await call('/admin/api/overview');
+  }catch(e){ m.className = 'msg err'; m.textContent = e.message; }
+}
+async function loadAudit(){
+  try{
+    const rows = await call('/admin/api/audit');
+    $('#aud').innerHTML = `<table><tr><th>Quand</th><th>Qui</th><th>Action</th><th>Sur</th><th>Détail</th></tr>${rows.map(r => `<tr><td>${dt(r.at)}</td><td>${esc(r.actor)}</td><td>${esc(r.action)}</td><td>${esc(r.target)}</td><td>${esc(r.action === 'connexion' ? devName(r.detail) : r.detail)}</td></tr>`).join('')}</table>`;
+  }catch(e){ $('#aud').textContent = e.message; }
+}
+boot();
+</script>
+</body>
+</html>

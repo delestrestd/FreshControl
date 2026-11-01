@@ -10564,7 +10564,8 @@ trApply();
    Données reçues d'un autre appareil : appliquées puis rechargement si l'on
    est sur l'écran de connexion, sinon bandeau « Actualiser » (l'appli garde
    ses données en mémoire, une saisie en cours n'est jamais interrompue). */
-const SB_URL = 'https://zoyfjvmqfzqiahemviiu.supabase.co';
+// Serveur : Supabase par défaut, ou le serveur maison (server/tempo-server.js) si fc_sync_srv est renseigné
+const SB_URL = (() => { try{ return localStorage.getItem('fc_sync_srv') || ''; }catch(e){ return ''; } })() || 'https://zoyfjvmqfzqiahemviiu.supabase.co';
 const SB_KEY = 'sb_publishable_HZQciUfctRqqApBPslG1mw_CywunzN8';
 const SYNC_KEYS = ['fc_stores','fc_products','fc_orders','fc_archive','fc_vrac','fc_stock_base','fc_stocks',
   'fc_ruptures','fc_reprises','fc_planning','fc_visits','fc_contacts','fc_email','fc_email_resp','fc_email_fin',
@@ -10909,7 +10910,7 @@ const Sync = (function(){
         keep(j);
       } else keep(await authCall('token?grant_type=password', { email, password: pw }));
       document.getElementById('sy-pw').value = ''; msg.textContent = '';
-      status(); await run(false);
+      status(); await run(true);
       if(!lastErr) toast('☁️ Synchronisation activée');
     }catch(e){ msg.textContent = '⚠️ ' + e.message; }
   }
@@ -10917,7 +10918,7 @@ const Sync = (function(){
   async function login(email, pw){
     try{ keep(await authCall('token?grant_type=password', { email: email.trim().toLowerCase(), password: pw })); }
     catch(e){ return false; }
-    status(); setTimeout(() => run(false), 300);
+    status(); setTimeout(() => run(true), 300);   // première connexion : données reçues affichées tout de suite
     return true;
   }
   function signOut(){
