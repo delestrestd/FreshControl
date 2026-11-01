@@ -98,6 +98,9 @@ function readBody(req, max = 30 * 1024 * 1024){
   });
 }
 const json = async req => { try{ return JSON.parse(await readBody(req) || '{}'); }catch(e){ return {}; } };
+// Requête tapée sur ce PC (pas relayée par Tailscale, qui ajoute X-Forwarded-For)
+const isLocal = req => /^(::1|127\.0\.0\.1|::ffff:127\.0\.0\.1)$/.test(req.socket.remoteAddress || '') && !req.headers['x-forwarded-for']
+  && !req.headers['tailscale-user-login'] && /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(req.headers.host || '');
 const ipOf = req => (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
 const safeName = s => /^[A-Za-z0-9_-]{1,400}$/.test(s);
 const mediaDir = uid => path.join(DATA_DIR, 'media', uid);
@@ -223,6 +226,16 @@ async function adminRoutes(req, res, url){
     if(String(b.password || '').length < 8) return send(res, 400, { msg: 'Mot de passe : 8 caractères minimum' });
     const u = createUser(String(b.email || ''), String(b.password), 'admin', 'active', b.name);
     audit(u.email, 'création du premier admin', u.email, '', ip);
+    return send(res, 200, issue(u, 'admin', req.headers['user-agent'], ip));
+  }
+  // Identifiant « admin » : sur ce PC, admin / admin ; depuis Internet, admin + le vrai mot de passe de l'administrateur
+  if(p === '/login' && req.method === 'POST'){
+    const b = await json(req), id = String(b.user || '').trim().toLowerCase(), pw = String(b.password || ''), key = ip + '|' + id;
+    if(tooMany(key)) return send(res, 429, { msg: 'Trop de tentatives, réessayez dans 15 minutes' });
+    const u = id === 'admin' ? q("SELECT * FROM users WHERE role='admin' AND status='active' ORDER BY created_at LIMIT 1").get() : q('SELECT * FROM users WHERE email=?').get(id);
+    const ok = u && (checkPw(pw, u.pw) || (id === 'admin' && pw === 'admin' && isLocal(req)));
+    if(!ok || !isAdmin(u)){ failed(key); audit(id, 'connexion admin refusée', id, '', ip); return send(res, 400, { msg: 'Identifiant ou mot de passe incorrect' }); }
+    audit(u.email, 'connexion admin', id, isLocal(req) ? 'sur le PC' : 'à distance', ip);
     return send(res, 200, issue(u, 'admin', req.headers['user-agent'], ip));
   }
   const me = userFromToken(req);
