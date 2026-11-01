@@ -1,0 +1,6 @@
+{
+  "port": 8787,
+  "dataDir": "D:\\TEMPO-SERVEUR\\data",
+  "lakeDir": "",
+  "origins": "https://fresh-control.vercel.app"
+}

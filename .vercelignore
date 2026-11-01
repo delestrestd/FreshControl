@@ -11,3 +11,4 @@ FreshControl_Catalogues/
 *.tmp
 files/
 scratch/
+server/
